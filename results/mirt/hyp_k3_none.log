@@ -1,0 +1,90 @@
+
+Data: 3714 obs / 737 models / 75 benchmarks (drop_low_obs=False)
+
+======================================================================
+Fitting MIRT  K = 3  (signed, sampler=nutpie)  (3714 obs / 737 models / 75 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 428.5s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=3: raw max r̂=2.253 (label-switching, ignore for K>1)  divergences=0 / 4000
+        identified: eta r̂ max=1.568 mean=1.034 (frac>1.01=0.43)  D r̂=1.557  sigma_b r̂=1.549
+  signed fit: per-draw rotation alignment (varimax)...
+
+── aligned column-norm spectrum ||A[:,k]|| (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       7.634        6.709         8.228              2.107
+axis2       3.623        3.140         4.838              1.022
+axis3       3.546        3.119         4.042                NaN
+
+── axes identified by signed (self-identifying); no rotation applied ──
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3
+axis1  1.000  0.045 -0.092
+axis2  0.045  1.000 -0.030
+axis3 -0.092 -0.030  1.000
+
+── axis1  top loadings (identified bundle) ──
+               benchmark                category  loading_median
+               ARC-AGI-2       Core AGI Progress        2.746965
+OTIS Mock AIME 2024-2025 High End Math Reasoning        2.023044
+                 ARC-AGI       Core AGI Progress        1.970412
+            MATH Level 5 High End Math Reasoning        1.815261
+     FrontierMath Tier 4 High End Math Reasoning        1.717974
+          Aider Polyglot          Autonomous SWE        1.637831
+            FrontierMath High End Math Reasoning        1.429849
+           TerminalBench    Agentic Computer Use        1.276948
+                 Cybench    Agentic Computer Use        1.257226
+              EnigmaEval       General Reasoning        1.249732
+
+── axis2  top loadings (identified bundle) ──
+               benchmark                  category  loading_median
+OTIS Mock AIME 2024-2025   High End Math Reasoning        1.139708
+            MATH Level 5   High End Math Reasoning        0.882834
+                   CSQA2         General Reasoning       -0.753278
+               ARC (AI2) Domain Specific Questions       -0.744493
+              OpenBookQA Domain Specific Questions       -0.737750
+       The Agent Company      Agentic Computer Use       -0.707947
+         Adversarial NLI         General Reasoning       -0.640466
+                 Cybench      Agentic Computer Use       -0.630457
+               GSO-Bench            Autonomous SWE       -0.533214
+   OS World (Screenshot)      Agentic Computer Use       -0.505466
+
+── axis3  top loadings (identified bundle) ──
+            benchmark                  category  loading_median
+                GSM8K Domain Specific Questions        1.459081
+OS World (Screenshot)      Agentic Computer Use       -0.830977
+                 MMLU Domain Specific Questions        0.765307
+ BIG-Bench Hard (BBH) Domain Specific Questions        0.759106
+   MMLU Pro Chemistry                 Chemistry        0.640687
+            ARC (AI2) Domain Specific Questions        0.631857
+             TriviaQA Domain Specific Questions        0.568232
+     MMLU Pro Biology                   Biology        0.552688
+            HellaSwag         General Reasoning        0.532548
+                BoolQ         General Reasoning        0.523060
+
+── alignment-method comparison (varimax / wop / matchalign / promax) ──
+  varimax    sign-confident [axis1 +48/-7  axis2 +8/-11  axis3 +18/-1]  chain-reprod 0.98/0.86/0.83  aligned-rhat 1.596
+  wop        sign-confident [axis1 +50/-10  axis2 +10/-24  axis3 +27/-4]  chain-reprod 0.99/0.86/0.86  aligned-rhat 1.605
+  matchalign sign-confident [axis1 +48/-7  axis2 +8/-11  axis3 +16/-1]  chain-reprod 0.98/0.86/0.83  aligned-rhat 1.596
+  promax     sign-confident [axis1 +40/-0  axis2 +18/-6  axis3 +8/-11]  chain-reprod 0.98/0.63/0.72  aligned-rhat 1.597
+  method agreement per axis (|corr| across method pairs):
+        min  median
+axis               
+axis1 0.993   0.997
+axis2 0.979   0.992
+axis3 0.941   0.977
+  per-chain divergence fraction: [0.00, 0.00, 0.00, 0.00]
+
+── axis hypothesis scorecard (free axes vs hypotheses) ──
+ axis  anthropic_ability_corr  human_gap_loading_corr  multimodal_loading_corr  n_informed_models  n_gap_benchmarks
+axis1                   0.187                   0.069                   -0.021                235                37
+axis2                  -0.665                  -0.286                    0.072                 28                37
+axis3                  -0.072                   0.071                   -0.031                 38                37
+
+── PPC goodness-of-fit ──
+  MIRT (K=3): R²=0.975  RMSE=0.043  MAE=0.028
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt
+Figures: run diagnostics/plot_mirt.py

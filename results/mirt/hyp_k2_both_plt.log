@@ -1,0 +1,81 @@
+  NOTE: signed + structured theta priors — rotation symmetry is only approximate (the ordered blocks weakly anchor the orientation); per-draw alignment is an approximation. See build_mirt_model's warning.
+  structured-theta prior; writing to /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_plt
+
+Data: 3714 obs / 737 models / 75 benchmarks (drop_low_obs=False)
+  --lineage-prior: 35 chains / 140 nodes / 412 chained models
+  --plt: axis1<-GPQA Diamond | axis2<-GSO-Bench
+
+======================================================================
+Fitting MIRT  K = 2  (signed, ordered-human prior, lineage prior, PLT (2 founders), sampler=nutpie)  (3714 obs / 737 models / 75 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/model_mirt.py:345: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 271.5s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=2: raw max r̂=2.423 (label-switching, ignore for K>1)  divergences=0 / 4000
+        identified: eta r̂ max=1.614 mean=1.046 (frac>1.01=0.52)  D r̂=1.804  sigma_b r̂=1.581
+  signed fit: per-draw rotation alignment (varimax)...
+
+── aligned column-norm spectrum ||A[:,k]|| (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       8.368        5.993        11.576              1.440
+axis2       5.810        4.319        10.126                NaN
+
+── axes identified by signed (self-identifying); no rotation applied ──
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2
+axis1  1.000  0.335
+axis2  0.335  1.000
+
+── axis1  top loadings (identified bundle) ──
+               benchmark                 category  loading_median
+               ARC-AGI-2        Core AGI Progress        3.129020
+                 ARC-AGI        Core AGI Progress        2.165713
+          Aider Polyglot           Autonomous SWE        2.020232
+                 Cybench     Agentic Computer Use        1.980014
+     FrontierMath Tier 4  High End Math Reasoning        1.699355
+               GSO-Bench           Autonomous SWE        1.664268
+                CAD-Eval Multimodal Understanding        1.586910
+OTIS Mock AIME 2024-2025  High End Math Reasoning        1.527692
+           TerminalBench     Agentic Computer Use        1.465168
+            MATH Level 5  High End Math Reasoning        1.383389
+
+── axis2  top loadings (identified bundle) ──
+               benchmark                  category  loading_median
+OTIS Mock AIME 2024-2025   High End Math Reasoning        2.298174
+            MATH Level 5   High End Math Reasoning        1.748176
+           Chess Puzzles         General Reasoning        1.571637
+                   GSM8K Domain Specific Questions        1.208981
+             BioLP-bench                   Biology        1.108652
+            FrontierMath   High End Math Reasoning        1.054417
+      MMLU Pro Chemistry                 Chemistry        0.969253
+    Humanity's Last Exam Domain Specific Questions        0.858551
+     FrontierMath Tier 4   High End Math Reasoning        0.825455
+         VisualToolBench  Multimodal Understanding        0.798560
+
+── alignment-method comparison (varimax / wop / matchalign / promax) ──
+  varimax    sign-confident [axis1 +54/-0  axis2 +6/-0]  chain-reprod 0.94/0.57  aligned-rhat 2.214
+  wop        sign-confident [axis1 +64/-0  axis2 +29/-5]  chain-reprod 0.95/0.55  aligned-rhat 1.883
+  matchalign sign-confident [axis1 +57/-0  axis2 +0/-0]  chain-reprod 0.91/0.58  aligned-rhat 1.822
+  promax     sign-confident [axis1 +47/-0  axis2 +14/-0]  chain-reprod 0.95/0.61  aligned-rhat 1.936
+  method agreement per axis (|corr| across method pairs):
+        min  median
+axis               
+axis1 0.712   0.924
+axis2 0.981   0.990
+  per-chain divergence fraction: [0.00, 0.00, 0.00, 0.00]
+
+── axis hypothesis scorecard (free axes vs hypotheses) ──
+ axis  anthropic_ability_corr  human_gap_loading_corr  multimodal_loading_corr  n_informed_models  n_gap_benchmarks
+axis1                   0.741                   0.346                   -0.059                 21                37
+axis2                     NaN                  -0.124                   -0.031                  1                37
+
+── PPC goodness-of-fit ──
+  MIRT (K=2): R²=0.959  RMSE=0.054  MAE=0.038
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_plt
+Figures: run diagnostics/plot_mirt.py

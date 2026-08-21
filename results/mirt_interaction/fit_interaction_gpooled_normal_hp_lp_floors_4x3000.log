@@ -1,0 +1,21 @@
+--floors: fixed-c 3PL; clipped 37 below-floor scores up to their benchmark chance floor
+
+INTERACTION MIRT  K=3  axes=['Reasoning', 'Knowledge', 'Agentic']
+data: 758 models, 96 benchmarks, 4274 obs
+loading prior: normal (non-negative cells, no founders)
+priors: human=True  lineage=True  interaction_scale=0.15  gamma_pooling=pooled  floors=True
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+
+── convergence (global; A/theta rotation-identified by PLT) ──
+  max r-hat=2.4121  min ESS=5  divergences=0/12000
+── identified (eta incl. interaction + D/sigma_b) ──
+  eta max r-hat=1.0014  D max r-hat=1.0030
+── fit ──
+  Bayesian R²=0.9537  RMSE=0.0477  MAE=0.0320
+── interaction gamma (>= 0; p = P(gamma > prior median), 0.5 = no signal) ──
+  prior median 0.101 logits-per-unit-product
+    ReasoningxKnowledge    gamma=0.004 [0.000, 0.016]  p=0.00
+    ReasoningxAgentic      gamma=0.004 [0.000, 0.018]  p=0.00
+    KnowledgexAgentic      gamma=0.004 [0.000, 0.016]  p=0.00
+
+artefacts -> /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_interaction/  (tag '_interaction_gpooled_normal_hp_lp_floors')

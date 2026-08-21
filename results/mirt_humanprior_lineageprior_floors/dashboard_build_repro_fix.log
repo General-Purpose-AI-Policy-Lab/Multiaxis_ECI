@@ -1,0 +1,28 @@
+/Users/yassineessifi/Desktop/ECI_Bayesian/data.py:608: UserWarning: human_baselines.csv: 1 human tier(s) lost ALL their benchmarks to the curated exclusions and leave the fit: ['Committee of Skilled Generalists']. Add a baseline on a non-excluded benchmark to keep the tier.
+  warnings.warn(
+   curated exclusions: 54 models have no observations left and leave the fit entirely (DeepSeek-V3-Base, Mistral-7B-Instruct-v0.1, claude-3-7-sonnet-20250219_12K, claude-3-7-sonnet-20250219_1K, ...)
+cached: K=1 · unidimensional · curated exclusions · no priors
+cached: K=1 · unidimensional · curated exclusions · human+lineage priors
+cached: K=3 · human+lineage priors · SG scores removed · chain 4 excluded (majority mode) · frontier forecast
+cached: K=3 · human+lineage priors · SG kept · no floors (islands baseline)
+cached: K=3 · human+lineage priors · SG kept · fixed-c 3PL chance floors + clip · 8×4000 · chain 1 excluded (majority solution)
+rendering K=3 · human+lineage priors · SG kept · fixed-c 3PL floors · positive loadings · non-negative rotation (pure bundles, no contrast) (exploratory) …
+  LOO/WAIC ΔELPD figure restricted to the modal 3387-obs group (2 fits); omitted ['K=3 both · −SG', 'K=3 both · +SG', 'K=3 both · +SG · floors', 'K=3 both · +SG · floors · positive'].
+
+                               fit  K  eta_rhat  div_pct  axis1_repro  axis2_repro  axis3_repro
+                               K=1  1     1.012      0.0        1.000          NaN          NaN
+                          K=1 both  1     1.003      0.0        1.000          NaN          NaN
+                    K=3 both · −SG  3     1.507      7.8        0.985        0.929        0.790
+                    K=3 both · +SG  3     1.184      8.1        0.998        0.998        0.999
+           K=3 both · +SG · floors  3     1.001      0.4        1.000        1.000        1.000
+K=3 both · +SG · floors · positive  3     1.003      0.0        1.000        1.000        1.000
+
+                               fit        type  K  free_loadings     R2   RMSE    MAE  PIT_var  eta_rhat  divergences max_phi
+                               K=1    baseline  1             77 0.9372 0.0660 0.0453   0.0603     1.012            2       —
+                          K=1 both exploratory  1             77 0.9353 0.0669 0.0464   0.0645     1.003            0       —
+                    K=3 both · −SG exploratory  3            255 0.9729 0.0443 0.0299   0.0489     1.507         2175   0.321
+                    K=3 both · +SG exploratory  3            255 0.9722 0.0449 0.0307   0.0506     1.184          644   0.288
+           K=3 both · +SG · floors exploratory  3            255 0.9635 0.0514 0.0333   0.0547     1.001          114   0.295
+K=3 both · +SG · floors · positive exploratory  3            255 0.9714 0.0455 0.0310   0.0527     1.003            1   0.347
+
+Dashboard → /Users/yassineessifi/Desktop/ECI_Bayesian/index.html  (16.0 MB, 6 fits)

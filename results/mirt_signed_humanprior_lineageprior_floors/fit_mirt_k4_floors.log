@@ -1,0 +1,88 @@
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_floors
+  --floors: fixed-c 3PL; clipped 36 below-floor scores up to their benchmark chance floor
+
+Data: 4051 obs / 751 models / 85 benchmarks
+  --lineage-prior: 36 chains / 146 nodes / 432 chained models
+
+======================================================================
+Fitting MIRT  K = 4  (signed loadings, ordered-human prior, lineage prior, fixed-c 3PL, sampler=nutpie)  (4051 obs / 751 models / 85 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/models/mirt.py:294: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 1881.5s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=4: raw max r̂=2.039 (label-switching, ignore for K>1)  divergences=894 / 32000
+        identified: eta r̂ max=1.677 mean=1.034 (frac>1.01=0.55)  D r̂=1.981  sigma_b r̂=1.260
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       0.550        0.495         0.614              1.000
+axis2       0.550        0.495         0.614              1.000
+axis3       0.550        0.495         0.614              1.000
+axis4       0.550        0.495         0.614                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3  axis4
+axis1  1.000  0.720  0.949  0.871
+axis2  0.720  1.000  0.817  0.820
+axis3  0.949  0.817  1.000  0.832
+axis4  0.871  0.820  0.832  1.000
+
+── axis1  top loadings (rotated bundle) ──
+           benchmark                  category  loading_median
+           ARC-AGI-2         Core AGI Progress        3.240925
+             ARC-AGI         Core AGI Progress        2.250093
+                VPCT  Multimodal Understanding        1.710898
+ FrontierMath Tier 4   High End Math Reasoning        1.655012
+              CritPt Domain Specific Questions        1.222288
+       TerminalBench      Agentic Computer Use        1.033769
+         APEX Agents         Core AGI Progress        0.987803
+         SimpleBench         General Reasoning        0.960754
+Humanity's Last Exam Domain Specific Questions        0.936813
+      Aider Polyglot            Autonomous SWE        0.836782
+
+── axis2  top loadings (rotated bundle) ──
+           benchmark                  category  loading_median
+               GSM8K Domain Specific Questions        1.628101
+BIG-Bench Hard (BBH) Domain Specific Questions        1.018417
+          OpenBookQA Domain Specific Questions        0.797859
+           ScienceQA Domain Specific Questions        0.710495
+           ARC (AI2) Domain Specific Questions        0.709177
+                MMLU Domain Specific Questions        0.649941
+ GPQA Main Chemistry                 Chemistry        0.634664
+     Adversarial NLI         General Reasoning        0.622463
+  MMLU Pro Chemistry                 Chemistry        0.595335
+               CSQA2         General Reasoning        0.451959
+
+── axis3  top loadings (rotated bundle) ──
+               benchmark                  category  loading_median
+OTIS Mock AIME 2024-2025   High End Math Reasoning        1.805543
+            MATH Level 5   High End Math Reasoning        1.161046
+           Chess Puzzles         General Reasoning        1.084382
+            GPQA Diamond Domain Specific Questions        0.874005
+                    MMLU Domain Specific Questions        0.782780
+  GPQA Diamond Chemistry                 Chemistry        0.657232
+                    VPCT  Multimodal Understanding        0.575092
+                   GSM8K Domain Specific Questions        0.567458
+            FrontierMath   High End Math Reasoning        0.551460
+    BIG-Bench Hard (BBH) Domain Specific Questions        0.517347
+
+── axis4  top loadings (rotated bundle) ──
+            benchmark                  category  loading_median
+OS World (Screenshot)      Agentic Computer Use        0.865114
+              Cybench      Agentic Computer Use        0.728561
+            GSO-Bench            Autonomous SWE        0.662496
+            HellaSwag         General Reasoning        0.504437
+             TriviaQA Domain Specific Questions        0.485751
+           OS World 2      Agentic Computer Use        0.433164
+           WinoGrande         General Reasoning        0.431709
+    The Agent Company      Agentic Computer Use        0.393271
+       Aider Polyglot            Autonomous SWE        0.374921
+       PostTrainBench            Autonomous SWE        0.363784
+
+── PPC goodness-of-fit ──
+  MIRT (K=4): R²=0.979  RMSE=0.039  MAE=0.026
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_floors
+Figures: run diagnostics/plot_mirt.py

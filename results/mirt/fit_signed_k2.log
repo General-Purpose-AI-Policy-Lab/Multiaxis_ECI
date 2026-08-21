@@ -1,0 +1,68 @@
+
+Data: 3704 obs / 750 models / 75 benchmarks (drop_low_obs=False)
+
+======================================================================
+Fitting MIRT  K = 2  (signed, sampler=nutpie)  (3704 obs / 750 models / 75 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 295.7s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=2: raw max r̂=2.705 (label-switching, ignore for K>1)  divergences=1 / 16000
+        identified: eta r̂ max=1.633 mean=1.043 (frac>1.01=0.36)  D r̂=1.636  sigma_b r̂=1.625
+  signed fit: per-draw rotation alignment (varimax)...
+
+── aligned column-norm spectrum ||A[:,k]|| (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       8.457        7.780         9.212              2.079
+axis2       4.068        3.397         4.729                NaN
+
+── axes identified by signed (self-identifying); no rotation applied ──
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2
+axis1  1.000 -0.211
+axis2 -0.211  1.000
+
+── axis1  top loadings (identified bundle) ──
+               benchmark                      category  loading_median
+               ARC-AGI-2             Core AGI Progress        2.994074
+OTIS Mock AIME 2024-2025       High End Math Reasoning        2.536760
+            MATH Level 5       High End Math Reasoning        2.122486
+                 ARC-AGI             Core AGI Progress        2.027913
+     FrontierMath Tier 4       High End Math Reasoning        1.773549
+          Aider Polyglot                Autonomous SWE        1.556504
+            FrontierMath       High End Math Reasoning        1.499733
+             BioLP-bench                       Biology        1.455900
+                 Cybench          Agentic Computer Use        1.361979
+       Fiction.LiveBench Advanced Language and Writing        1.323582
+
+── axis2  top loadings (identified bundle) ──
+           benchmark                  category  loading_median
+               GSM8K Domain Specific Questions        1.278977
+           ARC (AI2) Domain Specific Questions        0.940022
+           GSO-Bench            Autonomous SWE       -0.866922
+BIG-Bench Hard (BBH) Domain Specific Questions        0.865931
+          OpenBookQA Domain Specific Questions        0.850282
+             Cybench      Agentic Computer Use       -0.784736
+            TriviaQA Domain Specific Questions        0.771801
+   The Agent Company      Agentic Computer Use       -0.744329
+                MMLU Domain Specific Questions        0.739829
+           HellaSwag         General Reasoning        0.731567
+
+── alignment-method comparison (varimax / wop / matchalign / promax) ──
+  varimax    sign-confident [axis1 +56/-8  axis2 +15/-0]  chain-reprod 0.99/0.13  aligned-rhat 1.645
+  wop        sign-confident [axis1 +56/-10  axis2 +15/-0]  chain-reprod 0.99/0.14  aligned-rhat 1.644
+  matchalign sign-confident [axis1 +56/-8  axis2 +15/-0]  chain-reprod 0.99/0.13  aligned-rhat 1.645
+  promax     sign-confident [axis1 +50/-1  axis2 +14/-0]  chain-reprod 0.99/0.23  aligned-rhat 1.644
+  method agreement per axis (|corr| across method pairs):
+        min  median
+axis               
+axis1 0.967   0.990
+axis2 0.968   0.984
+  per-chain divergence fraction: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+
+── PPC goodness-of-fit ──
+  MIRT (K=2): R²=0.960  RMSE=0.054  MAE=0.036
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt
+Figures: run diagnostics/plot_mirt.py

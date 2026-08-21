@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# PyMC / ArviZ trace files (large, regenerable) — all locations, any prefix
+**/*trace*.nc
+
+# --stream-draws live stores: the same draws as the trace, plus the warmup
+# nutpie's store writes unconditionally. Thousands of chunk files each.
+**/live_draws.zarr/
+
+# Generated plots (regenerable via run.py) — incl. the optional --png dashboard stills
+plots/
+
+# Dashboard render cache (regenerable via diagnostics/build_dashboard.py);
+# the dashboard itself is the tracked repo-root index.html.
+results/dashboard_cache/
+
+# Diagnostic outputs (regenerable via diagnostics/*.py)
+results/residual_corr_*.csv
+
+# Per-row result dumps (regenerable from the traces on every fit). These are the
+# big ones — per-observation residuals (~3,700 rows) and per-model factor scores
+# (~750 rows) — and they churned the diff by ~15k lines per run for no signal.
+# The small summary tables (loadings, inclusion, factor_corr, tau, gof JSON) stay
+# tracked.
+results/**/*residuals*.csv
+results/**/*factor_scores*.csv
+
+# Regenerable comparison/diagnostic HTML under results/ (bulky inlined Plotly,
+# ~4 MB each). Keep the curated PNGs + CSV/JSON summaries; drop the interactive
+# HTML — it regenerates from compare_human_prior.py / the fit drivers.
+results/**/*.html
+
+# Data pipeline snapshots (one dated folder per fetch; regenerable)
+data/pipeline/snapshots/
+
+# Backup files
+*.bak
+*.bak_*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Stray runtime logs
+nohup.out
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.bak-*
+
+# Pipeline per-stage intermediates (regenerable by the notebook)
+data/pipeline/intermediate/
+
+# Eval harness artifacts (evals/*): run outputs are large and regenerable, the
+# dataset is third-party and fetched on demand, and a key file must never be
+# committed. The harness reads OPENROUTER_API_KEY from the environment.
+evals/*/out/
+evals/*/data_cache/
+.env
+
+# Agent tool scratch
+.context/
+
+# Local deliverables, not part of the repo (both build from tracked code)
+memo/
+slides/
+
+# Legacy PPCA/ARD posterior dumps (regenerable, >100 MB, over GitHub's file limit)
+results/**/*.nc

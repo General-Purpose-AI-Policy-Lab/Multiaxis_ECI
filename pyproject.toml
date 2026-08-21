@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+markers = [
+    "slow: tests that run actual NUTS sampling (skip with -m 'not slow')",
+]

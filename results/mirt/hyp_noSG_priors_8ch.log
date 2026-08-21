@@ -1,0 +1,8 @@
+priors=True chains=8 draws=1500  obs=3704
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+
+==== NO-SG K=3 priors 8x1500 ====
+identified: {"eta_max_rhat": 1.0073, "eta_mean_rhat": 1.0005, "eta_frac_gt_1.01": 0.0, "D_max_rhat": 1.007, "sigma_b_max_rhat": 1.0092, "tau_CD_max_rhat": 1.0038}
+divergences: 3 / 12000
+LL per chain: [6515.  6503.3 6507.1 6514.  6507.8 6514.5 6514.9 6507.2]  spread: 11.7
+chain D-dist max: 0.22

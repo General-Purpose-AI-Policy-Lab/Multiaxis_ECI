@@ -1,0 +1,105 @@
+{
+  "varimax": {
+    "aligned_max_rhat_A": 1.5960338551344773,
+    "reproducibility": [
+      0.9848737364494633,
+      0.8639945972455636,
+      0.8257543562559755
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 48,
+        "n_neg_confident": 7
+      },
+      "axis2": {
+        "n_pos_confident": 8,
+        "n_neg_confident": 11
+      },
+      "axis3": {
+        "n_pos_confident": 18,
+        "n_neg_confident": 1
+      }
+    },
+    "meta": null
+  },
+  "wop": {
+    "aligned_max_rhat_A": 1.6047115481432308,
+    "reproducibility": [
+      0.9908650970510673,
+      0.8639932117591191,
+      0.8632660450070349
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 50,
+        "n_neg_confident": 10
+      },
+      "axis2": {
+        "n_pos_confident": 10,
+        "n_neg_confident": 24
+      },
+      "axis3": {
+        "n_pos_confident": 27,
+        "n_neg_confident": 4
+      }
+    },
+    "meta": {
+      "wop_iterations": 5,
+      "wop_final_shift": 8.704961637628905e-07
+    }
+  },
+  "matchalign": {
+    "aligned_max_rhat_A": 1.5956274372274408,
+    "reproducibility": [
+      0.9848703456658003,
+      0.8632903799441742,
+      0.8270291447590634
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 48,
+        "n_neg_confident": 7
+      },
+      "axis2": {
+        "n_pos_confident": 8,
+        "n_neg_confident": 11
+      },
+      "axis3": {
+        "n_pos_confident": 16,
+        "n_neg_confident": 1
+      }
+    },
+    "meta": null
+  },
+  "promax": {
+    "aligned_max_rhat_A": 1.5970824316118835,
+    "reproducibility": [
+      0.9840973010863847,
+      0.6254547649980475,
+      0.7174101169314633
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 40,
+        "n_neg_confident": 0
+      },
+      "axis2": {
+        "n_pos_confident": 18,
+        "n_neg_confident": 6
+      },
+      "axis3": {
+        "n_pos_confident": 8,
+        "n_neg_confident": 11
+      }
+    },
+    "meta": {
+      "promax_fallbacks": 0
+    }
+  },
+  "per_chain_divergence_frac": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

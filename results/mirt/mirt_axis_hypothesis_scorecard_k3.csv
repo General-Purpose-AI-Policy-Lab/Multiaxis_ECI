@@ -1,0 +1,4 @@
+axis,anthropic_ability_corr,human_gap_loading_corr,multimodal_loading_corr,n_informed_models,n_gap_benchmarks
+axis1,0.187,0.069,-0.021,235,37
+axis2,-0.665,-0.286,0.072,28,37
+axis3,-0.072,0.071,-0.031,38,37

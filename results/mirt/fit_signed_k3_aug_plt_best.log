@@ -1,0 +1,14 @@
+  NOTE: signed + structured theta priors — rotation symmetry is only approximate (the ordered blocks weakly anchor the orientation); per-draw alignment is an approximation. See build_mirt_model's warning.
+  structured-theta prior; writing to /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_augment_plt
+   --augment: +404 obs for 101 existing models, 20 new benchmarks; 338 source models unmatched (see data/augmented/unmatched_models.csv)
+
+Data: 4118 obs / 737 models / 95 benchmarks (drop_low_obs=False)
+  --lineage-prior: 35 chains / 140 nodes / 412 chained models
+  --plt: axis1<-GPQA Diamond | axis2<-GSM8K | axis3<-GSO-Bench
+
+======================================================================
+Fitting MIRT  K = 3  (signed, ordered-human prior, lineage prior, PLT (3 founders), sampler=nutpie)  (4118 obs / 737 models / 95 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/model_mirt.py:382: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)

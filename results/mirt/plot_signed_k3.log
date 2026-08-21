@@ -1,0 +1,16 @@
+Loading /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt/trace_mirt_k3_signed.nc ...
+  varimax    sign-confident [axis1 +52/-8  axis2 +0/-1  axis3 +0/-0]  chain-reprod 0.98/0.32/0.35  aligned-rhat 1.929
+  wop        sign-confident [axis1 +52/-10  axis2 +18/-2  axis3 +17/-4]  chain-reprod 0.97/0.62/0.60  aligned-rhat 2.322
+  matchalign sign-confident [axis1 +52/-8  axis2 +0/-0  axis3 +0/-0]  chain-reprod 0.98/0.33/0.31  aligned-rhat 1.920
+  promax     sign-confident [axis1 +32/-2  axis2 +1/-0  axis3 +0/-0]  chain-reprod 0.98/0.65/0.58  aligned-rhat 2.191
+        min  median
+axis               
+axis1 0.902   0.966
+axis2 0.913   0.971
+axis3 0.908   0.977
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt
+Figure  → /Users/yassineessifi/Desktop/ECI_Bayesian/plots/mirt/diag_k3_signed_alignment.png
+  trace uses ALL 750 models
+  PPC: R²=0.972  RMSE=0.045  MAE=0.029
+figures → /Users/yassineessifi/Desktop/ECI_Bayesian/plots/mirt

@@ -1,0 +1,77 @@
+  structured-theta prior; writing to /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_plt
+
+Data: 3714 obs / 737 models / 75 benchmarks (drop_low_obs=False)
+  --plt: axis1<-GPQA Diamond | axis2<-GSO-Bench
+
+======================================================================
+Fitting MIRT  K = 2  (signed, PLT (2 founders), sampler=nutpie)  (3714 obs / 737 models / 75 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 194.1s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=2: raw max r̂=2.496 (label-switching, ignore for K>1)  divergences=0 / 4000
+        identified: eta r̂ max=1.834 mean=1.097 (frac>1.01=0.69)  D r̂=1.960  sigma_b r̂=1.759
+  signed fit: per-draw rotation alignment (varimax)...
+
+── aligned column-norm spectrum ||A[:,k]|| (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       7.085        5.649         8.610              1.352
+axis2       5.242        3.934         6.843                NaN
+
+── axes identified by signed (self-identifying); no rotation applied ──
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2
+axis1  1.000  0.469
+axis2  0.469  1.000
+
+── axis1  top loadings (identified bundle) ──
+               benchmark                category  loading_median
+OTIS Mock AIME 2024-2025 High End Math Reasoning        2.570240
+            MATH Level 5 High End Math Reasoning        2.210513
+     FrontierMath Tier 4 High End Math Reasoning        1.605613
+             BioLP-bench                 Biology        1.464510
+            FrontierMath High End Math Reasoning        1.367452
+               ARC-AGI-2       Core AGI Progress        1.210418
+           Chess Puzzles       General Reasoning        1.183667
+      MMLU Pro Chemistry               Chemistry        1.146606
+                 ARC-AGI       Core AGI Progress        1.055468
+          Aider Polyglot          Autonomous SWE        1.054541
+
+── axis2  top loadings (identified bundle) ──
+              benchmark                  category  loading_median
+              ARC-AGI-2         Core AGI Progress        2.242385
+                ARC-AGI         Core AGI Progress        1.428748
+                Cybench      Agentic Computer Use        1.208462
+      The Agent Company      Agentic Computer Use        1.196758
+SWE-Bench Pro (Private)            Autonomous SWE        1.010269
+                  GSM8K Domain Specific Questions       -0.978329
+         Aider Polyglot            Autonomous SWE        0.924504
+            APEX Agents         Core AGI Progress        0.812591
+              ARC (AI2) Domain Specific Questions       -0.790787
+   BIG-Bench Hard (BBH) Domain Specific Questions       -0.787174
+
+── alignment-method comparison (varimax / wop / matchalign / promax) ──
+  varimax    sign-confident [axis1 +41/-7  axis2 +21/-19]  chain-reprod 0.71/0.71  aligned-rhat 2.048
+  wop        sign-confident [axis1 +42/-1  axis2 +32/-18]  chain-reprod 0.68/0.86  aligned-rhat 2.070
+  matchalign sign-confident [axis1 +41/-7  axis2 +21/-19]  chain-reprod 0.71/0.71  aligned-rhat 2.048
+  promax     sign-confident [axis1 +36/-3  axis2 +19/-21]  chain-reprod 0.78/0.84  aligned-rhat 1.957
+  method agreement per axis (|corr| across method pairs):
+        min  median
+axis               
+axis1 0.984   0.993
+axis2 0.980   0.993
+  per-chain divergence fraction: [0.00, 0.00, 0.00, 0.00]
+
+── axis hypothesis scorecard (free axes vs hypotheses) ──
+ axis  anthropic_ability_corr  human_gap_loading_corr  multimodal_loading_corr  n_informed_models  n_gap_benchmarks
+axis1                   0.125                  -0.115                   -0.038                171                37
+axis2                   0.272                   0.234                    0.040                 62                37
+
+── PPC goodness-of-fit ──
+  MIRT (K=2): R²=0.953  RMSE=0.059  MAE=0.039
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_plt
+Figures: run diagnostics/plot_mirt.py

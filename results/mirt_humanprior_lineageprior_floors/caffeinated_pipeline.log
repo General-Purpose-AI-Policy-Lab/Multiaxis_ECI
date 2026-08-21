@@ -1,0 +1,32 @@
+[pipeline] Tue Jul 21 22:37:17 CEST 2026: awake; waiting for 10k fit PID 37597 to finish...
+[pipeline] Tue Jul 21 23:05:47 CEST 2026: fit process exited.
+[pipeline] Tue Jul 21 23:05:47 CEST 2026: retagging 10k trace to non-negative rotation...
+non-negative rotation: 80000 draws, 85 benchmarks, K=3
+  negative loading cells (<-0.05) at mean: 0/255  worst = -0.013
+  Phi off-diag: +0.22, +0.15, -0.02
+  axis1: ARC-AGI-2=+3.24, ARC-AGI=+2.17, GSO-Bench=+1.93, Cybench=+1.85, FrontierMath Tier 4=+1.71, Aider Polyglot=+1.70, TerminalBench=+1.50, The Agent Company=+1.39
+  axis2: VPCT=+2.59, OTIS Mock AIME 2024-2025=+2.19, MATH Level 5=+1.60, Chess Puzzles=+1.50, ARC-AGI-2=+1.39, GPQA Diamond Chemistry=+1.37, GPQA Main Chemistry=+1.34, CritPt=+1.23
+  axis3: GSM8K=+1.69, ARC (AI2)=+1.65, Adversarial NLI=+1.55, OpenBookQA=+1.39, BIG-Bench Hard (BBH)=+1.37, CSQA2=+1.22, SimpleQA Verified=+1.12, MMLU=+1.08
+
+Re-tagged trace + rewrote loadings/corr/scores → results/mirt_humanprior_lineageprior_floors
+[pipeline] Tue Jul 21 23:08:49 CEST 2026: rebuilding dashboard (--force-all, per no-stale-cache rule)...
+/Users/yassineessifi/Desktop/ECI_Bayesian/data.py:608: UserWarning: human_baselines.csv: 1 human tier(s) lost ALL their benchmarks to the curated exclusions and leave the fit: ['Committee of Skilled Generalists']. Add a baseline on a non-excluded benchmark to keep the tier.
+  warnings.warn(
+   curated exclusions: 54 models have no observations left and leave the fit entirely (DeepSeek-V3-Base, Mistral-7B-Instruct-v0.1, claude-3-7-sonnet-20250219_12K, claude-3-7-sonnet-20250219_1K, ...)
+skipping K=1 · unidimensional · curated exclusions · no priors — trace fit on a different data generation (702 models vs 690) and no cached card
+skipping K=1 · unidimensional · curated exclusions · human+lineage priors — trace fit on a different data generation (702 models vs 690) and no cached card
+skipping K=3 · human+lineage priors · SG scores removed · chain 4 excluded (majority mode) · frontier forecast — trace fit on a different data generation (751 models vs 745) and no cached card
+skipping K=3 · human+lineage priors · SG kept · no floors (islands baseline) — trace fit on a different data generation (751 models vs 745) and no cached card
+skipping K=3 · human+lineage priors · SG kept · fixed-c 3PL chance floors + clip · 8×4000 · chain 1 excluded (majority solution) — trace fit on a different data generation (751 models vs 745) and no cached card
+rendering K=3 · human+lineage priors · SG kept · fixed-c 3PL floors · positive loadings · non-negative rotation (pure bundles, no contrast) (exploratory) …
+
+                               fit  K  eta_rhat  div_pct  axis1_repro  axis2_repro  axis3_repro
+K=3 both · +SG · floors · positive  3     1.001      0.0          1.0          1.0          1.0
+
+                               fit        type  K  free_loadings     R2   RMSE   MAE  PIT_var  eta_rhat  divergences  max_phi
+K=3 both · +SG · floors · positive exploratory  3            255 0.9713 0.0456 0.031   0.0527     1.001            4    0.347
+
+Dashboard → /Users/yassineessifi/Desktop/ECI_Bayesian/index.html  (6.9 MB, 1 fits)
+[pipeline] Tue Jul 21 23:12:00 CEST 2026: PIPELINE COMPLETE — dashboard built.
+[pipeline] Tue Jul 21 23:12:10 CEST 2026: pmset sleepnow
+Sleeping now...

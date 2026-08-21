@@ -1,0 +1,71 @@
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_humanprior_lineageprior_floors
+  --floors: fixed-c 3PL; clipped 36 below-floor scores up to their benchmark chance floor
+
+Data: 4158 obs / 745 models / 85 benchmarks
+  --lineage-prior: 36 chains / 149 nodes / 417 chained models
+
+======================================================================
+Fitting MIRT  K = 3  (normal loadings, ordered-human prior, lineage prior, fixed-c 3PL, sampler=nutpie)  (4158 obs / 745 models / 85 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 1712.1s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=3: raw max r̂=2.287 (label-switching, ignore for K>1)  divergences=1 / 16000
+        identified: eta r̂ max=1.003 mean=1.000 (frac>1.01=0.00)  D r̂=1.003  sigma_b r̂=1.007
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       0.828        0.738         0.931              1.000
+axis2       0.828        0.738         0.931              1.000
+axis3       0.828        0.738         0.931                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3
+axis1  1.000  0.767  0.115
+axis2  0.767  1.000  0.065
+axis3  0.115  0.065  1.000
+
+── axis1  top loadings (rotated bundle) ──
+               benchmark                  category  loading_median
+               ARC-AGI-2         Core AGI Progress        4.338656
+OTIS Mock AIME 2024-2025   High End Math Reasoning        3.279766
+                    VPCT  Multimodal Understanding        3.187975
+                 ARC-AGI         Core AGI Progress        2.836765
+     FrontierMath Tier 4   High End Math Reasoning        2.564084
+            MATH Level 5   High End Math Reasoning        2.492276
+                  CritPt Domain Specific Questions        2.369612
+            FrontierMath   High End Math Reasoning        2.147373
+           Chess Puzzles         General Reasoning        2.067093
+                 Cybench      Agentic Computer Use        1.722423
+
+── axis2  top loadings (rotated bundle) ──
+           benchmark                  category  loading_median
+           ARC (AI2) Domain Specific Questions        2.416411
+               GSM8K Domain Specific Questions        2.284559
+     Adversarial NLI         General Reasoning        2.225302
+          OpenBookQA Domain Specific Questions        2.068105
+BIG-Bench Hard (BBH) Domain Specific Questions        1.891310
+               CSQA2         General Reasoning        1.695382
+                MMLU Domain Specific Questions        1.453488
+   SimpleQA Verified Domain Specific Questions        1.288710
+               BoolQ         General Reasoning        1.200009
+           SuperGLUE         General Reasoning        1.159354
+
+── axis3  top loadings (rotated bundle) ──
+              benchmark                 category  loading_median
+              GSO-Bench           Autonomous SWE        1.164944
+                Cybench     Agentic Computer Use        1.082824
+              ARC-AGI-2        Core AGI Progress        0.773130
+SWE-Bench Pro (Private)           Autonomous SWE        0.762750
+     Remote Labor Index        Core AGI Progress        0.694752
+         Aider Polyglot           Autonomous SWE        0.653302
+               CAD-Eval Multimodal Understanding        0.606901
+             OS World 2     Agentic Computer Use        0.564561
+      The Agent Company     Agentic Computer Use        0.553835
+          TerminalBench     Agentic Computer Use        0.546995
+
+── PPC goodness-of-fit ──
+  MIRT (K=3): R²=0.971  RMSE=0.046  MAE=0.031
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_humanprior_lineageprior_floors
+Figures: run diagnostics/plot_mirt.py

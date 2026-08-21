@@ -1,0 +1,73 @@
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_floors
+  --floors: fixed-c 3PL; clipped 36 below-floor scores up to their benchmark chance floor
+
+Data: 4051 obs / 751 models / 85 benchmarks
+  --lineage-prior: 36 chains / 146 nodes / 432 chained models
+
+======================================================================
+Fitting MIRT  K = 3  (signed loadings, ordered-human prior, lineage prior, fixed-c 3PL, sampler=nutpie)  (4051 obs / 751 models / 85 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/models/mirt.py:294: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 3645.8s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=3: raw max r̂=2.253 (label-switching, ignore for K>1)  divergences=136 / 80000
+        identified: eta r̂ max=1.031 mean=1.001 (frac>1.01=0.02)  D r̂=1.049  sigma_b r̂=1.026
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       0.690        0.614         0.779              1.000
+axis2       0.690        0.614         0.779              1.000
+axis3       0.690        0.614         0.779                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3
+axis1  1.000  0.184  0.739
+axis2  0.184  1.000  0.451
+axis3  0.739  0.451  1.000
+
+── axis1  top loadings (rotated bundle) ──
+               benchmark                  category  loading_median
+                    VPCT  Multimodal Understanding        3.320841
+OTIS Mock AIME 2024-2025   High End Math Reasoning        3.022895
+               ARC-AGI-2         Core AGI Progress        2.496001
+            MATH Level 5   High End Math Reasoning        2.283305
+           Chess Puzzles         General Reasoning        1.961185
+                 ARC-AGI         Core AGI Progress        1.863829
+                  CritPt Domain Specific Questions        1.692443
+            FrontierMath   High End Math Reasoning        1.675399
+  GPQA Diamond Chemistry                 Chemistry        1.568818
+            GPQA Diamond Domain Specific Questions        1.490745
+
+── axis2  top loadings (rotated bundle) ──
+              benchmark             category  loading_median
+              ARC-AGI-2    Core AGI Progress        1.767157
+                Cybench Agentic Computer Use        1.719704
+              GSO-Bench       Autonomous SWE        1.426823
+                ARC-AGI    Core AGI Progress        1.109895
+  OS World (Screenshot) Agentic Computer Use        0.991532
+      The Agent Company Agentic Computer Use        0.941219
+SWE-Bench Pro (Private)       Autonomous SWE        0.929617
+          TerminalBench Agentic Computer Use        0.910606
+     Remote Labor Index    Core AGI Progress        0.893073
+         Aider Polyglot       Autonomous SWE        0.822055
+
+── axis3  top loadings (rotated bundle) ──
+           benchmark                  category  loading_median
+               GSM8K Domain Specific Questions        1.563297
+BIG-Bench Hard (BBH) Domain Specific Questions        1.175794
+           ARC (AI2) Domain Specific Questions        1.162998
+          OpenBookQA Domain Specific Questions        1.070452
+                MMLU Domain Specific Questions        0.969882
+               BoolQ         General Reasoning        0.797658
+     Adversarial NLI         General Reasoning        0.731284
+          WinoGrande         General Reasoning        0.709615
+           HellaSwag         General Reasoning        0.656361
+   LAB-Bench Cloning                   Biology        0.512142
+
+── PPC goodness-of-fit ──
+  MIRT (K=3): R²=0.973  RMSE=0.044  MAE=0.030
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_floors
+Figures: run diagnostics/plot_mirt.py

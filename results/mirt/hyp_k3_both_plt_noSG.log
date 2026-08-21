@@ -1,0 +1,12 @@
+dropping 10 SG observations; 3704 remain
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+
+==== NO-SG K=3 both-priors PLT ====
+identified: {"eta_max_rhat": 1.4023, "eta_mean_rhat": 1.0333, "eta_frac_gt_1.01": 0.4425, "D_max_rhat": 1.5815, "sigma_b_max_rhat": 1.4622, "tau_CD_max_rhat": 1.0475}
+divergences: 0 / 4000
+LL per chain: [6516.2 6516.6 6512.4 6503.2]  spread: 13.5
+chain D-dist max: 2.98
+[[0.   2.98 2.96 0.86]
+ [2.98 0.   0.66 2.18]
+ [2.96 0.66 0.   2.12]
+ [0.86 2.18 2.12 0.  ]]

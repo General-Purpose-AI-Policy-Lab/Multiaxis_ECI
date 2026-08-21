@@ -1,0 +1,99 @@
+  NOTE: signed + structured theta priors — rotation symmetry is only approximate (the ordered blocks weakly anchor the orientation); per-draw alignment is an approximation. See build_mirt_model's warning.
+  structured-theta prior; writing to /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_augment_plt
+   --augment: +404 obs for 101 existing models, 20 new benchmarks; 338 source models unmatched (see data/augmented/unmatched_models.csv)
+
+Data: 4118 obs / 737 models / 95 benchmarks (drop_low_obs=False)
+  --lineage-prior: 35 chains / 140 nodes / 412 chained models
+  --plt: axis1<-GPQA Diamond | axis2<-GSO-Bench | axis3<-ARC-AGI-2
+
+======================================================================
+Fitting MIRT  K = 3  (signed, ordered-human prior, lineage prior, PLT (3 founders), sampler=nutpie)  (4118 obs / 737 models / 95 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/model_mirt.py:350: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 1336.8s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=3: raw max r̂=2.013 (label-switching, ignore for K>1)  divergences=2 / 12000
+        identified: eta r̂ max=1.320 mean=1.019 (frac>1.01=0.39)  D r̂=1.483  sigma_b r̂=1.183
+  signed fit: per-draw rotation alignment (varimax)...
+
+── aligned column-norm spectrum ||A[:,k]|| (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       7.470        6.595         8.284              1.605
+axis2       4.653        4.008         5.420              1.143
+axis3       4.071        3.468         5.354                NaN
+
+── axes identified by signed (self-identifying); no rotation applied ──
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3
+axis1  1.000  0.020  0.438
+axis2  0.020  1.000  0.013
+axis3  0.438  0.013  1.000
+
+── axis1  top loadings (identified bundle) ──
+               benchmark                category  loading_median
+               ARC-AGI-2       Core AGI Progress        2.611001
+OTIS Mock AIME 2024-2025 High End Math Reasoning        2.126697
+                 ARC-AGI       Core AGI Progress        1.814242
+            MATH Level 5 High End Math Reasoning        1.731726
+     FrontierMath Tier 4 High End Math Reasoning        1.520135
+           Chess Puzzles       General Reasoning        1.349141
+          Aider Polyglot          Autonomous SWE        1.316793
+            FrontierMath High End Math Reasoning        1.287576
+              BrowseComp    Agentic Computer Use        1.114515
+           TerminalBench    Agentic Computer Use        1.087036
+
+── axis2  top loadings (identified bundle) ──
+            benchmark                  category  loading_median
+                GSM8K Domain Specific Questions        1.769491
+                 MATH   High End Math Reasoning        1.308379
+   SyntheticReasoning         General Reasoning        1.008277
+OS World (Screenshot)      Agentic Computer Use       -0.943703
+ BIG-Bench Hard (BBH) Domain Specific Questions        0.769257
+           BrowseComp      Agentic Computer Use       -0.736985
+                 MMLU Domain Specific Questions        0.690414
+              Cybench      Agentic Computer Use       -0.639265
+            ARC (AI2) Domain Specific Questions        0.622396
+        Chess Puzzles         General Reasoning        0.601322
+
+── axis3  top loadings (identified bundle) ──
+               benchmark                  category  loading_median
+               GSO-Bench            Autonomous SWE        0.922830
+          Aider Polyglot            Autonomous SWE        0.828095
+                CAD-Eval  Multimodal Understanding        0.708894
+                 Cybench      Agentic Computer Use        0.698512
+OTIS Mock AIME 2024-2025   High End Math Reasoning       -0.669075
+               ARC (AI2) Domain Specific Questions        0.657784
+           SWE-Bench Pro            Autonomous SWE        0.647532
+           TerminalBench      Agentic Computer Use        0.646669
+               HellaSwag         General Reasoning        0.596324
+              OpenBookQA Domain Specific Questions        0.585305
+
+── alignment-method comparison (varimax / wop / matchalign / promax) ──
+  varimax    sign-confident [axis1 +52/-11  axis2 +31/-6  axis3 +20/-0]  chain-reprod 1.00/0.99/0.99  aligned-rhat 1.443
+  wop        sign-confident [axis1 +57/-12  axis2 +34/-8  axis3 +31/-2]  chain-reprod 1.00/0.99/1.00  aligned-rhat 1.615
+  matchalign sign-confident [axis1 +52/-11  axis2 +31/-6  axis3 +20/-0]  chain-reprod 1.00/0.99/0.99  aligned-rhat 1.445
+  promax     sign-confident [axis1 +38/-9  axis2 +31/-8  axis3 +18/-0]  chain-reprod 1.00/0.98/0.99  aligned-rhat 1.439
+  method agreement per axis (|corr| across method pairs):
+        min  median
+axis               
+axis1 0.991   0.996
+axis2 0.998   0.999
+axis3 0.992   0.996
+  per-chain divergence fraction: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+
+── axis hypothesis scorecard (free axes vs hypotheses) ──
+ axis  anthropic_ability_corr  human_gap_loading_corr  multimodal_loading_corr  n_informed_models  n_gap_benchmarks
+axis1                   0.189                   0.065                    0.048                331                37
+axis2                   0.016                  -0.022                    0.082                 87                37
+axis3                     NaN                   0.394                    0.048                  7                37
+
+── PPC goodness-of-fit ──
+  MIRT (K=3): R²=0.966  RMSE=0.050  MAE=0.033
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior_augment_plt
+Figures: run diagnostics/plot_mirt.py

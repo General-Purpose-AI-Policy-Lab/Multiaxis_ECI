@@ -1,0 +1,27 @@
+rendering ★ K=3 +priors, SG obs dropped (CONVERGED) (exploratory) …
+cached: K=3 no priors
+cached: K=3 no priors +PLT
+cached: K=2 no priors +PLT
+cached: K=3 +lineage
+cached: K=3 +lineage +PLT
+cached: K=3 +both priors
+cached: K=3 +both +PLT
+cached: K=2 +both priors
+cached: K=2 +both +PLT
+  WARNING: LOO/WAIC fits span different observation counts [3704, 3714] — ΔELPD across them is NOT comparable (ELPD is a sum over obs).
+Traceback (most recent call last):
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/diagnostics/build_dashboard.py", line 560, in <module>
+    main()
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/diagnostics/build_dashboard.py", line 442, in main
+    tables, cmp_figs = build_comparison(results)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/plots.py", line 1212, in build_comparison
+    figs["cmp_loo_waic"] = cmp_loo_waic_fig(loo_results)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/plots.py", line 827, in cmp_loo_waic_fig
+    d_loo, se_loo = delpd_se(r["loo_pointwise"], best["loo_pointwise"])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/plots.py", line 814, in delpd_se
+    diff = np.asarray(point_a) - np.asarray(point_b)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+ValueError: operands could not be broadcast together with shapes (3714,) (3704,) 

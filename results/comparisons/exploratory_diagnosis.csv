@@ -1,0 +1,9 @@
+fit,K,eta_rhat,div_pct,axis1_repro,axis2_repro,axis3_repro
+K=3 cy ladder0 · none,3,1.6,1.1,0.953,0.782,0.965
+K=3 cy ladder1 · lin+BM,3,1.01,0.8,1.0,0.999,0.999
+K=3 cy ladder2 · human,3,1.012,0.3,1.0,0.999,1.0
+K=3 cy ladder3 · both,3,1.027,6.0,0.997,0.998,0.996
+K=3 cy · positive · mode A,3,1.005,0.1,1.0,0.999,1.0
+K=3 cy · positive · mode B,3,1.009,0.1,1.0,0.999,0.999
+K=3 cy · signed · mode α,3,1.007,0.3,1.0,1.0,0.999
+K=3 cy · signed · mode β,3,1.005,0.4,1.0,1.0,1.0

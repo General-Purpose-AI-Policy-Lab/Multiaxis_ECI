@@ -1,0 +1,91 @@
+/Users/yassineessifi/Desktop/ECI_Bayesian/data.py:536: UserWarning: human_baselines.csv: 1 human tier(s) lost ALL their benchmarks to the curated exclusions and leave the fit: ['Committee of Skilled Generalists']. Add a baseline on a non-excluded benchmark to keep the tier.
+  warnings.warn(
+── Loading data ─────────────────────────────────────────────────
+   curated exclusions: 48 models have no observations left and leave the fit entirely (DeepSeek-V3-Base, Mistral-7B-Instruct-v0.1, claude-3-7-sonnet-20250219_12K, claude-3-7-sonnet-20250219_1K, ...)
+   n_obs=3387  n_models=702  n_benchmarks=77  zero_scores=33
+
+======================================================================
+Fitting MIRT  K = 1  (normal loadings, sampler=nutpie)  (3387 obs / 702 models / 77 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 142.9s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=1: raw max r̂=1.033 (label-switching, ignore for K>1)  divergences=51 / 32000
+        identified: eta r̂ max=1.003 mean=1.000 (frac>1.01=0.00)  D r̂=1.005  sigma_b r̂=1.007
+   saved trace → /Users/yassineessifi/Desktop/ECI_Bayesian/results/canonical/trace.nc
+
+── Convergence ──────────────────────────────────────────────────
+   max r_hat = 1.0330
+   min ess   = 241
+   divergences = 51
+
+── SOTA + ECI ───────────────────────────────────────────────────
+                         model release_date    C_mean   ECI_mean
+           claude-sonnet-5_max   2026-06-30  1.384381 159.797370
+                   glm-5.2_max   2026-06-16  1.331198 158.680390
+                kimi-k2.7-code   2026-06-12  1.055414 152.889147
+                claude-fable-5   2026-06-09  1.655973 165.500542
+            claude-fable-5_max   2026-06-09  1.665213 165.694038
+   claude-mythos-preview-early   2026-06-09  2.390888 180.928562
+                    MiniMax-M3   2026-06-01  0.762839 146.753331
+       claude-opus-4-8_unknown   2026-05-28  2.094051 174.714170
+                   qwen3.7-max   2026-05-19  1.208368 156.098969
+           deepseek-v4-pro_max   2026-04-24  1.111391 154.061234
+                 gpt-5.5-codex   2026-04-23  0.663946 144.707717
+               gpt-5.5_unknown   2026-04-23  1.650816 165.388779
+             gpt-5.5-pro_xhigh   2026-04-23  1.664039 165.668758
+                 grok-4.3_high   2026-04-17  1.044501 152.661807
+  gpt-5.4-pro-2026-03-05_xhigh   2026-03-05  1.594499 164.209388
+gpt-5.4-pro-2026-03-05_unknown   2026-03-05  1.456419 161.308919
+        gemini-3.1-pro-preview   2026-02-19  1.351278 159.100997
+               claude-opus-4-6   2026-02-05  1.136432 154.588771
+          claude-opus-4-6_high   2026-02-05  1.402298 160.171292
+       claude-opus-4-6_unknown   2026-02-05  1.406413 160.257558
+  gpt-5-pro-2025-10-06_unknown   2025-10-07  1.301744 158.060629
+         gpt-5-2025-08-07_high   2025-08-07  1.029198 152.338018
+      gpt-5-2025-08-07_unknown   2025-08-07  0.994114 151.602553
+             o3-pro-2025-06-10   2025-06-10  0.917397 149.989649
+        o3-pro-2025-06-10_high   2025-06-10  0.985016 151.414469
+              DeepSeek-R1-0528   2025-05-28  0.467153 140.540298
+         o3-2025-04-16_unknown   2025-04-16  0.813181 147.804135
+      gemini-2.5-pro-exp-03-25   2025-03-25  0.734011 146.141261
+       o3-mini-2025-01-31_high   2025-01-31  0.521452 141.677881
+            o1-2024-12-17_high   2024-12-17  0.440362 139.978575
+         o1-2024-12-17_unknown   2024-12-17  0.467880 140.556616
+        Llama-3.3-70B-Instruct   2024-12-06 -0.369347 122.978972
+            mistral-large-2411   2024-11-18 -0.318745 124.040907
+         o1-preview-2024-09-12   2024-09-12  0.117288 133.197543
+       o1-mini-2024-09-12_high   2024-09-12  0.168355 134.266761
+                Llama-3.1-405B   2024-07-23 -0.090017 128.840208
+
+── Forest summaries (D, A) ──────────────────────────────────────
+
+── Posterior predictive + GoF ───────────────────────────────────
+   n_obs                              3387
+   n_nonzero_score                    3354
+   n_zero_score                       33
+   zero_diag_threshold                0.0050
+   rmse                               0.0659
+   mae                                0.0453
+   bayesian_r2                        0.9373
+   ks_stat                            0.0736
+   ks_p                               0.0000
+   pit_mean                           0.5031
+   pit_var                            0.0604
+   zero_pred_below_threshold          0.5568
+
+── Plots ────────────────────────────────────────────────────────
+
+   Human groups fitted: 8
+                       name      mean   hdi_low  hdi_high  n_obs
+              Average Human -0.780616 -1.308010 -0.156076      8
+         Skilled Generalist -0.653321 -0.813210 -0.490900      9
+      High School Qualifier  0.327574  0.056355  0.600226      1
+Committee of Average Humans  0.801460 -0.560804  2.257866      1
+              Domain Expert  0.815047  0.638867  0.995046     16
+  High School Top Performer  1.069502  0.658668  1.531024      1
+              Top Performer  1.154578  0.666417  1.650651      5
+Committee of Domain Experts  1.439086  1.109453  1.791365      3
+   AI models in forest: 694
+
+Done. Results in /Users/yassineessifi/Desktop/ECI_Bayesian/results/canonical, plots in /Users/yassineessifi/Desktop/ECI_Bayesian/plots/canonical.

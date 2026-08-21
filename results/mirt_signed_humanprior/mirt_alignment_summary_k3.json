@@ -1,0 +1,110 @@
+{
+  "varimax": {
+    "aligned_max_rhat_A": 1.7158469751605578,
+    "reproducibility": [
+      0.966957490404956,
+      0.9698722047861269,
+      0.9056339238445332
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 53,
+        "n_neg_confident": 9
+      },
+      "axis2": {
+        "n_pos_confident": 10,
+        "n_neg_confident": 5
+      },
+      "axis3": {
+        "n_pos_confident": 15,
+        "n_neg_confident": 0
+      }
+    },
+    "meta": null
+  },
+  "wop": {
+    "aligned_max_rhat_A": 1.8475121608754805,
+    "reproducibility": [
+      0.991959774068695,
+      0.9700959445848042,
+      0.8950440057962155
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 57,
+        "n_neg_confident": 11
+      },
+      "axis2": {
+        "n_pos_confident": 16,
+        "n_neg_confident": 23
+      },
+      "axis3": {
+        "n_pos_confident": 26,
+        "n_neg_confident": 0
+      }
+    },
+    "meta": {
+      "wop_iterations": 7,
+      "wop_final_shift": 4.475814252002941e-07
+    }
+  },
+  "matchalign": {
+    "aligned_max_rhat_A": 1.7065651417077028,
+    "reproducibility": [
+      0.9669464338235675,
+      0.9673470147491143,
+      0.9020531034123147
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 53,
+        "n_neg_confident": 9
+      },
+      "axis2": {
+        "n_pos_confident": 10,
+        "n_neg_confident": 5
+      },
+      "axis3": {
+        "n_pos_confident": 15,
+        "n_neg_confident": 0
+      }
+    },
+    "meta": null
+  },
+  "promax": {
+    "aligned_max_rhat_A": 1.7421366768271838,
+    "reproducibility": [
+      0.9724366437559671,
+      0.7952508974945538,
+      0.8208856685696984
+    ],
+    "sign_counts": {
+      "axis1": {
+        "n_pos_confident": 44,
+        "n_neg_confident": 0
+      },
+      "axis2": {
+        "n_pos_confident": 17,
+        "n_neg_confident": 0
+      },
+      "axis3": {
+        "n_pos_confident": 10,
+        "n_neg_confident": 5
+      }
+    },
+    "meta": {
+      "promax_fallbacks": 0
+    }
+  },
+  "per_chain_divergence_frac": [
+    0.00025,
+    0.0,
+    0.0,
+    0.0,
+    0.00025,
+    0.0,
+    0.0415,
+    0.0
+  ],
+  "dropped_chains": []
+}

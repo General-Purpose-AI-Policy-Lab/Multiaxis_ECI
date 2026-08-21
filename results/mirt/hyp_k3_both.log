@@ -1,0 +1,95 @@
+  NOTE: signed + structured theta priors — rotation symmetry is only approximate (the ordered blocks weakly anchor the orientation); per-draw alignment is an approximation. See build_mirt_model's warning.
+  structured-theta prior; writing to /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior
+
+Data: 3714 obs / 737 models / 75 benchmarks (drop_low_obs=False)
+  --lineage-prior: 35 chains / 140 nodes / 412 chained models
+
+======================================================================
+Fitting MIRT  K = 3  (signed, ordered-human prior, lineage prior, sampler=nutpie)  (3714 obs / 737 models / 75 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/model_mirt.py:345: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 663.7s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=3: raw max r̂=2.119 (label-switching, ignore for K>1)  divergences=0 / 4000
+        identified: eta r̂ max=1.356 mean=1.033 (frac>1.01=0.48)  D r̂=1.378  sigma_b r̂=1.342
+  signed fit: per-draw rotation alignment (varimax)...
+
+── aligned column-norm spectrum ||A[:,k]|| (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       6.229        4.014         7.495              1.395
+axis2       4.466        3.141         6.639              1.107
+axis3       4.034        3.440         4.697                NaN
+
+── axes identified by signed (self-identifying); no rotation applied ──
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3
+axis1  1.000  0.220  0.489
+axis2  0.220  1.000  0.379
+axis3  0.489  0.379  1.000
+
+── axis1  top loadings (identified bundle) ──
+               benchmark                category  loading_median
+               ARC-AGI-2       Core AGI Progress        2.616042
+                 ARC-AGI       Core AGI Progress        1.760625
+     FrontierMath Tier 4 High End Math Reasoning        1.431209
+OTIS Mock AIME 2024-2025 High End Math Reasoning        1.364771
+                 Cybench    Agentic Computer Use        1.241967
+               GSO-Bench          Autonomous SWE        1.143401
+          Aider Polyglot          Autonomous SWE        1.139208
+           TerminalBench    Agentic Computer Use        1.016728
+            MATH Level 5 High End Math Reasoning        1.012208
+       The Agent Company    Agentic Computer Use        1.009500
+
+── axis2  top loadings (identified bundle) ──
+               benchmark                  category  loading_median
+OTIS Mock AIME 2024-2025   High End Math Reasoning        1.743775
+            MATH Level 5   High End Math Reasoning        1.364620
+           Chess Puzzles         General Reasoning        1.092009
+             BioLP-bench                   Biology        0.765804
+            FrontierMath   High End Math Reasoning        0.752786
+            GPQA Diamond Domain Specific Questions        0.624817
+      MMLU Pro Chemistry                 Chemistry        0.615806
+         VisualToolBench  Multimodal Understanding        0.599076
+    Humanity's Last Exam Domain Specific Questions        0.577306
+              EnigmaEval         General Reasoning        0.545100
+
+── axis3  top loadings (identified bundle) ──
+            benchmark                  category  loading_median
+                GSM8K Domain Specific Questions        1.659630
+ BIG-Bench Hard (BBH) Domain Specific Questions        0.840548
+                 MMLU Domain Specific Questions        0.805799
+            ARC (AI2) Domain Specific Questions        0.793331
+    SimpleQA Verified Domain Specific Questions        0.756313
+OS World (Screenshot)      Agentic Computer Use       -0.662042
+   MMLU Pro Chemistry                 Chemistry        0.616876
+       Aider Polyglot            Autonomous SWE        0.593545
+           OpenBookQA Domain Specific Questions        0.588925
+     MMLU Pro Biology                   Biology        0.574845
+
+── alignment-method comparison (varimax / wop / matchalign / promax) ──
+  varimax    sign-confident [axis1 +28/-1  axis2 +12/-0  axis3 +10/-0]  chain-reprod 0.97/0.81/0.77  aligned-rhat 1.379
+  wop        sign-confident [axis1 +40/-12  axis2 +34/-1  axis3 +40/-0]  chain-reprod 0.92/0.67/0.84  aligned-rhat 1.397
+  matchalign sign-confident [axis1 +34/-5  axis2 +9/-0  axis3 +5/-0]  chain-reprod 0.98/0.77/0.74  aligned-rhat 1.380
+  promax     sign-confident [axis1 +14/-2  axis2 +17/-0  axis3 +8/-0]  chain-reprod 0.95/0.86/0.84  aligned-rhat 1.395
+  method agreement per axis (|corr| across method pairs):
+        min  median
+axis               
+axis1 0.959   0.983
+axis2 0.945   0.982
+axis3 0.886   0.968
+  per-chain divergence fraction: [0.00, 0.00, 0.00, 0.00]
+
+── axis hypothesis scorecard (free axes vs hypotheses) ──
+ axis  anthropic_ability_corr  human_gap_loading_corr  multimodal_loading_corr  n_informed_models  n_gap_benchmarks
+axis1                     NaN                   0.209                   -0.023                 14                37
+axis2                     NaN                  -0.249                    0.065                  0                37
+axis3                     NaN                   0.037                    0.046                  5                37
+
+── PPC goodness-of-fit ──
+  MIRT (K=3): R²=0.972  RMSE=0.045  MAE=0.031
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior
+Figures: run diagnostics/plot_mirt.py

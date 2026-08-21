@@ -1,0 +1,7 @@
+pair,rows,n_shared,delta_elpd,se,z,n_k_bad_either,delta_elpd_k_ok_rows,n_k_ok_rows
+bare - both,all 4051 (identical data),4051,-100.16,39.67,-2.52,1312,-26.75,2739
+human - both,all 4051 (identical data),4051,-81.59,37.4,-2.18,1226,-11.87,2825
+nosg - both,non-SG rows,4041,18.74,19.8,0.95,883,22.76,3158
+floors - both,unclipped rows,4015,122.13,20.31,6.01,855,101.12,3160
+floors - nosg,non-SG ∩ unclipped rows,4008,97.86,24.47,4.0,853,83.67,3155
+floors_k4 - both,unclipped rows,4015,288.89,25.46,11.35,1045,182.48,2970

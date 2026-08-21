@@ -1,0 +1,15 @@
+  trace uses DROP-LOW-OBS data (302 models)
+  PPC: R²=0.967  RMSE=0.048  MAE=0.032
+Traceback (most recent call last):
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/diagnostics/plot_mirt.py", line 337, in <module>
+    main()
+  File "/Users/yassineessifi/Desktop/ECI_Bayesian/diagnostics/plot_mirt.py", line 268, in main
+    if np.corrcoef(a1, tb)[0, 1] < 0:
+       ^^^^^^^^^^^^^^^^^^^
+  File "/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py", line 3015, in corrcoef
+    c = cov(x, y, rowvar, dtype=dtype)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py", line 2823, in cov
+    X = np.concatenate((X, y), axis=0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 1, the array at index 0 has size 302 and the array at index 1 has size 750

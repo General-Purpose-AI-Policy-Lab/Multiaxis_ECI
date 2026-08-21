@@ -1,0 +1,9 @@
+model,n_chains,ess_min,ess_median,elpd_loo,se,p_loo,k>0.7,k_max,eta_rhat,group,rank,elpd_diff,dse
+1k no-floors (K=1),8,430,8280,5401.1,101.7,1006.5,329,2.45,1.012,raw (no-floor),4.0,944.08,81.96
+bare (1 mode),8,13,312,6159.3,74.7,1797.9,976,2.08,1.643,raw (no-floor),3.0,185.85,36.8
+human (1 mode),8,23,3120,6237.2,71.0,1720.5,985,1.87,1.244,raw (no-floor),2.0,107.94,29.9
+both mode 1 (majority),7,1154,9072,6315.4,70.6,1455.4,599,1.65,1.005,raw (no-floor),1.0,29.78,10.92
+both mode 2 (island),1,2,12,6345.1,69.3,1483.7,728,1.72,,raw (no-floor),0.0,0.0,0.0
+"K=3 both + floors (soft lineage, positive)",8,11609,68565,6335.0,71.7,1484.7,648,1.38,1.001,floor-clipped,2.0,24.51,15.39
+K=3 both + floors (HARD lineage) mode 1 (majority),7,2197,19903,6337.4,70.8,1443.6,613,1.45,1.003,floor-clipped,1.0,22.13,9.84
+K=3 both + floors (HARD lineage) mode 2 (island),1,2,668,6359.5,69.0,1459.0,661,1.38,,floor-clipped,0.0,0.0,0.0

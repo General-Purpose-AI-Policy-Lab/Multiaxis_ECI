@@ -1,0 +1,9 @@
+dropped benchmarks ['ARC-AGI']: 144 obs removed, 3570 remain; SG kept
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+
+==== NO-ARC K=3 priors free-rotation (dropped: ['ARC-AGI']) ====
+identified: {"eta_max_rhat": 1.0318, "eta_mean_rhat": 1.0018, "eta_frac_gt_1.01": 0.02, "D_max_rhat": 1.0469, "sigma_b_max_rhat": 1.0378, "tau_CD_max_rhat": 1.061}
+divergences: 0 / 4000
+LL per chain: [6241.4 6231.  6234.  6229. ]  spread: 12.3
+chain D-dist max: 0.47
+theta[SG] per chain: [[0.8, 0.8, 5.5], [0.9, 0.7, 5.5], [1.8, 1.8, -4.7], [0.7, 0.7, 5.6]]

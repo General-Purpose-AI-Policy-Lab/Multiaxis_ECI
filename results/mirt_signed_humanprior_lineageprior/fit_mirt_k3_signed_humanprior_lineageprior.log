@@ -1,0 +1,72 @@
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior
+
+Data: 4051 obs / 751 models / 85 benchmarks
+  --lineage-prior: 36 chains / 146 nodes / 432 chained models
+
+======================================================================
+Fitting MIRT  K = 3  (signed loadings, ordered-human prior, lineage prior, sampler=nutpie)  (4051 obs / 751 models / 85 benchmarks)
+======================================================================
+/Users/yassineessifi/Desktop/ECI_Bayesian/models/mirt.py:294: UserWarning: loading_prior='signed' with the ordered human/lineage theta blocks: those blocks are NOT rotation-invariant across axes (their per-axis increments softly prefer certain orientations), so the rotation symmetry is only APPROXIMATE and per-draw alignment is an approximation rather than an exact quotient. Flip side: the structured priors act as a weak, substantive orientation anchor. Interpret aligned axes with that caveat.
+  warnings.warn(
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  sampling done in 1320.3s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  K=3: raw max r̂=2.953 (label-switching, ignore for K>1)  divergences=3695 / 32000
+        identified: eta r̂ max=1.521 mean=1.075 (frac>1.01=0.90)  D r̂=1.543  sigma_b r̂=1.465
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       0.582        0.512         0.651              1.000
+axis2       0.582        0.512         0.651              1.000
+axis3       0.582        0.512         0.651                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3
+axis1  1.000  0.810  0.207
+axis2  0.810  1.000  0.493
+axis3  0.207  0.493  1.000
+
+── axis1  top loadings (rotated bundle) ──
+               benchmark                  category  loading_median
+               ARC-AGI-2         Core AGI Progress        3.266543
+                 ARC-AGI         Core AGI Progress        2.029577
+     FrontierMath Tier 4   High End Math Reasoning        1.733152
+                 Cybench      Agentic Computer Use        1.668105
+               GSO-Bench            Autonomous SWE        1.416913
+          Aider Polyglot            Autonomous SWE        1.407996
+           TerminalBench      Agentic Computer Use        1.290001
+OTIS Mock AIME 2024-2025   High End Math Reasoning        1.237437
+                  CritPt Domain Specific Questions        1.109293
+             APEX Agents         Core AGI Progress        0.992401
+
+── axis2  top loadings (rotated bundle) ──
+           benchmark                  category  loading_median
+               GSM8K Domain Specific Questions        2.744667
+           ARC (AI2) Domain Specific Questions        1.434255
+BIG-Bench Hard (BBH) Domain Specific Questions        1.400633
+                MMLU Domain Specific Questions        1.289922
+          OpenBookQA Domain Specific Questions        0.987773
+               BoolQ         General Reasoning        0.881839
+           HellaSwag         General Reasoning        0.678506
+    MMLU Pro Biology                   Biology        0.642797
+          WinoGrande         General Reasoning        0.571536
+        WMDP Biology                   Biology        0.509348
+
+── axis3  top loadings (rotated bundle) ──
+               benchmark                      category  loading_median
+OTIS Mock AIME 2024-2025       High End Math Reasoning        1.981132
+            MATH Level 5       High End Math Reasoning        1.503666
+           Chess Puzzles             General Reasoning        1.166543
+             BioLP-bench                       Biology        0.791763
+            GPQA Diamond     Domain Specific Questions        0.664171
+                  CritPt     Domain Specific Questions        0.663654
+      MMLU Pro Chemistry                     Chemistry        0.620905
+               ARC-AGI-2             Core AGI Progress        0.605352
+       SimpleQA Verified     Domain Specific Questions        0.596262
+       Fiction.LiveBench Advanced Language and Writing        0.580666
+
+── PPC goodness-of-fit ──
+  MIRT (K=3): R²=0.972  RMSE=0.045  MAE=0.030
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/results/mirt_signed_humanprior_lineageprior
+Figures: run diagnostics/plot_mirt.py
