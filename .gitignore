@@ -79,3 +79,4 @@ slides/
 
 # Legacy PPCA/ARD posterior dumps (regenerable, >100 MB, over GitHub's file limit)
 results/**/*.nc
+CLAUDE.md
