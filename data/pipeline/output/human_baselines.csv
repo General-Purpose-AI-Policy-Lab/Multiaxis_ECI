@@ -52,9 +52,7 @@ LAB-Bench SeqQA,Domain Expert,0.78,In-domain PhD,https://www.rand.org/pubs/resea
 LAB-Bench Protocol,Domain Expert,0.79,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Diamond Biology,Domain Expert,0.831,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Main Biology,Domain Expert,0.667,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
-MMLU Biology,Domain Expert,0.898,95th percentile test taker,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 WMDP Biology,Domain Expert,0.605,In-domain PhD (RAND),https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Main Chemistry,Domain Expert,0.72,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Diamond Chemistry,Domain Expert,0.831,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
-MMLU Chemistry,Domain Expert,0.898,95th percentile test taker,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 WMDP Chemistry,Domain Expert,0.433,In-domain PhD (RAND),https://www.rand.org/pubs/research_reports/RRA3797-1.html
