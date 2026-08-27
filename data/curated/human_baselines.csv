@@ -22,7 +22,6 @@ GSM8K,Skilled Generalist,0.9677,qualified human annotators who have passed a qua
 HellaSwag,Committee of Average Humans,0.956,majority vote of 5 crowd workers (MTurk),https://aclanthology.org/P19-1472.pdf
 MATH Level 5,Domain Expert,0.9,a three-time IMO gold medalist university student,https://arxiv.org/pdf/2103.03874v1
 MATH Level 5,Skilled Generalist,0.4,a computer science PhD student who does not especially like mathematics,https://arxiv.org/pdf/2103.03874v1
-MATH Level 5,Top Performer,0.9,Triple IMO gold medalist (article anchor),manually added
 MMLU,Average Human,0.345,MTurk,https://arxiv.org/pdf/2009.03300v3
 MMLU,Domain Expert,0.898,score is an estimation from the authors,https://arxiv.org/pdf/2009.03300v3
 MMLU Biology,Top Performer,0.9,baseline represent the 95th percentile of human test-takers,https://www.rand.org/pubs/research_reports/RRA3797-1.html
@@ -42,9 +41,8 @@ Visual Task Assessment (VISTA),Skilled Generalist,0.554,16 full-time employees,h
 VPCT,Average Human,0.999,three volunteers,EpochAI
 WinoGrande,Committee of Average Humans,0.94,majority vote of crowd workers (MTurk),https://arxiv.org/pdf/1907.10641
 SimpleQA Verified,Skilled Generalist,0.944,Grader Going through the test,OpenAI arXiv 2411.04368 §2.2
-BlueprintBench 2,Domain Expert,0.59,"PROVISIONAL — n=1. One human on 12 of the 50 apartments. The paper states NO qualification for them, so this Domain Expert filing rests on the score profile (100th pct of 21 machines) rather than on documented expertise; revisit if Andon publishes the baseliner's background. Two reasons 0.59 is a floor: the human drew iteratively while models answered in one shot, and the authors judge their similarity scorer understates the human lead (connectivity always correct, size ranking not).",https://epoch.ai/benchmarks/blueprint-bench-2 (normalized 0.59; Andon's own page 403s to fetches); protocol in arXiv 2509.25229 sec 4 (BlueprintBench 1). A raw composite of 0.547 circulates in secondary write-ups and is UNVERIFIED against the primary.
-EBR-bench,Domain Expert,0.95,"PROVISIONAL — n=1. One experienced Earthborne Rangers player, ~20/21 objectives, against ~9-10/21 for frontier models. Expertise is in the tested game itself, which is why this sits in Domain Expert. An anecdotal playthrough, not a designed baseline study: physical play over hours against agents in Epoch's harness, no variance estimate, conditions not matched.",https://epoch.ai/publications/earthborne-rangers-benchmark
-GDPval,Domain Expert,0.5,"Parity by symmetry, not a measured sitting: the score is a STRICT win rate (deliverable graded BETTER than an industry expert's), so an expert drawn from the reference pool wins 0.5 against it. Experts average ~14 yr in-occupation experience over 44 occupations. mu=0.5 gives A*theta=D, so this row anchors GDPval's difficulty at the expert ability level. VALID ONLY while the column carries strict wins: the wins-plus-ties variant puts the expert at 1.0 and this row becomes wrong.",https://evals.openai.com/gdpval/leaderboard — 'Parity with Industry Expert (50%)' reference line; method in arXiv 2510.04374 (OpenAI GDPval)
+BlueprintBench 2,Domain Expert,0.59,"n=1. One human on 12 of the 50 apartments. The paper states NO qualification for them, so this Domain Expert filing rests on the score profile (100th pct of 21 machines) rather than on documented expertise; revisit if Andon publishes the baseliner's background. Two reasons 0.59 is a floor: the human drew iteratively while models answered in one shot, and the authors judge their similarity scorer understates the human lead (connectivity always correct, size ranking not).",https://epoch.ai/benchmarks/blueprint-bench-2 (normalized 0.59; Andon's own page 403s to fetches); protocol in arXiv 2509.25229 sec 4 (BlueprintBench 1). A raw composite of 0.547 circulates in secondary write-ups and is UNVERIFIED against the primary.
+EBR-bench,Domain Expert,0.95,"n=1. One experienced Earthborne Rangers player, ~20/21 objectives, against ~9-10/21 for frontier models. Expertise is in the tested game itself, which is why this sits in Domain Expert. An anecdotal playthrough, not a designed baseline study: physical play over hours against agents in Epoch's harness, no variance estimate, conditions not matched.",https://epoch.ai/publications/earthborne-rangers-benchmark
 BioLP-bench,Domain Expert,0.384,Bachelor's w/ lab experience,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 LAB-Bench Cloning,Domain Expert,0.6,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 LAB-Bench LitQA2,Domain Expert,0.7,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
@@ -52,9 +50,7 @@ LAB-Bench SeqQA,Domain Expert,0.78,In-domain PhD,https://www.rand.org/pubs/resea
 LAB-Bench Protocol,Domain Expert,0.79,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Diamond Biology,Domain Expert,0.831,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Main Biology,Domain Expert,0.667,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
-MMLU Biology,Domain Expert,0.898,95th percentile test taker,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 WMDP Biology,Domain Expert,0.605,In-domain PhD (RAND),https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Main Chemistry,Domain Expert,0.72,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 GPQA Diamond Chemistry,Domain Expert,0.831,In-domain PhD,https://www.rand.org/pubs/research_reports/RRA3797-1.html
-MMLU Chemistry,Domain Expert,0.898,95th percentile test taker,https://www.rand.org/pubs/research_reports/RRA3797-1.html
 WMDP Chemistry,Domain Expert,0.433,In-domain PhD (RAND),https://www.rand.org/pubs/research_reports/RRA3797-1.html
