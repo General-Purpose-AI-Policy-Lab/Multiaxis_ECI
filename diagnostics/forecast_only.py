@@ -11,8 +11,8 @@ index.html from the caches.
     python diagnostics/forecast_only.py                    # flagship
     python diagnostics/forecast_only.py --fit <name> --no-html
 
-The ability array is cached to `theta_view_<trace stem>.f32.npy` beside the
-trace. Building it reads A, theta and tau_A out of the trace and applies the
+The ability array is cached to `theta_view_<trace stem>.<key>.f32.npy` beside
+the trace, keyed on the trace's (size, mtime) and the dropped chains. Building it reads A, theta and tau_A out of the trace and applies the
 same per-draw canonicalisation `prepare_fit` does; every later run memory-maps
 the cache. float32 costs ~1e-7 on a scale whose posterior SDs are ~0.3.
 
@@ -24,6 +24,8 @@ build_dashboard.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import pickle
 import subprocess
 import sys
@@ -39,16 +41,25 @@ sys.path.insert(0, str(ROOT))
 from analysis.factors import canonicalize_factors  # noqa: E402
 from analysis.fitview import FitView  # noqa: E402
 from config import PROJECT_ROOT  # noqa: E402
-from data import load_eci_data  # noqa: E402
-from diagnostics.build_dashboard import (CACHE_DIR, FITS, _cache_load,  # noqa: E402
-                                         _trace_path)
+from diagnostics.build_dashboard import (CACHE_DIR, _cache_load,  # noqa: E402
+                                         _trace_path, all_fits)
 from viz.dashboard import forecast_figures  # noqa: E402
 
 DEFAULT_FIT = "k4_drop2_humanmerge_flagship"
 
 
-def _theta_cache_path(trace: Path) -> Path:
-    return trace.with_name(f"theta_view_{trace.stem}.f32.npy")
+def _theta_cache_path(trace: Path, drop_chains=None) -> Path:
+    """Cache file for one (trace revision, kept chains) pair.
+
+    The key carries the trace's (size, mtime) — the identity
+    `build_dashboard._fingerprint` uses — so a re-fit at the same tag never
+    serves the old abilities, and the dropped chains, because they are dropped
+    before the array is built."""
+    st = trace.stat()
+    key = json.dumps({"size": st.st_size, "mtime": int(st.st_mtime),
+                      "drop_chains": sorted(drop_chains or [])}, sort_keys=True)
+    h = hashlib.sha256(key.encode()).hexdigest()[:12]
+    return trace.with_name(f"theta_view_{trace.stem}.{h}.f32.npy")
 
 
 def _load_theta(trace: Path, drop_chains=None) -> np.ndarray:
@@ -58,12 +69,13 @@ def _load_theta(trace: Path, drop_chains=None) -> np.ndarray:
     the trace's tens, because the log-likelihood and the deterministic eta are
     the bulk and neither is needed here.
     """
-    cache = _theta_cache_path(trace)
+    cache = _theta_cache_path(trace, drop_chains)
     if cache.exists():
         print(f"  theta cache: {cache.name}", flush=True)
         return np.load(cache, mmap_mode="r")
 
-    print(f"  reading A/theta/tau_A from {trace.name} …", flush=True)
+    print(f"  no theta cache for this trace revision — rebuilding from "
+          f"{trace.name} …", flush=True)
     ds = xr.open_dataset(trace, group="posterior", engine="h5netcdf")
     if drop_chains:
         ds = ds.sel(chain=[c for c in ds.chain.values if c not in drop_chains])
@@ -90,24 +102,22 @@ def main():
                     help="patch the card cache but skip the index.html re-emit")
     args = ap.parse_args()
 
-    fit = next((f for f in FITS if f["name"] == args.fit), None)
+    fits = all_fits()
+    fit = next((f for f in fits if f["name"] == args.fit), None)
     if fit is None:
         sys.exit(f"unknown fit {args.fit!r} — registry names: "
-                 + ", ".join(f["name"] for f in FITS))
+                 + ", ".join(f["name"] for f in fits))
     card = _cache_load(fit["name"])
     if card is None:
         sys.exit(f"no cached card for {args.fit!r} — run build_dashboard.py "
                  f"--force {args.fit} once first")
 
-    if fit.get("kind", "comp") != "comp" or "signed" in fit.get("name", ""):
+    if (fit.get("kind", "comp") != "comp"
+            or fit["spec"].loading_prior == "signed"):
         sys.exit(f"{args.fit!r} is not a raw-frame compensatory fit — its forecast "
                  f"frame needs the loadings, so use build_dashboard.py --force")
 
-    drop = fit.get("drop_benchmarks")
-    data = load_eci_data(include_all_benchmarks=fit.get("include_all", True),
-                         fit_cyber=fit.get("cyber", False),
-                         fit_simpleqa_original=fit.get("sqaorig", False),
-                         drop_benchmarks=list(drop) if drop else None)
+    data = fit["spec"].load_data()[0]
     raw = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "benchmarks_merged.csv")
     trace = _trace_path(fit)
     theta = np.asarray(_load_theta(trace, fit.get("drop_chains")), dtype=np.float64)

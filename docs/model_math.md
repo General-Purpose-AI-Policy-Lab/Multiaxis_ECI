@@ -259,36 +259,6 @@ identified *after* sampling, one draw at a time. This is the only prior that can
 represent **contrast** axes (some benchmarks $+$, others $-$). Incompatible with
 the anchor mask (hard zeros would break the rotation symmetry).
 
-**(c) `"signedhs"` — signed regularized horseshoe.** Signed cells with a
-per-cell "Finnish" horseshoe (Piironen & Vehtari 2017) that softly zeroes small
-loadings so sparsity picks the rotation:
-
-$$
-\tau_{hs} \sim \mathrm{HalfNormal}(0.5),
-\qquad \tau_{A,k} = \tau_{hs}\ \ \forall k,
-$$
-$$
-\lambda_{b,k} \sim \mathrm{HalfCauchy}(1),
-\qquad
-c^2 \sim \mathrm{Inv\text{-}Gamma}\!\Big(\tfrac{\nu}{2},\ \tfrac{\nu s^2}{2}\Big),
-\quad \nu=3,\ s=1,
-$$
-$$
-\tilde\lambda^2_{b,k} = \frac{c^2\,\lambda_{b,k}^2}{c^2 + \tau_{A,k}^2\,\lambda_{b,k}^2},
-\qquad
-A^{z}_{b,k}\sim\mathcal{N}(0,1),
-\qquad
-A_{b,k} = A^{z}_{b,k}\;\tau_{A,k}\;\tilde\lambda_{b,k}.
-$$
-
-| Symbol | Meaning |
-|---|---|
-| $\tau_{hs}$ | one shared global horseshoe scale (no per-axis ordering — ties would freeze the sampler). |
-| $\lambda_{b,k}$ | per-cell local scale (half-Cauchy): lets a single loading escape the shrinkage. |
-| $c^2$ | slab variance; a finite Inv-Gamma slab that soft-truncates the Cauchy tail so "on" loadings don't run away. |
-| $\nu,\,s$ | slab degrees-of-freedom and width (`RH_SLAB_DF=3`, `RH_SLAB_SCALE=1`). |
-| $\tilde\lambda_{b,k}$ | the **regularized** local scale — behaves like $\lambda_{b,k}$ for small loadings and saturates at the slab for large ones. |
-
 ### 5.4 Abilities $\theta_{m,k}$
 
 **Default (canonical + most fits):** a zero-sum normal per axis, over models:
@@ -360,7 +330,7 @@ priors, so no post-hoc alignment is needed:
 
 - **Anchors / Q-matrix** (`"normal"` only): hard-zero the mask so each
   benchmark loads on a prescribed axis subset.
-- **PLT founders** (`"signed"`/`"signedhs"`): pick $K$ ordered "founder"
+- **PLT founders** (`"signed"`): pick $K$ ordered "founder"
   benchmarks; founder $r$ (0-based) gets a **positive-lower-triangular** row,
 
 $$

@@ -14,10 +14,11 @@ schema — their reviewed ground truth lives in
 Model & benchmark integer indices are derived in-memory by sorting unique
 `model_version` / `benchmark` values alphabetically.
 
-Benchmark-level drops (Tier-2 + curated exclusion list) happen in the
-notebook. The only filtering here is by *modeling* flags on load_eci_data:
-  • the surgical "easy for humans / hard for machines" drop lives in
-    data/curated/excluded_benchmarks.txt and is applied at fit time.
+The processed file holds every benchmark. Two curated lists filter it here:
+  • data/curated/retired_benchmarks.txt is dropped for every fit, with no flag
+    over it, before any other scope logic.
+  • data/curated/excluded_benchmarks.txt is the "easy for humans / hard for
+    machines" drop, a per-fit scope choice (include_all_benchmarks).
   • drop_low_obs_models / fit_humans / collapse_effort_variants — see
     load_eci_data.
 
@@ -122,15 +123,31 @@ def drop_model_benchmark_cells(data: "ECIData", model_name, bench_names) -> "ECI
     return _subset_obs(data, ~drop)
 
 
-def load_excluded_benchmarks() -> set[str]:
-    """Read the curated exclusion list. Filtering is performed by the
-    preprocessing notebook — this function exists only so `ECIData` can
-    surface the list as metadata (for tests and downstream reporting)."""
-    path = CURATED_DIR / "excluded_benchmarks.txt"
+def _curated_name_list(filename: str) -> set[str]:
+    """One benchmark name per line, '#' comments and blanks skipped. An absent
+    file is an empty list, so a curated list is optional."""
+    path = CURATED_DIR / filename
     if not path.exists():
         return set()
     names = (pd.read_csv(path, comment="#", header=None)[0].str.strip())
     return set(names[names != ""].tolist())
+
+
+def load_excluded_benchmarks() -> set[str]:
+    """The curated "easy for humans" exclusion list. A per-fit scope choice:
+    `load_eci_data` drops it by default and `include_all_benchmarks=True` keeps
+    it, so the list also travels on `ECIData` as metadata."""
+    return _curated_name_list("excluded_benchmarks.txt")
+
+
+def load_retired_benchmarks() -> set[str]:
+    """Benchmarks no fit may use, dropped by `load_eci_data` before any other
+    scope logic. Not a flag: a retired column cannot carry a comparable loading
+    row at all (a superseded version pooled into one difficulty, a transformed
+    score on a scale no other benchmark shares), so there is no configuration
+    in which admitting it is valid. The processed file still holds every
+    benchmark; the file states the per-benchmark reason."""
+    return _curated_name_list("retired_benchmarks.txt")
 
 
 BENCHMARK_FLOORS_FILE = CURATED_DIR / "benchmark_lower_bounds.csv"
@@ -158,48 +175,6 @@ def load_benchmark_floors(data: "ECIData") -> np.ndarray:
         bad = [(b, f) for b, f in zip(benchmarks, floors) if not 0.0 <= f < 1.0]
         raise ValueError(f"benchmark floors must be in [0, 1): {bad}")
     return floors
-
-
-BENCHMARK_N_ITEMS_FILE = CURATED_DIR / "benchmark_n_items.csv"
-
-# Verification stamps under which an item count may serve as an instrument
-# floor. "not-item-mean" and "UNVERIFIED" never qualify: the first is proof the
-# score is no simple item mean, the second is a count nobody has vouched for,
-# and a wrong count here CLAIMS precision instead of just wasting some.
-_N_ITEMS_VERIFIED = {"primary-source", "stderr-inversion", "score-grid"}
-
-
-def apply_item_count_n_eff(data: "ECIData") -> "ECIData":
-    """Fallback effective test length from VERIFIED item counts (--item-counts).
-
-    A cell with no reported stderr has n_eff = inf and its whole noise budget
-    is estimated. But when the benchmark is a plain single-run item mean with a
-    verified item count N, the score cannot be more precise than a full N-item
-    run, so n_eff = N is an honest instrument floor. Conservative by
-    construction: a vendor that averaged k seeds is treated as k = 1 (noisier
-    than truth, never tighter). Three exclusions:
-      * counts whose `verification` is not in _N_ITEMS_VERIFIED — an unvouched
-        or non-item-mean count would claim false precision;
-      * cells that already carry a reported stderr — row truth wins;
-      * human rows — tier scores mix protocols and constructed anchors (the
-        GDPval parity 0.5 is a definition, not an N-item sitting), so no
-        instrument claim is honest there.
-    """
-    from dataclasses import replace
-    if data.n_eff is None:
-        raise ValueError("apply_item_count_n_eff needs data.n_eff (load first)")
-    table = pd.read_csv(BENCHMARK_N_ITEMS_FILE)
-    ok = table[table["verification"].isin(_N_ITEMS_VERIFIED)]
-    count_by_bench = dict(zip(ok["benchmark"], ok["n_items"].astype(float)))
-    benchmarks = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
-    counts = np.array([count_by_bench.get(b, np.inf) for b in benchmarks])
-    if np.any(counts[np.isfinite(counts)] < 2):
-        raise ValueError("verified item counts must be >= 2")
-    n_eff = np.asarray(data.n_eff, dtype=np.float64).copy()
-    human_obs = data.is_human[data.model_idx]
-    mask = ~np.isfinite(n_eff) & np.isfinite(counts[data.bench_idx]) & ~human_obs
-    n_eff[mask] = counts[data.bench_idx][mask]
-    return replace(data, n_eff=n_eff)
 
 
 BENCHMARK_CLIPS_FILE = CURATED_DIR / "benchmark_score_clips.csv"
@@ -274,52 +249,6 @@ def clip_scores_to_floors(data: "ECIData", floors: np.ndarray) -> "ECIData":
         scores=new_scores,
         zero_score_mask=new_scores == 0.0,
     )
-
-
-BENCHMARK_CEILINGS_FILE = CURATED_DIR / "benchmark_upper_bounds.csv"
-
-
-def load_benchmark_ceilings(data: "ECIData") -> np.ndarray:
-    """Per-benchmark upper asymptote d_b in blookup order, for the fixed-d 4PL fit.
-
-    Reads the curated `benchmark_upper_bounds.csv` (benchmark, upper_bound,
-    reason, source_url) and maps each ceiling onto the benchmark index order
-    used by the model. A benchmark absent from the file gets 1.0 (an inert
-    ceiling: the link collapses to the 2PL/3PL there). Unlike the floors file,
-    absence is the norm — only benchmarks with a documented saturation point
-    below 1 carry a row — so there is no coverage warning. Values must lie in
-    (0, 1].
-
-    Warns loudly if any observed score already exceeds its benchmark ceiling:
-    the model's mean can never reach such a score, so the ceiling (not the
-    data) needs review before fitting.
-    """
-    benchmarks = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
-    table = pd.read_csv(BENCHMARK_CEILINGS_FILE)
-    ceil_by_bench = dict(zip(table["benchmark"], table["upper_bound"].astype(float)))
-    unknown = set(ceil_by_bench) - set(benchmarks)
-    if unknown:
-        warnings.warn(
-            f"benchmark_upper_bounds.csv names {len(unknown)} benchmark(s) not "
-            f"in the data (ignored): {sorted(unknown)}", UserWarning)
-    ceilings = np.array([ceil_by_bench.get(b, 1.0) for b in benchmarks],
-                        dtype=np.float64)
-    if not np.all((ceilings > 0.0) & (ceilings <= 1.0)):
-        bad = [(b, d) for b, d in zip(benchmarks, ceilings) if not 0.0 < d <= 1.0]
-        raise ValueError(f"benchmark ceilings must be in (0, 1]: {bad}")
-    above = data.scores > ceilings[data.bench_idx] + 1e-9
-    if above.any():
-        model_of = dict(zip(data.mlookup["model_idx"] - 1, data.mlookup["model"]))
-        bench_of = dict(zip(data.blookup["benchmark_idx"] - 1,
-                            data.blookup["benchmark"]))
-        hits = sorted({(bench_of[data.bench_idx[i]], model_of[data.model_idx[i]],
-                        float(data.scores[i]))
-                       for i in np.flatnonzero(above)})
-        warnings.warn(
-            f"{int(above.sum())} observation(s) exceed their benchmark ceiling "
-            f"(e.g. {hits[:3]}) — the fitted mean can never reach them; review "
-            f"benchmark_upper_bounds.csv.", UserWarning)
-    return ceilings
 
 
 # Human groups dropped before fitting (empty — all groups kept).
@@ -585,6 +514,10 @@ def load_eci_data(drop_low_obs_models: bool = False,
     `data/processed/benchmarks_merged.csv` (every benchmark, no exclusions). Re-run
     that notebook after editing `data/pipeline/canonical/`.
 
+    `retired_benchmarks.txt` is dropped first and unconditionally, with no flag
+    over it: those columns cannot carry a comparable loading row in any
+    configuration (see `load_retired_benchmarks`).
+
     The flags here are all *modeling* choices, not data prep. All default to
     the canonical broad-index configuration (keep everything except the curated
     `excluded_benchmarks.txt` list, which is filtered out here at fit time):
@@ -619,11 +552,13 @@ def load_eci_data(drop_low_obs_models: bool = False,
         fit. For targeted sensitivity runs (e.g. the GBAEval+VPCT basin-flip
         test); unlike the curated exclusion list this is per-fit and never the
         default scope. Applied before humans are appended, so their rows on
-        the dropped benchmarks go too. Raises on a name not in the table (a
-        typo would silently fit the full scope). Ignored when eci_data_only.
+        the dropped benchmarks go too. A name already absent is a no-op, so
+        naming a retired benchmark here changes nothing; any other absent name
+        warns, because a typo would otherwise silently fit the full scope.
+        Ignored when eci_data_only.
       • min_release_date (default None) — era filter. Drop every model whose
         known release date is BEFORE this ISO date (e.g. "2024-01-01" = the
-        post-2023 fit, CLI `--post-2023`). Models with no release date anywhere
+        post-2023 fit). Models with no release date anywhere
         (mostly recent SEAL/RAND-only entries) are KEPT — the filter removes
         known-old models, it doesn't demand a date. No SOTA/anchor protection:
         a pre-cutoff SOTA model (gpt-4-0314) is dropped like any other. Humans
@@ -656,6 +591,16 @@ def load_eci_data(drop_low_obs_models: bool = False,
                 "and copy `output/benchmarks_merged.csv` into `data/processed/`."
             )
         df = pd.read_csv(PROCESSED_FILE)
+
+        # Retired benchmarks leave first, before any scope flag is read: no
+        # configuration may admit them, so this is the one benchmark drop with
+        # no flag governing it. Doing it here also makes an explicit
+        # drop_benchmarks of the same names a no-op rather than a second drop.
+        retired = load_retired_benchmarks()
+        n_retired = int(df["benchmark"].isin(retired).sum())
+        df = df[~df["benchmark"].isin(retired)].reset_index(drop=True)
+        print(f"   retired benchmarks: dropped {sorted(retired)} "
+              f"({n_retired} obs); {df['benchmark'].nunique()} benchmarks remain")
 
         # Curated "easy-for-humans" exclusions are a MODELING choice, applied here
         # rather than during data generation — the pipeline emits every
@@ -733,9 +678,15 @@ def load_eci_data(drop_low_obs_models: bool = False,
     # Targeted per-fit drops (sensitivity runs). Before humans, so their rows
     # on the dropped benchmarks go too.
     if drop_benchmarks and not eci_data_only:
-        unknown = set(drop_benchmarks) - set(df["benchmark"])
+        # A name already absent is a no-op: the retirement list removes some
+        # names a caller may still pass, and a retired name asks for exactly
+        # what already happened. Any OTHER absent name is a typo, which would
+        # silently fit the full scope, so it warns rather than passing unseen.
+        unknown = (set(drop_benchmarks) - set(df["benchmark"])
+                   - load_retired_benchmarks())
         if unknown:
-            raise ValueError(f"drop_benchmarks not in the table: {sorted(unknown)}")
+            warnings.warn(f"drop_benchmarks not in the table: {sorted(unknown)}; "
+                          "nothing dropped for those names")
         n_rows = int(df["benchmark"].isin(drop_benchmarks).sum())
         df = df[~df["benchmark"].isin(drop_benchmarks)].reset_index(drop=True)
         print(f"   drop_benchmarks: removed {sorted(drop_benchmarks)} "

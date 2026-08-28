@@ -7,11 +7,9 @@ from dataclasses import dataclass
 
 from analysis.factors import (
     mirt_factors_from_trace, trace_anchors, trace_axis_names,
-    trace_display_rotation, trace_loading_prior,
+    trace_loading_prior,
 )
-from analysis.rotation import (
-    align_rotations, apply_rotation, nonneg_rotate, promax_rotate,
-)
+from analysis.rotation import align_rotations
 from data import ECIData
 
 # ── Unified fit view-model (the single rotation/identity contract) ──────────
@@ -25,8 +23,8 @@ class FitView:
     the rotation/identity decision.
 
     Always present: `theta` (S, M, K) abilities; `Phi` (K, K) axis correlation to
-    DISPLAY (promax-oblique when `rotated`, else the raw ability correlation);
-    `Phi_raw` (K, K) the raw ability correlation; `names`, `K`, and the family
+    DISPLAY; `Phi_raw` (K, K) the raw ability correlation (for a signed fit, the
+    per-draw alignment's promax factor correlation); `names`, `K`, and the family
     flags. Family-specific fields are None when they don't apply:
       * `A`   — (S, B, K) loadings. None for non-comp (slope fixed = 1).
       * `tau` — (S, K) per-axis scale (tau_A). None for non-comp.
@@ -56,18 +54,17 @@ class FitView:
 
 
 def prepare_fit(idata, data: ECIData) -> FitView:
-    """Turn any MIRT trace into a normalized `FitView`, applying the correct
-    rotation-vs-pinned decision — the single code path every figure consumer
-    (dashboard, plot_mirt) goes through.
+    """Turn any MIRT trace into a normalized `FitView` — the single code path
+    every figure consumer (dashboard, plot_mirt) goes through.
 
-    Gating:
-      * non-comp (`constant_data` carries a `Q`): read `theta` directly, no `A`,
-        no rotation; `Phi` = ability correlation.
-      * anchored **or** signed-family **or** bifactor **or** K == 1: axes
-        already identified (anchors), aligned per draw (signed), or fixed by
-        the prior's dense/sparse asymmetry (bifactor) → NO promax on top;
-        `Phi = Phi_raw` (ability correlation, or the alignment's own Phi).
-      * else (exploratory "normal", K ≥ 2): promax-rotate loadings + abilities.
+    No fit is rotated after sampling. A signed-family fit is aligned per DRAW
+    (rotation + sign + permutation, promax criterion) inside the loop below,
+    because its draws sit in arbitrary orientations. Every other family reports
+    its raw frame: anchors, the bifactor prior's asymmetry, K == 1, or (for a
+    non-negative loading prior) the positivity constraint pins the rotation.
+
+    Non-comp fits (`constant_data` carries a `Q`) read `theta` directly, have no
+    `A`, and take `Phi` = ability correlation.
     """
     is_nc = ("Q" in idata.constant_data) if hasattr(idata, "constant_data") else False
     if is_nc:
@@ -79,12 +76,7 @@ def prepare_fit(idata, data: ECIData) -> FitView:
                        is_nc=True, anchored=False, rotated=False)
 
     anchored = bool(trace_anchors(idata))
-    is_signed = trace_loading_prior(idata) in ("signed", "signedhs")
-    # Bifactor: the prior's dense-g / sparse-specifics asymmetry already fixed
-    # the orientation, so rotating would mix g back into the specifics and undo
-    # the identification. Not `anchored` — no benchmark is pinned to an axis, so
-    # the dashboard must not draw a Q-matrix for it.
-    is_bifactor = trace_loading_prior(idata) == "bifactor"
+    is_signed = trace_loading_prior(idata) == "signed"
     A, theta, tau = mirt_factors_from_trace(idata)
     K = theta.shape[2]
     signed_res = None
@@ -101,23 +93,14 @@ def prepare_fit(idata, data: ECIData) -> FitView:
     Phi_raw = np.corrcoef(theta.mean(0).T) if K > 1 else np.array([[1.0]])
     if signed_res is not None and signed_res.Phi is not None:
         Phi_raw = signed_res.Phi        # promax factor correlation
-    if anchored or is_signed or is_bifactor or K == 1:
-        Phi, rotated = Phi_raw, False
-    else:
-        # Exploratory 'normal'-prior fit: promax by default. Trace-recorded
-        # overrides: mirt_display_rotation='nonneg' opts into the non-negative
-        # frame (varimax criterion + hard non-negativity) so its axes read as
-        # pure positive bundles with no contrast; 'none' skips rotation
-        # entirely — the raw rank-tracked axes ARE the frame (the positivity
-        # constraint pins the rotation; Phi = raw ability correlation).
-        disp = trace_display_rotation(idata)
-        if disp == "none":
-            Phi, rotated = Phi_raw, False
-        else:
-            rotate = nonneg_rotate if disp == "nonneg" else promax_rotate
-            Tl, Tt, Phi = rotate(A.mean(0))
-            A, theta, Phi = apply_rotation(A, theta, Phi, Tl, Tt)
-            rotated = True
+    # No post-hoc rotation, ever. Anchors, the per-draw signed alignment and
+    # K == 1 each identify the axes outright; the bifactor prior's dense-g /
+    # sparse-specifics asymmetry fixes the orientation (rotating would mix g
+    # back into the specifics); and for a non-negative loading prior the
+    # positivity constraint itself pins the rotation. So the raw rank-tracked
+    # axes ARE the frame, and Phi is the raw ability correlation (or, for a
+    # signed fit, the alignment's own promax factor correlation).
+    Phi, rotated = Phi_raw, False
     return FitView(theta=theta, Phi=Phi, Phi_raw=Phi_raw, names=names, K=K,
                    is_nc=False, anchored=anchored, rotated=rotated,
                    A=A, tau=tau)

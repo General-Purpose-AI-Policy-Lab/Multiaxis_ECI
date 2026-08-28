@@ -30,8 +30,8 @@ def build_gof_figures(scores, y_pred_mean, yrep, pit, hover, bench_of_obs,
                       residual_mask=None, include_ecdf: bool = False,
                       model_of_obs=None, eta_of_obs=None,
                       floor=None, ceiling=None) -> dict:
-    """Shared goodness-of-fit figure set — the same core figures that fit.py,
-    `plot_mirt`, and the dashboard each used to build inline.
+    """Shared goodness-of-fit figure set — the core figures fit.py, `plot_mirt`
+    and the dashboard all read from here.
 
     `bench_of_obs` is the benchmark name for each observation; `residual_mask`
     (bool array) subsets which observations enter the per-benchmark residual box
@@ -71,7 +71,7 @@ def signed_display_frames(view, idata):
     from analysis import (align_rotations, mirt_factors_from_trace,
                           trace_loading_prior)
     if not (view.A is not None and view.K >= 2
-            and trace_loading_prior(idata) in ("signed", "signedhs")):
+            and trace_loading_prior(idata) == "signed"):
         return None
     A0, th0, _ = mirt_factors_from_trace(idata, rank_track=False)
     return {"raw": align_rotations(A0, th0, method="raw"),
@@ -79,19 +79,26 @@ def signed_display_frames(view, idata):
 
 
 def build_axis_figures(view, data, raw, bench, signed_frames=None,
-                       prefix: str = "", suffix: str = "") -> dict:
+                       prefix: str = "", suffix: str = "",
+                       axis_titles: dict | None = None,
+                       human_labels: dict | None = None) -> dict:
     """Ability-timeline + loading figures for one posterior: per axis, the
     measured timeline (SD<0.4, low-obs dropped), its all-models companion, and
     the loading forest, plus the all-axis loading heatmap.
 
-    Split out of `build_fit_figures` so a MODE-RESTRICTED view (the same fit
-    sliced to one basin's chains) reuses the identical builders. `prefix` keys
+    `build_fit_figures` and a MODE-RESTRICTED view (the same fit sliced to one
+    basin's chains) share these builders through this function. `prefix` keys
     the mode's figures apart from the whole-fit ones on the same card; `suffix`
-    names the mode in every title, so each figure reads on its own."""
+    names the mode in every title, so each figure reads on its own. `axis_titles`
+    (e.g. config.AXIS_TITLES) swaps the display text only — figure dict keys and
+    axis widget titles keep `names[k]` so cache/anchor ids don't churn.
+    `human_labels` reaches `capability_timeline_fig` unchanged (None = its
+    default French tier labels, `{}` = the raw English tier names)."""
     from analysis import (loadings_forest_df, mirt_human_axis_stats,
                           mirt_model_timeline_df)
     figs = {}
     K, names = view.K, view.names
+    titles = axis_titles or {}
     # Signed fits: timelines and loadings in the OBLIQUE frame (dashboard
     # decision 2026-07-06 — the raw-frame timelines doubled every card for
     # little extra signal; the raw frame survives in the axis-strength forest).
@@ -99,21 +106,24 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     A = signed_frames["oblique"].A if signed_frames else view.A
     tag = "_oblique" if signed_frames else ""
     for k in range(K):
+        disp = titles.get(names[k], names[k])
         hstat = mirt_human_axis_stats(theta, k, data)
         tl = mirt_model_timeline_df(theta, k, data, raw)
         if not tl.empty:
-            fig = capability_timeline_fig(tl, human_stats=hstat)
-            fig.update_layout(title=dict(text=f"{names[k]} — measured (50% intervals){suffix}", x=0.5),
-                              yaxis=dict(title=names[k]))
+            fig = capability_timeline_fig(tl, human_stats=hstat,
+                                          human_labels=human_labels)
+            fig.update_layout(title=dict(text=f"{disp} — measured (50% intervals){suffix}", x=0.5),
+                              yaxis=dict(title=disp))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}"] = fig
         # ALL-models companion — every dated model, incl. sparse/extrapolated (wide CI).
         tl_all = mirt_model_timeline_df(theta, k, data, raw,
                                         sd_cap=None, drop_low_obs=False)
         if not tl_all.empty:
-            fig_all = capability_timeline_fig(tl_all, human_stats=hstat)
+            fig_all = capability_timeline_fig(tl_all, human_stats=hstat,
+                                              human_labels=human_labels)
             fig_all.update_layout(
-                title=dict(text=f"{names[k]} — all models (50% intervals){suffix}", x=0.5),
-                yaxis=dict(title=names[k]))
+                title=dict(text=f"{disp} — all models (50% intervals){suffix}", x=0.5),
+                yaxis=dict(title=disp))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}_all"] = fig_all
     if A is not None and K >= 2:
         # Per-axis loading forests: which benchmarks load ± on that axis (sorted,
@@ -121,7 +131,8 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
         for k in range(K):
             figs[f"{prefix}loadings_{k+1}_{_slug(names[k])}"] = forest_fig(
                 loadings_forest_df(A, k, bench), "loading",
-                f"{names[k]} loadings{suffix}", reference=0.0, ref_label="0")
+                f"{titles.get(names[k], names[k])} loadings{suffix}",
+                reference=0.0, ref_label="0")
         # All-axis overview in axis SHARE, not raw loading: the fraction of a
         # benchmark's squared loading-row norm pointing along the axis. Purity
         # defines an axis better than steepness — on raw loadings a long
@@ -139,22 +150,25 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     return figs
 
 
-def forecast_figures(view, data, raw, names, th_fc) -> dict:
+def forecast_figures(view, data, raw, names, th_fc,
+                     axis_titles: dict | None = None) -> dict:
     """Frontier-projection figure set: per axis a timeline overlay, a crossover
     'when' chart and an exceedance-probability curve.
 
-    Split out of `build_fit_figures` so a forecast-only re-render (see
-    `diagnostics/forecast_only.py`) draws from ONE definition — the dashboard
-    card and the fast path cannot drift apart on fit_basis, sd_cap or the
-    SOTA rule. `th_fc` is the ability array to forecast on, in the frame the
-    caller's timelines already use.
+    ONE definition for both the dashboard card and the forecast-only re-render
+    (`diagnostics/forecast_only.py`), so the two cannot drift apart on
+    fit_basis, sd_cap or the SOTA rule. `th_fc` is the ability array to forecast on, in the frame the
+    caller's timelines already use. `axis_titles` swaps display text only,
+    same convention as `build_axis_figures`.
     """
     figs = {}
     K = view.K
+    titles = axis_titles or {}
     from analysis import (mirt_crossover_df, mirt_frontier_forecast,
                           mirt_human_axis_stats, mirt_model_timeline_df)
-    from config import FORECAST_NO_SOTA_AXES
+    from config import FORECAST_KW, FORECAST_NO_SOTA_AXES
     for k in range(K):
+        disp = titles.get(names[k], names[k])
         # Informed cloud at SD < 0.4 (low-obs dropped): the forecast panel
         # shows only measured abilities — an extrapolated pre-2023 model at
         # prior-wide CI is not evidence about the frontier. The forecast
@@ -186,12 +200,9 @@ def forecast_figures(view, data, raw, names, th_fc) -> dict:
             # slope only uses the Oct-2024-onward records.
             back = pd.to_datetime(tl["release_date"]).min()
             fc = mirt_frontier_forecast(th_fc, k, data, raw,
-                                        fit_basis="records",
-                                        fit_start="2024-10-01",
-                                        sd_cap=0.4,
-                                        sota_exempt=k not in FORECAST_NO_SOTA_AXES,
-                                        back_start=back,
-                                        hdi_prob=0.5)
+                                        **dict(FORECAST_KW,
+                                              sota_exempt=k not in FORECAST_NO_SOTA_AXES,
+                                              back_start=back))
         except ValueError:
             continue
         hstat = mirt_human_axis_stats(th_fc, k, data, hdi_prob=0.5)
@@ -199,15 +210,15 @@ def forecast_figures(view, data, raw, names, th_fc) -> dict:
                                hdi_prob=0.5)
         slug = _slug(names[k])
         figs[f"forecast_{k+1}_{slug}"] = capability_forecast_fig(
-            tl, hstat, fc, cx, axis_name=names[k])
+            tl, hstat, fc, cx, axis_name=disp)
         figs[f"forecast_{k+1}_{slug}"].update_layout(
-            title_text=f"Forecast — {names[k]} (50% intervals)")
+            title_text=f"Forecast — {disp} (50% intervals)")
         figs[f"forecast_{k+1}_{slug}_when"] = crossover_dotwhisker_fig(
-            cx, axis_name=names[k])
+            cx, axis_name=disp)
         figs[f"forecast_{k+1}_{slug}_when"].update_layout(
-            title_text=f"Forecast — {names[k]} (crossover dates, 50% intervals)")
+            title_text=f"Forecast — {disp} (crossover dates, 50% intervals)")
         figs[f"forecast_{k+1}_{slug}_prob"] = exceedance_prob_fig(
-            fc, th_fc, k, data, axis_name=names[k])
+            fc, th_fc, k, data, axis_name=disp)
     return figs
 
 
@@ -232,9 +243,12 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     bench_of_obs = [bench[b] for b in data.bench_idx]
     # Item characteristic curve inputs — compensatory fits only: the sum link has
     # one logit η = A_b·θ_m − D_b per observation, the non-comp product link does
-    # not. Fixed floor/ceiling, when the fit carries them, set the curve asymptotes.
+    # not. The fixed floor and the estimated ceiling, when the fit carries them,
+    # set the curve asymptotes.
     eta_of_obs = floor = ceiling = None
-    if not view.is_nc and view.A is not None:
+    # loglog link: ICC eta needs alpha * log(A . theta_pos); skipped here like the nc family
+    is_loglog = "alpha" in idata.posterior
+    if not view.is_nc and view.A is not None and not is_loglog:
         import json
         A_mean, th_mean = view.A.mean(0), view.theta.mean(0)
         D_mean = idata.posterior["D"].mean(("chain", "draw")).values
@@ -244,15 +258,11 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         if "mirt_floor_c" in attrs:
             floor = dict(zip(bench, json.loads(attrs["mirt_floor_c"])))
         if "ceiling_d" in idata.posterior:
-            # Estimated asymptote (ceiling noise / soft ceiling): the fitted d is
-            # the posterior variable — curated wall and noise gap together — not
-            # the fixed attr, which is only the wall. Same precedence the PPC
-            # uses. Averaged over the chains this card keeps, so a mode-restricted
-            # card draws its own mode's ceiling.
+            # Estimated asymptote (--ceiling-noise): the fitted d is a posterior
+            # variable, same source the PPC reads. Averaged over the chains this
+            # card keeps, so a mode-restricted card draws its own mode's ceiling.
             ceiling = dict(zip(bench, idata.posterior["ceiling_d"]
                                .mean(("chain", "draw")).values))
-        elif "mirt_fixed_ceiling_d" in attrs:
-            ceiling = dict(zip(bench, json.loads(attrs["mirt_fixed_ceiling_d"])))
     figs.update(build_gof_figures(data.scores, gof.y_pred_mean, yrep, gof.pit,
                                   hover, bench_of_obs,
                                   model_of_obs=[mod[m] for m in data.model_idx],
@@ -263,11 +273,10 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     is_signed = signed_frames is not None
     # Timelines and loadings come from one builder (so a mode view reuses it),
     # but they sit on either side of the difficulty timeline on the page. The
-    # loading block is held back and re-inserted below, which keeps the figure
-    # ORDER identical to what earlier builds produced — cards whose trace is on a
-    # superseded data generation can never be re-rendered, so a reordering here
-    # would leave the dashboard permanently inconsistent between them and fresh
-    # cards.
+    # loading block is held back and re-inserted below to hold that fixed order:
+    # a card whose trace is on a superseded data generation can never be
+    # re-rendered, so a reordering here would leave the dashboard permanently
+    # inconsistent between those cards and fresh ones.
     axis_figs = build_axis_figures(view, data, raw, bench, signed_frames)
     load_figs = {k: axis_figs.pop(k) for k in list(axis_figs)
                  if k.startswith("loadings")}
@@ -496,7 +505,14 @@ def assemble_dashboard(fit_sections: list, comparison: dict,
     groups = {}
     for s in fit_sections:
         groups.setdefault(s["type"], []).append(s)
-    for typ in ("data", "baseline", "exploratory", "confirmed"):
+    # Only these four types are rendered below, so a section carrying any other
+    # would be silently dropped from both the nav and the HTML.
+    known = ("data", "baseline", "exploratory", "confirmed")
+    unknown = sorted(set(groups) - set(known))
+    if unknown:
+        raise ValueError(f"section type(s) {unknown} would not be rendered — "
+                         f"known types: {list(known)}")
+    for typ in known:
         prev_group = None
         for i, s in enumerate(groups.get(typ, [])):
             if i == 0:

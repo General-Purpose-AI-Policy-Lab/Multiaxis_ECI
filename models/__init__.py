@@ -1,6 +1,6 @@
 """Model builders: one module per structural family.
 
-- mirt: compensatory K-axis Beta-MIRT (loading priors: normal / signed / signedhs)
+- mirt: compensatory K-axis Beta-MIRT (loading priors: normal / pt1 / signed / bifactor)
 - mirt_nc: non-compensatory (conjunctive product link)
 - mirt_sparse: sparse-gate conjunctive (horseshoe on the gates)
 - mirt_interaction: compensatory + pairwise ability interactions

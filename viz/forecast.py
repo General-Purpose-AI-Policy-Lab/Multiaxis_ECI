@@ -6,30 +6,26 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-from viz.core import HUMAN_LEVEL_LABELS_FR, capability_timeline_fig
+from viz.core import (FUTURE_COLOR, HUMAN_LEVEL_LABELS_FR, PASSED_COLOR,
+                      capability_timeline_fig)
 
 # ── Frontier forecasting figures ────────────────────────────────────────────
 
 FORECAST_COLOR = "#ff9500"        # frontier extrapolation
-_PASSED_COLOR  = "#2ca02c"        # tier already surpassed
-_FUTURE_COLOR  = "#d62728"        # tier not yet reached
 
 
 def _crossover_color(status: str) -> str:
-    return _PASSED_COLOR if status.startswith("passed") else _FUTURE_COLOR
+    return PASSED_COLOR if status.startswith("passed") else FUTURE_COLOR
 
 
 def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
-                            *, axis_name: str,
-                            fit_points=None) -> go.Figure:
+                            *, axis_name: str) -> go.Figure:
     """Timeline (points + human bands) with the frontier forecast band and a
     dashed vertical marker at each tier's projected crossover date. Built on top
     of `capability_timeline_fig`, so styling and legend are inherited verbatim.
 
-    `fit_points` (optional timeline-schema DataFrame) marks the record-setters
-    the trend was actually regressed on. The fit cap (SD < 0.4) is looser than
-    the measured cloud's (SD < 0.3), so a fitted record can be absent from the
-    cloud; the markers keep every fitted point visible."""
+    The cloud and the trend fit share one SD cap (0.4, set by the caller), so
+    every fitted record is also a plotted point."""
     fig = capability_timeline_fig(timeline_df, human_stats=human_stats)
     gx = pd.to_datetime(fc.grid_dates).strftime("%Y-%m-%d")
 
@@ -91,12 +87,16 @@ def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
     return fig
 
 
-def crossover_dotwhisker_fig(crossover_df, *, axis_name: str) -> go.Figure:
+def crossover_dotwhisker_fig(crossover_df, *, axis_name: str,
+                             human_labels: dict | None = None) -> go.Figure:
     """When the frontier is projected to reach each human tier: tier on Y,
-    crossover date + 94% CI on X, coloured passed (vert) vs future (rouge)."""
+    crossover date + 94% CI on X, coloured passed (vert) vs future (rouge).
+
+    `human_labels` defaults to HUMAN_LEVEL_LABELS_FR; pass {} for raw names."""
+    labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
     fig = go.Figure()
     for _, r in crossover_df.iterrows():
-        label = HUMAN_LEVEL_LABELS_FR.get(r["tier"], r["tier"])
+        label = labels.get(r["tier"], r["tier"])
         if pd.isna(r["crossover_date_median"]):
             fig.add_trace(go.Scatter(
                 x=[None], y=[label], mode="markers",
@@ -134,9 +134,13 @@ def crossover_dotwhisker_fig(crossover_df, *, axis_name: str) -> go.Figure:
     return fig
 
 
-def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str) -> go.Figure:
+def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str,
+                        human_labels: dict | None = None) -> go.Figure:
     """P(frontier > tier) over the forecast grid — one S-curve per human tier,
-    with reference lines at 0.5 and 0.975 (decisive)."""
+    with reference lines at 0.5 and 0.975 (decisive).
+
+    `human_labels` defaults to HUMAN_LEVEL_LABELS_FR; pass {} for raw names."""
+    labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
     from analysis.forecast import _to_year
 
     xg = _to_year(fc.grid_dates)
@@ -156,7 +160,7 @@ def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str) -> go.
         p = (f > th[:, None]).mean(0)                               # (G,)
         fig.add_trace(go.Scatter(
             x=gx, y=p, mode="lines", line=dict(color=col, width=2),
-            name=HUMAN_LEVEL_LABELS_FR.get(m, m),
+            name=labels.get(m, m),
             hovertemplate="P = %{y:.2f}<br>%{x|%Y-%m}<extra></extra>"))
     for yv, lab in [(0.5, "0.5"), (0.975, "0.975 (décisif)")]:
         fig.add_hline(y=yv, line=dict(color="#888", dash="dot", width=1),

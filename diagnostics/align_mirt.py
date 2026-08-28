@@ -2,12 +2,13 @@
 
 Runs analysis.alignment_report (varimax / wop / matchalign / promax — four
 independent post-hoc identifications of the SAME posterior) on an existing
-trace and writes the comparison artefacts. fit.py already does this
-inline for --loading-prior signed; this script exists so the comparison can
-be re-run, tweaked, or applied to other signed traces without paying for
-sampling again.
+trace and writes the comparison artefacts. This is the only writer of those
+files; `diagnostics/plot_mirt.py` reads them back.
 
-Outputs (into the fit's results dir):
+The fit's flag set and its data scope come from `analysis.FitSpec.from_trace`,
+so K and the scope are the trace's own, never a CLI guess.
+
+Outputs (beside the trace, in its own folder):
   mirt_alignment_loadings.csv   — per (method, axis, benchmark): median, HDI,
                                   sign_confident (HDI excludes 0).
   mirt_alignment_agreement.csv  — per method-pair × axis: |corr| of mean
@@ -19,8 +20,8 @@ Outputs (into the fit's results dir):
                                   (sign-confident highlighted) + agreement map.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python diagnostics/align_mirt.py --K 3 \
-      --loading-prior signed
+  ~/miniforge3/envs/pymc_env/bin/python diagnostics/align_mirt.py \
+      --trace results/mirt_signed_humanprior_lineageprior/trace_mirt_k3_signed_humanprior_lineageprior.nc
 """
 from __future__ import annotations
 
@@ -39,14 +40,11 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from analysis import alignment_report  # noqa: E402
-from data import load_eci_data  # noqa: E402
+from analysis import FitSpec, alignment_report  # noqa: E402
 from persistence import save_df, save_json  # noqa: E402
 
-RESULTS_DIR = ROOT / "results" / "mirt"
 
-
-def _diag_figure(rep: dict, K: int, out_path: Path):
+def _diag_figure(rep: dict, out_path: Path):
     """One figure: aligned loading medians ± HDI per axis for the varimax
     method (sign-confident loadings solid, straddling-zero ones faded), plus
     the method-agreement matrix. Matches the diag_k*_ ad-hoc figure family."""
@@ -95,69 +93,42 @@ def _diag_figure(rep: dict, K: int, out_path: Path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--K", type=int, default=3, help="which fitted trace to load")
-    ap.add_argument("--loading-prior",
-                    choices=["signed", "signedhs", "normal"],
-                    default="signed",
-                    help="which trace tag to load (must match the fit). Alignment "
-                         "assumes the sampled orbit was free — on constrained "
-                         "traces (normal, non-negative) it is exploratory only.")
+    ap.add_argument("--trace", required=True,
+                    help="path to the fitted trace. Outputs land in the fit's "
+                         "results dir. Alignment assumes the sampled orbit was free — on a "
+                         "constrained trace (normal, non-negative loadings) it is "
+                         "exploratory only.")
     ap.add_argument("--methods", nargs="+",
                     default=["varimax", "wop", "matchalign", "promax"],
                     choices=["varimax", "wop", "matchalign", "promax", "geomin"])
     ap.add_argument("--drop-chains", type=int, nargs="*", default=None,
                     help="0-indexed chains to EXCLUDE (e.g. for a mode-restricted "
                          "readout). The summary records the subset honestly.")
-    ap.add_argument("--human-prior", action="store_true",
-                    help="load the human-prior trace (tagged dir, matches fit.py)")
-    ap.add_argument("--lineage-prior", action="store_true",
-                    help="load the lineage-prior trace (tagged dir, matches fit.py)")
-    ap.add_argument("--trace", default=None,
-                    help="explicit trace path — bypasses the tag/dir logic "
-                         "(for fits the flags cannot name: bare signed in "
-                         "results/mirt_signed/, noSG, floors). Outputs land "
-                         "next to the trace.")
     args = ap.parse_args()
 
-    global RESULTS_DIR
-    if args.trace:
-        trace_path = Path(args.trace).resolve()
-        RESULTS_DIR = trace_path.parent
-        # figure suffix from the trace filename (e.g. _signed_..._floors)
-        tag = trace_path.stem.replace(f"trace_mirt_k{args.K}", "")
-    else:
-        tag = {"signed": "_signed", "signedhs": "_signedhs",
-               "normal": ""}[args.loading_prior]
-        if args.human_prior:
-            tag += "_humanprior"
-        if args.lineage_prior:
-            tag += "_lineageprior"
-        if args.human_prior or args.lineage_prior:
-            RESULTS_DIR = ROOT / "results" / f"mirt{tag}"
-        trace_path = RESULTS_DIR / f"trace_mirt_k{args.K}{tag}.nc"
+    trace_path = Path(args.trace).resolve()
     print(f"Loading {trace_path} ...", flush=True)
     idata = az.from_netcdf(trace_path)
+    spec = FitSpec.from_trace(idata, trace_path)
+    # Outputs land beside the trace, not under `spec.results_dir`: a trace
+    # fitted under an earlier tag grammar sits in a folder the spec no longer
+    # derives, and plot_mirt reads these files back from the trace's own folder.
+    K, results_dir = spec.K, trace_path.parent
     if args.drop_chains:
         keep = [c for c in range(idata.posterior.sizes["chain"])
                 if c not in set(args.drop_chains)]
         idata = idata.isel(chain=keep)
         print(f"  dropped chains {args.drop_chains}; using {keep}", flush=True)
 
-    trace_n_models = idata.posterior.sizes.get("model")
-    data = load_eci_data(include_all_benchmarks=True, drop_low_obs_models=False)
-    if trace_n_models != data.n_models:
-        data = load_eci_data(include_all_benchmarks=True, drop_low_obs_models=True)
-        if data.n_models != trace_n_models:
-            raise RuntimeError(f"trace has {trace_n_models} models; neither data "
-                               f"scope matches")
+    data = spec.load_data(idata)[0]
 
     rep = alignment_report(idata, data, methods=tuple(args.methods))
     all_load = pd.concat(
         [e["loadings"].assign(method=m) for m, e in rep["methods"].items()],
         ignore_index=True)
     # K-tagged filenames: K=2 and K=3 fits share a results dir.
-    save_df(all_load, RESULTS_DIR / f"mirt_alignment_loadings_k{args.K}.csv")
-    save_df(rep["agreement"], RESULTS_DIR / f"mirt_alignment_agreement_k{args.K}.csv")
+    save_df(all_load, results_dir / f"mirt_alignment_loadings_k{K}.csv")
+    save_df(rep["agreement"], results_dir / f"mirt_alignment_agreement_k{K}.csv")
     summary = {m: {"aligned_max_rhat_A": e["aligned_max_rhat_A"],
                    "reproducibility": e["reproducibility"],
                    "sign_counts": e["sign_counts"],
@@ -165,7 +136,7 @@ def main():
                for m, e in rep["methods"].items()}
     summary["per_chain_divergence_frac"] = rep.get("per_chain_divergence_frac")
     summary["dropped_chains"] = args.drop_chains or []
-    save_json(summary, RESULTS_DIR / f"mirt_alignment_summary_k{args.K}.json")
+    save_json(summary, results_dir / f"mirt_alignment_summary_k{K}.json")
 
     for m, e in rep["methods"].items():
         sc = "  ".join(f"{ax} +{v['n_pos_confident']}/-{v['n_neg_confident']}"
@@ -177,10 +148,10 @@ def main():
     print(rep["agreement"].groupby("axis")["abs_corr"].agg(["min", "median"])
           .to_string(float_format=lambda x: f"{x:.3f}"))
 
-    fig_path = ROOT / "plots" / "mirt" / f"diag_k{args.K}{tag}_alignment.png"
+    fig_path = ROOT / "plots" / "mirt" / f"diag_k{K}{spec.tag}_alignment.png"
     fig_path.parent.mkdir(parents=True, exist_ok=True)
-    _diag_figure(rep, args.K, fig_path)
-    print(f"\nOutputs → {RESULTS_DIR}\nFigure  → {fig_path}")
+    _diag_figure(rep, fig_path)
+    print(f"\nOutputs → {results_dir}\nFigure  → {fig_path}")
 
 
 if __name__ == "__main__":

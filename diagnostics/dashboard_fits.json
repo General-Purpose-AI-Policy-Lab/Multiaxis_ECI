@@ -1,0 +1,33 @@
+[
+  {
+    "name": "demo_k2_floors",
+    "label": "K=2 demo \u00b7 positive loadings \u00b7 3PL floors \u00b7 4x400 (red-team walkthrough)",
+    "type": "exploratory",
+    "spec": {
+      "K": 2,
+      "loading_prior": "normal",
+      "link": "linear",
+      "human_prior": false,
+      "human_merge": false,
+      "lineage_prior": false,
+      "lineage_bm": false,
+      "time_prior": false,
+      "theta_t": false,
+      "theta_pos": false,
+      "no_sg": false,
+      "apply_exclusions": false,
+      "cyber": false,
+      "simpleqa_original": false,
+      "drop_benchmarks": [],
+      "private_bases": false,
+      "floors": true,
+      "ceilings": false,
+      "ceiling_noise": false,
+      "known_se": false,
+      "pooled_noise": true
+    },
+    "trace_path": "results/mirt_floors/trace_mirt_k2_floors.nc",
+    "short": "K=2 demo",
+    "forecast": true
+  }
+]

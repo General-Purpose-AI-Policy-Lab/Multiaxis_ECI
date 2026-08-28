@@ -25,16 +25,29 @@ def _pred_rhat_summary(pred, name: str) -> dict:
             f"{name}_frac_gt_1.01": float(np.nanmean(r > 1.01))}
 
 
+def _identified_eta(post, data: ECIData, n_obs_sample: int, seed: int):
+    """eta over a random observation subset, in the scale the likelihood used.
+
+    theta_pos when the fit has it (the likelihood reads softplus(theta) there).
+    On a loglog fit ("alpha" in the posterior) eta is alpha*log(A . theta_pos):
+    difficulty sits inside A's row scale, so there is no D term.
+    """
+    th = post["theta_pos"] if "theta_pos" in post else post["theta"]
+    bi, mi = _rhat_subset_idx(data, n_obs_sample, seed)
+    A_sel = post["A"].isel(bench=("obs", bi))
+    th_sel = th.isel(model=("obs", mi))
+    if "alpha" in post:
+        return post["alpha"].isel(bench=("obs", bi)) * np.log(
+            (A_sel * th_sel).sum("latent"))
+    return (A_sel * th_sel).sum("latent") - post["D"].isel(bench=("obs", bi))
+
+
 def mirt_identified_ess(trace, data: ECIData, n_obs_sample: int = 400,
                         seed: int = 0) -> dict:
     """Bulk ESS on the identified eta subset — the ESS companion to
     `mirt_identified_rhat`, same observation sample, same invariance argument
     (raw A/theta ESS is deflated by label switching that eta cannot see)."""
-    post = trace.posterior
-    A, th, D = post["A"], post["theta"], post["D"]
-    bi, mi = _rhat_subset_idx(data, n_obs_sample, seed)
-    eta = (A.isel(bench=("obs", bi)) * th.isel(model=("obs", mi))).sum("latent") \
-        - D.isel(bench=("obs", bi))
+    eta = _identified_eta(trace.posterior, data, n_obs_sample, seed)
     ess = az.ess(eta.to_dataset(name="eta"))["eta"].values
     return {"eta_ess_min": float(np.nanmin(ess)),
             "eta_ess_med": float(np.nanmedian(ess))}
@@ -61,15 +74,16 @@ def mirt_identified_rhat(trace, data: ECIData, n_obs_sample: int = 400,
         random subset of observations — invariant to permutation/rotation/sign,
       * D, sigma_b, tau_CD — per-benchmark / global, no axis label at all.
 
+    On a theta_pos fit the likelihood reads softplus(theta), so eta is built
+    from `theta_pos` there — scoring the raw scale would judge convergence on a
+    quantity the model never evaluated. On a loglog fit ("alpha" in the
+    posterior) eta is alpha*log(A . theta_pos) instead, with no D term.
+
     Returns max/mean r-hat for eta and max r-hat for each identified parameter.
     """
     post = trace.posterior
-    A, th, D = post["A"], post["theta"], post["D"]
-    bi, mi = _rhat_subset_idx(data, n_obs_sample, seed)
-    eta = (A.isel(bench=("obs", bi)) * th.isel(model=("obs", mi))).sum("latent") \
-        - D.isel(bench=("obs", bi))
-    out = _pred_rhat_summary(eta, "eta")
-    out.update(_param_max_rhats(post, ("D", "sigma_b", "tau_CD")))
+    out = _pred_rhat_summary(_identified_eta(post, data, n_obs_sample, seed), "eta")
+    out.update(_param_max_rhats(post, ("D", "sigma_b", "tau_CD", "alpha")))
     return out
 
 

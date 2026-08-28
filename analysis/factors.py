@@ -52,20 +52,6 @@ def trace_loading_prior(trace) -> str:
     return str(trace.posterior.attrs.get("mirt_loading_prior", ""))
 
 
-def trace_display_rotation(trace) -> str:
-    """Display rotation recorded on a MIRT trace ('' = the promax default).
-
-    Fit drivers write `posterior.attrs["mirt_display_rotation"]` at save time
-    ('nonneg' = non-negativity-constrained varimax, 'none' = raw rank-tracked
-    axes with no rotation at all) so prepare_fit picks the interpretation
-    frame per fit without a caller flag — same pattern as
-    `trace_loading_prior`. Only the exploratory 'normal'-prior, non-anchored
-    branch honors it; every other fit keeps promax."""
-    if not hasattr(trace, "posterior"):
-        return ""
-    return str(trace.posterior.attrs.get("mirt_display_rotation", ""))
-
-
 def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     """Pull (A, theta, tau_A) from a MIRT trace and canonicalize them.
 
@@ -81,7 +67,7 @@ def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     if rank_track is None:
         rank_track = (not trace_anchors(trace)
                       and trace_loading_prior(trace)
-                      not in ("signed", "signedhs", "bifactor"))
+                      not in ("signed", "bifactor"))
     A = trace.posterior["A"].values
     theta = trace.posterior["theta"].values
     tau = trace.posterior["tau_A"].values

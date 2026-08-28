@@ -9,7 +9,6 @@ exploration traces live in `results/mirt*/`).
 | `build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ `results/comparisons/*.csv`) |
 | `plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → `plots/<out>/` |
 | `align_mirt.py` | Per-draw rotation-alignment comparison on an existing signed trace (no re-sampling) |
-| `forecast_mirt.py` | AI-frontier vs human-tier crossover projection per axis |
 | `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit |
 | `compute_sota.py` | Recompute the data-driven SOTA list → `data/curated/sota_models.txt` |
 | `residual_corr.py` | Is 1D capability sufficient? (see below) |

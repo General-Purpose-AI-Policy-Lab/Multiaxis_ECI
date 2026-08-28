@@ -3,14 +3,15 @@
 Two modes:
 
   python fit.py --preset canonical
-      The headline ECI pipeline: K=1, "normal" loading prior, curated
+      The headline ECI pipeline: K=1, "pt1" loading prior, curated
       benchmark exclusions, humans as test-takers. Produces the anchored ECI
       scale, SOTA table, forests, timeline, PPC/GoF and figures under
       results/canonical/ and plots/canonical/.
 
-  python fit.py --K 3 --loading-prior signed [--human-prior --lineage-prior ...]
-      Exploration: the K-axis MIRT on the full benchmark set, promax
-      post-processing, per-config results/mirt{tag}/ folders.
+  python fit.py --K 4 [--human-merge --lineage-prior --lineage-bm ...]
+      Exploration: the K-axis MIRT on the full benchmark set, per-config
+      results/mirt{tag}/ folders. Non-negative loadings and fixed-c 3PL
+      floors are the defaults; --loading-prior signed and --no-floors opt out.
 
 The non-compensatory / sparse-gate / interaction families have their own
 drivers in fits/.
@@ -19,10 +20,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
-import sys
+import shutil
 import time
-from pathlib import Path
 
 import arviz as az
 import numpy as np
@@ -31,20 +30,14 @@ import pymc as pm
 
 import config  # attribute access so --eci-data-only / --raw-c overrides propagate
 from analysis import (
-    align_rotations, all_models_stats_df, apply_rotation, factor_corr_df,
+    FitSpec, all_models_stats_df, factor_corr_df,
     factor_scores_df, forest_stats_df, forest_stats_from_draws, human_stats_df,
-    loadings_table, mirt_factors_from_trace, mirt_identified_rhat,
-    nonneg_rotate, promax_rotate, sota_stats_df, tau_spectrum_df,
-    timeline_stats_df,
+    loadings_table, mirt_identified_rhat, prepare_fit, sota_stats_df,
+    spec_json, tau_spectrum_df, timeline_stats_df, trace_loading_prior,
 )
-from config import (
-    DATA_DIR, HUMAN_ORDER, HUMAN_ORDER_MERGED, SAMPLE_KW, SG_MODEL_NAME,
-)
-from data import (
-    apply_item_count_n_eff, clip_scores_to_floors, drop_model_benchmark_cells,
-    drop_model_observations, drop_zero_scores, load_benchmark_ceilings,
-    load_benchmark_floors, load_eci_data, release_time_covariate,
-)
+from config import DATA_DIR, SAMPLE_KW
+from data import (drop_zero_scores, load_eci_data, load_excluded_benchmarks,
+                  load_retired_benchmarks, release_time_covariate)
 from lineage import build_lineage_structure
 from models.mirt import build_mirt_model
 from persistence import load_trace, save_df, save_json, save_pit, save_summary, save_trace
@@ -54,9 +47,6 @@ from viz import (
     forest_fig, hyperparams_fig, pit_ecdf_fig, pit_hist_fig, pred_vs_obs_fig,
     residuals_per_benchmark_fig, save_fig, sota_forest_fig,
 )
-
-ROOT = Path(__file__).resolve().parent
-
 
 class _Heartbeat:
     """Live, file-friendly sampling progress.
@@ -100,9 +90,9 @@ def convergence(idata) -> dict:
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
                 loading_prior="signed", floor_c=None,
-                ceiling_d=None, ceiling_noise=False, known_se=False,
+                ceiling_noise=False, known_se=False,
                 pooled_noise=False, shared_base_zsn=True, time_t=None,
-                theta_t_cells=False, theta_pos=False,
+                theta_t_cells=False, theta_pos=False, link="linear",
                 checkpoint_path=None, stream_path=None):
     """Build + sample one compensatory MIRT; print identified convergence."""
     tag = f"{loading_prior} loadings"
@@ -114,8 +104,6 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         tag += ", time prior"
     if floor_c is not None:
         tag += ", fixed-c 3PL"
-    if ceiling_d is not None:
-        tag += ", fixed-d ceiling" if floor_c is None else " + fixed-d ceiling (4PL)"
     if ceiling_noise:
         tag += ", noise-ceiling 4PL"
     if known_se:
@@ -128,6 +116,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         tag += ", cell-wise t theta"
     if theta_pos:
         tag += ", positive theta (softplus link)"
+    if link != "linear":
+        tag += f", {link} link"
     sampler = sample_kw.get("nuts_sampler", "pymc")
     print(f"\n{'='*70}\nFitting MIRT  K = {K}  ({tag}, sampler={sampler})  "
           f"({data.n_obs} obs / {data.n_models} models / {data.n_benchmarks} benchmarks)\n{'='*70}",
@@ -136,12 +126,12 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                              human_order=human_order, lineage=lineage,
                              lineage_bm=lineage_bm,
                              variant_offsets=variant_offsets,
-                             floor_c=floor_c, ceiling_d=ceiling_d,
+                             floor_c=floor_c,
                              ceiling_noise=ceiling_noise, known_se=known_se,
                              pooled_noise=pooled_noise,
                              shared_base_zsn=shared_base_zsn,
                              time_t=time_t, theta_t_cells=theta_t_cells,
-                             theta_pos=theta_pos)
+                             theta_pos=theta_pos, link=link)
     # PyMC sampler uses the heartbeat callback below (so its bar stays off);
     # nutpie/numpyro have no heartbeat, so let their own live progress bar show.
     sample_kw = {**sample_kw, "progressbar": sampler != "pymc"}
@@ -167,6 +157,10 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
             # (persistence.load_live_draws trims the NaN tail).
             from nutpie import zarr_store
             stream_path.parent.mkdir(parents=True, exist_ok=True)
+            # The store path carries the flag tag but not K or the chain/draw
+            # counts, so a rerun at a different shape reopens the previous run's
+            # tree and writes new-shaped arrays over stale chunks. Start clean.
+            shutil.rmtree(stream_path, ignore_errors=True)
             nsk["zarr_store"] = zarr_store.LocalStore(str(stream_path), mkdir=True)
         sample_kw["nuts_sampler_kwargs"] = nsk
     extra = {"callback": _Heartbeat(total=sample_kw["tune"] + sample_kw["draws"])} \
@@ -216,11 +210,65 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
 
 # ── Canonical preset: the headline ECI pipeline ─────────────────────────────
 
+def open_only_drop_list(include_all_benchmarks: bool, keep_open: bool = True) -> list[str]:
+    """Benchmarks to drop for --open-only (keep_open=True) or --closed-only
+    (keep_open=False), filtered down to whatever load_eci_data would
+    otherwise have loaded (curated-exclusion scope unless
+    include_all_benchmarks). Shared with diagnostics/country_frontier.py so
+    both build the exact same open-only data scope from one place.
+    """
+    access_path = DATA_DIR / "curated" / "benchmark_access.csv"
+    if not access_path.exists():
+        raise FileNotFoundError(
+            f"--open-only needs {access_path}, which does not exist yet "
+            "(columns: benchmark,access,verified,evidence_url,notes).")
+    access = pd.read_csv(access_path)
+    open_ok = set(access.loc[(access["access"] == "public") &
+                              (access["verified"] == "yes"), "benchmark"])
+    # The access file covers the full exploration scope (98 benchmarks);
+    # canonical only ever sees the curated-exclusion scope (90). The drop list
+    # is filtered down to what load_eci_data will actually have loaded, so the
+    # printed kept/dropped counts describe the fit's own scope.
+    all_benchmarks = (set(pd.read_csv(DATA_DIR / "processed" / "benchmarks_merged.csv")["benchmark"])
+                      - load_retired_benchmarks())
+    in_scope = all_benchmarks if include_all_benchmarks \
+        else all_benchmarks - load_excluded_benchmarks()
+    drop = sorted(in_scope - open_ok) if keep_open else sorted(in_scope & open_ok)
+    label = "--open-only" if keep_open else "--closed-only"
+    print(f"── {label}: {len(in_scope) - len(drop)} "
+          f"{'public/verified' if keep_open else 'closed'} "
+          f"benchmarks kept, {len(drop)} dropped ─────")
+    return drop
+
+
 def run_canonical(args) -> None:
-    results_dir = config.RESULTS_DIR / "canonical"
-    plots_dir = config.PLOTS_DIR / "canonical"
+    if args.open_only and args.closed_only:
+        raise ValueError("--open-only and --closed-only cannot compose: "
+                          "they are complementary scopes.")
+    if args.open_only and args.eci_data_only:
+        # eci_data.csv uses the reference dataset's "pretty" benchmark names,
+        # which don't match benchmark_access.csv (keyed on the processed
+        # file's names) — the drop list would silently match nothing.
+        raise ValueError("--open-only and --eci-data-only cannot compose: "
+                          "the reference eci_data.csv names don't match "
+                          "benchmark_access.csv")
+    if args.closed_only and args.eci_data_only:
+        raise ValueError("--closed-only and --eci-data-only cannot compose: "
+                          "the reference eci_data.csv names don't match "
+                          "benchmark_access.csv")
+
+    scope_tag = "canonical_open" if args.open_only else \
+        ("canonical_closed" if args.closed_only else "canonical")
+    results_dir = config.RESULTS_DIR / scope_tag
+    plots_dir = config.PLOTS_DIR / scope_tag
     results_dir.mkdir(parents=True, exist_ok=True)
     plots_dir.mkdir(parents=True, exist_ok=True)
+
+    # keep_open is exactly --open-only: the two flags are complementary and
+    # cannot compose, so one call covers both scopes.
+    access_drop = (open_only_drop_list(args.include_all_benchmarks,
+                                       keep_open=args.open_only)
+                   if args.open_only or args.closed_only else None)
 
     if args.raw_c:
         config.RAW_C_MODE = True
@@ -261,13 +309,30 @@ def run_canonical(args) -> None:
                          drop_low_obs_models=False,
                          collapse_effort_variants=False,
                          include_all_benchmarks=args.include_all_benchmarks,
-                         min_release_date="2024-01-01" if args.post_2023 else None)
+                         drop_benchmarks=access_drop)
     if args.drop_zero_scores:
         before = data.n_obs
         data = drop_zero_scores(data)
         print(f"   --drop-zero-scores: removed {before - data.n_obs} zero-score observations")
     print(f"   n_obs={data.n_obs}  n_models={data.n_models}  "
           f"n_benchmarks={data.n_benchmarks}  zero_scores={data.zero_score_mask.sum()}")
+
+    if args.open_only or args.closed_only:
+        # Sampling costs hours; catch a missing anchor here rather than in
+        # eci_transform after the fact.
+        flag = "--open-only" if args.open_only else "--closed-only"
+        n_ge4 = int((data.n_obs_per_model >= 4).sum())
+        print(f"   {flag} preflight: n_benchmarks={data.n_benchmarks} "
+              f"(dropped {len(access_drop)})  n_obs={data.n_obs}  "
+              f"n_models_with_ge4_obs={n_ge4}/{data.n_models}")
+        have = set(data.mlookup["model"])
+        missing = [m for m in (config.ANCHOR_LOW[0], config.ANCHOR_HIGH[0]) if m not in have]
+        if missing:
+            raise ValueError(
+                f"{flag}: ECI anchor model(s) {missing} have no observations "
+                "left after dropping benchmarks — eci_transform would "
+                "fail. Pick different anchors or add a benchmark that "
+                "covers them.")
 
     sample_kw = {
         **SAMPLE_KW,
@@ -284,8 +349,11 @@ def run_canonical(args) -> None:
         print(f"   reusing trace from {trace_path}")
         trace = load_trace(trace_path)
     else:
-        trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="normal")
-        trace.posterior.attrs["mirt_loading_prior"] = "normal"
+        # pt1 is the canonical loading prior: product-1 identification (Epoch's
+        # sum-to-zero log-alpha gauge), fewer divergences than `normal` on this
+        # scope at unchanged abilities (rank corr 0.9988).
+        trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1")
+        trace.posterior.attrs["mirt_loading_prior"] = "pt1"
         save_trace(trace, trace_path)
         print(f"   saved trace → {trace_path}")
 
@@ -411,44 +479,15 @@ def run_canonical(args) -> None:
 # ── Exploration: the K-axis MIRT campaign driver ────────────────────────────
 
 def run_exploration(args, parser) -> None:
-    # One tag identifies the fit config; reused for BOTH the results/plots folder
-    # and the trace filename, so distinct configs never overwrite each other's
-    # fixed-name artefacts. The loading prior leads the tag (matching the
-    # historical `trace_mirt_k3_signed_...` convention); "normal" stays
-    # untagged so its folders reduce to the canonical mirt_humanprior etc.
-    tag = "" if args.loading_prior == "normal" else f"_{args.loading_prior}"
-    if args.human_merge: tag += "_humanmerge"
-    elif args.human_prior: tag += "_humanprior"
-    if args.lineage_prior: tag += "_lineageprior"
-    if args.lineage_bm: tag += "_lineagebm"
-    if args.time_prior: tag += "_timeprior"
-    if args.theta_t: tag += "_thetat"
-    if args.theta_pos: tag += "_thetapos"
-    if args.min_release_date:
-        tag += f"_since{args.min_release_date[:4]}"
-    if args.no_sg: tag += "_noSG"
-    if args.no_sg_gpqa: tag += "_noSGgpqa"
-    if args.no_sg_arcagi: tag += "_noSGarcagi"
-    if args.apply_exclusions: tag += "_excluded"
-    if args.cyber: tag += "_cyber"
-    if args.simpleqa_original: tag += "_sqaorig"
-    if args.drop_benchmarks:
-        tag += "_drop" + "".join(re.sub(r"\W", "", b) for b in args.drop_benchmarks)
-    if args.private_bases: tag += "_privbase"
-    if args.floors: tag += "_floors"
-    if args.ceilings: tag += "_ceilings"
-    if args.ceiling_noise: tag += "_ceilnoise"
-    if args.known_se: tag += "_knownse"
-    if args.item_counts: tag += "_itemcounts"
-    if args.pooled_noise: tag += "_poolednoise"
-
-    human_order = (HUMAN_ORDER_MERGED if args.human_merge
-                   else HUMAN_ORDER if args.human_prior else None)
-    results_dir = ROOT / "results" / (f"mirt{tag}" if tag else "mirt")
-    plots_dir = ROOT / "plots" / (f"mirt{tag}" if tag else "mirt")
+    # The spec owns the fit's identity: its tag, its folders, its trace name and
+    # the data scope it is fit on. Nothing here re-derives any of those.
+    spec = FitSpec.from_args(args, parser)
+    human_order = spec.human_order
+    results_dir = spec.results_dir
+    plots_dir = spec.plots_dir
     results_dir.mkdir(parents=True, exist_ok=True)
     plots_dir.mkdir(parents=True, exist_ok=True)
-    if tag:
+    if spec.tag:
         print(f"  per-config folder: {results_dir}", flush=True)
 
     sample_kw = {
@@ -463,79 +502,12 @@ def run_exploration(args, parser) -> None:
     if args.seed is not None:
         sample_kw["random_seed"] = args.seed
 
-    data = load_eci_data(
-        include_all_benchmarks=not args.apply_exclusions,
-        fit_cyber=args.cyber,
-        fit_simpleqa_original=args.simpleqa_original,
-        drop_benchmarks=args.drop_benchmarks,
-        min_release_date=args.min_release_date)
-    if args.apply_exclusions:
-        print("  --apply-exclusions: curated exclusions applied at fit time "
-              "(dropped benchmarks from excluded_benchmarks.txt)", flush=True)
-    if sum([args.no_sg, args.no_sg_gpqa, args.no_sg_arcagi]) > 1:
-        parser.error("--no-sg / --no-sg-gpqa / --no-sg-arcagi are mutually exclusive "
-                     "(one drops all SG obs, the others only its GPQA / ARC-AGI cells).")
-    if args.no_sg:
-        n_before = data.n_obs
-        data = drop_model_observations(data, [SG_MODEL_NAME])
-        print(f"  --no-sg: dropped {n_before - data.n_obs} '{SG_MODEL_NAME}' "
-              f"observations (tier kept in model index, prior-only theta)", flush=True)
-    if args.no_sg_gpqa:
-        n_before = data.n_obs
-        gpqa = [b for b in data.blookup["benchmark"] if "GPQA" in b]
-        data = drop_model_benchmark_cells(data, SG_MODEL_NAME, gpqa)
-        print(f"  --no-sg-gpqa: dropped {n_before - data.n_obs} '{SG_MODEL_NAME}' "
-              f"GPQA cells {gpqa} (other SG scores kept)", flush=True)
-    if args.no_sg_arcagi:
-        n_before = data.n_obs
-        # ARC-AGI abstraction family only ("ARC-AGI", "ARC-AGI-2") — NOT the easy
-        # "ARC (AI2)" science-QA benchmark, which is a different construct.
-        arcagi = [b for b in data.blookup["benchmark"] if b.startswith("ARC-AGI")]
-        data = drop_model_benchmark_cells(data, SG_MODEL_NAME, arcagi)
-        print(f"  --no-sg-arcagi: dropped {n_before - data.n_obs} '{SG_MODEL_NAME}' "
-              f"ARC-AGI cells {arcagi} (other SG scores kept)", flush=True)
-    floor_c = None
-    if args.floors:
-        floor_c = load_benchmark_floors(data)
-        n_before = int((data.scores < floor_c[data.bench_idx]).sum())
-        data = clip_scores_to_floors(data, floor_c)
-        print(f"  --floors: fixed-c 3PL; clipped {n_before} below-floor scores up "
-              f"to their benchmark chance floor", flush=True)
-    ceiling_d = None
-    if args.ceilings:
-        ceiling_d = load_benchmark_ceilings(data)
-        capped = [(b, d) for b, d in
-                  zip(data.blookup.sort_values("benchmark_idx")["benchmark"],
-                      ceiling_d) if d < 1.0]
-        print(f"  --ceilings: fixed-d upper asymptote on {len(capped)} "
-              f"benchmark(s): " + ", ".join(f"{b} d={d}" for b, d in capped),
-              flush=True)
-    if args.known_se:
-        measured = np.isfinite(data.n_eff)
-        print(f"  --known-se: {int(measured.sum())} of {data.n_obs} cells "
-              f"({measured.mean():.1%}) carry a reported stderr, median "
-              f"effective test length {np.median(data.n_eff[measured]):.0f} "
-              f"tasks; the rest keep the estimated per-benchmark noise",
-              flush=True)
-        if args.item_counts:
-            before = int(measured.sum())
-            data = apply_item_count_n_eff(data)
-            measured = np.isfinite(data.n_eff)
-            print(f"  --item-counts: +{int(measured.sum()) - before} cells get "
-                  f"the verified item-count floor; instrument coverage now "
-                  f"{int(measured.sum())} of {data.n_obs} ({measured.mean():.1%})",
-                  flush=True)
-    elif args.item_counts:
-        raise SystemExit("--item-counts requires --known-se (it only fills the "
-                         "n_eff slot that machinery reads)")
+    data, floor_c, n_eff = spec.load_data()
     print(f"\nData: {data.n_obs} obs / {data.n_models} models / "
           f"{data.n_benchmarks} benchmarks", flush=True)
     bench_names = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
     model_names = data.mlookup.sort_values("model_idx")["model"].tolist()
 
-    if args.lineage_bm and not args.lineage_prior:
-        parser.error("--lineage-bm re-indexes the lineage increments by time; it "
-                     "needs --lineage-prior.")
     lineage = (build_lineage_structure(data.mlookup)
                if args.lineage_prior else None)
     if args.lineage_prior:
@@ -558,24 +530,27 @@ def run_exploration(args, parser) -> None:
               flush=True)
 
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
-    idata_k, conv_k = sample_mirt(data, args.K, sample_kw,
+    idata_k, conv_k = sample_mirt(data, spec.K, sample_kw,
                                   human_order=human_order, lineage=lineage,
-                                  lineage_bm=args.lineage_bm, time_t=time_t,
-                                  loading_prior=args.loading_prior, floor_c=floor_c,
-                                  ceiling_d=ceiling_d,
-                                  ceiling_noise=args.ceiling_noise,
-                                  known_se=args.known_se,
-                                  pooled_noise=args.pooled_noise,
-                                  shared_base_zsn=not args.private_bases,
-                                  theta_t_cells=args.theta_t,
-                                  theta_pos=args.theta_pos,
-                                  checkpoint_path=results_dir
-                                  / f"trace_mirt_k{args.K}{tag}.nc",
+                                  lineage_bm=spec.lineage_bm, time_t=time_t,
+                                  loading_prior=spec.loading_prior, floor_c=floor_c,
+                                  ceiling_noise=spec.ceiling_noise,
+                                  known_se=spec.known_se,
+                                  pooled_noise=spec.pooled_noise,
+                                  shared_base_zsn=not spec.private_bases,
+                                  theta_t_cells=spec.theta_t,
+                                  theta_pos=spec.theta_pos,
+                                  link=spec.link,
+                                  checkpoint_path=spec.trace_path,
                                   stream_path=(results_dir / "live_draws.zarr"
                                                if args.stream_draws else None))
+    # The whole flag set travels with the trace, so any later reader recovers
+    # the fit's tag, folders and data scope without a filename convention.
+    idata_k.posterior.attrs["mirt_spec"] = spec_json(spec)
     # Loading prior travels with the trace so prepare_fit can gate
     # rotation/sign handling without caller flags.
     idata_k.posterior.attrs["mirt_loading_prior"] = args.loading_prior
+    idata_k.posterior.attrs["mirt_link"] = args.link
     if human_order:
         idata_k.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
     if lineage:
@@ -602,22 +577,17 @@ def run_exploration(args, parser) -> None:
         idata_k.posterior.attrs["mirt_theta_pos"] = json.dumps(True)
     if floor_c is not None:
         idata_k.posterior.attrs["mirt_floor_c"] = json.dumps(floor_c.tolist())
-    if ceiling_d is not None:
-        idata_k.posterior.attrs["mirt_fixed_ceiling_d"] = json.dumps(ceiling_d.tolist())
     if args.known_se:
         idata_k.posterior.attrs["mirt_known_se"] = json.dumps(True)
-    if args.item_counts:
-        idata_k.posterior.attrs["mirt_item_counts"] = json.dumps(True)
     if args.pooled_noise:
         idata_k.posterior.attrs["mirt_pooled_noise"] = json.dumps(True)
-    if args.rotation != "promax":
-        # Display rotation travels with the trace so prepare_fit (dashboard,
-        # plot_mirt) picks the same interpretation frame the CSVs use here.
-        idata_k.posterior.attrs["mirt_display_rotation"] = args.rotation
-    save_trace(idata_k, results_dir / f"trace_mirt_k{args.K}{tag}.nc")
+    save_trace(idata_k, spec.trace_path)
 
-    # ── Factors: rank-track then oblique-rotate ────────────────────────────
-    A, theta, tau = mirt_factors_from_trace(idata_k)
+    # ── Factors: the same identity decision every figure gets ─────────────
+    # prepare_fit owns it (per-draw alignment for the signed family, the raw
+    # frame otherwise), so these CSVs and the dashboard cannot read the fit in
+    # different frames.
+    view = prepare_fit(idata_k, data)
 
     # tau spectrum is a PRE-rotation quantity: rotation mixes axes and would
     # scramble the per-axis scales, so dimensionality is read here, first.
@@ -626,58 +596,31 @@ def run_exploration(args, parser) -> None:
     # apart. Realised per-axis strength lives in the loading column norms (the
     # horseshoe's local scales are per cell), and that is also what shows a
     # specific the data did not need collapsing to an empty column.
-    spec = tau_spectrum_df(
-        np.linalg.norm(A, axis=1) if args.loading_prior == "bifactor" else tau)
-    save_df(spec, results_dir / "mirt_tau_spectrum.csv")
+    tau_spec = tau_spectrum_df(
+        np.linalg.norm(view.A, axis=1) if args.loading_prior == "bifactor"
+        else view.tau)
+    save_df(tau_spec, results_dir / "mirt_tau_spectrum.csv")
     print("\n── tau_A spectrum (gap ratio flags the live/dead break) ──")
-    print(spec.to_string(index=False, float_format=lambda x: f"{x:.3f}"))
+    print(tau_spec.to_string(index=False, float_format=lambda x: f"{x:.3f}"))
 
-    # Oblique rotation → simple-structure bundles. Three paths:
-    #   * signed/signedhs, K>1 — every draw sits in its own orientation, so a
-    #     mean-then-rotate would cancel structure; align each draw (rotation +
-    #     sign + permutation) with the SAME promax frame prepare_fit uses, so
-    #     these CSVs match the dashboard.
-    #   * --rotation none — raw frame: the energy rank-tracking in
-    #     mirt_factors_from_trace already fixed the cross-chain axis
-    #     permutation, and on the non-negative prior the positivity constraint
-    #     pins the rotation itself (raw vs rotated axes agree at corr ≥ 0.98
-    #     on the K=3 floors fit). Phi is the raw ability correlation.
-    #   * 'normal' prior otherwise — no sign symmetry; rotate the
-    #     posterior-mean loadings and apply to every draw. Default promax;
-    #     --rotation nonneg keeps loadings non-negative (pure positive
-    #     bundles, no contrast — only sound on the non-negative prior).
-    frame_label = "rotated bundle"
-    if args.loading_prior in ("signed", "signedhs") and args.K > 1:
-        aligned = align_rotations(A, theta, method="promax")
-        A, theta, Phi = aligned.A, aligned.theta, aligned.Phi
-    elif args.loading_prior == "bifactor":
-        # The bifactor frame IS the axes: the prior's dense/sparse asymmetry
-        # already picked the orientation (that is what identifies g), so any
-        # rotation here would mix the general column back into the specifics
-        # and undo it. Phi is the raw ability correlation; g-vs-specific
-        # overlap is a RESULT to read, not something a rotation should set.
-        Phi = (np.corrcoef(theta.mean(axis=0).T) if args.K > 1
-               else np.array([[1.0]]))
-        frame_label = "bifactor frame (axis1 = g, no rotation)"
-    elif args.rotation == "none":
-        Phi = (np.corrcoef(theta.mean(axis=0).T) if args.K > 1
-               else np.array([[1.0]]))
-        frame_label = "raw bundle (rank-tracked, no rotation)"
-    else:
-        rotate = nonneg_rotate if args.rotation == "nonneg" else promax_rotate
-        Tload, Ttheta, Phi = rotate(A.mean(axis=0))
-        A, theta, Phi = apply_rotation(A, theta, Phi, Tload, Ttheta)
+    # Which frame prepare_fit landed on, for the loading print below. Read off
+    # the view and the trace, so the label cannot disagree with the frame.
+    lp = trace_loading_prior(idata_k)
+    frame_label = (
+        "bifactor frame (axis1 = g, no rotation)" if lp == "bifactor"
+        else "promax-aligned bundle (per draw)" if lp == "signed" and view.K > 1
+        else "raw bundle (rank-tracked, no rotation)")
 
-    corr = factor_corr_df(Phi)
+    corr = factor_corr_df(view.Phi)
     save_df(corr.reset_index().rename(columns={"index": "axis"}),
             results_dir / "mirt_factor_corr.csv")
     print("\n── factor correlation Phi (off-diag = axis-ability overlap) ──")
     print(corr.to_string(float_format=lambda x: f"{x:.3f}"))
 
-    loadings = loadings_table(A, bench_names, data.bench_category)
+    loadings = loadings_table(view.A, bench_names, data.bench_category)
     save_df(loadings, results_dir / "mirt_loadings.csv")
 
-    scores = factor_scores_df(theta, model_names, is_human=data.is_human)
+    scores = factor_scores_df(view.theta, model_names, is_human=data.is_human)
     save_df(scores, results_dir / "mirt_factor_scores.csv")
 
     for k in range(min(args.K, 4)):
@@ -691,14 +634,12 @@ def run_exploration(args, parser) -> None:
     # so we use the same PPC-based GoF the canonical pipeline uses: Bayesian
     # R², RMSE, MAE on posterior-predictive draws, plus per-observation
     # residuals for the residual-per-benchmark diagnostic.
-    n_eff = data.n_eff if args.known_se else None
 
     def gof_report(idata, label, gtag):
         y_rep = posterior_predictive_mirt(idata, data, floor_c=floor_c,
-                                          ceiling_d=ceiling_d, n_eff=n_eff)
+                                          n_eff=n_eff)
         mu = posterior_predictive_mirt(idata, data, floor_c=floor_c,
-                                       ceiling_d=ceiling_d, n_eff=n_eff,
-                                       return_mean=True)
+                                       n_eff=n_eff, return_mean=True)
         gof = compute_gof(y_rep, data, mu)
         save_json(gof.metrics, results_dir / f"mirt_gof_{gtag}.json")
         m = gof.metrics
@@ -719,7 +660,7 @@ def run_exploration(args, parser) -> None:
     save_df(resid_df, results_dir / "mirt_residuals.csv")
 
     if not args.skip_baseline:
-        baseline_path = results_dir / "trace_mirt_k1.nc"
+        baseline_path = spec.baseline_trace_path
         if baseline_path.exists() and not args.refit_baseline:
             # The K=1 MIRT is data-shape-locked: it indexes the same (model,
             # benchmark) coords as the K-axis fit, so a cached trace is safe to
@@ -728,7 +669,10 @@ def run_exploration(args, parser) -> None:
             # recomputed — no extra forward pass.
             idata_1d = az.from_netcdf(baseline_path)
             post = idata_1d.posterior
-            if post.sizes.get("model") == data.n_models and \
+            # draw > 0 because an interrupted baseline is saved as an
+            # aborted 0-draw trace, and the dims of an empty trace still match.
+            if post.sizes.get("draw", 0) > 0 and \
+               post.sizes.get("model") == data.n_models and \
                post.sizes.get("bench") == data.n_benchmarks:
                 print(f"\nReusing cached K=1 baseline → {baseline_path}", flush=True)
                 gof_path = results_dir / "mirt_gof_k1.json"
@@ -741,14 +685,14 @@ def run_exploration(args, parser) -> None:
                       f"bench={post.sizes.get('bench')}) don't match current data "
                       f"({data.n_models}, {data.n_benchmarks}) — refitting.", flush=True)
                 idata_1d, _ = sample_mirt(data, 1, sample_kw, loading_prior="normal",
-                                          floor_c=floor_c, ceiling_d=ceiling_d,
+                                          floor_c=floor_c,
                                           ceiling_noise=args.ceiling_noise,
                                           known_se=args.known_se)
                 save_trace(idata_1d, baseline_path)
                 gof_report(idata_1d, "1D (K=1)", "k1")
         else:
             idata_1d, _ = sample_mirt(data, 1, sample_kw, loading_prior="normal",
-                                      floor_c=floor_c, ceiling_d=ceiling_d,
+                                      floor_c=floor_c,
                                       ceiling_noise=args.ceiling_noise,
                                       known_se=args.known_se)
             save_trace(idata_1d, baseline_path)
@@ -756,32 +700,14 @@ def run_exploration(args, parser) -> None:
 
     print(f"\nOutputs → {results_dir}")
     if args.plots:
-        import subprocess
-        # Forward EVERY flag that feeds plot_mirt's trace tag or data scope —
-        # a missing one points it at a different fit's trace (or none at all).
-        cmd = [sys.executable, str(ROOT / "diagnostics" / "plot_mirt.py"),
-               "--K", str(args.K), "--axes", str(args.K),
-               "--loading-prior", args.loading_prior]
-        for flag, on in [("--human-prior", args.human_prior),
-                         ("--human-merge", args.human_merge),
-                         ("--lineage-prior", args.lineage_prior),
-                         ("--lineage-bm", args.lineage_bm),
-                         ("--time-prior", args.time_prior),
-                         ("--no-sg", args.no_sg),
-                         ("--no-sg-gpqa", args.no_sg_gpqa),
-                         ("--no-sg-arcagi", args.no_sg_arcagi),
-                         ("--apply-exclusions", args.apply_exclusions),
-                         ("--floors", args.floors),
-                         ("--ceilings", args.ceilings),
-                         ("--ceiling-noise", args.ceiling_noise),
-                         ("--known-se", args.known_se),
-                         ("--pooled-noise", args.pooled_noise)]:
-            if on:
-                cmd.append(flag)
-        print(f"\n--plots: rendering figures ({' '.join(cmd[2:])})", flush=True)
-        subprocess.run(cmd, check=True)
+        # In-process: the spec travels with the trace, so no flag list to keep
+        # in sync, and the posterior in memory is reused instead of re-read.
+        from diagnostics.plot_mirt import plot_fit
+        print("\n--plots: rendering figures", flush=True)
+        plot_fit(spec.trace_path, idata=idata_k, axes=args.K)
     else:
-        print("Figures: run diagnostics/plot_mirt.py")
+        print("Figures: run diagnostics/plot_mirt.py --trace "
+              f"{spec.trace_path}")
 
 
 def main():
@@ -789,7 +715,7 @@ def main():
         description="Fit the compensatory Beta-MIRT: --preset canonical for the "
                     "headline ECI pipeline (K=1), or the K-axis exploration flags.")
     parser.add_argument("--preset", choices=["canonical"],
-                        help="'canonical': K=1, normal prior, curated exclusions, "
+                        help="'canonical': K=1, pt1 prior, curated exclusions, "
                              "humans in, full ECI deliverables → results/canonical/")
     # Shared sampling controls.
     parser.add_argument("--draws", type=int, default=None,
@@ -819,27 +745,36 @@ def main():
                         help="[canonical] report raw C instead of anchored ECI")
     parser.add_argument("--include-all-benchmarks", action="store_true",
                         help="[canonical] keep the curated-excluded benchmarks in the fit")
-    parser.add_argument("--min-release-date", metavar="YYYY-MM-DD", default=None,
-                        help="[exploration] drop models released before this date. "
-                             "Undated models are kept: after the 2026-07-28 date "
-                             "backfill the remaining undated ones are genuinely "
-                             "recent (Manus, Muse Spark, audio models), and humans "
-                             "have no release date by nature.")
-    parser.add_argument("--post-2023", action="store_true",
-                        help="[canonical] era sensitivity: drop models with a known "
-                             "release date before 2024-01-01")
+    parser.add_argument("--open-only", action="store_true",
+                        help="[canonical] fit only benchmarks whose items are public "
+                             "(access==public and verified==yes in "
+                             "data/curated/benchmark_access.csv); results go to "
+                             "results/canonical_open/")
+    parser.add_argument("--closed-only", action="store_true",
+                        help="[canonical] fit only benchmarks NOT public+verified "
+                             "in data/curated/benchmark_access.csv (the complement "
+                             "of --open-only); results go to "
+                             "results/canonical_closed/")
     # Exploration flags.
     parser.add_argument("--K", type=int, default=4,
                         help="[exploration] latent dimension")
-    parser.add_argument("--loading-prior", default="signed",
-                        choices=["signed", "normal", "signedhs", "bifactor"],
-                        help="[exploration] loading-matrix prior. Default 'signed' "
-                             "(Normal cells, rotation-invariant); 'normal' is "
-                             "non-negative HalfNormal loadings; 'bifactor' is a "
+    parser.add_argument("--loading-prior", default="normal",
+                        choices=["signed", "normal", "pt1", "bifactor"],
+                        help="[exploration] loading-matrix prior. Default 'normal' "
+                             "(non-negative HalfNormal loadings, so each axis is a "
+                             "bundle of benchmarks a model is good at); 'signed' is "
+                             "Normal cells, rotation-invariant, the only one that "
+                             "can hold a contrast axis; 'pt1' is the "
+                             "same non-negative family under product-to-one "
+                             "loadings per axis (Epoch's ECI identification, "
+                             "a reparameterization of 'normal'); 'bifactor' is a "
                              "dense non-negative general column (axis1) plus "
                              "non-negative horseshoe specifics (axes 2..K), which "
                              "identifies g without assigning any benchmark to an "
                              "axis. Needs --K >= 2.")
+    parser.add_argument("--link", choices=["linear", "loglog"], default="linear",
+                        help="IRF link: linear 2PL (default) or the log-logistic "
+                             "mu = 1/(1+(theta.A)^-alpha)")
     parser.add_argument("--human-prior", action="store_true",
                         help="[exploration] order human tiers by config.HUMAN_ORDER")
     parser.add_argument("--stream-draws", action="store_true",
@@ -896,10 +831,6 @@ def main():
                              "softplus is monotone, so rankings are unchanged")
     parser.add_argument("--no-sg", action="store_true",
                         help="[exploration] drop the Skilled Generalist tier's observations")
-    parser.add_argument("--no-sg-gpqa", action="store_true",
-                        help="[exploration] drop only the Skilled Generalist's GPQA cells")
-    parser.add_argument("--no-sg-arcagi", action="store_true",
-                        help="[exploration] drop only the Skilled Generalist's ARC-AGI cells")
     parser.add_argument("--apply-exclusions", action="store_true",
                         help="[exploration] apply excluded_benchmarks.txt at fit time "
                              "(the canonical scope; exploration default is the full set)")
@@ -924,55 +855,40 @@ def main():
                              "span only the unstructured rows. Same marginal scale; "
                              "changes how much of the population the location pin "
                              "covers")
-    parser.add_argument("--floors", action="store_true",
-                        help="[exploration] fixed-c 3PL: clip scores up to each "
-                             "benchmark's chance floor and set mu = c + (1-c)*sigmoid "
-                             "(floors from data/curated/benchmark_lower_bounds.csv)")
-    parser.add_argument("--ceilings", action="store_true",
-                        help="[exploration] fixed-d upper asymptote: set "
-                             "mu = c + (d-c)*sigmoid with d fixed per benchmark "
-                             "from data/curated/benchmark_upper_bounds.csv "
-                             "(benchmarks absent from the file keep d=1); with "
-                             "--floors this is the fixed 4PL")
+    parser.add_argument("--no-floors", dest="floors", action="store_false",
+                        help="[exploration] drop the fixed-c 3PL floors, which are "
+                             "ON by default: with them, scores are clipped up to "
+                             "each benchmark's chance floor and mu = c + "
+                             "(1-c)*sigmoid, floors read from "
+                             "data/curated/benchmark_lower_bounds.csv and never "
+                             "estimated. This is the sensitivity run: a "
+                             "below-chance score becomes a point demand on ability "
+                             "again rather than reading as uninformative-low")
     parser.add_argument("--ceiling-noise", action="store_true",
                         help="[exploration] noise 4PL: estimate a per-benchmark "
                              "upper asymptote confined to a noise-sized gap, "
                              "Beta(1,20) (mean 0.048, P(gap>0.10)=0.122) — grading "
-                             "noise, not walls. Composes with --ceilings: the gap "
-                             "sits on top of each curated wall. Read ceiling_d "
-                             "off the trace")
+                             "noise, not walls. Read ceiling_d off the trace")
     parser.add_argument("--known-se", action="store_true",
                         help="[exploration] split the Beta noise: fixed per-cell "
                              "instrument precision from reported harness stderr "
                              "(n_eff = p(1-p)/se^2), sigma_b becomes excess-only. "
                              "Cells without stderr are unchanged.")
-    parser.add_argument("--pooled-noise", action="store_true",
-                        help="[exploration] hierarchical noise: learn the "
-                             "population location/spread of the per-benchmark "
-                             "noise scale instead of fixing it; thin benchmarks "
-                             "shrink toward the shared median")
-    parser.add_argument("--item-counts", action="store_true",
-                        help="[exploration] with --known-se: cells with no "
-                             "reported stderr get the instrument floor "
-                             "n_eff = n_items from the VERIFIED rows of "
-                             "data/curated/benchmark_n_items.csv (machine rows "
-                             "only; conservative — multi-seed runs are treated "
-                             "as single-run)")
-    parser.add_argument("--rotation", default="promax",
-                        choices=["promax", "nonneg", "none"],
-                        help="[exploration] display rotation for loadings/timelines. "
-                             "promax (default); nonneg keeps loadings non-negative "
-                             "(pure positive bundles, no contrast — only sound on the "
-                             "'normal' prior); none skips rotation entirely and "
-                             "reports the raw rank-tracked axes (the non-negative "
-                             "prior already pins the frame). Recorded on the trace "
-                             "so the dashboard uses the same frame.")
+    parser.add_argument("--no-pooled-noise", dest="pooled_noise",
+                        action="store_false",
+                        help="[exploration] fix the per-benchmark noise prior "
+                             "instead of learning its population location and "
+                             "spread. Hierarchical noise is the default, so this "
+                             "is the sensitivity run: a thin benchmark keeps a "
+                             "free scale rather than shrinking to the shared "
+                             "median")
     parser.add_argument("--skip-baseline", action="store_true",
                         help="[exploration] skip the K=1 baseline fit")
     parser.add_argument("--refit-baseline", action="store_true",
                         help="[exploration] re-fit the K=1 baseline even if cached")
     parser.add_argument("--plots", action="store_true",
-                        help="[exploration] render figures via diagnostics/plot_mirt.py")
+                        help="[exploration] render figures in-process via "
+                             "diagnostics.plot_mirt.plot_fit")
     args = parser.parse_args()
 
     if args.preset == "canonical":

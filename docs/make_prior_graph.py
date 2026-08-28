@@ -1,7 +1,7 @@
 """Beta-MIRT prior graph, centered parametrization. 4-page vector PDF.
 
 Represents the flagship fit: K=4, non-negative loadings, fixed guessing
-floors (no ceilings), pooled per-benchmark noise, merged human order,
+floors, pooled per-benchmark noise, merged human order,
 Brownian-motion lineage steps over release gaps.
 """
 import numpy as np
@@ -133,9 +133,9 @@ with PdfPages(out) as pdf:
             ha="left", va="top")
 
     mbox(ax, 0.6, 5.6, 4.4, 6.95, "Test-taker structure",
-         "human tiers · model families · effort variants", "priors: pages 3–4")
+         "human tiers · model families · effort variants")
     mbox(ax, 5.6, 5.6, 9.4, 6.95, "Benchmark structure",
-         "loading scales · difficulty · noise", "page 2")
+         "loading scales · difficulty · noise")
 
     stoch(ax, 2.5, 4.35, r"$\theta_{mk}$", r=0.4)
     ax.text(2.5, 3.7, "abilities", ha="center", va="center", fontsize=9.5,

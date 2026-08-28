@@ -70,7 +70,6 @@ def posterior_predictive_mirt(trace, data: ECIData,
                               seed: int = PPC_SEED,
                               max_draws: int = 2000,
                               floor_c: np.ndarray | None = None,
-                              ceiling_d: np.ndarray | None = None,
                               n_eff: np.ndarray | None = None,
                               return_mean: bool = False) -> np.ndarray:
     """MIRT posterior predictive: mu = sigmoid(sum_k A theta - D), draw Beta.
@@ -83,11 +82,8 @@ def posterior_predictive_mirt(trace, data: ECIData,
     same fixed-c 3PL link as the model, mu = c_b + (1 - c_b) * sigmoid(eta), so
     GoF/PIT match a floored fit. Omit for a plain 2PL trace.
 
-    ceiling_d: per-benchmark fixed upper asymptote (blookup order). When given,
-    applies the same fixed-d link as the model,
-    mu = c_b + (d_b - c_b) * sigmoid(eta). Distinct from the SOFT ceiling,
-    which is estimated and read off the trace automatically (`ceiling_d` in
-    the posterior).
+    A ceiling_noise trace carries its estimated `ceiling_d` in the posterior
+    and is detected automatically; there is no fixed-ceiling argument.
 
     n_eff: per-observation effective test length (data.n_eff) for a trace fit
     with the known_se noise split — the predictive Beta then uses the same
@@ -100,28 +96,41 @@ def posterior_predictive_mirt(trace, data: ECIData,
     """
     post = trace.posterior
     soft_d = "ceiling_d" in post
-    # theta_pos fit: the likelihood reads softplus(theta), not theta
-    # (models/mirt.py). Raw theta stays the reported ability, but scoring the
-    # predictive with it would evaluate a different link than the fit.
-    th_name = "theta_pos" if "theta_pos" in post else "theta"
-    names = ["A", th_name, "D", "phi_b"] + (["ceiling_d"] if soft_d else [])
-    A, theta, D, phi, *rest = _pull_flat(post, names, max_draws)
-    K = A.shape[-1]
+    ceil_names = ["ceiling_d"] if soft_d else []
+    if "alpha" in post:
+        A, tp, alpha, phi, *rest = _pull_flat(
+            post, ["A", "theta_pos", "alpha", "phi_b"] + ceil_names, max_draws)
+        K = A.shape[-1]
 
-    eta = -D[:, data.bench_idx]                                  # (S, n_obs)
-    for k in range(K):
-        eta += A[:, data.bench_idx, k] * theta[:, data.model_idx, k]
+        s = np.zeros_like(A[:, data.bench_idx, 0])
+        for k in range(K):
+            s += A[:, data.bench_idx, k] * tp[:, data.model_idx, k]
+        # loglog link: difficulty lives in A's row scale, so no D subtraction;
+        # must match models/mirt.py bit for bit or GoF/PIT score a different
+        # likelihood than the fit.
+        eta = alpha[:, data.bench_idx] * np.log(s)
+    else:
+        # theta_pos fit: the likelihood reads softplus(theta), not theta
+        # (models/mirt.py). Raw theta stays the reported ability, but scoring the
+        # predictive with it would evaluate a different link than the fit.
+        th_name = "theta_pos" if "theta_pos" in post else "theta"
+        names = ["A", th_name, "D", "phi_b"] + ceil_names
+        A, theta, D, phi, *rest = _pull_flat(post, names, max_draws)
+        K = A.shape[-1]
+
+        eta = -D[:, data.bench_idx]                                  # (S, n_obs)
+        for k in range(K):
+            eta += A[:, data.bench_idx, k] * theta[:, data.model_idx, k]
     mu = expit(eta)
     if soft_d:
-        # soft-4PL trace: apply the same mu = c + (d - c) * sigmoid link the
-        # model used, with the per-draw estimated ceiling d.
+        # ceiling_noise trace: apply the same mu = c + (d - c) * sigmoid link
+        # the model used, with the per-draw estimated ceiling d.
         d = rest[0]                                              # (S, B)
         c_obs = np.asarray(floor_c)[data.bench_idx] if floor_c is not None else 0.0
         mu = c_obs + (d[:, data.bench_idx] - c_obs) * mu
-    elif floor_c is not None or ceiling_d is not None:
-        c_obs = np.asarray(floor_c)[data.bench_idx] if floor_c is not None else 0.0
-        d_obs = np.asarray(ceiling_d)[data.bench_idx] if ceiling_d is not None else 1.0
-        mu = c_obs + (d_obs - c_obs) * mu
+    elif floor_c is not None:
+        c_obs = np.asarray(floor_c)[data.bench_idx]
+        mu = c_obs + (1.0 - c_obs) * mu
     if return_mean:
         return mu
     return _beta_draw(mu, phi, data, seed, n_eff=n_eff)

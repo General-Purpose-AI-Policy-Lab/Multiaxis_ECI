@@ -15,9 +15,11 @@ and produces an InferenceData with the right variables.
 """
 from __future__ import annotations
 
+import dataclasses
 import json
 import subprocess
 import sys
+import warnings
 from pathlib import Path
 
 import arviz as az
@@ -57,8 +59,9 @@ from models.mirt_nc import _validate_qmatrix, build_mirt_nc_model
 from persistence import save_pit, save_summary, save_trace
 from viz import (
     all_models_forest_fig, capability_timeline_fig, density_overlay_fig,
-    forest_fig, hyperparams_fig, pit_ecdf_fig, pit_hist_fig, pred_vs_obs_fig,
-    residuals_per_benchmark_fig, sota_forest_fig,
+    forest_fig, forest_grid_fig, hyperparams_fig, loadings_grid_fig,
+    pit_ecdf_fig, pit_hist_fig, pred_vs_obs_fig,
+    residuals_per_benchmark_fig, sota_forest_fig, subplot_grid,
 )
 from ppc import (
     _beta_draw, _flatten_over_chains, _thin_sel, boundary_mask, compute_gof,
@@ -80,15 +83,17 @@ def raw_df(data: ECIData) -> pd.DataFrame:
     the complete `data/processed/benchmarks_merged.csv` (every benchmark). With
     the canonical defaults (collapse_effort_variants=False,
     drop_low_obs_models=False) the modeling-stage transforms that change the row
-    count are (1) the curated exclusion filter applied at fit time and (2) the
-    human-baseline merge — so this mirror applies both.
+    count are (1) the unconditional retirement drop, (2) the curated exclusion
+    filter applied at fit time and (3) the human-baseline merge, so this mirror
+    applies all three.
     """
     from data import (PROCESSED_FILE, _load_human_baselines_as_models,
-                      load_excluded_benchmarks)
+                      load_excluded_benchmarks, load_retired_benchmarks)
 
     df = pd.read_csv(PROCESSED_FILE)
-    # Mirror load_eci_data's default fit-time exclusion filter.
-    df = df[~df["benchmark"].isin(load_excluded_benchmarks())].reset_index(drop=True)
+    # Mirror load_eci_data's two benchmark filters, retirement first.
+    df = df[~df["benchmark"].isin(load_retired_benchmarks()
+                                  | load_excluded_benchmarks())].reset_index(drop=True)
     humans = _load_human_baselines_as_models()
     humans = humans[humans["benchmark"].isin(df["benchmark"].unique())]
     df = pd.concat([df, humans], ignore_index=True)
@@ -314,11 +319,11 @@ class TestData:
         assert (data.scores <= 1.0).all()
 
 
-# ───────────────────────── Era filter (--post-2023) ────────────────────────
+# ──────────────── Era filter (load_eci_data date bounds) ───────────────────
 class TestEraFilter:
     def test_min_release_date_filter(self, data):
-        """--post-2023: known-pre-cutoff models dropped, undated + humans kept,
-        both ECI anchors survive (they are 2024/2025 releases)."""
+        """min_release_date: known-pre-cutoff models dropped, undated + humans
+        kept, both ECI anchors survive (they are 2024/2025 releases)."""
         post = load_eci_data(min_release_date="2024-01-01")
         assert post.n_models < data.n_models
         present = set(post.mlookup["model"])
@@ -380,10 +385,29 @@ class TestScopeFlags:
         # Human rows on a dropped benchmark must go too (VPCT has one).
         assert got.is_human.sum() <= data_all.is_human.sum()
 
-    def test_drop_benchmarks_rejects_unknown_name(self):
-        """A typo must raise, not silently fit the full scope."""
-        with pytest.raises(ValueError, match="not in the table"):
-            load_eci_data(include_all_benchmarks=True, drop_benchmarks=["GBAEvaal"])
+    def test_drop_benchmarks_warns_on_unknown_name(self, data_all):
+        """A typo must be visible, not silently fit the full scope. It is a
+        warning rather than an error because a name already absent has to be a
+        no-op: the retirement list removes names a caller may still pass."""
+        with pytest.warns(UserWarning, match="not in the table"):
+            got = load_eci_data(include_all_benchmarks=True,
+                                drop_benchmarks=["GBAEvaal"])
+        assert got.n_obs == data_all.n_obs
+
+    def test_dropping_a_retired_benchmark_is_a_silent_no_op(self, data_all):
+        """The retirement list already removed them, so naming one changes
+        nothing and raises no warning."""
+        from data import load_retired_benchmarks
+        retired = sorted(load_retired_benchmarks())
+        assert retired, "retired_benchmarks.txt is empty"
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", UserWarning)
+            got = load_eci_data(include_all_benchmarks=True,
+                                drop_benchmarks=retired)
+        assert (got.n_obs, got.n_models, got.n_benchmarks) == (
+            data_all.n_obs, data_all.n_models, data_all.n_benchmarks)
+        for b in retired:
+            assert b not in set(data_all.blookup["benchmark"])
 
     def test_cyber_is_additive_and_never_shadows_a_pipeline_row(self, data_all):
         """Cyber rows land only on models already fit, only on benchmarks the
@@ -618,15 +642,6 @@ class TestPPC:
         assert (floored >= 0.4 - 0.05).all()        # >= floor up to Beta MC noise
         assert (floored >= plain - 1e-9).all()      # flooring never lowers the mean
 
-    def test_pp_fixed_ceiling_caps_mu(self, synth_trace, data):
-        """Fixed-ceiling PP: mu = d*sigmoid, so E[y_rep] per obs <= d and never
-        above the uncapped mean. A low uniform ceiling makes this visible."""
-        ceils = np.full(data.n_benchmarks, 0.6)
-        plain = posterior_predictive_mirt(synth_trace, data).mean(axis=0)
-        capped = posterior_predictive_mirt(synth_trace, data, ceiling_d=ceils).mean(axis=0)
-        assert (capped <= 0.6 + 0.05).all()         # <= ceiling up to Beta MC noise
-        assert (capped <= plain + 1e-9).all()       # capping never raises the mean
-
     def test_pp_known_se_adds_instrument_noise(self, synth_trace, data):
         """known_se-aware PP: a short instrument (small n_eff) widens the
         predictive spread, an infinite one leaves the per-benchmark noise alone."""
@@ -665,32 +680,6 @@ class TestFloors:
         assert ((floors >= 0.0) & (floors < 1.0)).all()
 
 
-class TestCeilings:
-    # Fixed ceilings are exploration-only (opt-in --ceilings), same scope
-    # convention as TestFloors above.
-    def test_load_ceilings_shape_and_coverage(self, data_all):
-        from data import load_benchmark_ceilings
-        ceils = load_benchmark_ceilings(data_all)
-        assert ceils.shape == (data_all.n_benchmarks,)
-        assert ((ceils > 0.0) & (ceils <= 1.0)).all()
-        benchmarks = list(
-            data_all.blookup.sort_values("benchmark_idx")["benchmark"])
-        capped = {b for b, d in zip(benchmarks, ceils) if d < 1.0}
-        # exactly the curated file's rows; every other benchmark stays inert
-        assert capped == {"FrontierMath v1", "FrontierMath Tier 4 v1"}
-
-    def test_no_observation_above_ceiling(self, data_all):
-        # the curated ceilings must dominate the observed scores; a data
-        # refresh that pushes a model above its ceiling should be reviewed,
-        # and load_benchmark_ceilings warns about it
-        import warnings as _warnings
-        from data import load_benchmark_ceilings
-        with _warnings.catch_warnings():
-            _warnings.simplefilter("error", UserWarning)
-            ceils = load_benchmark_ceilings(data_all)
-        assert (data_all.scores <= ceils[data_all.bench_idx] + 1e-9).all()
-
-
 class TestPlots:
     def test_hyperparams(self, synth_trace):
         assert isinstance(hyperparams_fig(synth_trace), go.Figure)
@@ -707,6 +696,27 @@ class TestPlots:
         df = all_models_stats_df(synth_trace, data)
         fig = all_models_forest_fig(df, highlight={ANCHOR_LOW[0]})
         assert isinstance(fig, go.Figure)
+
+    def test_axis_grids(self):
+        # One panel per axis, drawn from synthetic frames: the forest grid must
+        # keep every row of every panel, the loadings grid must cut to top_n by
+        # share, and the shared legend must carry each row kind exactly once.
+        dfs = [pd.DataFrame({"name": [f"m{i}" for i in range(5)],
+                             "kind": ["model"] * 3 + ["frontier", "human"],
+                             "mean": np.arange(5.0),
+                             "hdi_low": np.arange(5.0) - 1,
+                             "hdi_high": np.arange(5.0) + 1})
+               for _ in range(4)]
+        fg = forest_grid_fig(dfs, [f"axis{k+1}" for k in range(4)])
+        assert sum(len(t.x) for t in fg.data) == 20
+        assert sum(t.showlegend for t in fg.data) == 3
+
+        rows = [{"axis": f"axis{k+1}", "benchmark": f"b{b}",
+                 "loading_median": 0.1 * b, "hdi_low": 0.0, "hdi_high": 0.2 * b,
+                 "axis_share": b / 10.0} for k in range(4) for b in range(10)]
+        lg = loadings_grid_fig(pd.DataFrame(rows), top_n=3)
+        assert [len(t.x) for t in lg.data] == [3] * 4
+        assert isinstance(subplot_grid([fg, lg], ["a", "b"]), go.Figure)
 
     def test_capability_timeline(self, synth_trace, data, raw_df):
         tl = timeline_stats_df(synth_trace, data, raw_df)
@@ -864,29 +874,14 @@ class TestMIRT:
         names0 = ({v.name for v in m0.free_RVs} | {d.name for d in m0.deterministics})
         assert not ({"ceiling_gap", "ceiling_d"} & names0)
 
-    def test_ceiling_noise_confined_and_composes_with_walls(self, data_all):
-        """ceiling_noise keeps the estimated gap noise-sized, and it sits UNDER
-        each curated wall instead of replacing it."""
-        from data import load_benchmark_ceilings
-        walls = load_benchmark_ceilings(data_all)
-        capped = np.flatnonzero(walls < 1.0)
-        assert capped.size, "no curated wall to test composition against"
-
-        m = build_mirt_model(data_all, K=1, ceiling_noise=True, ceiling_d=walls)
+    def test_ceiling_noise_gap_is_noise_sized(self, data_all):
+        """the estimated ceiling stays a noise-sized gap under 1, never a wall."""
+        m = build_mirt_model(data_all, K=1, ceiling_noise=True)
         d = pm.draw(m["ceiling_d"], draws=400, random_seed=0)
         assert d.shape == (400, data_all.n_benchmarks)
-        # every draw stays under its wall, and the walled benchmarks stay near
-        # it: median within 10%, and no draw below half the wall (Beta(1,20):
-        # P(gap > 0.5) ≈ 1e-6, so an all-draws bound at 0.5 is stable; the old
-        # 0.7 bound was calibrated for Beta(1,49) and trips on ~half the seeds
-        # under the current prior, P(gap > 0.3) ≈ 8e-4 per draw)
-        assert np.all(d <= walls + 1e-12)
-        assert np.all(d[:, capped] > 0.5 * walls[capped])
-        assert np.all(np.median(d[:, capped], axis=0) > 0.9 * walls[capped])
-        # noise-sized: the median gap on unwalled benchmarks is ~0.034
-        # (Beta(1,20): P(gap > 0.10) = 0.122).
-        free = np.setdiff1d(np.arange(data_all.n_benchmarks), capped)
-        gap = 1.0 - d[:, free]
+        assert np.all(d <= 1.0 + 1e-12)
+        # noise-sized: the median gap is ~0.034 (Beta(1,20): P(gap > 0.10) = 0.122)
+        gap = 1.0 - d
         assert 0.02 < np.median(gap) < 0.05
         assert (gap > 0.10).mean() < 0.15
 
@@ -1094,31 +1089,13 @@ class TestMIRT:
             {"method_a", "method_b", "axis", "abs_corr"}
         assert len(rep["agreement"]) == 3          # 1 method pair × 3 axes
 
-    def test_signedhs_build_signed_and_sparse(self, data):
-        """Signed horseshoe: signed cells (both signs in the prior), per-cell
-        local scales present, ONE shared global scale (flat tau_A), and a
-        visible spike of near-zero loadings (the sparsity that picks the
-        rotation). Anchors refused (it LEARNS structure)."""
-        model = build_mirt_model(data, K=3, loading_prior="signedhs")
-        free = {v.name for v in model.free_RVs}
-        assert {"A_z", "lam_hs", "c2_hs", "tau_hs_signed"} <= free
-        A, tau = pm.draw([model["A"], model["tau_A"]], draws=100, random_seed=0)
-        assert (A < 0).any() and (A > 0).any()
-        assert np.allclose(tau, tau[..., :1])          # shared across axes
-        assert (np.abs(A) < 0.05).mean() > 0.25        # spike mass present
-        bench0 = data.blookup["benchmark"].tolist()[0]
-        with pytest.raises(ValueError):
-            build_mirt_model(data, K=3, loading_prior="signedhs",
-                             anchors={bench0: 0})
-
     def test_plt_triangular_pattern(self, data):
         """PLT identification: founder r has exact zeros ABOVE the diagonal,
         a strictly POSITIVE diagonal loading (sign folded, HalfNormal-shaped),
-        and free signed cells below; non-founder rows keep the signed prior.
-        Checked on prior draws for both members of the signed family."""
+        and free signed cells below; non-founder rows keep the signed prior."""
         bl = data.blookup["benchmark"].tolist()
         founders = bl[:3]                                   # axis r <- bl[r]
-        for prior in ("signedhs", "signed"):
+        for prior in ("signed",):
             model = build_mirt_model(data, K=3, loading_prior=prior,
                                      plt_founders=founders)
             A = pm.draw(model["A"], draws=200, random_seed=0)   # (200, B, K)
@@ -1136,13 +1113,13 @@ class TestMIRT:
         with pytest.raises(ValueError, match="signed"):
             build_mirt_model(data, K=3, loading_prior="normal", plt_founders=ok)
         with pytest.raises(ValueError, match="exactly K"):
-            build_mirt_model(data, K=3, loading_prior="signedhs",
+            build_mirt_model(data, K=3, loading_prior="signed",
                              plt_founders=bl[:2])
         with pytest.raises(ValueError, match="distinct"):
-            build_mirt_model(data, K=3, loading_prior="signedhs",
+            build_mirt_model(data, K=3, loading_prior="signed",
                              plt_founders=[bl[0], bl[0], bl[1]])
         with pytest.raises(ValueError, match="not in data"):
-            build_mirt_model(data, K=3, loading_prior="signedhs",
+            build_mirt_model(data, K=3, loading_prior="signed",
                              plt_founders=[bl[0], bl[1], "NotARealBenchmark"])
 
     def test_signed_tiny_sample_runs(self, data):
@@ -1254,15 +1231,26 @@ class TestMIRT:
         _, _, tau_explicit = mirt_factors_from_trace(mirt_synth, rank_track=False)
         assert np.array_equal(tau_auto, tau_explicit)
 
-    # ── unified fit view-model (prepare_fit) — the single rotation contract ──
-    def test_prepare_fit_exploratory_rotates(self, mirt_synth, data):
-        """Unanchored K≥2 compensatory fit → promax-rotated; A present, full shape."""
+    # ── unified fit view-model (prepare_fit) — the single frame contract ──
+    def test_prepare_fit_positive_prior_never_rotates(self, mirt_synth, data):
+        """Unanchored K≥2 fit on a non-negative loading prior → the raw
+        rank-tracked frame, whatever the trace says. Positivity pins the
+        rotation, so loadings and abilities pass through
+        mirt_factors_from_trace untouched (the permutation relabel is kept, no
+        rotation on top), Phi is the raw ability correlation, and a display
+        rotation recorded on the trace changes nothing."""
+        mirt_synth.posterior.attrs["mirt_display_rotation"] = "promax"
         view = prepare_fit(mirt_synth, data)
-        assert not view.is_nc and not view.anchored
-        assert view.rotated and view.K == 3 and view.A is not None
+        assert not view.is_nc and not view.anchored and not view.rotated
+        assert view.K == 3 and view.A is not None
         S = (mirt_synth.posterior.sizes["chain"] * mirt_synth.posterior.sizes["draw"])
         assert view.A.shape == (S, data.n_benchmarks, 3)
         assert view.theta.shape == (S, data.n_models, 3)
+        A_rt, th_rt, _ = mirt_factors_from_trace(mirt_synth)
+        assert np.allclose(view.A, A_rt)
+        assert np.allclose(view.theta, th_rt)
+        assert np.allclose(view.Phi, np.corrcoef(th_rt.mean(0).T))
+        assert np.allclose(view.Phi, view.Phi_raw)
 
     def test_prepare_fit_anchored_no_rotation(self, mirt_synth, data):
         """Anchored fit → axes pinned, NO promax; Phi is the raw ability correlation."""
@@ -1270,22 +1258,6 @@ class TestMIRT:
         mirt_synth.posterior.attrs["mirt_anchors"] = json.dumps({bench[0]: 0})
         view = prepare_fit(mirt_synth, data)
         assert view.anchored and not view.rotated
-        assert np.allclose(view.Phi, view.Phi_raw)
-
-    def test_prepare_fit_display_rotation_none_raw_frame(self, mirt_synth, data):
-        """mirt_display_rotation='none' → the raw rank-tracked frame: loadings
-        and abilities pass through mirt_factors_from_trace untouched (the
-        permutation relabel is kept, no rotation applied on top) and Phi is
-        the raw ability correlation."""
-        view_default = prepare_fit(mirt_synth, data)
-        assert view_default.rotated                       # promax default
-        mirt_synth.posterior.attrs["mirt_display_rotation"] = "none"
-        view = prepare_fit(mirt_synth, data)
-        assert not view.rotated
-        A_rt, th_rt, _ = mirt_factors_from_trace(mirt_synth)
-        assert np.allclose(view.A, A_rt)
-        assert np.allclose(view.theta, th_rt)
-        assert np.allclose(view.Phi, np.corrcoef(th_rt.mean(0).T))
         assert np.allclose(view.Phi, view.Phi_raw)
 
     def test_prepare_fit_nc_has_no_loadings(self, mirt_nc_synth, data_all):
@@ -2086,3 +2058,224 @@ class TestFigureSets:
         assert 'id="cmp"' in html and 'id="fit-x"' in html          # both sections
         assert "RENDERED[d.id]" in html                            # lazy render wired
         assert html.lstrip().lower().startswith("<!doctype html>")
+
+
+# ───────────────────────── FitSpec ─────────────────────────────────────────
+class TestFitSpec:
+    """Fit identity: the tag, and recovering a spec from an existing trace."""
+
+    @staticmethod
+    def _idata(K=4, attrs=None, n_models=5, n_bench=3):
+        """A trace stub carrying only what `from_trace` reads: attrs and dims."""
+        import xarray as xr
+        A = np.zeros((1, 2, n_bench, K))
+        theta = np.zeros((1, 2, n_models, K))
+        post = xr.Dataset({"A": (("chain", "draw", "bench", "latent"), A),
+                           "theta": (("chain", "draw", "model", "latent"), theta)},
+                          attrs=attrs or {})
+        return az.InferenceData(posterior=post)
+
+    def test_flagship_tag_literal(self):
+        # The name every future flagship artefact is written under. Pooled noise
+        # and the 3PL floors are defaults and carry no token; FrontierMath v1 and
+        # AlgoTune are out of scope through the retirement list, so no `_drop`
+        # either. Non-negative loadings are the default too, so no prior token.
+        assert analysis.FLAGSHIP.tag == (
+            "_humanmerge_lineageprior_lineagebm")
+        assert analysis.FLAGSHIP.trace_path.name == (
+            "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc")
+        assert analysis.FLAGSHIP.pooled_noise and analysis.FLAGSHIP.floors
+        assert analysis.FLAGSHIP.loading_prior == "normal"
+        assert not analysis.FLAGSHIP.drop_benchmarks
+
+    def test_spec_json_round_trip(self):
+        spec = analysis.FitSpec(
+            K=3, loading_prior="signed", link="loglog", human_merge=True,
+            lineage_prior=True, lineage_bm=True, time_prior=True, theta_t=True,
+            theta_pos=True, no_sg=True,
+            apply_exclusions=True, cyber=True, simpleqa_original=True,
+            drop_benchmarks=("FrontierMath v1", "AlgoTune"), private_bases=True,
+            floors=True, ceiling_noise=True, known_se=True,
+            pooled_noise=True)
+        idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(spec)})
+        got = analysis.FitSpec.from_trace(idata, spec.trace_path)
+        assert got == spec
+
+    def test_folder_tag_fallback(self):
+        # No attrs at all: the folder tag carries the flags that never had one.
+        idata = self._idata(K=3)
+        p = (PROJECT_ROOT / "results" / "mirt_noSG_excluded_floors_ceilnoise"
+             / "trace_mirt_k3_noSG_excluded_floors_ceilnoise.nc")
+        spec = analysis.FitSpec.from_trace(idata, p)
+        assert (spec.apply_exclusions, spec.no_sg, spec.floors,
+                spec.ceiling_noise) == (True, True, True, True)
+        assert spec.loading_prior == "normal" and spec.drop_benchmarks == ()
+
+    def test_lossy_tokens_refused(self):
+        idata = self._idata(K=3)
+        with pytest.raises(ValueError):
+            analysis.FitSpec.from_trace(
+                idata, PROJECT_ROOT / "results" / "mirt_dropGBAEvalVPCT_floors"
+                / "trace_mirt_k3_dropGBAEvalVPCT_floors.nc")
+        # An unknown historical token is refused too, never partly parsed.
+        with pytest.raises(ValueError, match="unrecognized tag token"):
+            analysis.FitSpec.from_trace(
+                idata, PROJECT_ROOT / "results" / "mirt_lineagehard_floors"
+                / "trace_mirt_k3_lineagehard_floors.nc")
+
+    def test_attrless_baseline_takes_folder_data_scope(self):
+        # fit.py's K=1 baseline carries no attrs and no tag in its filename. It
+        # keeps the folder's DATA scope and gets the model-side flags from
+        # fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
+        # and the pooled noise not).
+        idata = self._idata(K=1)
+        p = (PROJECT_ROOT / "results"
+             / "mirt_humanprior_lineageprior_cyber_floors_knownse_poolednoise"
+             / "trace_mirt_k1.nc")
+        spec = analysis.FitSpec.from_trace(idata, p)
+        assert spec.K == 1
+        assert (spec.cyber, spec.floors, spec.known_se) == (True, True, True)
+        assert not (spec.human_prior or spec.lineage_prior or spec.pooled_noise)
+        assert spec.tag == "_cyber_knownse"          # floors emits no token
+
+    # `tag` writes the tokens and `_parse_tag` reads them from a second list, so
+    # every flag has to survive the round trip or a folder tag silently loads the
+    # wrong data scope. One case per boolean flag set AWAY from its default, and
+    # one per loading prior; the dependent flag brings its prerequisite with it.
+    # pooled_noise and floors are excluded: both default on and the tag carries
+    # no token for either, so the folder cannot express them. Their legacy tokens
+    # are covered by test_legacy_poolednoise_token_still_parses and
+    # test_legacy_floors_token_still_parses.
+    @pytest.mark.parametrize("kwargs", [
+        pytest.param({f.name: not f.default}, id=f.name)
+        for f in dataclasses.fields(analysis.FitSpec)
+        if isinstance(f.default, bool) and f.name not in ("pooled_noise", "floors")
+    ] + [
+        pytest.param({"loading_prior": p}, id=f"prior_{p}")
+        for p in ("normal", "signed", "signedhs", "pt1", "bifactor")
+    ])
+    def test_tag_round_trips_through_parse_tag(self, kwargs):
+        from analysis.fitspec import _parse_tag
+        prereq = {"lineage_bm": {"lineage_prior": True}}
+        for f in list(kwargs):
+            kwargs.update(prereq.get(f, {}))
+        spec = analysis.FitSpec(K=2, **kwargs)
+        # `tag` never emits `_floors`, so a parsed spec always reads floors OFF
+        # (the legacy meaning of an absent token). Every other flag must survive.
+        assert analysis.FitSpec(K=2, **_parse_tag(spec.tag)) == dataclasses.replace(
+            spec, floors=False)
+
+    def test_legacy_floors_token_still_parses(self):
+        # `tag` stopped emitting `_floors` once floors became the default, but
+        # both directions of the legacy token must keep their ORIGINAL meaning:
+        # present = on, ABSENT = off. Three attrless traces on disk sit in
+        # folders with no token (mirt_humanprior, mirt_loglog) and were fit
+        # without floors, so an absent token must not inherit the True default.
+        from analysis.fitspec import _parse_tag
+        assert _parse_tag("_floors")["floors"] is True
+        assert _parse_tag("_humanprior")["floors"] is False
+        assert _parse_tag("")["floors"] is False
+        # and the token is never written again
+        assert "_floors" not in analysis.FitSpec(K=2, floors=True).tag
+
+    def test_attrless_nofloors_folder_keeps_floors_off(self):
+        # The end-to-end version of the case above, through from_trace: the
+        # round-trip guard must accept a spec whose tag omits a token the folder
+        # never carried, and the recovered scope must be the unclipped one.
+        idata = self._idata(K=3, attrs={"mirt_loading_prior": "normal"})
+        p = (PROJECT_ROOT / "results" / "mirt_humanprior"
+             / "trace_mirt_k3_humanprior.nc")
+        spec = analysis.FitSpec.from_trace(idata, p)
+        assert spec.human_prior and not spec.floors
+        assert spec.loading_prior == "normal"
+
+    def test_legacy_poolednoise_token_still_parses(self):
+        # Folders written while the tag carried the token must still resolve, and
+        # they name the value the default already holds.
+        from analysis.fitspec import _parse_tag
+        assert _parse_tag("_floors_poolednoise") == {
+            "loading_prior": "normal", "floors": True, "pooled_noise": True}
+
+    def test_legacy_flagship_trace_name_resolves(self):
+        # The on-disk flagship trace predates both the retirement list and the
+        # token removal. Its `mirt_spec` attr names the drop flags, so the
+        # round-trip guard must accept a folder tag that carries tokens the
+        # current grammar no longer writes.
+        import dataclasses as dc
+        legacy = dc.replace(analysis.FLAGSHIP,
+                            drop_benchmarks=("FrontierMath v1", "AlgoTune"))
+        tag = ("_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune"
+               "_floors_poolednoise")
+        p = (PROJECT_ROOT / "results" / f"mirt{tag}" / f"trace_mirt_k4{tag}.nc")
+        idata = self._idata(K=4, attrs={"mirt_spec": analysis.spec_json(legacy)})
+        assert analysis.FitSpec.from_trace(idata, p) == legacy
+
+    @pytest.mark.parametrize("folder,fname,attrs", [
+        # folder flags disagree with the filename's
+        ("mirt_floors_ceilnoise", "trace_mirt_k3_floors.nc", None),
+        # attrs name a flag set the folder does not
+        ("mirt_floors", "trace_mirt_k3_floors.nc",
+         {"mirt_spec": None}),
+        # attrs name a K the filename does not
+        ("mirt_floors", "trace_mirt_k3_floors.nc",
+         {"mirt_spec": "K4"}),
+    ])
+    def test_misfiled_trace_still_refused(self, folder, fname, attrs):
+        # Field equality replaced a path-string compare; every mis-filing the
+        # string compare caught must still raise.
+        import dataclasses as dc
+        if attrs and "mirt_spec" in attrs:
+            spec = analysis.FitSpec(K=3, loading_prior="normal", floors=True)
+            spec = (dc.replace(spec, K=4) if attrs["mirt_spec"] == "K4"
+                    else dc.replace(spec, ceiling_noise=True))
+            attrs = {"mirt_spec": analysis.spec_json(spec)}
+        idata = self._idata(K=3, attrs=attrs)
+        p = PROJECT_ROOT / "results" / folder / fname
+        with pytest.raises(ValueError, match="round-trip failed"):
+            analysis.FitSpec.from_trace(idata, p)
+
+    def test_flag_conflicts_raise(self):
+        with pytest.raises(ValueError):
+            analysis.FitSpec(K=2, lineage_bm=True)
+
+
+def test_plot_mirt_folder_decision():
+    """`--folder` must refuse the two filenames that are not fits of their own,
+    and thin one draw per 2 GB so the 38 GB flagship fits in 26 GB of RAM."""
+    from diagnostics.plot_mirt import folder_decision
+    assert folder_decision("trace.nc", 1_694_555_488)[0] is not None
+    assert folder_decision("trace_mirt_k1.nc", 141_356)[0] is not None
+    assert folder_decision("trace_mirt_k2_loglog.nc", 20_333_520) == (None, 1)
+    assert folder_decision("trace_mirt_k4_humanmerge.nc",
+                           38_016_363_203) == (None, 19)
+    # an explicit --thin wins over the size rule
+    assert folder_decision("trace_mirt_k4_humanmerge.nc",
+                           38_016_363_203, thin=3) == (None, 3)
+
+
+def test_dashboard_json_registry_round_trip(tmp_path, monkeypatch):
+    """A `--add`ed entry must come back out of the JSON as a usable card.
+
+    `dataclasses.asdict` turns the spec's `drop_benchmarks` tuple into a list,
+    which would make the spec unhashable and break the dashboard's per-scope
+    data cache; the trace path must come back a Path, since a legacy card is
+    the whole reason it is stored explicitly.
+    """
+    import dataclasses as dc
+    import json as _json
+    from diagnostics import build_dashboard as bd
+
+    spec = dc.replace(analysis.FLAGSHIP, drop_benchmarks=("FrontierMath v1",))
+    reg = tmp_path / "dashboard_fits.json"
+    reg.write_text(_json.dumps([{
+        "name": "tmp_card", "label": "L", "type": "exploratory",
+        "forecast": True, "spec": dc.asdict(spec),
+        "trace_path": str(analysis.FLAGSHIP_TRACE)}]))
+    monkeypatch.setattr(bd, "FITS_JSON", reg)
+
+    entry, = bd._json_fits()
+    assert entry["spec"] == spec and hash(entry["spec"]) == hash(spec)
+    assert entry["trace_path"] == analysis.FLAGSHIP_TRACE
+    assert bd._trace_path(entry) == analysis.FLAGSHIP_TRACE
+    assert (entry["origin"], entry["forecast"]) == ("json", True)
+    assert [f["name"] for f in bd.all_fits()][-1] == "tmp_card"

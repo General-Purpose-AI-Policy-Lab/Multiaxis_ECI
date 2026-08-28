@@ -11,6 +11,15 @@ from plotly.subplots import make_subplots
 
 CHAIN_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
 
+# Shared palette: AI models, human tiers, display anchors, and the
+# passed/future split on forecast crossover markers. The single source every
+# figure script reads, so no caller carries its own hex.
+AI_COLOR = "#4c78a8"
+HUMAN_COLOR = "#e8890c"
+ANCHOR_COLOR = "#888888"
+PASSED_COLOR = "#2ca02c"
+FUTURE_COLOR = "#d62728"
+
 
 def save_fig(fig: go.Figure, name: str, plots_dir: Path) -> None:
     plots_dir.mkdir(parents=True, exist_ok=True)
@@ -19,6 +28,85 @@ def save_fig(fig: go.Figure, name: str, plots_dir: Path) -> None:
         fig.write_image(plots_dir / f"{name}.png", scale=2)
     except Exception as e:
         print(f"  PNG export skipped for {name} ({type(e).__name__}: {e})")
+
+
+# Print defaults, applied per property only where the figure left it unset, so a
+# figure that carries its own type sizes or background keeps them. Dotted paths
+# are resolved on the layout; `None` there means "the figure never set it".
+# Deliberately just the two backgrounds: a printed figure must not inherit a
+# dark or transparent canvas. No `font.family` here — the template's font is a
+# visual choice, and forcing Arial re-renders every glyph of the committed LW
+# exports (measured: 2.7% of pixels differ, dimensions unchanged).
+_PRINT_LAYOUT = {"paper_bgcolor": "white",
+                 "plot_bgcolor": "white"}
+
+
+def save_print(fig: go.Figure, path, *, width: int | None = None,
+               height: int | None = None, scale: int = 2,
+               pdf: bool = True) -> Path:
+    """Write `fig` as a print-quality PNG (and PDF) at `path` (suffix ignored).
+
+    The layout patch lands on a COPY: the caller's figure is never mutated, so
+    the same figure can also go to HTML unchanged. `scale=2` is the pixel
+    dimension every committed LW export was made at; changing it changes them.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out = go.Figure(fig)
+    for dotted, value in _PRINT_LAYOUT.items():
+        obj = out.layout
+        for part in dotted.split(".")[:-1]:
+            obj = obj[part]
+        if obj[dotted.split(".")[-1]] is None:
+            obj[dotted.split(".")[-1]] = value
+    if width:
+        out.layout.width = width
+    if height:
+        out.layout.height = height
+
+    png = path.with_suffix(".png")
+    out.write_image(png, scale=scale)
+    if pdf:
+        # Vector: `scale` is a raster notion and does not apply.
+        out.write_image(path.with_suffix(".pdf"))
+    return png
+
+
+def subplot_grid(figs, titles=None, ncols: int = 2, vertical_spacing: float = 0.09,
+                 horizontal_spacing: float = 0.09, **layout) -> go.Figure:
+    """Lay finished figures out as the panels of one grid.
+
+    What carries over per panel: the traces, the horizontal reference lines
+    (`add_hline` shapes) and the two axis titles. What does not: per-figure
+    width/height/title, since the grid sets its own. A legend name is shown on
+    its FIRST panel only, so N panels of the same series read as one legend
+    entry — which assumes a name means the same thing in every panel.
+
+    Traces are copied, so the source figures stay usable (e.g. for HTML).
+    """
+    figs = list(figs)
+    nrows = -(-len(figs) // ncols)
+    grid = make_subplots(rows=nrows, cols=ncols, vertical_spacing=vertical_spacing,
+                         horizontal_spacing=horizontal_spacing,
+                         subplot_titles=list(titles) if titles else None)
+    seen: set[str] = set()
+    for i, f in enumerate(figs):
+        row, col = i // ncols + 1, i % ncols + 1
+        for tr in f.data:
+            if getattr(tr, "x", None) is not None and len(tr.x) == 0:
+                continue                # an empty panel trace is legend noise
+            tr = tr.__class__(tr)
+            if tr.name:
+                tr.showlegend = tr.name not in seen
+                seen.add(tr.name)
+            grid.add_trace(tr, row=row, col=col)
+        for sh in f.layout.shapes:
+            if sh.type == "line" and sh.y0 == sh.y1:
+                grid.add_hline(y=sh.y0, line=sh.line, layer=sh.layer, row=row, col=col)
+        grid.update_xaxes(title_text=f.layout.xaxis.title.text, row=row, col=col)
+        grid.update_yaxes(title_text=f.layout.yaxis.title.text, row=row, col=col)
+    grid.update_layout(template="plotly_white", **layout)
+    return grid
 
 
 # ── Trace + posterior pair ────────────────────────────────────────────────
@@ -100,12 +188,12 @@ def hyperparams_fig(trace) -> go.Figure:
     """Trace + posterior for the global scale hyperparameters.
 
     The discrimination/loading scale is `tau_alpha` on a 1D trace and
-    `tau_A_normal` / `tau_A_signed` / `tau_hs_signed` on a MIRT trace,
+    `tau_A_normal` / `tau_A_signed` on a MIRT trace,
     depending on the loading prior.
     """
     post = trace.posterior
     items = [("tau_CD", post["tau_CD"].values)]
-    for name in ("tau_alpha", "tau_A_normal", "tau_A_signed", "tau_hs_signed"):
+    for name in ("tau_alpha", "tau_A_normal", "tau_A_signed"):
         if name in post:
             items.append((name, post[name].values))
             break
@@ -281,27 +369,20 @@ HUMAN_LEVEL_LABELS_FR = {
     "High School Qualifier":        "Lycéen qualifié",
     "High School Top Performer":    "Lycéen, meilleur performeur",
 }
-HUMAN_LEVEL_ORDER = [
-    "Humain moyen",
-    "Comité d'humains moyens",
-    "Généraliste qualifié",
-    "Comité de généralistes qualifiés",
-    "Expert du domaine",
-    "Comité d'experts du domaine",
-    "Meilleur performeur",
-]
 
 
 def capability_timeline_fig(timeline_df: pd.DataFrame,
                              human_stats: pd.DataFrame | None = None,
                              annotate_benchmarks: list[str] | None = None,
-                             annotate_models: list[str] | None = None) -> go.Figure:
+                             annotate_models: list[str] | None = None,
+                             human_labels: dict | None = None) -> go.Figure:
     """Capability (models) + difficulty (benchmarks) vs release date.
 
     Recreates the EpochAI-style chart: latent IRT scale on Y, release date on X.
     Models in teal, benchmarks in pink, both with 94% HDI bars. Human groups
-    appear as dashed horizontal mean lines, labeled in French via
-    HUMAN_LEVEL_LABELS_FR."""
+    appear as dashed horizontal mean lines, labeled via `human_labels` (default
+    HUMAN_LEVEL_LABELS_FR; pass {} for the raw English tier names)."""
+    labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
     annotate_benchmarks = set(annotate_benchmarks or [])
     annotate_models = set(annotate_models or [])
 
@@ -342,7 +423,7 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
             return f"rgba({inner},{alpha})"
 
         for i, (_, r) in enumerate(rows.iterrows()):
-            label_name = HUMAN_LEVEL_LABELS_FR.get(r["name"], r["name"])
+            label_name = labels.get(r["name"], r["name"])
             legend_label = f"{label_name} (n={r['n_obs']})"
             line_color = _to_rgba(palette[i], 0.85)
 

@@ -54,39 +54,6 @@ def cmp_convergence_fig(tab: pd.DataFrame,
     return fig
 
 
-def cmp_axis_reproducibility_fig(
-        rows: list,
-        title: str = "Do independent chains find the same axes? "
-                     "(1D + exploratory fits)") -> go.Figure:
-    """Cross-chain axis reproducibility per fit — the diagnosis behind the r̂.
-
-    One bar group per fit, one bar per ranked axis: median |corr| of per-chain
-    mean abilities (1 = every chain found the same axis; 0 = each run invents
-    its own). `rows`: dicts with fit, axis_repro (list, strongest axis first),
-    eta_rhat, div_pct. r̂ says THAT chains disagree; this says WHICH axis."""
-    shades = ["#0C447C", "#378ADD", "#85B7EB", "#c9dff5"]
-    fig = go.Figure()
-    max_k = max(len(r["axis_repro"]) for r in rows)
-    for k in range(max_k):
-        fig.add_trace(go.Bar(
-            name=f"axis {k + 1} (ranked)",
-            x=[r["fit"] for r in rows],
-            y=[r["axis_repro"][k] if k < len(r["axis_repro"]) else None
-               for r in rows],
-            marker_color=shades[min(k, len(shades) - 1)]))
-    fig.add_hline(y=0.95, line=dict(color="green", dash="dash"),
-                  annotation_text="reproducible", annotation_position="top right")
-    fig.update_layout(
-        barmode="group", template="plotly_white", height=520, width=940,
-        title=dict(text=title, x=0.5),
-        yaxis=dict(title="cross-chain |corr| of axis abilities", range=[0, 1.08]),
-        xaxis=dict(tickvals=[r["fit"] for r in rows],
-                   ticktext=[f"{r['fit']}<br><sub>r̂ {r['eta_rhat']:.2f} · "
-                             f"{r['div_pct']:.0f}% div</sub>" for r in rows]),
-        legend=dict(orientation="h", y=1.06, x=0))
-    return fig
-
-
 def cmp_pit_ecdf_fig(results: list,
                      title: str = "Calibration — PIT ECDF vs perfect (hugs diagonal = calibrated)") -> go.Figure:
     """PIT ECDF overlay vs the diagonal. `results`: list of dicts with 'fit' + 'pit'."""
@@ -158,91 +125,6 @@ def cmp_loo_waic_fig(results: list,
     fig.update_layout(title=dict(text=title, x=0.5), template="plotly_white",
                       height=max(380, 80 * len(names)) + (60 if note else 0), width=1000,
                       margin=dict(b=90 if note else 60))
-    return fig
-
-
-def cmp_loo_ladder_fig(df: pd.DataFrame,
-                       title: str = "LOO ladder, per mode (curated chain subsets)"
-                       ) -> go.Figure:
-    """Render the hand-curated per-mode LOO ladder CSV
-    (results/comparisons/loo_cv_full.csv) — rows are fits OR chain-subset
-    modes of a fit, defined offline; this figure never recomputes them.
-
-    Columns used: model, n_chains, elpd_loo, se, eta_rhat, group, rank,
-    elpd_diff, dse (plus p_loo / k>0.7 / k_max / ess_* for hover).
-
-    Left panel: absolute ELPD ± SE for every row, colored by data group —
-    absolute values are only comparable WITHIN a group (the floor-clipped fit
-    scores different observed values, so its ELPD lives on its own scale).
-    Right panel: ΔELPD ± paired dSE vs the group-best row, only for rows the
-    CSV ranks (the comparable group). Open markers flag rows whose convergence
-    is not demonstrated (eta r̂ > 1.01, or a single-chain mode where r̂ is
-    undefined)."""
-    d = df.copy()
-    labels = [f"{m} · {int(n)}ch" for m, n in zip(d["model"], d["n_chains"])]
-    y = list(range(len(d)))[::-1]                       # first CSV row on top
-    group_color = {g: c for g, c in zip(d["group"].unique(),
-                                        ["#2c7fb8", "#d95f02", "#2ca02c"])}
-    rhat = pd.to_numeric(d["eta_rhat"], errors="coerce")
-    open_marker = (rhat > 1.01) | rhat.isna() | (d["n_chains"] < 2)
-    hover = [
-        (f"{m}<br>ELPD {e:.1f} ± {s:.1f} · p_loo {p:.0f}"
-         f"<br>Pareto k>0.7: {int(kb)} · k_max {km:.2f}"
-         f"<br>eta r̂ {r if np.isfinite(r) else 'n/a (single chain)'}")
-        for m, e, s, p, kb, km, r in zip(d["model"], d["elpd_loo"], d["se"],
-                                         d["p_loo"], d["k>0.7"], d["k_max"], rhat)]
-    fig = make_subplots(rows=1, cols=2, shared_yaxes=True,
-                        subplot_titles=["ELPD ± SE (per data group)",
-                                        "ΔELPD ± paired dSE (vs group best)"],
-                        horizontal_spacing=0.08)
-    for g in d["group"].unique():
-        m = (d["group"] == g).values
-        fig.add_trace(go.Scatter(
-            x=d["elpd_loo"][m], y=[yy for yy, keep in zip(y, m) if keep],
-            mode="markers",
-            error_x=dict(type="data", array=d["se"][m], thickness=1.5, width=5),
-            marker=dict(size=10, color=group_color[g],
-                        symbol=["circle-open" if o else "circle"
-                                for o in open_marker[m]],
-                        line=dict(width=2, color=group_color[g])),
-            text=[h for h, keep in zip(hover, m) if keep],
-            hovertemplate="%{text}<extra></extra>", showlegend=False),
-            row=1, col=1)
-    ranked = d["rank"].notna().values
-    fig.add_trace(go.Scatter(
-        x=(-d["elpd_diff"][ranked]), y=[yy for yy, keep in zip(y, ranked) if keep],
-        mode="markers",
-        error_x=dict(type="data", array=d["dse"][ranked], thickness=1.5, width=5),
-        marker=dict(size=10, color=[group_color[g] for g in d["group"][ranked]],
-                    symbol=["circle-open" if o else "circle"
-                            for o in open_marker[ranked]],
-                    line=dict(width=2,
-                              color=[group_color[g] for g in d["group"][ranked]])),
-        text=[h for h, keep in zip(hover, ranked) if keep],
-        hovertemplate="%{text}<extra></extra>", showlegend=False), row=1, col=2)
-    # legend-only entries: fixed filled markers so the legend reads as the
-    # group key (the per-point open/filled symbol encodes convergence, not group)
-    for g in d["group"].unique():
-        fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers",
-                                 marker=dict(size=10, color=group_color[g]),
-                                 name=g), row=1, col=1)
-    fig.add_vline(x=0, line=dict(color="#888", dash="dash"), row=1, col=2)
-    fig.update_yaxes(tickvals=y, ticktext=labels, row=1, col=1)
-    fig.update_xaxes(title_text="ELPD (comparable within a group only)", row=1, col=1)
-    fig.update_xaxes(title_text="ΔELPD (0 = group best)", row=1, col=2)
-    fig.add_annotation(
-        text="Curated ladder (loo_cv_full.csv): modes are hand-defined chain subsets.<br>"
-             "Open marker = convergence not demonstrated (eta r̂ > 1.01 or "
-             "single-chain mode).<br>"
-             "Floor-clipped rows score different observed values; no ΔELPD "
-             "across groups.",
-        xref="paper", yref="paper", x=0, y=-0.26, showarrow=False, align="left",
-        font=dict(size=11, color="#888"))
-    fig.update_layout(title=dict(text=title, x=0.5), template="plotly_white",
-                      height=max(400, 80 * len(d)) + 90, width=1050,
-                      margin=dict(b=130),
-                      legend=dict(orientation="h", yanchor="bottom", y=1.06,
-                                  xanchor="right", x=1))
     return fig
 
 
@@ -323,26 +205,6 @@ def cmp_tau_spectrum_fig(taus: dict,
     return fig
 
 
-def cmp_axis_match_fig(df: pd.DataFrame,
-                       title: str = "Do the discovered axes match the hypothesized skills? "
-                                    "(|corr| of loading vectors vs the confirmed Q-matrix axes)") -> go.Figure:
-    """Heatmap: each fit's axes (rows) vs the confirmed Q-matrix skill axes
-    (cols), scored by |corr| of the mean loading vectors over the shared
-    benchmark set. Green row = a discovered axis that lines up with one
-    hypothesized skill; a row with no green is structure the category scheme
-    does not explain (e.g. a signed contrast axis); a row green in TWO columns
-    is a blend. `df`: rows = "fit · axis", cols = skill axis names."""
-    fig = go.Figure(go.Heatmap(
-        z=df.values, x=list(df.columns), y=list(df.index),
-        zmin=0, zmax=1, colorscale="RdYlGn",
-        text=np.round(df.values, 2), texttemplate="%{text}",
-        colorbar=dict(title="|corr|")))
-    fig.update_layout(title=dict(text=title, x=0.5), template="plotly_white",
-                      height=max(420, 26 * len(df) + 160), width=760,
-                      yaxis=dict(autorange="reversed"))
-    return fig
-
-
 _ALIGN_METHOD_COLORS = {"varimax": "#0C447C", "wop": "#e67e22",
                         "matchalign": "#27ae60", "promax": "#8e44ad",
                         "geomin": "#16a085"}
@@ -356,7 +218,7 @@ def alignment_methods_fig(load_df: pd.DataFrame, top_n: int = 10,
     (varimax / WOP / MatchAlign / promax). Bars that agree across colors =
     the axis is data-driven, not an artifact of the rotation criterion; bars
     that disagree = orientation the data leave soft. `load_df` is the long
-    `mirt_alignment_loadings_k{K}.csv` written by fit.py/align_mirt
+    `mirt_alignment_loadings_k{K}.csv` written by `diagnostics/align_mirt.py`
     (columns: method, axis, benchmark, loading_median, hdi_low, hdi_high)."""
     axes_names = sorted(load_df["axis"].unique())
     methods = [m for m in _ALIGN_METHOD_COLORS if m in set(load_df["method"])]
@@ -384,16 +246,6 @@ def alignment_methods_fig(load_df: pd.DataFrame, top_n: int = 10,
                       title=dict(text=title, x=0.5),
                       legend=dict(orientation="h", y=1.08, x=0),
                       font=dict(size=10))
-    return fig
-
-
-def cmp_axis_collapse_fig(d3: pd.DataFrame,
-                          title: str = "Axis distinctness — max |Φ| off-diagonal (→1 = axes collapse)") -> go.Figure:
-    """Max |Φ| off-diagonal per fit. `d3`: df with fit, type, max_phi (float)."""
-    fig = go.Figure(go.Bar(x=d3["fit"], y=d3["max_phi"],
-                           marker_color=[_CMP_TYPE_COLOR.get(t, "#888780") for t in d3["type"]]))
-    fig.update_layout(title=dict(text=title, x=0.5), yaxis_title="max |Φ|",
-                      template="plotly_white", height=440, width=820, xaxis_tickangle=-25)
     return fig
 
 

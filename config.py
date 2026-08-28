@@ -37,6 +37,7 @@ LOW_OBS_THRESHOLD = 4
 PRIOR_SIGMA_B   = dict(mu=math.log(0.05), sigma=0.5)
 PRIOR_TAU_CD    = dict(mu=math.log(3.0),  sigma=1.0)
 PRIOR_TAU_ALPHA = dict(mu=math.log(0.5),  sigma=0.5)
+PRIOR_ALPHA = dict(mu=0.0, sigma=0.5)   # loglog link: per-bench discrimination cells, x tau_alpha (marginal median 0.5)
 
 # Hierarchical sigma_b (models/mirt.py, build_mirt_model(..., pooled_noise=True)).
 # The population LOCATION of the log noise scale is learned, centered on the
@@ -132,7 +133,7 @@ PRIOR_TIME_BETA = 0.5
 # unit scale the rest of the theta priors assume.
 PRIOR_THETA_T_NU = 4.0
 
-# Regularized-horseshoe scales, used by the "signedhs" loading prior
+# Regularized-horseshoe scales, used by the "bifactor" loading prior
 # (models/mirt.py) and the sparse-gate model's gate horseshoe (models/mirt_sparse.py).
 RH_TAU_SCALE  = 0.5   # global-scale prior width
 RH_SLAB_DF    = 3.0   # nu in c^2 ~ Inv-Gamma(nu/2, nu*s^2/2); smaller = heavier slab
@@ -212,6 +213,19 @@ SOTA_MODELS: list[str] = _load_sota_models()
 # this entry once the axis has live coverage (BALROG, SimpleQA Verified and
 # SimpleBench all load on it and are still being run).
 FORECAST_NO_SOTA_AXES: set[int] = {3}
+
+# The frontier-forecast fit shared by the dashboard, the memo and the LW post:
+# records only, fit from the reasoning-model cutoff, SD<0.4 cloud, 50% HDIs.
+# Each caller still supplies its own sota_exempt/back_start/horizon_date.
+FORECAST_KW = dict(fit_basis="records", fit_start="2024-10-01", sd_cap=0.4,
+                   hdi_prob=0.5)
+
+# Display strings for the flagship's 4 axes, opt-in per fit (figure dict keys
+# stay axis{k} so cache/anchor ids don't churn when a caller passes these).
+AXIS_TITLES = {"axis1": "Axis 1 — Fluid Intelligence",
+              "axis2": "Axis 2 — Scientific Knowledge and Reasoning",
+              "axis3": "Axis 3 — Agentic",
+              "axis4": "Axis 4 — Legacy QA"}
 
 RELEASE_DATES: dict[str, str] = {
     # Pre-2023 models the merge leaves undated. Without these the era filter

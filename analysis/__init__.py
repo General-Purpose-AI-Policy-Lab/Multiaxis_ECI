@@ -28,6 +28,15 @@ from analysis.factors import (
     trace_axis_names,
     trace_loading_prior,
 )
+from analysis.fitspec import (
+    FLAGSHIP,
+    FLAGSHIP_MAJORITY_CHAINS,
+    FLAGSHIP_THIN,
+    FLAGSHIP_TRACE,
+    FitSpec,
+    open_flagship,
+    spec_json,
+)
 from analysis.fitview import FitView, prepare_fit
 from analysis.forecast import ForecastResult, mirt_crossover_df, mirt_frontier_forecast
 from analysis.rotation import (
@@ -42,7 +51,6 @@ from analysis.rotation import (
     permutation_matched_reproducibility,
     factor_corr_df,
     geomin_rotate,
-    nonneg_rotate,
     promax_rotate,
 )
 from analysis.stats import (
@@ -50,6 +58,7 @@ from analysis.stats import (
     _release_dates,
     all_models_stats_df,
     capability_draws,
+    eci_affine,
     eci_transform,
     flat_C,
     forest_stats_df,
@@ -70,13 +79,13 @@ from analysis.timelines import (
 
 __all__ = [
     "ECITransform", "post_stats", "capability_draws", "flat_C",
-    "eci_transform", "_release_dates",
+    "eci_transform", "eci_affine", "_release_dates",
     "sota_stats_df", "all_models_stats_df", "timeline_stats_df",
     "human_stats_df", "forest_stats_df", "forest_stats_from_draws",
     "canonicalize_factors", "align_factor_signs", "AlignResult",
     "align_rotations", "_aligned_reproducibility", "alignment_report",
     "crosschain_axis_reproducibility", "permutation_matched_reproducibility",
-    "promax_rotate", "geomin_rotate", "nonneg_rotate",
+    "promax_rotate", "geomin_rotate",
     "apply_rotation", "factor_corr_df",
     "mirt_identified_ess",
     "mirt_identified_rhat", "mirt_identified_rhat_interaction",
@@ -90,4 +99,6 @@ __all__ = [
     "loadings_forest_df", "nc_difficulty_timeline_df",
     "ForecastResult", "mirt_frontier_forecast", "mirt_crossover_df",
     "FitView", "prepare_fit",
+    "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_MAJORITY_CHAINS",
+    "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship",
 ]

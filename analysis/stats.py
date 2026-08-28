@@ -58,6 +58,17 @@ def flat_C(trace) -> np.ndarray:
     return capability_draws(trace)
 
 
+def eci_affine(C_draws: np.ndarray, lo_idx: int, hi_idx: int) -> tuple[np.ndarray, np.ndarray]:
+    """Per-draw ECI affine (a, b) pinned at two model indices into a raw
+    (draws, model) capability array. Same math as `eci_transform`, for callers
+    that already have C and anchor indices without a full ECIData (the LW
+    timeline scripts read `theta[..., 0]` straight off a trace)."""
+    span = config.ANCHOR_HIGH[1] - config.ANCHOR_LOW[1]
+    b = span / (C_draws[:, hi_idx] - C_draws[:, lo_idx])
+    a = config.ANCHOR_LOW[1] - b * C_draws[:, lo_idx]
+    return a, b
+
+
 def eci_transform(C_flat: np.ndarray, data: ECIData) -> ECITransform:
     """Per-draw ECI affine from the two-anchor convention.
 
@@ -69,9 +80,7 @@ def eci_transform(C_flat: np.ndarray, data: ECIData) -> ECITransform:
         return ECITransform(a=np.zeros(n), b=np.ones(n))
     low_idx  = find_model_idx(data.mlookup, config.ANCHOR_LOW[0])
     high_idx = find_model_idx(data.mlookup, config.ANCHOR_HIGH[0])
-    span = config.ANCHOR_HIGH[1] - config.ANCHOR_LOW[1]
-    b = span / (C_flat[:, high_idx] - C_flat[:, low_idx])
-    a = config.ANCHOR_LOW[1] - b * C_flat[:, low_idx]
+    a, b = eci_affine(C_flat, low_idx, high_idx)
     return ECITransform(a=a, b=b)
 
 

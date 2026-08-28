@@ -5,6 +5,9 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+from viz.core import AI_COLOR, HUMAN_COLOR
 
 # ── MIRT per-fit figure builders ──
 # All pure: take arrays / DataFrames, return a go.Figure. No trace loading, no
@@ -108,6 +111,129 @@ def ppca_spectrum_fig(med, lo, hi, labels) -> go.Figure:
     ).update_layout(title=dict(text="PPCA axis strength (ARD τ, ranked per draw)", x=0.5),
                     xaxis_title="axis", yaxis_title="τ",
                     template="plotly_white", height=440, width=720)
+
+
+# ── per-axis grids (one panel per axis, one figure-level legend) ──
+
+# The row kinds a per-axis forest can carry: marker color, marker symbol, legend
+# label. `kind` is optional on the input frames — a frame without it is models.
+FOREST_KINDS = (
+    ("model",    AI_COLOR,    "circle",  "models"),
+    ("frontier", AI_COLOR,    "diamond", "frontier releases (shown even when wide)"),
+    ("human",    HUMAN_COLOR, "square",  "human tiers"),
+)
+
+
+def forest_grid_fig(dfs, titles, ncols: int = 2,
+                    x_title: str = "ability (mean, 95% interval)",
+                    title: str = "Top models, frontier releases and human tiers per axis",
+                    row_px: int = 22, width: int = 1180) -> go.Figure:
+    """One forest per axis on a grid, sharing a single figure-level legend.
+
+    Each frame is a `forest_fig` frame (name, mean, hdi_low, hdi_high) plus an
+    optional `kind` column in {model, frontier, human}, which picks the marker
+    and the legend entry. Rows are drawn in the frame's own order, bottom-up, so
+    a caller that sorts ascending by `mean` gets the strongest row at the top.
+    Panel y-axes are independent: the same name may sit at a different height in
+    each panel, which is the point of a per-axis forest.
+    """
+    dfs = list(dfs)
+    nrows = -(-len(dfs) // ncols)
+    fig = make_subplots(rows=nrows, cols=ncols, subplot_titles=list(titles),
+                        horizontal_spacing=0.36 / ncols, vertical_spacing=0.10)
+    seen: set[str] = set()
+    tallest = 1
+    for i, df in enumerate(dfs):
+        row, col = i // ncols + 1, i % ncols + 1
+        kinds = df["kind"] if "kind" in df else pd.Series("model", index=df.index)
+        tallest = max(tallest, len(df))
+        for kind, color, symbol, label in FOREST_KINDS:
+            d = df[kinds == kind]
+            if d.empty:
+                continue
+            fig.add_trace(go.Scatter(
+                x=d["mean"], y=d["name"], mode="markers", name=label,
+                legendgroup=kind, showlegend=label not in seen,
+                marker=dict(color=color, size=7, symbol=symbol),
+                error_x=dict(type="data", symmetric=False,
+                             array=(d["hdi_high"] - d["mean"]).values,
+                             arrayminus=(d["mean"] - d["hdi_low"]).values,
+                             color=color, thickness=1.6, width=0),
+                hovertemplate="<b>%{y}</b><br>%{x:.2f}<extra></extra>",
+            ), row=row, col=col)
+            seen.add(label)
+        # Every row label must render: Plotly thins a long categorical axis.
+        names = df["name"].tolist()
+        fig.update_yaxes(categoryorder="array", categoryarray=names,
+                         tickmode="array", tickvals=names, ticktext=names,
+                         tickfont=dict(size=9), automargin=True,
+                         row=row, col=col)
+        fig.update_xaxes(title_text=x_title, row=row, col=col)
+    fig.update_layout(
+        title=dict(text=title, x=0.5), template="plotly_white",
+        width=width, height=nrows * max(360, row_px * tallest) + 90,
+        legend=dict(orientation="h", yanchor="bottom", y=-0.07, x=0.5,
+                    xanchor="center"),
+        margin=dict(l=60, r=30, t=90, b=90))
+    return fig
+
+
+def loadings_grid_fig(load_df: pd.DataFrame, titles: dict | None = None,
+                      ncols: int = 2, top_n: int = 20,
+                      title: str | None = None, width: int = 1180) -> go.Figure:
+    """Per axis, the `top_n` benchmarks with the largest share of that axis.
+
+    `load_df` is `analysis.loadings_table` output — one row per (axis,
+    benchmark) with loading_median / hdi_low / hdi_high / axis_share — so the
+    share definition (the fraction of a benchmark's squared loading row pointing
+    along this axis) is the one the dashboard heatmap and the fit's own CSVs use.
+
+    The bar is the loading, so steepness stays visible; the color is the share,
+    so a short row pointing squarely along the axis reads as pure even though
+    its bar is short. Ranking is by share, not by loading: a long half-aligned
+    row would otherwise out-rank it and mis-name the axis.
+    """
+    titles = titles or {}
+    axes = list(dict.fromkeys(load_df["axis"]))
+    nrows = -(-len(axes) // ncols)
+    fig = make_subplots(rows=nrows, cols=ncols, vertical_spacing=0.10,
+                        horizontal_spacing=0.24 / ncols,
+                        subplot_titles=[titles.get(a, a) for a in axes])
+    for i, axis in enumerate(axes):
+        row, col = i // ncols + 1, i % ncols + 1
+        d = (load_df[load_df["axis"] == axis]
+             .sort_values("axis_share", ascending=False, kind="stable")
+             .head(top_n).iloc[::-1])            # weakest share at the bottom
+        fig.add_trace(go.Bar(
+            x=d["loading_median"], y=d["benchmark"], orientation="h",
+            showlegend=False, marker=dict(color=d["axis_share"], coloraxis="coloraxis"),
+            error_x=dict(type="data", symmetric=False,
+                         array=(d["hdi_high"] - d["loading_median"]).values,
+                         arrayminus=(d["loading_median"] - d["hdi_low"]).values,
+                         color="#333", thickness=1.1, width=3),
+            customdata=d["axis_share"],
+            hovertemplate="<b>%{y}</b><br>loading %{x:.2f}"
+                          "<br>axis share %{customdata:.2f}<extra></extra>",
+        ), row=row, col=col)
+        names = d["benchmark"].tolist()
+        # The share is printed after the name as well as encoded in the color: a
+        # static export has no hover, and the exact number is the ranking key.
+        fig.update_yaxes(
+            categoryorder="array", categoryarray=names,
+            tickmode="array", tickvals=names,
+            ticktext=[f"{b}  {s:.2f}" for b, s in zip(names, d["axis_share"])],
+            tickfont=dict(size=9), automargin=True, row=row, col=col)
+        fig.update_xaxes(title_text="loading (median, 95% interval)",
+                         zeroline=True, zerolinecolor="#222", row=row, col=col)
+    fig.update_layout(
+        title=dict(text=title or f"The {top_n} benchmarks that define each axis, "
+                                 "ranked by axis share", x=0.5),
+        template="plotly_white", width=width,
+        height=nrows * max(360, 22 * top_n) + 80,
+        coloraxis=dict(colorscale="Viridis", cmin=0.0, cmax=1.0,
+                       colorbar=dict(title="axis share", len=0.6)),
+        margin=dict(l=60, r=30, t=90, b=60))
+    return fig
 
 
 # ── single-fit deep-dive builders (K vs 1D; used by the lean plot_mirt CLI) ──

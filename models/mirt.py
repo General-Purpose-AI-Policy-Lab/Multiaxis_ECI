@@ -3,9 +3,8 @@
 eta = sum_k A[b,k]*theta[m,k] - D[b], mu = sigmoid(eta), score ~ Beta(mu*phi, (1-mu)*phi).
 Loading prior: "normal" (non-negative A, single shared scale, composes with
 hard anchors / Q-matrix), "signed" (signed-free, rotation resolved per draw in
-post-processing), "signedhs" (signed cells x per-cell regularized horseshoe),
-or "bifactor" (dense non-negative general column + non-negative horseshoe
-specifics). Convergence judged on identified quantities only (eta, D, sigma_b).
+post-processing), or "bifactor" (dense non-negative general column +
+non-negative horseshoe specifics). Convergence judged on identified quantities only (eta, D, sigma_b).
 """
 from __future__ import annotations
 
@@ -15,6 +14,7 @@ import pytensor.tensor as pt
 
 from config import (
     ECI_EPS,
+    PRIOR_ALPHA,
     PRIOR_DELTA_HUMAN,
     PRIOR_LINEAGE_DELTA,
     PRIOR_LINEAGE_DELTA_BM,
@@ -374,22 +374,21 @@ def build_mirt_model(data: ECIData, K: int,
                       pin_benchmark: str | None = None,
                       plt_founders: list[str] | None = None,
                       floor_c: np.ndarray | None = None,
-                      ceiling_d: np.ndarray | None = None,
                       ceiling_noise: bool = False,
                       known_se: bool = False,
                       pooled_noise: bool = False,
                       shared_base_zsn: bool = True,
                       time_t: np.ndarray | None = None,
                       theta_t_cells: bool = False,
-                      theta_pos: bool = False) -> pm.Model:
+                      theta_pos: bool = False,
+                      link: str = "linear") -> pm.Model:
     """Build the K-factor compensatory Beta-MIRT model.
 
     loading_prior: "normal" (non-negative loadings, single shared tau, composes
-    with hard anchors — the confirmatory choice), "signed" (signed-free
-    loadings, identified post-hoc — see below), "signedhs" (signed loadings
-    × per-cell regularized horseshoe, shared global scale — sparsity softly
-    picks the rotation; post-hoc alignment still applies), or "bifactor"
-    (one dense general column plus sparse specifics — see below).
+    with hard anchors — the confirmatory choice), "pt1" (non-negative loadings
+    under the product-to-one constraint — see below), "signed" (signed-free
+    loadings, identified post-hoc — see below), or "bifactor" (one dense
+    general column plus sparse specifics — see below).
     K=1 reproduces the 1D Beta IRT.
 
     "normal": A[b,k] = HalfNormal(1) * tau_A, tau_A ~ LogNormal(log 0.5, 0.5)
@@ -397,6 +396,28 @@ def build_mirt_model(data: ECIData, K: int,
     selection), non-centered (a unit-scale z multiplied by tau_A). Loadings
     therefore cannot go negative; each axis is a "good-at-these" bundle.
     Median tau_A 0.5 with HalfNormal(1) cells gives typical loadings ~0.4.
+
+    "pt1": log A[.,k] is a ZeroSumNormal over benchmarks, so each axis's
+    loadings have product exactly 1. This is the identification Epoch's public
+    ECI uses (sum-to-zero on log alpha), generalized to K axes.
+
+    It removes a real ridge that "normal" leaves open. eta has K exact
+    multiplicative degeneracies, one per axis: A[:,k] -> c*A[:,k] with
+    theta[:,k] -> theta[:,k]/c leaves eta unchanged AND leaves theta's
+    sum-to-zero intact, so theta's zero-sum constraint does not touch them —
+    under "normal" they are broken only softly, by theta's prior sitting at
+    unit scale against a free tau_A. pt1 breaks all K hard, and therefore has
+    NO free loading scale: a tau_A would reinstate one ridge per axis. pt1 sits
+    exactly K free dimensions below "normal".
+
+    The gauge value 1 is arbitrary and means nothing; realized axis strength
+    lives in theta's per-axis spread, which stays free (its ZeroSumNormal is a
+    prior, not a hard constraint). sigma_A is the log-space spread of the
+    loadings, the only scale the block needs.
+
+    Costs: loadings are lognormal rather than half-normal, so no benchmark can
+    sit at zero loading on an axis it does not measure, and hard anchors are
+    unavailable (exp is never exactly 0).
 
     "signed": A[b,k] = Normal(0,1) * shared scalar tau — no sign constraint,
     no ordering, no orthonormality. The prior is exactly rotation-invariant,
@@ -409,15 +430,6 @@ def build_mirt_model(data: ECIData, K: int,
     two highly correlated positive axes. Mutually exclusive with anchors:
     hard zeros would break the exact rotation symmetry the post-hoc
     alignment relies on.
-
-    "signedhs": the regularized ("Finnish") horseshoe of Piironen & Vehtari
-    (2017) on signed Normal cells — per-cell half-Cauchy local scale, one
-    shared global scale (deliberately no per-axis ordering: ordering builds
-    likelihood walls at scale ties), and a finite Inv-Gamma slab that
-    soft-truncates the Cauchy tail. Each loading is either "really in the
-    axis" (either sign, slab) or squeezed to ~0, so sparsity itself softly
-    picks the rotation. Mutually exclusive with anchors (it LEARNS structure
-    rather than IMPOSING it).
 
     "bifactor": axis 1 is a GENERAL column every benchmark may load, axes 2..K
     are SPECIFICS. Both blocks are non-negative; what separates them is the
@@ -503,6 +515,22 @@ def build_mirt_model(data: ECIData, K: int,
     that per-draw post-hoc alignment quotients out, so alignment degrades to
     permutation matching — the same caveat theta_t_cells carries, warned below.
 
+    link : str
+        "linear" (default) is the compensatory 2PL: eta = A.theta - D.
+        "loglog" is the log-logistic IRF mu = 1/(1+(theta.A)^(-alpha_b)),
+        i.e. eta = alpha_b * log(sum_k A_bk exp(theta_mk)) with theta, A and
+        alpha_b positive. Raw theta keeps every prior block (the ZeroSumNormal
+        pin becomes geometric mean 1 per axis; human/lineage/time structure
+        survives because exp is monotone). log(sum) is a smooth max
+        (within log K of the best axis), so the family is disjunctive - the
+        complement of the conjunctive product link in mirt_nc.py. At K=1 it
+        is the current 2PL reparameterized with alpha_b as discrimination.
+        Difficulty is A's row scale, stored as the Deterministic
+        D = -alpha * (row mean of log A); no D is sampled. Requires
+        loading_prior="normal"; rejects theta_pos, anchors, plt_founders,
+        pin_benchmark. Floors, known_se and pooled_noise compose
+        unchanged (they act on mu and phi after the link).
+
     shared_base_zsn: whether those bases join that ZeroSumNormal (default) or
     each get a private Normal(0, 1) with the sum-to-zero spanning only the
     unstructured rows. Same marginal scale either way; the difference is how
@@ -528,7 +556,7 @@ def build_mirt_model(data: ECIData, K: int,
     Implemented by folding the sign of the existing cell (|A| on the diagonal
     ⇒ HalfNormal-shaped prior) and zeroing above-diagonal cells (their z's
     become benign prior-only Gaussians) — no new random variables. Only for
-    the signed family ("signed"/"signedhs"). Known literature caveat: the
+    the signed family ("signed"). Known literature caveat: the
     result depends on the founder choice — the list is part of the model
     specification, pick rows whose unanchored profiles already match the
     pattern (near-zero where the constraint puts zeros).
@@ -545,33 +573,20 @@ def build_mirt_model(data: ECIData, K: int,
     deliberately keeps no floor (below-chance is signal there), and the
     nc/sparse product links have no single eta to floor.
 
-    ceiling_d: optional fixed-d upper asymptote — a per-benchmark saturation
-    point (shape (n_benchmarks,), blookup order, from
-    data.load_benchmark_ceilings). The mean becomes
-    mu = c_b + (d_b - c_b) * sigmoid(eta), so a perfect test-taker lands at the
-    benchmark's known ceiling d_b rather than 1 (e.g. ForecastBench's
-    superforecaster median, DeepResearchBench's LLM-judge noise ceiling). Like
-    floor_c, d is FIXED from documented ground truth, not estimated — a freely
-    estimated wall (the retired soft_ceiling flag) was weakly identified /
-    multimodal on this data, exactly the failure the fixed-c 3PL avoids on the
-    floor side. A benchmark with d_b = 1 collapses to the 2PL/3PL link there.
-    Together floor_c + ceiling_d give the fixed 4PL: mu in (c_b, d_b).
-
     ceiling_noise: estimate a per-benchmark upper asymptote confined to a
     noise-sized gap (label errors, judge disagreement). The mean becomes
-    mu = c_b + (d_b - c_b) * sigmoid(eta) with
-    d_b = d_hi - delta_b * (d_hi - c_b) and delta_b ~ Beta(1, 20) (mean 0.048,
-    mode 0, P(gap > 0.10) = 0.122): "no ceiling unless the data insists". This
-    is the smooth relaxation of a spike-slab at d = d_hi — a point-mass mixture
-    would give NUTS a two-story posterior per benchmark (the islands failure
-    mode), the Beta dial does not. d_b is identified only where observations
-    press the ceiling; elsewhere the posterior returns the prior, the honest
-    "not measurable yet" answer. Composes with ceiling_d: a curated wall is the
-    level a benchmark saturates at for a substantive reason, and the noise gap
-    sits on top of it (d_hi is the wall where one is given, else 1). Diagnostic
-    use: read `ceiling_d` off the trace to see which benchmarks demand d < d_hi.
-    (The retired soft_ceiling flag was the same asymptote at Beta(1, 19),
-    without the ceiling_d composition.)
+    mu = c_b + (d_b - c_b) * sigmoid(eta) with d_b = 1 - delta_b * (1 - c_b)
+    and delta_b ~ Beta(1, 20) (mean 0.048, mode 0, P(gap > 0.10) = 0.122):
+    "no ceiling unless the data insists". This is the smooth relaxation of a
+    spike-slab at d = 1 — a point-mass mixture would give NUTS a two-story
+    posterior per benchmark (the islands failure mode), the Beta dial does not.
+    d_b is identified only where observations press the ceiling; elsewhere the
+    posterior returns the prior, the honest "not measurable yet" answer.
+    Diagnostic use: read `ceiling_d` off the trace to see which benchmarks
+    demand d < 1. This is the only ceiling the model carries — a FIXED wall
+    read from a curated file was the retired --ceilings flag, and a freely
+    estimated one (the retired soft_ceiling flag) was weakly identified /
+    multimodal on this data, which is why the gap is confined to noise size.
 
     known_se: split the Beta noise into a KNOWN per-cell part and an estimated
     per-benchmark remainder, using data.n_eff (the effective test length the
@@ -589,8 +604,8 @@ def build_mirt_model(data: ECIData, K: int,
     left exactly as it is today. What changes under the flag is the MEANING of
     sigma_b: it becomes the EXCESS scatter beyond the instrument (construct
     misfit — the benchmark measuring something the axes do not), not the total
-    scatter. Orthogonal to floor_c / ceiling_d / ceiling_noise, which move mu:
-    the same phi_n is used whichever mean transform is in force.
+    scatter. Orthogonal to floor_c / ceiling_noise, which move mu: the same
+    phi_n is used whichever mean transform is in force.
 
     pooled_noise: learn the POPULATION the per-benchmark noise scales are drawn
     from instead of fixing it. sigma_b = exp(mu_s + tau_s * z_b) with
@@ -604,15 +619,20 @@ def build_mirt_model(data: ECIData, K: int,
     rather than asserted. Non-centered (z * tau) per the repo convention: it
     breaks the funnel between tau_s and the per-benchmark z. Everything
     downstream reads the "sigma_b" deterministic, so this composes with
-    known_se (which then pools the EXCESS noise), floor_c and ceiling_d.
+    known_se (which then pools the EXCESS noise), floor_c and ceiling_noise.
     """
     if K < 1:
         raise ValueError(f"K must be >= 1, got {K}")
 
-    if loading_prior not in ("normal", "signed", "signedhs", "bifactor"):
+    if loading_prior not in ("normal", "pt1", "signed", "bifactor"):
         raise ValueError(
-            f"loading_prior must be 'normal', 'signed', 'signedhs', or "
+            f"loading_prior must be 'normal', 'pt1', 'signed', or "
             f"'bifactor', got {loading_prior!r}")
+    if loading_prior == "pt1" and anchors:
+        raise ValueError(
+            "loading_prior='pt1' builds A as exp(...), which is never exactly "
+            "0, so a hard-zero anchor cannot be imposed. Use "
+            "loading_prior='normal' for anchored fits.")
     if loading_prior == "bifactor":
         if anchors:
             raise ValueError(
@@ -625,11 +645,6 @@ def build_mirt_model(data: ECIData, K: int,
                 f"loading_prior='bifactor' needs K >= 2 (one general column "
                 f"plus at least one specific); got K={K}. For a single general "
                 f"column use loading_prior='normal'.")
-    if loading_prior == "signedhs" and anchors:
-        raise ValueError(
-            f"loading_prior={loading_prior!r} LEARNS the loading structure and "
-            f"is mutually exclusive with hard `anchors` (which IMPOSE it). Pass "
-            f"one or the other, not both.")
     if loading_prior == "signed" and anchors:
         raise ValueError(
             "loading_prior='signed' relies on the loadings being EXACTLY "
@@ -640,10 +655,10 @@ def build_mirt_model(data: ECIData, K: int,
     # the A-construction below only has to apply the triangular transform.
     plt_idx = None
     if plt_founders is not None:
-        if loading_prior not in ("signed", "signedhs"):
+        if loading_prior != "signed":
             raise ValueError(
                 f"plt_founders identifies the rotation of the signed "
-                f"exploratory family ('signed'/'signedhs'); got "
+                f"exploratory family ('signed'); got "
                 f"loading_prior={loading_prior!r}. For hard structure use "
                 f"`anchors` instead.")
         if anchors:
@@ -668,19 +683,6 @@ def build_mirt_model(data: ECIData, K: int,
                 f"got {floor_c.shape}")
         if not np.all(np.isfinite(floor_c)) or not np.all((floor_c >= 0.0) & (floor_c < 1.0)):
             raise ValueError("floor_c values must be finite and in [0, 1)")
-    if ceiling_d is not None:
-        ceiling_d = np.asarray(ceiling_d, dtype=np.float64)
-        if ceiling_d.shape != (data.n_benchmarks,):
-            raise ValueError(
-                f"ceiling_d must have shape ({data.n_benchmarks},), "
-                f"got {ceiling_d.shape}")
-        if not np.all(np.isfinite(ceiling_d)) or not np.all((ceiling_d > 0.0) & (ceiling_d <= 1.0)):
-            raise ValueError("ceiling_d values must be finite and in (0, 1]")
-        if floor_c is not None and not np.all(ceiling_d > floor_c):
-            bad = np.flatnonzero(ceiling_d <= floor_c)
-            raise ValueError(
-                f"ceiling_d must exceed floor_c on every benchmark; violated at "
-                f"benchmark position(s) {bad.tolist()}")
 
     n_eff = None
     if known_se:
@@ -699,7 +701,7 @@ def build_mirt_model(data: ECIData, K: int,
     if lineage_bm and lineage is None:
         raise ValueError("lineage_bm=True requires a lineage structure")
 
-    if loading_prior in ("signed", "signedhs") and (human_order or lineage):
+    if loading_prior == "signed" and (human_order or lineage):
         import warnings
         warnings.warn(
             "loading_prior='signed' with the ordered human/lineage theta blocks: "
@@ -710,7 +712,7 @@ def build_mirt_model(data: ECIData, K: int,
             "structured priors act as a weak, substantive orientation anchor. "
             "Interpret aligned axes with that caveat.", UserWarning)
 
-    if theta_pos and loading_prior in ("signed", "signedhs"):
+    if theta_pos and loading_prior == "signed":
         import warnings
         warnings.warn(
             "theta_pos with a signed loading prior: softplus in the likelihood "
@@ -719,6 +721,23 @@ def build_mirt_model(data: ECIData, K: int,
             "itself orients the axes (up to permutation). Alignment reduces to "
             "permutation matching; interpret aligned axes with that caveat.",
             UserWarning)
+
+    if link not in ("linear", "loglog"):
+        raise ValueError(f"unknown link: {link!r} (use 'linear' or 'loglog')")
+    if link == "loglog":
+        # The loglog A block replaces the loading prior (log needs A > 0 and
+        # structure-free cells); positivity is built in (exp of theta); D is
+        # derived from A's row scale, so there is nothing to pin or anchor.
+        if loading_prior != "normal":
+            raise ValueError("link='loglog' requires loading_prior='normal'")
+        if theta_pos:
+            raise ValueError("link='loglog' already reads exp(theta); drop theta_pos")
+        if anchors:
+            raise ValueError("anchors force a loading to exactly 0 (log A = -inf); incompatible with link='loglog'")
+        # plt_founders needs no check here: it already requires a signed
+        # loading prior (rejected above via loading_prior != "normal").
+        if pin_benchmark is not None:
+            raise ValueError("link='loglog' derives D from A's row scale; there is no sampled D to pin")
 
     coords = {
         "model":  data.mlookup["model"].tolist(),
@@ -746,10 +765,39 @@ def build_mirt_model(data: ECIData, K: int,
             sigma_b = pm.LogNormal("sigma_b", dims="bench", **PRIOR_SIGMA_B)
         tau_CD = pm.LogNormal("tau_CD", **PRIOR_TAU_CD)
 
-        if loading_prior == "normal":
+        if link == "loglog":
+            # One shared scale for the row-centered log-loading mix
+            # (log-ratio units: PRIOR_TAU_ALPHA's median 0.5 reads as typical
+            # axis-weight ratios of ~e^+-0.5). Exposed as the (K,) tau_A
+            # every downstream consumer expects.
+            tau_A_scalar = pm.LogNormal("tau_A_loglog", **PRIOR_TAU_ALPHA)
+            tau_A = pm.Deterministic("tau_A", pt.ones(K) * tau_A_scalar, dims="latent")
+        elif loading_prior == "normal":
             # Single shared scale for all axes (no per-axis selection).
             tau_A_scalar = pm.LogNormal("tau_A_normal", **PRIOR_TAU_ALPHA)
             tau_A = pm.Deterministic("tau_A", pt.ones(K) * tau_A_scalar, dims="latent")
+        elif loading_prior == "pt1":
+            # Product-to-one identification (Epoch's public ECI convention,
+            # generalized per axis). eta = sum_k A[b,k] theta[m,k] - D[b] has K
+            # EXACT multiplicative degeneracies, one per axis: A[:,k] -> c*A[:,k]
+            # with theta[:,k] -> theta[:,k]/c leaves eta untouched and leaves
+            # theta's sum-to-zero intact, so the theta prior only breaks them
+            # softly. Pinning each column's geometric mean to exactly 1 breaks
+            # all K hard, which is why there is NO free loading scale here: a
+            # tau_A would reinstate one ridge. The gauge value 1 is arbitrary
+            # and carries no meaning; realized axis strength lives in theta's
+            # per-axis spread, which stays free (its ZeroSumNormal is a prior,
+            # not a constraint).
+            #
+            # sigma_A is the log-space spread of the loadings, the only scale
+            # the block needs, and it is SAMPLED -- Barry's tau_alpha is free
+            # too (alpha_b ~ LogNormal(0, tau_alpha^2)), so fixing it would
+            # depart from the identification this prior exists to reproduce.
+            sigma_A = pm.LogNormal("sigma_A", **PRIOR_TAU_ALPHA)
+            # Flat unit tau_A so every downstream reader (tau spectrum, axis
+            # strength, rank tracking) gets the (K,) vector it expects; the
+            # flat-tau path already reads strength off the loading columns.
+            tau_A = pm.Deterministic("tau_A", pt.ones(K), dims="latent")
         elif loading_prior == "signed":
             # Shared scalar scale, like "normal" — deliberately NO per-axis tau
             # and NO ordering: either would break the exact rotation invariance
@@ -773,14 +821,10 @@ def build_mirt_model(data: ECIData, K: int,
                 pt.concatenate([pt.stack([tau_g]), pt.ones(K - 1) * tau_hs]),
                 dims="latent")
         else:
-            # Signed horseshoe: ONE shared global scale (no per-axis ordering —
-            # ties would freeze the sampler). The per-cell local scales below
-            # do the orientation work instead: among the rotations the
-            # likelihood can't tell apart, sparsity prefers the one where each
-            # axis has few large loadings (of either sign) — varimax's job,
-            # done inside the sampler.
-            tau_hs = pm.HalfNormal("tau_hs_signed", RH_TAU_SCALE)
-            tau_A = pm.Deterministic("tau_A", pt.ones(K) * tau_hs, dims="latent")
+            # Every prior on the whitelist above has a branch; a new one must
+            # add its own rather than inherit whichever branch sits last.
+            raise AssertionError(
+                f"no tau_A branch for loading_prior={loading_prior!r}")
 
         # theta: human tiers (hard-ordered) and lineage chains (soft-ordered)
         # are structured blocks whose base levels join the unstructured models
@@ -797,9 +841,18 @@ def build_mirt_model(data: ECIData, K: int,
         # is what eta reads, so with A >= 0 an axis can only add to a score,
         # never pull it below the sigmoid(-D) baseline. softplus is monotone,
         # so raw-space order constraints survive on the likelihood scale.
-        theta_lik = (pm.Deterministic("theta_pos", pt.softplus(theta),
-                                      dims=("model", "latent"))
-                     if theta_pos else theta)
+        if link == "loglog":
+            # exp, not softplus: theta = exp(z) has lognormal marginals and
+            # the ZeroSumNormal pin becomes geometric mean 1 per axis. Stored
+            # for downstream eta reconstruction (PPC, identified r-hat); the
+            # predictor itself reads raw theta inside a logsumexp.
+            theta_lik = pm.Deterministic("theta_pos", pt.exp(theta),
+                                         dims=("model", "latent"))
+        elif theta_pos:
+            theta_lik = pm.Deterministic("theta_pos", pt.softplus(theta),
+                                         dims=("model", "latent"))
+        else:
+            theta_lik = theta
 
         free_mask = np.ones((data.n_benchmarks, K), dtype=float)
         if anchors:
@@ -820,7 +873,25 @@ def build_mirt_model(data: ECIData, K: int,
                 free_mask[bi, :] = 0.0
                 free_mask[bi, axis_list] = 1.0
 
-        if loading_prior == "signed":
+        if link == "loglog":
+            # Free lognormal loadings via an exact log-space split:
+            # log A_bk = row mean + row-centered mix. Same K free cells per
+            # row as unsplit lognormal cells (1 mean + K-1 centered), so this
+            # is a reparameterization, not a constraint. The split exists
+            # because the row mean is the difficulty scale (tau_CD units,
+            # +-6 logits) while the mix is axis-weight ratios (tau_A units,
+            # ~e^+-1); one shared scale would squash one or blow up the other.
+            logA_row_z = pm.Normal("logA_row_z", 0.0, 1.0, dims="bench")
+            logA_mix_z = pm.ZeroSumNormal("logA_mix_z", dims=("bench", "latent"))
+            logA = (logA_row_z * tau_CD)[:, None] + tau_A_scalar * logA_mix_z
+            A = pm.Deterministic("A", pt.exp(logA), dims=("bench", "latent"))
+            # Discrimination: the slope on log-ability. At K=1 this link is
+            # the 2PL reparameterized with alpha in the discrimination seat
+            # (typical fitted discriminations ~0.5).
+            alpha_z = pm.LogNormal("alpha_z", dims="bench", **PRIOR_ALPHA)
+            tau_alpha = pm.LogNormal("tau_alpha", **PRIOR_TAU_ALPHA)
+            alpha = pm.Deterministic("alpha", alpha_z * tau_alpha, dims="bench")
+        elif loading_prior == "signed":
             # Signed-free: iid Normal cells × shared scale. Spherical in the
             # K-dim row space, so prior and likelihood are both invariant under
             # rotating (A, theta) together — the sampler explores that orbit
@@ -828,24 +899,6 @@ def build_mirt_model(data: ECIData, K: int,
             # free_mask (anchors are excluded above), no initval needed.
             A_z = pm.Normal("A_z", 0.0, 1.0, dims=("bench", "latent"))
             A = pm.Deterministic("A", _apply_plt(A_z * tau_A, plt_idx, K),
-                                 dims=("bench", "latent"))
-        elif loading_prior == "signedhs":
-            # Per-cell regularized horseshoe (HalfCauchy local scale, Inv-Gamma
-            # slab soft-truncating the tail) on SIGNED Normal cells. Each
-            # loading is either "really in the axis" (either sign, slab) or
-            # squeezed to ~0 — so the mushy middle of the signed fit's aligned
-            # loadings thins out, and the sparsity itself softly picks the
-            # rotation. Post-hoc alignment still applies (as an approximation —
-            # sparsity breaks exact orbit symmetry).
-            lam = pm.HalfCauchy("lam_hs", 1.0, dims=("bench", "latent"))
-            c2 = pm.InverseGamma("c2_hs", alpha=RH_SLAB_DF / 2.0,
-                                 beta=RH_SLAB_DF * RH_SLAB_SCALE**2 / 2.0)
-            tau_row = tau_A[None, :]
-            lam_t2 = c2 * lam**2 / (c2 + tau_row**2 * lam**2)
-            A_z = pm.Normal("A_z", 0.0, 1.0, dims=("bench", "latent"))
-            A = pm.Deterministic("A",
-                                 _apply_plt(A_z * tau_row * pt.sqrt(lam_t2),
-                                            plt_idx, K),
                                  dims=("bench", "latent"))
         elif loading_prior == "bifactor":
             # Dense general column: the "normal" block on one column, no
@@ -866,6 +919,14 @@ def build_mirt_model(data: ECIData, K: int,
                 pt.concatenate([pt.shape_padright(g_z * tau_g),
                                 A_s_z * tau_hs * pt.sqrt(lam_t2)], axis=1),
                 dims=("bench", "latent"))
+        elif loading_prior == "pt1":
+            # Zero-sum runs over the LAST dim, so log A is sampled transposed:
+            # each ROW of logA_z is one axis, summing to zero across benchmarks.
+            # Non-negativity is automatic (exp), so no free_mask (anchors are
+            # rejected above) and no positive-family choice to make.
+            logA_z = pm.ZeroSumNormal("logA_z", dims=("latent", "bench"))
+            A = pm.Deterministic("A", pt.exp(sigma_A * logA_z).T,
+                                 dims=("bench", "latent"))
         else:
             A_z = pm.HalfNormal("A_z", sigma=1.0, dims=("bench", "latent"))
             A_masked = A_z * pt.as_tensor(free_mask)
@@ -881,29 +942,43 @@ def build_mirt_model(data: ECIData, K: int,
         # Sampling B-1 free difficulties and splicing a fixed 0 at the pin (not
         # recentering a full D_z) avoids leaving a redundant, freely-wandering
         # D_z[pin] in the geometry.
-        if pin_benchmark is None:
-            D_z = pm.Normal("D_z", 0.0, 1.0, dims="bench")
+        if link == "loglog":
+            # Difficulty read back in logits from A's row scale:
+            # eta = alpha*log(theta_pos . A) = alpha*log(theta_pos . u) - D
+            # with u = exp(row-centered mix), D = -alpha * (row mean of
+            # log A). Exact - a per-row constant cannot enter a zero-sum
+            # vector - and it keeps every posterior["D"] reader meaningful.
+            D = pm.Deterministic("D", -alpha * logA_row_z * tau_CD, dims="bench")
         else:
-            bench_names = data.blookup["benchmark"].tolist()   # same list as the `bench` coord
-            if pin_benchmark not in bench_names:
-                raise ValueError(f"pin_benchmark not in data: '{pin_benchmark}'")
-            pin = bench_names.index(pin_benchmark)              # 0-indexed position (NOT benchmark_idx)
-            keep = np.array([i for i in range(data.n_benchmarks) if i != pin])
-            D_z_free = pm.Normal("D_z_free", 0.0, 1.0, shape=data.n_benchmarks - 1)
-            D_z = pt.set_subtensor(pt.zeros(data.n_benchmarks)[keep], D_z_free)
-        D = pm.Deterministic("D", D_z * tau_CD, dims="bench")
+            if pin_benchmark is None:
+                D_z = pm.Normal("D_z", 0.0, 1.0, dims="bench")
+            else:
+                bench_names = data.blookup["benchmark"].tolist()   # same list as the `bench` coord
+                if pin_benchmark not in bench_names:
+                    raise ValueError(f"pin_benchmark not in data: '{pin_benchmark}'")
+                pin = bench_names.index(pin_benchmark)              # 0-indexed position (NOT benchmark_idx)
+                keep = np.array([i for i in range(data.n_benchmarks) if i != pin])
+                D_z_free = pm.Normal("D_z_free", 0.0, 1.0, shape=data.n_benchmarks - 1)
+                D_z = pt.set_subtensor(pt.zeros(data.n_benchmarks)[keep], D_z_free)
+            D = pm.Deterministic("D", D_z * tau_CD, dims="bench")
 
-        A_obs     = A[data.bench_idx]          # (n_obs, K)
-        theta_obs = theta_lik[data.model_idx]  # (n_obs, K)
-        eta  = (A_obs * theta_obs).sum(axis=-1) - D[data.bench_idx]
+        if link == "loglog":
+            # Stable predictor: log(sum_k A_bk exp(theta_k)) =
+            # logsumexp_k(theta_k + log A_bk), never materializing A or
+            # exp(theta). logsumexp is a smooth max (within log K of the
+            # best-loaded axis), so the family is disjunctive.
+            eta = alpha[data.bench_idx] * pt.logsumexp(
+                theta[data.model_idx] + logA[data.bench_idx], axis=-1)
+        else:
+            A_obs     = A[data.bench_idx]          # (n_obs, K)
+            theta_obs = theta_lik[data.model_idx]  # (n_obs, K)
+            eta = (A_obs * theta_obs).sum(axis=-1) - D[data.bench_idx]
         mu_n = pm.math.sigmoid(eta)
         if ceiling_noise:
             # Estimated 4PL: the mean saturates at d_b instead of 1. delta is
-            # the FRACTION of the (c_b, d_hi_b] range left unreachable, so
+            # the FRACTION of the (c_b, 1] range left unreachable, so
             # d_b > c_b holds by construction — a free absolute gap could dip
-            # below the floor and flip the Beta mean negative. d_hi_b is the
-            # curated wall where one is given, else 1, so without either this
-            # is exactly d_b = 1 - delta.
+            # below the floor and flip the Beta mean negative.
             #
             # Beta(1, 20): mean 0.048, P(delta > 0.10) = 0.122. Beta(1, beta)
             # is an Exponential folded onto [0, 1]: mode at 0 and log-density
@@ -926,19 +1001,16 @@ def build_mirt_model(data: ECIData, K: int,
             # Beta(1, 19).)
             delta = pm.Beta("ceiling_gap", alpha=1.0, beta=20.0, dims="bench")
             c_full = floor_c if floor_c is not None else np.zeros(data.n_benchmarks)
-            d_hi = ceiling_d if ceiling_d is not None else np.ones(data.n_benchmarks)
-            d_b = pm.Deterministic("ceiling_d", d_hi - delta * (d_hi - c_full),
+            d_b = pm.Deterministic("ceiling_d", 1.0 - delta * (1.0 - c_full),
                                    dims="bench")
             c_obs = c_full[data.bench_idx]
             mu_n = c_obs + (d_b[data.bench_idx] - c_obs) * mu_n
-        elif floor_c is not None or ceiling_d is not None:
-            # fixed 3PL/4PL: a random guesser lands at chance c_b (not 0) and a
-            # perfect test-taker at the known saturation d_b (not 1). Both are
-            # numpy constants, so either side left at its default folds the
-            # link back to the plainer model exactly.
-            c_obs = floor_c[data.bench_idx] if floor_c is not None else 0.0
-            d_obs = ceiling_d[data.bench_idx] if ceiling_d is not None else 1.0
-            mu_n = c_obs + (d_obs - c_obs) * mu_n
+        elif floor_c is not None:
+            # fixed 3PL: a random guesser lands at chance c_b, not 0. c is a
+            # numpy constant, so leaving it at its default folds the link back
+            # to the 2PL exactly.
+            c_obs = floor_c[data.bench_idx]
+            mu_n = c_obs + (1.0 - c_obs) * mu_n
 
         phi   = pm.Deterministic("phi_b", 1.0 / (4.0 * sigma_b**2) - 1.0, dims="bench")
         if n_eff is None:

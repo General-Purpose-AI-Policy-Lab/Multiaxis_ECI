@@ -40,9 +40,9 @@ Outputs:
 
 Run:
   ~/miniforge3/envs/pymc_env/bin/python diagnostics/diagnose_chains.py \
-      --trace results/mirt_signed/trace_mirt_k3_signed.nc --name k3_bare --fig
+      --trace results/mirt_loglog/trace_mirt_k2_loglog.nc --name k2_loglog --fig
   ~/miniforge3/envs/pymc_env/bin/python diagnostics/diagnose_chains.py \
-      --trace results/mirt_signed/trace_mirt_k3_signed.nc --write-modes
+      --trace results/mirt_loglog/trace_mirt_k2_loglog.nc --write-modes
 """
 from __future__ import annotations
 
