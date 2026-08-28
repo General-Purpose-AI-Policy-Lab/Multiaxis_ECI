@@ -1,0 +1,52 @@
+{
+ "trace": "trace_mirt_k4_humanmerge_dropFrontierMathv1AlgoTune_floors_poolednoise.nc",
+ "n_chains": 12,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.6) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -19.3,
+  -16.1,
+  -19.9,
+  -10.8,
+  -5.5,
+  -1.4,
+  -13.6,
+  -7.5,
+  -8.4,
+  -7.8,
+  0.0,
+  -23.4
+ ],
+ "modes": [
+  {
+   "chains": [
+    5,
+    7,
+    8,
+    9,
+    10
+   ],
+   "mean_logp": 3668.738817145381,
+   "min_matched_corr": 0.99,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    6,
+    11
+   ],
+   "mean_logp": 3658.24505437434,
+   "min_matched_corr": 0.988,
+   "label": "B",
+   "delta_logp": -10.5,
+   "matched_corr_to_best": 0.041
+  }
+ ]
+}

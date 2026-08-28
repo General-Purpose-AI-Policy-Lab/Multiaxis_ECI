@@ -1,9 +1,0 @@
-ALL 3714 obs kept; SG detached from tier chain
-Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
-
-==== SG-INDEPENDENT K=3 both-priors ====
-identified: {"eta_max_rhat": 1.8875, "eta_mean_rhat": 1.0796, "eta_frac_gt_1.01": 0.7775, "D_max_rhat": 2.4349, "sigma_b_max_rhat": 1.6716, "tau_CD_max_rhat": 1.1432}
-divergences: 154 / 4000
-LL per chain: [6500.9 6428.  6482.8 6321.8]  spread: 179.2
-chain D-dist max: 4.87
-theta[SG] per chain: [[-0.2, -4.9, -2.3], [-2.0, 2.2, 1.3], [0.9, 6.1, 1.4], [-0.4, 0.2, -2.8]]

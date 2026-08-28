@@ -1,0 +1,39 @@
+{
+ "trace": "trace_mirt_k1.nc",
+ "n_chains": 10,
+ "K": 1,
+ "basis": "K=1: one axis, so no loading criterion applies \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -3.1,
+  -2.4,
+  -0.7,
+  -2.1,
+  -3.3,
+  -3.1,
+  -1.5,
+  0.0,
+  -1.4,
+  -1.9
+ ],
+ "modes": [
+  {
+   "chains": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "mean_logp": 5513.4599620403615,
+   "min_matched_corr": 1.0,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  }
+ ]
+}

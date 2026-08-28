@@ -1,8 +1,0 @@
-non-negative rotation: 16000 draws, 85 benchmarks, K=3
-  negative loading cells (<-0.05) at mean: 0/255  worst = -0.013
-  Phi off-diag: +0.23, +0.15, -0.02
-  axis1: ARC-AGI-2=+3.24, ARC-AGI=+2.17, GSO-Bench=+1.93, Cybench=+1.84, FrontierMath Tier 4=+1.70, Aider Polyglot=+1.69, TerminalBench=+1.50, The Agent Company=+1.39
-  axis2: VPCT=+2.58, OTIS Mock AIME 2024-2025=+2.18, MATH Level 5=+1.60, Chess Puzzles=+1.49, ARC-AGI-2=+1.39, GPQA Diamond Chemistry=+1.37, GPQA Main Chemistry=+1.33, CritPt=+1.23
-  axis3: GSM8K=+1.69, ARC (AI2)=+1.65, Adversarial NLI=+1.55, OpenBookQA=+1.40, BIG-Bench Hard (BBH)=+1.37, CSQA2=+1.22, SimpleQA Verified=+1.11, MMLU=+1.08
-
-Re-tagged trace + rewrote loadings/corr/scores → results/mirt_humanprior_lineageprior_floors

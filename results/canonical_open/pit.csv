@@ -1,0 +1,2437 @@
+obs_idx,model,benchmark,score,pit
+2,glm-5.2_unknown,GBAEval,0.0001721823188174,0.283
+3,text-ada-001,GSM8K,0.004,0.5205
+4,qwen3.7-max,GBAEval,0.0040666088933695,0.066
+5,ada,GSM8K,0.006,0.297
+6,text-curie-001,GSM8K,0.006,0.209
+7,babbage,GSM8K,0.007,0.3205
+8,gemini-3.1-pro-preview,GBAEval,0.0084627909799686,0.0555
+9,kimi-k2.7-code,GBAEval,0.0085265631089688,0.1335
+10,kimi-k2.6,GBAEval,0.0086249321153157,0.104
+11,MiniMax-M3,GBAEval,0.009136320401503,0.219
+12,gemini-1.0-pro-001,BioLP-bench,0.01,0.342
+13,o3-mini-2025-01-31_low,GSO-Bench,0.013,0.2385
+14,o3-mini-2025-01-31_high,GSO-Bench,0.013,0.08
+15,amazon.nova-micro-v1:0,BioLP-bench,0.0139999999999999,0.4285
+16,Mixtral-8x7B-Instruct-v0.1,BioLP-bench,0.0139999999999999,0.6545
+17,Llama-4-Maverick-17B-128E-Instruct,VisualToolBench,0.0141,0.3075
+18,codestral-2405,SWE-Bench Pro,0.0151,0.291
+19,Llama-4-Scout-17B-16E-Instruct,VisualToolBench,0.0158,0.6705
+20,curie,GSM8K,0.016,0.244
+21,claude-3-haiku-20240307,BioLP-bench,0.016,0.3765
+22,opt-66b,GSM8K,0.018,0.098
+23,Llama-3.1-8B-Instruct,BioLP-bench,0.019,0.607
+24,nova-premier,VisualToolBench,0.02,0.56
+25,grok-build-0.1,GBAEval,0.0238125353588441,0.1915
+26,mistral-large-2402,BioLP-bench,0.024,0.4035
+27,claude-3-opus-20240229,BioLP-bench,0.025,0.076
+28,Llama-3.1-70B-Instruct,BioLP-bench,0.026,0.122
+29,amazon.nova-lite-v1:0,BioLP-bench,0.026,0.2405
+30,claude-3-sonnet-20240229,BioLP-bench,0.026,0.4025
+31,GLM-4.5-Air,GSO-Bench,0.0294,0.7775
+32,Llama-2-70b-chat-hf,MATH Level 5,0.0328549848942598,0.217
+33,gpt-oss-20b,TerminalBench,0.034,0.122
+34,gpt-oss-20b_unknown,TerminalBench,0.034,0.4455
+35,Mistral-7B-Instruct-v0.3,MATH Level 5,0.0359705438066465,0.5495
+36,o4-mini-2025-04-16_high,GSO-Bench,0.036,0.2255
+37,gpt-4o-mini-2024-07-18,Aider Polyglot,0.036,0.0305
+38,open-mistral-7b,MATH Level 5,0.0368202416918429,0.657
+39,Qwen2-VL-7B-Instruct,BALROG,0.037,0.202
+40,claude-3-7-sonnet-20250219,GSO-Bench,0.038,0.6455
+41,claude-3-7-sonnet-20250219_unknown,GSO-Bench,0.038,0.397
+42,gemini-2.5-pro,GSO-Bench,0.039,0.1035
+43,gemini-2.5-pro-preview-06-05,GSO-Bench,0.0392,0.029
+44,opt-175b,GSM8K,0.04,0.1075
+45,qwen2-72b-instruct,The Agent Company,0.042,0.233
+46,Llama-3.1-405B-Instruct,BioLP-bench,0.042,0.0935
+47,deepseek-coder-1.3b-base,GSM8K,0.044,0.487
+48,claude-sonnet-4-20250514_unknown,VisualToolBench,0.0444,0.343
+49,claude-sonnet-4-20250514,VisualToolBench,0.0448,0.4975
+50,claude-3-5-sonnet-20241022,GSO-Bench,0.046,0.8015
+51,gemma-3-4b-it,SimpleQA Verified,0.046046046046046,0.3575
+52,gemini-2.5-flash,VisualToolBench,0.0469,0.529
+53,claude-opus-4-1-20250805,VisualToolBench,0.0471,0.218
+54,gemma-3-27b-it,Aider Polyglot,0.049,0.02
+55,claude-sonnet-4-20250514,GSO-Bench,0.049,0.5535
+56,Kimi-K2-Instruct,GSO-Bench,0.049,0.55
+57,Qwen3-Coder-480B-A35B-Instruct,GSO-Bench,0.049,0.425
+58,claude-sonnet-4-20250514_unknown,GSO-Bench,0.049,0.4875
+59,Meta-Llama-3-70B-Instruct,Cybench,0.05,0.7745
+60,Qwen2.5-VL-72B-Instruct,OS World (Screenshot),0.05,0.054
+61,Yi-34B-Chat,MATH Level 5,0.0514539274924471,0.194
+62,claude-opus-4-1-20250805_unknown,VisualToolBench,0.0516,0.162
+63,Llama-4-Maverick-17B-128E-Instruct,SWE-Bench Pro,0.0524,0.0205
+64,Mistral-7B-Instruct-v0.2,GPQA Diamond Chemistry,0.054,0.191
+65,ministral-3b-2410,SimpleQA Verified,0.0542797494780793,0.391
+66,Mistral-7B-Instruct-v0.2,GPQA Main Chemistry,0.055,0.1535
+67,gpt-4.1-2025-04-14,VisualToolBench,0.0552,0.868
+68,codestral-2501,SimpleQA Verified,0.055613850996852,0.2885
+69,claude-sonnet-4-5-20250929,VisualToolBench,0.0559999999999999,0.1915
+70,amazon.nova-pro-v1:0,The Agent Company,0.057,0.1275
+71,gpt-oss-20b,SimpleQA Verified,0.0594503645541222,0.1525
+72,amazon.nova-pro-v1:0,BioLP-bench,0.06,0.378
+73,claude-3-5-sonnet-20240620,BioLP-bench,0.061,0.144
+74,DeepSeek-V3,BioLP-bench,0.061,0.058
+75,Meta-Llama-3-8B-Instruct,MATH Level 5,0.0612726586102719,0.243
+76,claude-sonnet-4-5-20250929_unknown,VisualToolBench,0.062,0.1065
+77,MiniMax-M2.5,CL-Bench Life,0.063,0.1205
+78,deepseek-llm-67b-chat,MATH Level 5,0.0639161631419939,0.3715
+79,Llama-3.2-1B-Instruct,BALROG,0.066,0.337
+80,gemini-3.5-flash_unknown,GBAEval,0.0670136640255754,0.314
+81,gemma-3-12b-it,SimpleQA Verified,0.0670335167583792,0.3095
+82,falcon-7b,GSM8K,0.068,0.1855
+83,gemini-1.5-pro-001,BioLP-bench,0.068,0.18
+84,ministral-8b-2410,SimpleQA Verified,0.0681699003670686,0.408
+85,claude-opus-4-20250514_unknown,GSO-Bench,0.0686,0.337
+86,mimo-v2-pro_high,CL-Bench Life,0.069,0.4715
+87,claude-opus-4-20250514,GSO-Bench,0.069,0.5825
+88,gpt-5-2025-08-07_high,GSO-Bench,0.069,0.108
+89,kimi-k2-thinking,PostTrainBench,0.0725,0.1705
+90,deepseek-v3.2,CL-Bench Life,0.074,0.264
+91,qwen3-max-2025-09-23,PostTrainBench,0.0742,0.296
+92,glm-4.7,PostTrainBench,0.0748,0.1495
+93,Mixtral-8x22B-Instruct-v0.1,Cybench,0.075,0.558
+94,Llama-3.1-405B-Instruct,Cybench,0.075,0.3595
+95,gemini-1.5-pro-001-feb24,Cybench,0.075,0.3345
+96,qwen2.5-7b-instruct,BALROG,0.078,0.1315
+97,muse-spark-1.1,GBAEval,0.0791725771495411,0.155
+98,grok-4.3_high,GDP.pdf,0.08,0.054
+99,gemini-1.5-pro-002,The Agent Company,0.08,0.0875
+100,Llama-4-Maverick-17B-128E-Instruct,MultiNRC,0.0843999999999999,0.036
+101,granite-4.0-h-small,SimpleQA Verified,0.0856983861992209,0.314
+102,o3-2025-04-16_high,GSO-Bench,0.088,0.2505
+103,gpt-4.1-nano-2025-04-14,Aider Polyglot,0.089,0.0575
+104,davinci,GSM8K,0.09,0.331
+105,gemma-4-26b-a4b-it,SimpleQA Verified,0.0905125408942202,0.348
+106,gpt-4o-mini-2024-07-18,SimpleQA Verified,0.0906344410876133,0.306
+107,mpt-7b,GSM8K,0.091,0.26
+108,Baichuan-7B,GSM8K,0.092,0.2155
+109,qwen3.5-9B,TerminalBench,0.092,0.5275
+110,LFM2-Audio-1.5B,AudioMultiChallenge,0.0929,0.39
+111,Mixtral-8x7B-Instruct-v0.1,MATH Level 5,0.0929003021148036,0.596
+112,MiniMax-M2.1,PostTrainBench,0.0933,0.3745
+113,DeepSeek-V3.2-Exp_thinking,CL-Bench Life,0.095,0.378
+114,bloom,GSM8K,0.095,0.411
+115,MiniMax-M2.5,PostTrainBench,0.095,0.6705
+116,mistral-large-2407,BioLP-bench,0.095,0.58
+117,glm-4.6,SWE-Bench Pro,0.0967,0.102
+118,gemini-3-flash-preview,GSO-Bench,0.098,0.216
+119,Llama-4-Scout-17B-16E-Instruct,BioLP-bench,0.099,0.591
+120,claude-sonnet-4-5-20250929,PostTrainBench,0.0994,0.3915
+121,open-mixtral-8x7b,MATH Level 5,0.0995090634441087,0.322
+122,claude-3-opus-20240229,Cybench,0.1,0.786
+123,o1-mini-2024-09-12_medium,Cybench,0.1,0.2015
+124,o1-preview-2024-09-12,Cybench,0.1,0.053
+125,gemini-3-flash-preview,GDP.pdf,0.1,0.146
+126,gemini-3.5-flash-lite_high,GDP.pdf,0.1,0.23
+127,Llama-3.2-3B-Instruct,BALROG,0.101,0.3985
+128,openhands-lm-32b-v0.1,Aider Polyglot,0.102,0.501
+129,kimi-k2.5,PostTrainBench,0.1026,0.129
+130,gpt-4-turbo-2024-04-09,BioLP-bench,0.104,0.7425
+131,gpt-oss-20b,MultiNRC,0.1043,0.6115
+132,GLM-4.5-Air,MultiNRC,0.1043,0.394
+133,gemma-3-27b-it,SimpleQA Verified,0.1071071071071071,0.2855
+134,Phi-4-mini-instruct,SciCode,0.107638888888889,0.2955
+135,open-mistral-nemo-2407,MATH Level 5,0.1082892749244713,0.352
+136,glm-4.7_high,CL-Bench Life,0.109,0.566
+137,LLaMA-7B,GSM8K,0.11,0.2855
+138,codestral-2501,Aider Polyglot,0.111,0.7065
+139,o4-mini-2025-04-16,VisualToolBench,0.1112,0.7695
+140,Llama-3.1-405B-Instruct,SWE-Bench Pro,0.1118,0.3265
+141,gpt-3.5-turbo-1106,SimpleQA Verified,0.1118951612903225,0.5345
+142,gemini-1.0-pro-001,MATH Level 5,0.1124433534743202,0.2715
+143,gemma-3-27b-it,SWE-Bench Pro,0.1138,0.4305
+144,MiniMax-M2.5,CL-Bench,0.114,0.1735
+145,gpt-5-nano-2025-08-07_medium,TerminalBench,0.115,0.0485
+146,phi-4,BALROG,0.116,0.0215
+147,gpt-3.5-turbo-0125,MATH Level 5,0.1163141993957704,0.412
+148,dbrx-instruct,MATH Level 5,0.1165030211480362,0.312
+149,claude-2.0,MATH Level 5,0.1172583081570997,0.1565
+150,gemini-2.5-pro-preview-06-05,VisualToolBench,0.1175,0.5075
+151,qwen2.5-72b-instruct,The Agent Company,0.118,0.3845
+152,grok-4-20_high,CL-Bench Life,0.119,0.581
+153,grok-2-1212,BioLP-bench,0.119,0.7915
+154,Qwen2.5-Omni-7B,AudioMultiChallenge,0.1195,0.414
+155,c4ai-command-a-03-2025,Aider Polyglot,0.12,0.4945
+156,claude-3-haiku-20240307,CAD-Eval,0.12,0.3925
+157,kimi-k2.6,GDP.pdf,0.12,0.201
+158,deepseek-v3.2,CL-Bench,0.124,0.3305
+159,qwen3.5-plus_high,CL-Bench Life,0.124,0.598
+160,gpt-4o,MultiNRC,0.1242,0.674
+161,gpt-4o-2024-11-20,Cybench,0.125,0.8265
+162,Llama-4-Maverick-17B-128E-Instruct,BioLP-bench,0.125,0.3845
+163,Qwen2-VL-72B-Instruct,BALROG,0.128,0.356
+164,Llama-3.1-70B-Instruct,The Agent Company,0.128,0.6595
+165,yi-lightning,Aider Polyglot,0.129,0.506
+166,Mistral-7B-Instruct-v0.2,MMLU Pro Chemistry,0.13,0.5825
+167,gpt-oss-120b,SimpleQA Verified,0.131198347107438,0.1965
+168,Llama-3.1-8B-Instruct,SciCode,0.131944444444444,0.002
+169,DeepSeek-V3.2-Exp_thinking,CL-Bench,0.132,0.227
+170,kimi-k2.5_high,CL-Bench Life,0.132,0.601
+171,open-mistral-7b,GPQA Diamond,0.132260101010101,0.36
+172,MiniMax-M2.7,ExploitBench,0.133,0.3675
+173,deepseek-v4-pro_high,CL-Bench Life,0.135,0.3705
+174,claude-opus-4-6_unknown,CL-Bench Life,0.136,0.2125
+175,claude-haiku-4-5-20251001_unknown,ExploitBench,0.1369999999999999,0.5925
+176,gpt-5.1-2025-11-13_high,GSO-Bench,0.137,0.3105
+177,Kimi-Audio-7B-Instruct,AudioMultiChallenge,0.1372,0.4545
+178,gpt-5.1-2025-11-13_unknown,GSO-Bench,0.1373,0.276
+179,o3-2025-04-16_unknown,VisualToolBench,0.1374,0.615
+180,gpt-5.3-codex,PostTrainBench,0.1377,0.127
+181,gpt-5.4-2026-03-05_unknown,CL-Bench Life,0.138,0.2125
+182,glm-5,PostTrainBench,0.1388,0.3405
+183,gemini-2.5-flash-native-audio-preview-12-2025 (non-thinking),AudioMultiChallenge,0.139,0.441
+184,gemini-3.5-flash_unknown,GDP.pdf,0.14,0.3415
+185,gemini-3.6-flash_unknown,GDP.pdf,0.14,0.391
+186,grok-4.5_high,GDP.pdf,0.14,0.1885
+187,Llama-3.1-405B-Instruct,The Agent Company,0.141,0.452
+188,ministral-3b-2410,MATH Level 5,0.1444486404833836,0.8345
+189,qwen3-max-2025-09-23,CL-Bench,0.145,0.3955
+190,gemini-1.5-flash-002,BALROG,0.146,0.1215
+191,claude-sonnet-4-5-20250929,GSO-Bench,0.147,0.86
+192,claude-sonnet-4-5-20250929_unknown,GSO-Bench,0.1471,0.8085
+193,Yi-34B-Chat,GPQA Diamond,0.1474116161616161,0.0085
+194,gpt-4o-mini-audio-preview-2024-12-17,AudioMultiChallenge,0.1482,0.4545
+195,claude-3-haiku-20240307,MATH Level 5,0.1487915407854985,0.28
+196,ministral-8b-2410,MATH Level 5,0.149358006042296,0.7435
+197,muse-spark-1.1,GDP.pdf,0.15,0.1055
+198,Llama-3.1-8B-Instruct,BALROG,0.151,0.667
+199,gpt-oss-120b,MultiNRC,0.1517,0.177
+200,Mistral-7B-Instruct-v0.3,GPQA Diamond,0.1518308080808081,0.3325
+201,gemma-3n-E4B-it,AudioMultiChallenge,0.1549,0.4465
+202,Phi-4-multimodal-instruct,AudioMultiChallenge,0.1549,0.4585
+203,deepseek-v3.2,SWE-Bench Pro,0.1556,0.226
+204,Llama-4-Maverick-17B-128E-Instruct,Aider Polyglot,0.156,0.022
+205,mimo-v2-pro,CL-Bench,0.157,0.536
+206,internlm-chat-20b,GSM8K,0.157,0.114
+207,gemini-3-pro-preview_high,CL-Bench,0.158,0.541
+208,gpt-3.5-turbo-1106,MATH Level 5,0.158893504531722,0.55
+209,glm-4.7,CL-Bench,0.159,0.4285
+210,gpt-4.1-mini-2025-04-14,CAD-Eval,0.16,0.0085
+211,qwen2.5-72b-instruct,BALROG,0.162,0.164
+212,gpt-oss-120b,SWE-Bench Pro,0.162,0.2755
+213,Qwen2.5-Coder-32B-Instruct,Aider Polyglot,0.1639999999999999,0.337
+214,mpt-30b,GSM8K,0.164,0.2325
+215,claude-sonnet-4-6,PostTrainBench,0.1642,0.36
+216,gpt-realtime-mini-2025-12-15,AudioMultiChallenge,0.1659,0.434
+217,Llama-2-7b,GSM8K,0.167,0.2785
+218,gpt-4o-2024-11-20,The Agent Company,0.167,0.699
+219,Llama-3.2-11B-Vision-Instruct,BALROG,0.168,0.8505
+220,gemini-3.1-pro-preview_high,CL-Bench Life,0.169,0.5705
+221,claude-opus-4-6_high,CL-Bench Life,0.17,0.443
+222,gemini-3.1-pro-preview,GDP.pdf,0.17,0.3705
+223,Llama-4-Scout-17B-16E-Instruct,SciCode,0.170138888888889,0.0005
+224,gemini-2.5-flash-preview-09-2025,TerminalBench,0.171,0.104
+225,gemini-2.5-flash,TerminalBench,0.171,0.0855
+226,gpt-4o-2024-08-06,BioLP-bench,0.171,0.8925
+227,gpt-5.2-codex,PostTrainBench,0.1722,0.4025
+228,claude-opus-4-5-20251101,PostTrainBench,0.1729,0.54
+229,gpt-5.1-2025-11-13_high,CL-Bench Life,0.173,0.8115
+230,gemma-3-12b-it,SciCode,0.173611111111111,0.0345
+231,gpt-4o-mini-2024-07-18,BALROG,0.174,0.4425
+232,glm-4.5,MultiNRC,0.1744,0.565
+233,gpt-4.5-preview-2025-02-27,Cybench,0.175,0.3305
+234,claude-3-5-sonnet-20240620,Cybench,0.175,0.8715
+235,Phi-3-medium-128k-instruct,MATH Level 5,0.1756042296072507,0.206
+236,Mistral-Nemo-Instruct-2407,BALROG,0.176,0.4705
+237,kimi-k2-thinking,CL-Bench,0.176,0.7025
+238,qwen3-235b-a22b,MultiNRC,0.1762999999999999,0.331
+239,gemma-2b,GSM8K,0.177,0.5165
+240,gpt-5.3-codex_high,PostTrainBench,0.1776,0.516
+241,o3-2025-04-16_high,CL-Bench,0.178,0.448
+242,DeepSeek-V2.5,Aider Polyglot,0.178,0.5305
+243,open-mixtral-8x22b,SimpleQA Verified,0.1784424961320268,0.673
+244,claude-sonnet-4-6_max,GDP.pdf,0.18,0.744
+245,gpt-5.2-2025-12-11_high,CL-Bench,0.181,0.201
+246,glm-5.1,ExploitBench,0.181,0.524
+247,gemini-3-pro-preview,PostTrainBench,0.1812,0.285
+248,claude-3-sonnet-20240229,MATH Level 5,0.1817409365558912,0.1645
+249,gemini-2.0-flash-thinking-exp-01-21,Aider Polyglot,0.182,0.198
+250,gpt-4o-2024-11-20,Aider Polyglot,0.182,0.326
+251,gpt-5.2-2025-12-11_unknown,CL-Bench,0.182,0.372
+252,gpt-5.1-2025-11-13_none,MultiNRC,0.1828999999999999,0.288
+253,claude-sonnet-4-20250514,MultiNRC,0.1839,0.1675
+254,kimi-k2.6,ExploitBench,0.184,0.283
+255,Kimi-K2-Instruct,MultiNRC,0.1848,0.178
+256,MiMo-Audio-7B-Instruct,AudioMultiChallenge,0.1858,0.4665
+257,gemini-3-pro-preview,GSO-Bench,0.186,0.2575
+258,gpt-5-2025-08-07_unknown,VisualToolBench,0.1868,0.453
+259,glm-5,CL-Bench,0.187,0.45
+260,gpt-oss-120b,TerminalBench,0.187,0.3055
+261,gpt-oss-120b_unknown,TerminalBench,0.187,0.5395
+262,kimi-k3_max,GDP.pdf,0.19,0.3835
+263,gemini-2.0-flash-001,The Agent Company,0.19,0.2675
+264,claude-3-5-haiku-20241022,BALROG,0.193,0.515
+265,kimi-k2.5,CL-Bench,0.193,0.628
+266,gpt-5.4-2026-03-05_high,CL-Bench Life,0.193,0.8305
+267,DeepSeek-R1-Distill-Qwen-32B,BALROG,0.195,0.469
+268,grok-4-fast-reasoning,SimpleQA Verified,0.1967380224260958,0.483
+269,gpt-5.1-codex-max,PostTrainBench,0.1968,0.5485
+270,MiMo-Audio-7B-Instruct (Thinking),AudioMultiChallenge,0.1969,0.4525
+271,qwen3.5-plus,CL-Bench,0.198,0.6385
+272,DeepSeek-R1,BioLP-bench,0.198,0.1625
+273,ml-elephant,CAD-Eval,0.2,0.489
+274,claude-3-7-sonnet-20250219,Cybench,0.2,0.5135
+275,grok-3-mini_unknown,SimpleQA Verified,0.2020725388601036,0.293
+276,gpt-5.4-2026-03-05_high,PostTrainBench,0.2023,0.345
+277,qwen3.6-plus,CL-Bench,0.203,0.773
+278,grok-2-1212,SimpleQA Verified,0.2048192771084337,0.58
+279,LLaMA-13B,GSM8K,0.2055,0.331
+280,claude-opus-4-6_unknown,CL-Bench,0.207,0.207
+281,gemini-3.1-pro-preview_high,CL-Bench,0.208,0.249
+282,Mixtral-8x7B-Instruct-v0.1,GPQA Main Chemistry,0.208,0.694
+283,QwQ-32B,Aider Polyglot,0.209,0.51
+284,gemini-1.5-pro-002,BALROG,0.21,0.328
+285,claude-opus-4-7_max,GDP.pdf,0.21,0.6255
+286,gemma-2-9b-it,MATH Level 5,0.2100641993957704,0.647
+287,gpt-5.1-2025-11-13_unknown,CL-Bench,0.211,0.6515
+288,claude-opus-4-5-20251101_unknown,CL-Bench,0.211,0.582
+289,gemma-3-27b-it,SciCode,0.211805555555556,0.015
+290,Qwen-1_8B,GSM8K,0.212,0.841
+291,o4-mini-2025-04-16,SimpleQA Verified,0.2121366649668536,0.209
+292,gpt-4.1-2025-04-14,MultiNRC,0.2123,0.59
+293,deepseek-coder-6.7b-base,GSM8K,0.213,0.7035
+294,gpt-5.2-2025-12-11_medium,PostTrainBench,0.2138,0.598
+295,gpt-5.2-2025-12-11_none,PostTrainBench,0.2138,0.9395
+296,qwen3-235b-a22b,SWE-Bench Pro,0.2141,0.5105
+297,gemini-2.5-flash-native-audio-preview-12-2025 (thinking),AudioMultiChallenge,0.2146,0.479
+298,gemini-3.1-pro-preview,PostTrainBench,0.2159,0.332
+299,starcoder2-3b,GSM8K,0.216,0.7275
+300,gpt-5.4-2026-03-05_xhigh,CL-Bench Life,0.217,0.8365
+301,qwen-max-2025-01-25,Aider Polyglot,0.218,0.2585
+302,gpt-5-nano-2025-08-07_unknown,TerminalBench,0.218,0.539
+303,gpt-3.5-turbo-0125,GPQA Main Chemistry,0.2189999999999999,0.5525
+304,o4-mini-2025-04-16_high,MultiNRC,0.2218,0.155
+305,gemini-2.0-flash-exp,Aider Polyglot,0.222,0.508
+306,grok-4-20,CL-Bench,0.222,0.6775
+307,gpt-5.5_high,CL-Bench Life,0.222,0.763
+308,mistral-large-2411,SimpleQA Verified,0.222684703433923,0.6305
+309,Llama-4-Maverick-17B-128E-Instruct,PRBench Finance,0.2235773314,0.01
+310,o3-mini-2025-01-31_medium,Cybench,0.225,0.202
+311,gemini-3.1-pro-preview,GSO-Bench,0.2255,0.224
+312,Meta-Llama-3-70B-Instruct,MATH Level 5,0.225547583081571,0.2835
+313,vicuna-13b-v1.3,GSM8K,0.226,0.31
+314,Hermes-2-Theta-Llama-3-70B,MATH Level 5,0.226869335347432,0.4075
+315,gpt-5.6-luna_unknown,GDP.pdf,0.227,0.882
+316,Llama-3.1-8B-Instruct,MATH Level 5,0.2287575528700906,0.8495
+317,gpt-4-0613,MATH Level 5,0.2297016616314199,0.2795
+318,Llama-3.3-70B-Instruct,BALROG,0.23,0.685
+319,claude-opus-4-8_max,GDP.pdf,0.23,0.6215
+320,o3-2025-04-16_medium,OS World (Screenshot),0.23,0.098
+321,Llama-3.1-8B-Instruct,GPQA Main Chemistry,0.23,0.6075
+322,Mistral-7B-Instruct-v0.2,MMLU Chemistry,0.23,0.03
+323,gpt-4o-2024-08-06,Aider Polyglot,0.231,0.382
+324,claude-opus-4-6_high,PostTrainBench,0.2316,0.299
+325,claude-opus-4-6,PostTrainBench,0.2316,0.4435
+326,opt-1.3b,ARC (AI2),0.232,0.359
+327,claude-3-7-sonnet-20250219,BioLP-bench,0.2339999999999999,0.751
+328,grok-4.5_high,PostTrainBench,0.2345,0.436
+329,gpt-realtime-2025-08-28,AudioMultiChallenge,0.2345,0.483
+330,claude-sonnet-4-6,ExploitBench,0.236,0.7315
+331,DeepSeek-V3.1,MultiNRC,0.236,0.474
+332,gpt-5.1-2025-11-13_high,CL-Bench,0.237,0.9165
+333,gpt-5-mini-2025-08-07_unknown,MultiNRC,0.2389,0.3055
+334,claude-3-5-sonnet-20241022,BioLP-bench,0.239,0.8805
+335,claude-opus-5_max,GDP.pdf,0.24,0.6415
+336,open-mixtral-8x22b,MATH Level 5,0.2424471299093655,0.468
+337,DeepSeek-V3.1,SimpleQA Verified,0.2426065162907268,0.398
+338,DeepSeek-R1,MultiNRC,0.2427,0.5935
+339,Mistral-7B-Instruct-v0.2,WMDP Chemistry,0.243,0.093
+340,Qwen3-Omni-30B-A3B-Instruct,AudioMultiChallenge,0.2434,0.486
+341,mistral-large-2402,MATH Level 5,0.2446185800604229,0.456
+342,glm-4.6,TerminalBench,0.245,0.6405
+343,Baichuan-2-7B-Base,GSM8K,0.246,0.511
+344,qwen3.6-35b-a3b,TerminalBench,0.246,0.132
+345,claude-3-sonnet-20240229,GPQA Main Chemistry,0.246,0.331
+346,deepseek-llm-67b-chat,GPQA Diamond,0.2462121212121212,0.543
+347,solar-pro-3,SciCode,0.246527777777778,0.4605
+348,gpt-5.6-terra_unknown,GDP.pdf,0.247,0.8945
+349,grok-2-1212,GPQA Diamond Chemistry,0.247,0.0415
+350,Mixtral-8x7B-Instruct-v0.1,GPQA Diamond Chemistry,0.247,0.7825
+351,claude-opus-4-6_unknown,PostTrainBench,0.2482,0.5735
+352,Llama-4-Maverick-17B-128E-Instruct,PRBench Legal,0.2483652214,0.022
+353,gpt2-xl,ARC (AI2),0.25,0.3625
+354,gpt-5.5_xhigh,GDP.pdf,0.25,0.7075
+355,falcon-40b,GSM8K,0.25,0.2645
+356,gpt-5.5_xhigh,PostTrainBench,0.2502,0.338
+357,gemini-3.1-flash-lite,MultiNRC,0.2502,0.2045
+358,opt-13b,MMLU,0.251,0.2795
+359,gemini-1.5-flash-001,MATH Level 5,0.2512273413897281,0.3305
+360,ministral-3b-2410,GPQA Diamond,0.2525252525252525,0.6775
+361,deepseek-coder-1.3b-base,ARC (AI2),0.254,0.334
+362,gpt-4o-audio-preview-2025-06-03,AudioMultiChallenge,0.2544,0.486
+363,Yi-1.5-34B-Chat,MATH Level 5,0.2548149546827795,0.611
+364,gpt-5.4-2026-03-05_high,GSO-Bench,0.2549,0.4605
+365,gpt-j-6b,MMLU,0.257,0.288
+366,claude-3-haiku-20240307,GPQA Main Chemistry,0.257,0.591
+367,WizardLM-2-8x22B,MATH Level 5,0.2573640483383685,0.2835
+368,deepseek-coder-1.3b-base,MMLU,0.258,0.348
+369,grok-code-fast-1,TerminalBench,0.258,0.549
+370,o3-mini-2025-01-31_medium,BioLP-bench,0.258,0.4965
+371,Llama-4-Scout-17B-16E-Instruct,GPQA Diamond Chemistry,0.258,0.0435
+372,granite-4.1-30b,SciCode,0.258101851851852,0.4675
+373,mimo-v2-flash,SciCode,0.259259259259259,0.464
+374,gpt-4.1-nano-2025-04-14,SciCode,0.259259259259259,0.16
+375,Llama-3.1-8B-Instruct,GPQA Diamond,0.2594696969696969,0.34
+376,gpt-4o-2024-08-06,CAD-Eval,0.26,0.314
+377,Llama-3.3-70B-Instruct,SciCode,0.260416666666667,0.2265
+378,Meta-Llama-3-8B-Instruct,GPQA Diamond,0.2607323232323232,0.4975
+379,gemini-3.1-pro-preview,ExploitBench,0.261,0.453
+380,Cerebras-GPT-13B,MMLU,0.262,0.397
+381,dolly-v2-12b,MMLU,0.262,0.4585
+382,Meta-Llama-3-8B-Instruct,GPQA Main Chemistry,0.262,0.8715
+383,RedPajama-INCITE-7B-Base,MMLU,0.263,0.1945
+384,Llama-2-70b-chat-hf,GPQA Diamond,0.2632575757575757,0.729
+385,Voxtral-Small-24B-2507,AudioMultiChallenge,0.2633,0.487
+386,mistral-small-2506,SciCode,0.263888888888889,0.482
+387,claude-opus-4-5-20251101_unknown,GSO-Bench,0.2647,0.794
+388,claude-opus-4-7,ExploitBench,0.265,0.297
+389,claude-opus-4-5-20251101,GSO-Bench,0.265,0.898
+390,mistral-small-2503,SciCode,0.265046296296296,0.29
+391,Baichuan-13B-Base,GSM8K,0.268,0.3635
+392,gemini-3-pro-preview,VisualToolBench,0.2685,0.7755
+393,amazon.nova-lite-v1:0,GPQA Diamond Chemistry,0.2689999999999999,0.2245
+394,Meta-Llama-3-8B-Instruct,GPQA Diamond Chemistry,0.2689999999999999,0.795
+395,stablelm-tuned-alpha-7b,ARC (AI2),0.27,0.4765
+396,chatgpt-4o-01-29-2025,Aider Polyglot,0.271,0.5125
+397,Qwen3-235B-A22B-Thinking-2507,MultiNRC,0.2711,0.666
+398,ministral-8b-2410,GPQA Diamond,0.2714646464646464,0.667
+399,gpt-3.5-turbo-0125,GPQA Diamond,0.271780303030303,0.421
+400,grok-4-0709,TerminalBench,0.272,0.0925
+401,Qwen3-Coder-480B-A35B-Instruct,TerminalBench,0.272,0.326
+402,Llama-3.2-90B-Vision-Instruct,BALROG,0.273,0.917
+403,DeepSeek-V3,SimpleQA Verified,0.2738336713995943,0.673
+404,gpt-5.2-2025-12-11_high,GSO-Bench,0.274,0.84
+405,claude-3-5-haiku-20241022,SciCode,0.274305555555556,0.4
+406,gemma-2-9b-it,GPQA Diamond,0.2746212121212121,0.2745
+407,claude-opus-4-6_unknown,VisualToolBench,0.2752,0.513
+408,qwen3.5-9B,SciCode,0.275462962962963,0.437
+409,DeepSeek-R1-0528,MultiNRC,0.2758,0.456
+410,Phi-3-medium-128k-instruct,GPQA Diamond,0.2758838383838384,0.079
+411,Kimi-K2-Instruct,SWE-Bench Pro,0.2767,0.658
+412,claude-3-7-sonnet-20250219_unknown,MultiNRC,0.2777,0.684
+413,Kimi-K2-Instruct,TerminalBench,0.278,0.4665
+414,gemma-2-27b-it,MATH Level 5,0.2788897280966767,0.488
+415,gpt-4-turbo-2024-04-09,GPQA Main Chemistry,0.2789999999999999,0.1005
+416,Llama-3.1-70B-Instruct,BALROG,0.279,0.891
+417,gpt-5.4-2026-03-05_xhigh,CL-Bench,0.279,0.8495
+418,claude-3-5-haiku-20241022,Aider Polyglot,0.28,0.84
+419,claude-3-haiku-20240307,GPQA Diamond Chemistry,0.28,0.6045
+420,gemini-1.0-pro-001,GPQA Diamond Chemistry,0.28,0.7085
+421,gpt-4-0613,GPQA Diamond Chemistry,0.28,0.446
+422,gpt-3.5-turbo-1106,GPQA Diamond,0.2803030303030303,0.417
+423,gemini-2.5-flash,SimpleQA Verified,0.2805429864253393,0.506
+424,nova-2.0-pro-preview_none,SciCode,0.28125,0.47
+425,vicuna-13b-v1.1,GSM8K,0.2813,0.385
+426,claude-sonnet-4-5-20250929,MultiNRC,0.2815,0.2915
+427,Qwen-1_8B,BIG-Bench Hard (BBH),0.282,0.536
+428,Qwen-1_8B,MMLU,0.282,0.0985
+429,Llama-4-Scout-17B-16E-Instruct,GPQA Main Biology,0.284,0.001
+430,Meta-Llama-3-70B-Instruct,GPQA Main Biology,0.284,0.0145
+431,grok-2-1212,GPQA Main Chemistry,0.284,0.0915
+432,Llama-3.1-70B-Instruct,GPQA Main Chemistry,0.284,0.191
+433,mistral-large-2402,GPQA Main Chemistry,0.284,0.6085
+434,Meta-Llama-3-70B-Instruct,GPQA Main Chemistry,0.284,0.5625
+435,claude-opus-4-7_xhigh,PostTrainBench,0.2856,0.718
+436,falcon-7b,BIG-Bench Hard (BBH),0.2877,0.4725
+437,devstral-small-2512,SciCode,0.288194444444444,0.4685
+438,qwen1.5-72b-chat,GPQA Diamond,0.2881944444444444,0.4835
+439,gemini-3.1-pro-preview,VisualToolBench,0.2897,0.548
+440,gpt-4-turbo-2024-04-09,GPQA Diamond Chemistry,0.29,0.131
+441,mistral-large-2402,GPQA Diamond Chemistry,0.29,0.5675
+442,Llama-3.1-8B-Instruct,GPQA Diamond Chemistry,0.29,0.8135
+443,amazon.nova-micro-v1:0,GPQA Diamond Chemistry,0.29,0.7525
+444,claude-opus-4-20250514,MultiNRC,0.29,0.5875
+445,gpt-5.4-2026-03-05_high,VisualToolBench,0.2917,0.7365
+446,gemini-2.5-flash-preview-04-17,DeepResearchBench,0.2919,0.079
+447,reka-flash-3,BALROG,0.292,0.537
+448,claude-sonnet-4-5-20250929_unknown,SimpleQA Verified,0.2921195652173913,0.394
+449,gpt-4.1-2025-04-14,DeepResearchBench,0.2930999999999999,0.037
+450,grok-3-beta,BALROG,0.295,0.411
+451,gemini-1.0-pro-001,GPQA Main Chemistry,0.295,0.883
+452,claude-opus-4-1-20250805,MultiNRC,0.2967,0.578
+453,claude-fable-5_max,GDP.pdf,0.298,0.816
+454,claude-haiku-4-5-20251001,TerminalBench,0.298,0.7075
+455,open-mixtral-8x7b,GPQA Diamond,0.2982954545454545,0.605
+456,open-mistral-nemo-2407,GPQA Diamond,0.2989267676767677,0.595
+457,open_llama_7b,MMLU,0.299,0.2635
+458,gpt-5.2-2025-12-11_unknown,SWE-Bench Pro,0.2994,0.1685
+459,gemini-2.0-flash-001,CAD-Eval,0.3,0.196
+460,grok-4-fast,Cybench,0.3,0.5245
+461,claude-fable-5_unknown,GDP.pdf,0.3,0.6795
+462,MiniMax-M2,TerminalBench,0.3,0.5475
+463,gpt-4-0613,GPQA Main Biology,0.301,0.0195
+464,Llama-4-Scout-17B-16E-Instruct,GPQA Main Chemistry,0.301,0.118
+465,mistral-large-2407,GPQA Diamond Chemistry,0.301,0.1155
+466,gpt-3.5-turbo-0125,GPQA Diamond Chemistry,0.301,0.847
+467,gpt-4.1-mini-2025-04-14,PRBench Legal,0.3037525441,0.231
+468,gpt-4.1-mini-2025-04-14,PRBench Finance,0.3044630977,0.257
+469,gpt-5.4-2026-03-05_unknown,SimpleQA Verified,0.3045226130653266,0.1385
+470,Mixtral-8x7B-Instruct-v0.1,GPQA Diamond,0.3058712121212121,0.9065
+471,gpt-4.5-preview-2025-02-27,BioLP-bench,0.306,0.9345
+472,amazon.nova-lite-v1:0,GPQA Main Chemistry,0.306,0.476
+473,gpt-4-0613,GPQA Diamond,0.3065025252525252,0.1035
+474,gpt-5.6-sol_unknown,GDP.pdf,0.307,0.895
+475,qwen1.5-32b-chat,GPQA Diamond,0.307449494949495,0.4755
+476,mpt-7b,MMLU,0.308,0.115
+477,claude-sonnet-4-6,SimpleQA Verified,0.3088391906283279,0.2635
+478,gpt-4o-2024-11-20,SWE-Bench Verified,0.3099173553719008,0.028
+479,claude-opus-4-1-20250805,SimpleQA Verified,0.3102493074792243,0.5195
+480,Mixtral-8x7B-Instruct-v0.1,MMLU Pro Chemistry,0.311,0.368
+481,claude-haiku-4-5-20251001,BALROG,0.312,0.5575
+482,claude-haiku-4-5-20251001_1K,BALROG,0.312,0.529
+483,internlm-7b,GSM8K,0.312,0.687
+484,computer-use-preview-2025-03-11,OS World (Screenshot),0.313,0.46
+485,gpt-5.4-2026-03-05_xhigh,GSO-Bench,0.3137,0.322
+486,claude-3-sonnet-20240229,GPQA Diamond Biology,0.316,0.065
+487,gpt-5.4-2026-03-05_unknown,GBAEval,0.3160372478663838,0.587
+488,amazon.nova-pro-v1:0,GPQA Main Chemistry,0.317,0.273
+489,claude-3-opus-20240229,GPQA Main Chemistry,0.317,0.322
+490,amazon.nova-micro-v1:0,GPQA Main Chemistry,0.317,0.9265
+491,Llama-4-Maverick-17B-128E-Instruct,SpatialViz-Bench,0.3178,0.2625
+492,o1-2024-12-17_medium,BioLP-bench,0.318,0.5315
+493,gemini-2.5-pro-preview-05-06,DeepResearchBench,0.319,0.056
+494,gpt-5-mini-2025-08-07_medium,TerminalBench,0.319,0.4255
+495,kimi-k3_unknown,PostTrainBench,0.3196,0.5485
+496,Yi-1.5-34B-Chat,GPQA Diamond,0.319760101010101,0.3815
+497,claude-3-5-haiku-20241022,CAD-Eval,0.32,0.78
+498,Qwen-VL-Max,SpatialViz-Bench,0.3203,0.529
+499,claude-sonnet-5_unknown,SimpleQA Verified,0.3206696716033483,0.1545
+500,gpt-4-0613,GPQA Main Chemistry,0.322,0.766
+501,qwen3-coder-next,SciCode,0.322916666666667,0.4925
+502,gpt-4o-2024-05-13,BALROG,0.323,0.932
+503,gpt-4.1-mini-2025-04-14,Aider Polyglot,0.324,0.2995
+504,Cerebras-GPT-13B,ARC (AI2),0.324,0.591
+505,chatglm2-6b,GSM8K,0.324,0.7325
+506,o1-preview-2024-09-12,BioLP-bench,0.324,0.968
+507,Baichuan-7B,BIG-Bench Hard (BBH),0.3248,0.5435
+508,Baichuan-2-7B-Base,ARC (AI2),0.325,0.0805
+509,Yi-6B,GSM8K,0.325,0.3695
+510,claude-3-5-sonnet-20241022,BALROG,0.326,0.8465
+511,gemini-2.5-pro,TerminalBench,0.326,0.201
+512,DeepSeek-R1-0528,PRBench Finance,0.326704915,0.1
+513,starcoder2-7b,GSM8K,0.327,0.7895
+514,gpt-4o-2024-08-06,GPQA Main Chemistry,0.3279999999999999,0.1615
+515,Meta-Llama-3-8B-Instruct,MMLU Pro Chemistry,0.3279999999999999,0.271
+516,gpt-5-2025-08-07_minimal,BALROG,0.328,0.4585
+517,dbrx-instruct,GPQA Diamond,0.3289141414141414,0.6955
+518,o1-mini-2024-09-12_unknown,Aider Polyglot,0.3289999999999999,0.486
+519,gemini-1.5-flash-8b-001,GPQA Diamond,0.3295454545454545,0.533
+520,claude-2.1,GPQA Diamond,0.3295454545454545,0.453
+521,PaLM 62B,GSM8K,0.33,0.3685
+522,gemini-3.5-flash-lite,SimpleQA Verified,0.3308119011598587,0.539
+523,Llama-4-Maverick-17B-128E-Instruct,SciCode,0.331018518518519,0.4475
+524,mistral-large-2407,GPQA Main Chemistry,0.3329999999999999,0.2575
+525,Qwen2.5-VL-72B-Instruct,SpatialViz-Bench,0.3331,0.614
+526,claude-opus-4-6_unknown,GSO-Bench,0.3333,0.7335
+527,claude-opus-4-6,GSO-Bench,0.3333,0.6655
+528,glm-4.7,TerminalBench,0.334,0.2855
+529,gemini-2.5-flash,BALROG,0.335,0.5235
+530,LLaMA-7B,BIG-Bench Hard (BBH),0.335,0.6085
+531,chatglm2-6b,BIG-Bench Hard (BBH),0.337,0.2205
+532,mistral-medium-2508,SciCode,0.3379629629629631,0.5075
+533,claude-opus-4-8_high,PostTrainBench,0.3379999999999999,0.656
+534,falcon-40b-instruct,GSM8K,0.338,0.423
+535,claude-3-7-sonnet-20250219_unknown,SpatialViz-Bench,0.3389999999999999,0.1635
+536,Eurus-2-7B-PRIME,GPQA Diamond,0.3390151515151515,0.4955
+537,claude-opus-4-20250514_unknown,MultiNRC,0.3393,0.5325
+538,gemini-1.0-pro-001,GPQA Diamond,0.3396464646464646,0.7625
+539,claude-opus-4-1-20250805,PRBench Legal,0.3399523797,0.1055
+540,gemini-1.5-pro-002,CAD-Eval,0.34,0.5775
+541,open-mixtral-8x22b,GPQA Diamond,0.3405934343434343,0.4105
+542,claude-opus-5_unknown,PostTrainBench,0.3406,0.543
+543,claude-opus-4-8_max,PostTrainBench,0.3408,0.8205
+544,starcoder2-3b,ARC (AI2),0.342,0.2415
+545,Llama-4-Scout-17B-16E-Instruct,SpatialViz-Bench,0.3424,0.702
+546,glm-5.2_max,PostTrainBench,0.3429,0.882
+547,Llama-2-13b,GSM8K,0.343,0.331
+548,gpt-4.1-2025-04-14,PRBench Finance,0.343200519,0.406
+549,gpt-oss-20b_high,SciCode,0.34375,0.4945
+550,Qwen2.5-Coder-0.5B,ARC (AI2),0.344,0.1115
+551,mpt-30b-instruct,GSM8K,0.344,0.2985
+552,claude-3-5-sonnet-20241022,The Agent Company,0.344,0.8785
+553,amazon.nova-pro-v1:0,GPQA Diamond Chemistry,0.344,0.349
+554,Qwen2.5-Coder-0.5B,GSM8K,0.345,0.7875
+555,gemini-3-flash-preview,SWE-Bench Pro,0.3463,0.3285
+556,claude-2.0,GPQA Diamond,0.3465909090909091,0.6165
+557,grok-3-mini-beta_low,Aider Polyglot,0.347,0.071
+558,gpt-realtime-1.5,AudioMultiChallenge,0.3472999999999999,0.526
+559,gpt-5-mini-2025-08-07_unknown,TerminalBench,0.348,0.544
+560,INTELLECT-1-Instruct,BIG-Bench Hard (BBH),0.3485,0.1745
+561,DeepSeek-R1,BALROG,0.349,0.641
+562,gpt-5.1-2025-11-13_unknown,SimpleQA Verified,0.3492222779729051,0.3535
+563,claude-sonnet-4-20250514,Cybench,0.35,0.641
+564,falcon-7b,MMLU,0.35,0.3085
+565,DeepSeek-V3.1,PRBench Finance,0.3508810862,0.344
+566,gpt-5.4-2026-03-05_low,DeepResearchBench,0.3508880948453333,0.061
+567,DeepSeek-R1-0528,DeepResearchBench,0.351,0.1055
+568,claude-opus-4-1-20250805,PRBench Finance,0.3515131181,0.215
+569,kimi-k2.5,MultiNRC,0.3517,0.191
+570,magistral-small-2509,SciCode,0.351851851851852,0.5025
+571,gemma-2b,BIG-Bench Hard (BBH),0.352,0.6275
+572,text-davinci-001,Adversarial NLI,0.354,0.3515
+573,Mistral-7B-Instruct-v0.2,GSM8K,0.354,0.7895
+574,deepseek-coder-33b-base,GSM8K,0.354,0.8045
+575,gpt-4-0125-preview,MATH Level 5,0.3541351963746224,0.4395
+576,Qwen3-32B,SciCode,0.354166666666667,0.5365
+577,DeepSeek-V3,SciCode,0.354166666666667,0.6895
+578,claude-haiku-4-5-20251001_unknown,TerminalBench,0.355,0.4105
+579,Meta-Llama-3-70B-Instruct,GPQA Diamond Chemistry,0.355,0.784
+580,mpt-7b,BIG-Bench Hard (BBH),0.356,0.786
+581,LLaMA-7B,MMLU,0.356,0.224
+582,gemini-2.0-pro-exp-02-05,Aider Polyglot,0.356,0.278
+583,CodeQwen1.5-7B,ARC (AI2),0.357,0.12
+584,kimi-k2-thinking,TerminalBench,0.357,0.393
+585,DeepSeek-R1,SciCode,0.357142857142857,0.27
+586,gpt-4-0314,GPQA Diamond,0.3573232323232323,0.1375
+587,qwen3.6-35b-a3b,SciCode,0.357638888888889,0.1165
+588,DeepSeek-V3-0324,SciCode,0.357638888888889,0.447
+589,opt-13b,ARC (AI2),0.358,0.62
+590,claude-3-7-sonnet-20250219,OS World (Screenshot),0.358,0.4175
+591,claude-sonnet-4-5-20250929_unknown,MultiNRC,0.3583,0.5755
+592,nemotron-3-super,SciCode,0.359953703703704,0.5435
+593,openai/gpt-oss-120b_low,SciCode,0.359953703703704,0.5225
+594,gpt-3.5-turbo-0125,MMLU Pro Chemistry,0.36,0.234
+595,gemini-3.1-flash-live-preview,AudioMultiChallenge,0.3606,0.51
+596,claude-3-5-sonnet-20241022,GPQA Main Chemistry,0.361,0.09
+597,trinity-large-thinking,SciCode,0.361111111111111,0.515
+598,glm-5.2_none,SciCode,0.361111111111111,0.537
+599,gpt-4o,TutorBench,0.3611999999999999,0.297
+600,LLaMA-7B,ScienceQA,0.3619,0.095
+601,mistral-large-2512,SciCode,0.362268518518519,0.503
+602,gpt-5.6-sol_max,PostTrainBench,0.3622999999999999,0.7855
+603,gpt-5.4-mini-2026-03-17_low,DeepResearchBench,0.3626446724539791,0.4515
+604,gpt-j-6b,ARC (AI2),0.363,0.62
+605,xgen-7b-8k-base,MMLU,0.363,0.3065
+606,claude-3-haiku-20240307,GPQA Diamond,0.3630050505050505,0.7415
+607,gemini-2.0-flash-001,MultiChallenge,0.3635,0.1915
+608,Kimi-K2-Instruct,PRBench Legal,0.3638483743,0.4425
+609,gemini-3.1-flash-lite,DeepResearchBench,0.3639498038812288,0.1085
+610,deepseek-coder-6.7b-base,ARC (AI2),0.364,0.2905
+611,deepseek-coder-6.7b-base,MMLU,0.364,0.288
+612,gpt-4.1-2025-04-14,PRBench Legal,0.3648357264,0.6305
+613,gemma-2-27b-it,GPQA Diamond,0.3648989898989899,0.4565
+614,starcoder2-3b,MMLU,0.366,0.3135
+615,MiniMax-M2.1,TerminalBench,0.366,0.471
+616,Llama-3.1-70B-Instruct,GPQA Diamond Chemistry,0.366,0.517
+617,claude-3-opus-20240229,GPQA Diamond Chemistry,0.366,0.4925
+618,DeepSeek-R1-0528,PRBench Legal,0.366094653,0.3005
+619,claude-3-7-sonnet-20250219,DeepResearchBench,0.3663,0.3195
+620,Llama-3.1-70B-Instruct,MATH Level 5,0.366786253776435,0.19
+621,claude-3-opus-20240229,GPQA Diamond Biology,0.368,0.045
+622,amazon.nova-micro-v1:0,GPQA Diamond Biology,0.368,0.281
+623,Mixtral-8x7B-Instruct-v0.1,GPQA Diamond Biology,0.368,0.4515
+624,Llama-4-Scout-17B-16E-Instruct,GPQA Diamond Biology,0.368,0.0355
+625,MiniMax-M2.1,SWE-Bench Pro,0.3681,0.75
+626,gemini-2.5-flash,SpatialViz-Bench,0.3686,0.3965
+627,Llama-2-13b-chat,GSM8K,0.369,0.2365
+628,internlm-7b,BIG-Bench Hard (BBH),0.37,0.381
+629,falcon-40b,BIG-Bench Hard (BBH),0.371,0.16
+630,claude-opus-4-6_max,MultiChallenge,0.3715,0.0005
+631,claude-3-5-sonnet-20240620,GPQA Main Chemistry,0.372,0.3135
+632,claude-sonnet-5_unknown,GSO-Bench,0.3725,0.5985
+633,claude-3-7-sonnet-20250219_16K,BioLP-bench,0.374,0.78
+634,Hermes-2-Theta-Llama-3-70B,GPQA Diamond,0.3746843434343434,0.605
+635,claude-3-opus-20240229,MATH Level 5,0.3748111782477341,0.1625
+636,phi-1_5,MMLU,0.376,0.274
+637,Llama-3.1-405B-Instruct,GPQA Diamond Chemistry,0.376,0.348
+638,gpt-realtime-2,AudioMultiChallenge,0.3761,0.501
+639,DeepSeek-V3.1,PRBench Legal,0.3762239226,0.527
+640,CodeQwen1.5-7B,GSM8K,0.377,0.837
+641,claude-3-7-sonnet-20250219,GPQA Main Chemistry,0.377,0.06
+642,gpt-4o-mini-2024-07-18,GPQA Diamond,0.3772095959595959,0.2425
+643,sonar,DeepResearchBench,0.3775,0.475
+644,sonar-pro,DeepResearchBench,0.3776,0.4935
+645,command-a-plus-05-2026,SciCode,0.378472222222222,0.5155
+646,LLaMA-13B,BIG-Bench Hard (BBH),0.379,0.422
+647,ST-LLM,Video-MME,0.379,0.076
+648,Baichuan-2-13B-Base,ARC (AI2),0.38,0.04
+649,mpt-30b,BIG-Bench Hard (BBH),0.38,0.4925
+650,claude-opus-4-20250514,Cybench,0.38,0.3965
+651,claude-opus-4-1-20250805,TerminalBench,0.38,0.5915
+652,claude-opus-4-1-20250805_unknown,TerminalBench,0.38,0.441
+653,o4-mini,PRBench Legal,0.3811371849,0.4875
+654,claude-3-5-haiku-20241022,GPQA Diamond,0.3813131313131313,0.134
+655,gemini-exp-1206,Aider Polyglot,0.382,0.5065
+656,Qwen3-235B-A22B-Instruct-2507,PRBench Legal,0.3829537588,0.7
+657,Llama-3.1-405B-Instruct,GPQA Main Chemistry,0.3829999999999999,0.491
+658,Kimi-K2-Instruct,PRBench Finance,0.3833573916,0.604
+659,claude-opus-4-1-20250805_unknown,MultiNRC,0.3839,0.846
+660,gemini-2.5-flash,PRBench Finance,0.3840960771,0.608
+661,glm-4.6,SciCode,0.384259259259259,0.7275
+662,Llama-3.1-8B-Instruct,GPQA Main Biology,0.385,0.3735
+663,INTELLECT-1-Instruct,GSM8K,0.3858,0.773
+664,mercury-2,SciCode,0.386574074074074,0.5225
+665,nova-2.0-pro-preview_low,SciCode,0.386574074074074,0.523
+666,starcoder2-7b,ARC (AI2),0.387,0.229
+667,open_llama_7b,ARC (AI2),0.387,0.541
+668,gpt-4o-2024-08-06,GPQA Diamond Chemistry,0.387,0.39
+669,Qwen3-Coder-480B-A35B-Instruct,SWE-Bench Pro,0.387,0.8705
+670,mistral-large-2402,GPQA Diamond,0.3876262626262626,0.7
+671,starcoder2-7b,MMLU,0.388,0.211
+672,gpt-oss-120b_high,SciCode,0.388888888888889,0.5445
+673,DeepSeek-V3.2-Exp_thinking,SciCode,0.388888888888889,0.3905
+674,gemini-2.5-pro,PRBench Finance,0.3891719165,0.337
+675,grok-4-1,Cybench,0.39,0.533
+676,claude-opus-4-5-20251101,SimpleQA Verified,0.3900414937759336,0.4905
+677,qwen2-72b-instruct,MATH Level 5,0.3906722054380664,0.5435
+678,gpt-5.6-luna_unknown,SimpleQA Verified,0.3907815631262525,0.558
+679,RedPajama-INCITE-7B-Base,ARC (AI2),0.391,0.607
+680,Qwen3-235B-A22B-Instruct-2507,PRBench Finance,0.3913950691,0.723
+681,Llama-2-7b,BIG-Bench Hard (BBH),0.3916,0.6185
+682,gemini-3-pro-preview,PRBench Finance,0.3918,0.044
+683,o4-mini,PRBench Finance,0.3921552546,0.5745
+684,gpt-5-mini-2025-08-07_high,SciCode,0.392361111111111,0.3315
+685,magistral-medium-2509,SciCode,0.392361111111111,0.531
+686,gemini-2.5-pro-preview-05-06,The Agent Company,0.393,0.346
+687,grok-3,SimpleQA Verified,0.3933434190620272,0.747
+688,mistral-medium-2505,PRBench Finance,0.3935148645999999,0.826
+689,deepseek-coder-33b-base,MMLU,0.394,0.182
+690,gpt-4.1-2025-04-14,MultiChallenge,0.3943,0.176
+691,Llama-3.2-90B-Vision-Instruct,MATH Level 5,0.3943542296072507,0.4375
+692,claude-haiku-4-5-20251001,SWE-Bench Pro,0.3945,0.9575
+693,video_chat2_mistral,Video-MME,0.395,0.0915
+694,mistral-medium-2505,PRBench Legal,0.3954637501,0.868
+695,mistral-medium-2604,SciCode,0.395833333333333,0.533
+696,dolly-v2-12b,ARC (AI2),0.396,0.792
+697,deepseek-v3.2,TerminalBench,0.396,0.8875
+698,Megatron-Turing NLG 530B,Adversarial NLI,0.397,0.155
+699,o3-mini-2025-01-31_high,SciCode,0.397856419092825,0.518
+700,gpt-4.5-preview-2025-02-27,GPQA Diamond Chemistry,0.3979999999999999,0.0975
+701,claude-3-7-sonnet-20250219,GPQA Diamond Chemistry,0.3979999999999999,0.1045
+702,claude-3-5-sonnet-20240620,GPQA Diamond Chemistry,0.3979999999999999,0.3615
+703,DeepSeek-V3,GPQA Diamond Chemistry,0.3979999999999999,0.238
+704,Llama-3.1-8B-Instruct,MMLU Pro Chemistry,0.3979999999999999,0.434
+705,o4-mini-2025-04-16_medium,BioLP-bench,0.3989999999999999,0.769
+706,sharegpt4video-8b,Video-MME,0.399,0.0905
+707,Video-LLaVA-7B,Video-MME,0.399,0.091
+708,nemotron-3-ultra,SciCode,0.399305555555556,0.5185
+709,gpt-5.6-luna_none,SciCode,0.399305555555556,0.775
+710,Qwen3-32B,Aider Polyglot,0.4,0.4775
+711,gpt-4-1106-preview,MATH Level 5,0.4002077039274924,0.5185
+712,gemini-2.5-flash,AudioMultiChallenge,0.4004,0.681
+713,gemma-4-26b-a4b,SciCode,0.4004629629629631,0.523
+714,claude-sonnet-4-20250514_unknown,SciCode,0.4004629629629631,0.529
+715,step-3.7-flash,SciCode,0.4004629629629631,0.5385
+716,gpt-5.5_xhigh,GSO-Bench,0.402,0.626
+717,claude-3-7-sonnet-20250219,The Agent Company,0.402,0.885
+718,Llama-4-Maverick-17B-128E-Instruct,TutorBench,0.402,0.318
+719,gpt-oss-120b,PRBench Legal,0.4020563979,0.8755
+720,gemini-1.5-flash-001,GPQA Diamond,0.4037247474747474,0.65
+721,gpt-4.1-mini-2025-04-14,SciCode,0.403935185185185,0.8975
+722,gemini-1.5-pro-001,GPQA Main Chemistry,0.4039999999999999,0.485
+723,CodeQwen1.5-7B,MMLU,0.405,0.236
+724,gemini-1.0-pro-001,MMLU Pro Chemistry,0.405,0.3285
+725,Meta-Llama-3-70B-Instruct,GPQA Diamond,0.4056186868686868,0.702
+726,claude-3-sonnet-20240229,GPQA Diamond,0.4059343434343434,0.7285
+727,Chat-UniVi-7B-v1.5,Video-MME,0.406,0.106
+728,gemini-3-pro-preview,PRBench Legal,0.406,0.043
+729,DeepSeek-V3.1-Terminus,SciCode,0.40625,0.544
+730,qwen3.6-plus,SciCode,0.407407407407407,0.1395
+731,gemini-1.5-pro-001,MATH Level 5,0.4074773413897281,0.017
+732,qwen2-72b-instruct,GPQA Diamond,0.4078282828282828,0.4285
+733,claude-sonnet-4-5-20250929,PRBench Legal,0.4084357639,0.5625
+734,gemini-3.5-flash-lite,SciCode,0.408564814814815,0.455
+735,kimi-k2-thinking,PRBench Legal,0.4090194398,0.543
+736,cogito-671b-v2.1,SciCode,0.409722222222222,0.5495
+737,gemini-2.5-flash,PRBench Legal,0.4101527724,0.816
+738,Llama-3.2-90B-Vision-Instruct,GPQA Diamond,0.4103535353535353,0.299
+739,gpt-5.2-codex,SWE-Bench Pro,0.4104,0.3925
+740,gpt-neox-20b,ARC (AI2),0.411,0.567
+741,Qwen-VL-Chat,Video-MME,0.411,0.0895
+742,gpt-5.2-2025-12-11_low,DeepResearchBench,0.4111991557763133,0.263
+743,xgen-7b-8k-base,ARC (AI2),0.412,0.4235
+744,claude-opus-4-6_high,GSO-Bench,0.412,0.7405
+745,o3-2025-04-16_medium,BioLP-bench,0.412,0.241
+746,qwen3-235b-a22b,MultiChallenge,0.4122,0.296
+747,claude-opus-4-5-20251101,MultiNRC,0.4122999999999999,0.32
+748,o1-2024-12-17_unknown,SpatialViz-Bench,0.4136,0.558
+749,gemini-2.5-pro,PRBench Legal,0.4142704352999999,0.526
+750,text-davinci-002,GSM8K,0.415,0.0685
+751,gpt-5.6-terra_unknown,SimpleQA Verified,0.415454089312594,0.5175
+752,Llama-3.3-70B-Instruct,MATH Level 5,0.4159743202416918,0.2935
+753,Baichuan-2-7B-Base,BIG-Bench Hard (BBH),0.416,0.6915
+754,gpt-5-2025-08-07_high,SWE-Bench Pro,0.4178,0.6575
+755,claude-fable-5_max,PostTrainBench,0.4179,0.879
+756,qwen-turbo-2024-11-01,GPQA Diamond,0.4179292929292929,0.218
+757,gpt-oss-120b_high,Aider Polyglot,0.418,0.17
+758,gemini-3.1-pro-preview,PRBench Finance,0.418728,0.0665
+759,gemini-3.1-flash-lite,SciCode,0.418981481481481,0.5365
+760,gpt-4.1-2025-04-14,CAD-Eval,0.42,0.3505
+761,claude-opus-4-1-20250805,Cybench,0.42,0.464
+762,Qwen2.5-Coder-0.5B,MMLU,0.42,0.283
+763,deepseek-v4-flash_high,SciCode,0.420138888888889,0.5505
+764,gemma-2b,ARC (AI2),0.421,0.4005
+765,gemini-1.0-pro-001,GPQA Diamond Biology,0.421,0.4815
+766,gpt-5.2-2025-12-11_unknown,MultiNRC,0.4218,0.4875
+767,deepseek-coder-33b-base,ARC (AI2),0.422,0.2695
+768,Llama-2-34b,GSM8K,0.422,0.4785
+769,gpt-4-0125-preview,GPQA Diamond,0.4226641414141414,0.546
+770,Baichuan-7B,MMLU,0.423,0.5735
+771,gemma-2b,MMLU,0.423,0.5
+772,Mixtral-8x7B-Instruct-v0.1,GPQA Main Biology,0.423,0.668
+773,Ring-2.6-1T,SciCode,0.423611111111111,0.526
+774,Qwen3-235B-A22B-Thinking-2507,SciCode,0.423611111111111,0.768
+775,gpt-4-1106-preview,GPQA Diamond,0.4236111111111111,0.469
+776,internlm-chat-20b,BIG-Bench Hard (BBH),0.424,0.555
+777,phi-2,Adversarial NLI,0.425,0.319
+778,mpt-7b,ARC (AI2),0.426,0.487
+779,gpt-4.5-preview-2025-02-27,GPQA Main Chemistry,0.426,0.199
+780,Llama-3.1-Tulu-3-70B-DPO,MATH Level 5,0.426642749244713,0.4315
+781,MiniMax-M2.5,TerminalBench,0.427,0.8995
+782,claude-sonnet-4-20250514,SWE-Bench Pro,0.427,0.9675
+783,nova-2.0-pro-preview_medium,SciCode,0.427083333333333,0.52
+784,gpt-5.1-2025-11-13_low,DeepResearchBench,0.4279020222415737,0.565
+785,Yi-6B,BIG-Bench Hard (BBH),0.428,0.3105
+786,gemini-2.5-pro-preview-06-05,DeepResearchBench,0.428,0.337
+787,claude-sonnet-4-5-20250929,TerminalBench,0.428,0.6505
+788,gemini-2.5-pro,SciCode,0.428240740740741,0.4455
+789,gpt-5-2025-08-07_high,SciCode,0.429398148148148,0.2635
+790,claude-opus-4-5-20251101_64K,BALROG,0.43,0.565
+791,grok-4-0709,Cybench,0.43,0.1675
+792,claude-3-5-sonnet-20241022,GPQA Diamond Chemistry,0.43,0.3015
+793,gemini-1.5-pro-001,GPQA Diamond Chemistry,0.43,0.4975
+794,Baichuan-13B-Base,BIG-Bench Hard (BBH),0.4301,0.502
+795,vicuna-13b-v1.1,BIG-Bench Hard (BBH),0.4304,0.4715
+796,mimo-v2.5,SciCode,0.430555555555556,0.5535
+797,Llama-2-7b,ScienceQA,0.4308,0.1485
+798,vicuna-13b-v1.1,ARC (AI2),0.432,0.177
+799,kimi-k2.5,TerminalBench,0.432,0.247
+800,claude-sonnet-4-20250514,The Agent Company,0.432,0.5785
+801,Chat-Uni-Vi-7B-v1.5 + 100k SG-WV,Video-MME,0.432,0.147
+802,claude-haiku-4-5-20251001_unknown,SciCode,0.43287037037037,0.5955
+803,gpt-5.1-2025-11-13_high,SciCode,0.43287037037037,0.1495
+804,gemini-2.5-pro-exp-03-25,BALROG,0.433,0.584
+805,gemini-3-pro-preview,SWE-Bench Pro,0.433,0.3425
+806,LLaMA-13B,ScienceQA,0.4333,0.1275
+807,tml-interaction-small,AudioMultiChallenge,0.4336,0.5395
+808,gemma-4-31b-it,SciCode,0.434027777777778,0.5795
+809,kimi-k2-thinking,PRBench Finance,0.4340518016,0.721
+810,WizardLM-2-8x22B,GPQA Diamond,0.4343434343434343,0.7075
+811,claude-opus-4-5-20251101,BALROG,0.435,0.342
+812,claude-opus-4-5-20251101_unknown,BALROG,0.435,0.203
+813,grok-4-0709,BALROG,0.436,0.718
+814,claude-3-7-sonnet-20250219_2K,DeepResearchBench,0.436,0.57
+815,gemini-1.0-pro-001,GPQA Main Biology,0.436,0.5165
+816,claude-sonnet-4-5-20250929,SWE-Bench Pro,0.436,0.9005
+817,glm-5.1,SciCode,0.4375,0.2725
+818,claude-sonnet-4-5-20250929,PRBench Finance,0.4379291198,0.755
+819,gpt-oss-120b,PRBench Finance,0.43802783,0.9565
+820,claude-opus-4-7_unknown,GBAEval,0.4381136187608589,0.6205
+821,kimi-k2.5,PRBench Legal,0.438324,0.5285
+822,text-davinci-001,MMLU,0.439,0.129
+823,claude-sonnet-4-20250514,OS World (Screenshot),0.439,0.4845
+824,gemini-2.5-flash-preview-05-20,Aider Polyglot,0.44,0.2915
+825,gemini-3.1-pro-preview,PRBench Legal,0.440231,0.0935
+826,Llama-2-34b,BIG-Bench Hard (BBH),0.441,0.197
+827,LLaMA-33B,GSM8K,0.441,0.376
+828,claude-opus-4-7_high,GSO-Bench,0.441,0.5745
+829,claude-3-sonnet-20240229,GPQA Diamond Chemistry,0.441,0.967
+830,Mixtral-8x7B-Instruct-v0.1,WMDP Chemistry,0.441,0.364
+831,claude-opus-4-6_unknown,GBAEval,0.4411559216788414,0.7335
+832,claude-opus-4-7,GSO-Bench,0.4412,0.8285
+833,Llama-3.1-70B-Instruct,GPQA Diamond,0.4419191919191919,0.3675
+834,claude-3-haiku-20240307,MMLU Pro Chemistry,0.442,0.283
+835,claude-opus-4-5-20251101_unknown,PRBench Legal,0.4421,0.31
+836,DeepSeek-V3,GPQA Main Chemistry,0.4429999999999999,0.5675
+837,gpt-5-codex,TerminalBench,0.443,0.5645
+838,gpt-5.4-2026-03-05_high,PRBench Legal,0.4435,0.163
+839,phi-1_5,ARC (AI2),0.444,0.4575
+840,o3-2025-04-16_medium,MultiNRC,0.4445,0.9345
+841,claude-opus-4-8_unknown,SimpleQA Verified,0.4453386988598256,0.3235
+842,gpt-5.6-terra_none,SciCode,0.4456018518518521,0.654
+843,gemini-2.5-pro,SpatialViz-Bench,0.4466,0.77
+844,claude-sonnet-4-5-20250929_unknown,SciCode,0.446759259259259,0.597
+845,DeepSeek-R1-Distill-Qwen-14B,GPQA Diamond,0.4469696969696969,0.025
+846,muse-spark-1.1,VisualToolBench,0.4477,0.5905
+847,mistral-small-2501,MATH Level 5,0.4481684290030212,0.4875
+848,mistral-large-2407,MATH Level 5,0.4481684290030212,0.137
+849,gpt-4.5-preview-2025-02-27,Aider Polyglot,0.449,0.54
+850,Yi-6B-Chat,GSM8K,0.449,0.519
+851,claude-3-haiku-20240307,GPQA Main Biology,0.449,0.4795
+852,o4-mini-2025-04-16_high,MultiChallenge,0.449,0.185
+853,deepseek-v4-flash_max,SciCode,0.449074074074074,0.5585
+854,Qwen-7B,BIG-Bench Hard (BBH),0.45,0.3795
+855,Qwen-7B,MMLU,0.45,0.1165
+856,Meta-Llama-3-8B-Instruct,MMLU Chemistry,0.45,0.3345
+857,text-babbage-001,BoolQ,0.451,0.2215
+858,MiniMax-M2.7,TerminalBench,0.451,0.553
+859,gemini-2.5-pro-preview-06-05,MultiNRC,0.4512,0.8005
+860,glm-4.7,SciCode,0.451388888888889,0.7085
+861,Qwen2.5-Coder-1.5B,ARC (AI2),0.452,0.0665
+862,phi-2,TriviaQA,0.452,0.0045
+863,mistral-small-2501,GPQA Diamond,0.4529671717171717,0.491
+864,chatgpt-4o-03-27-2025,Aider Polyglot,0.4529999999999999,0.5065
+865,SliME-Llama3-8B,Video-MME,0.453,0.159
+866,gpt-oss-120b,MultiChallenge,0.4534,0.4875
+867,MiniMax-M3,SciCode,0.453703703703704,0.6075
+868,gpt-5.2-pro-2025-12-11,PRBench Legal,0.454392,0.541
+869,claude-opus-4-20250514,TutorBench,0.4546,0.2825
+870,qwen3.7-plus,SciCode,0.454861111111111,0.33
+871,amazon.nova-micro-v1:0,MMLU Pro Chemistry,0.455,0.5985
+872,o3-2025-04-16_high,MultiNRC,0.455,0.828
+873,gpt-5.6-luna_low,SciCode,0.456018518518519,0.5655
+874,gpt-5.4-2026-03-05_high,PRBench Finance,0.45627,0.2585
+875,Baichuan2-13B-Chat,GSM8K,0.457,0.5895
+876,claude-sonnet-4-5-20250929,TutorBench,0.457,0.182
+877,Llama-2-7b,MMLU,0.458,0.4785
+878,gpt-5.6-luna_medium,SciCode,0.458333333333333,0.5555
+879,gemini-1.5-pro-001,GPQA Diamond,0.4586489898989899,0.0675
+880,claude-opus-4-5-20251101,SWE-Bench Pro,0.4589,0.665
+881,Llama-2-7b,ARC (AI2),0.459,0.388
+882,Nemotron-4 15B,GSM8K,0.46,0.331
+883,gemini-1.0-pro-001,MMLU Chemistry,0.46,0.203
+884,Inkling_xhigh,SciCode,0.460648148148148,0.394
+885,qwen2.5-32b-instruct,GPQA Diamond,0.4608585858585858,0.352
+886,DeepSeek-V3.1,MultiChallenge,0.461,0.3545
+887,gemini-3.1-pro-preview,SWE-Bench Pro,0.461,0.318
+888,claude-opus-4-5-20251101_unknown,PRBench Finance,0.4615999999999999,0.473
+889,Llama-3.1-Tulu-3-70B-DPO,GPQA Diamond,0.4627525252525252,0.55
+890,gpt-5.2-pro-2025-12-11,PRBench Finance,0.4634,0.586
+891,claude-3-5-haiku-20241022,MATH Level 5,0.4635574018126888,0.5735
+892,text-ada-001,BoolQ,0.464,0.2085
+893,gemma-7b,GSM8K,0.464,0.23
+894,deepseek-v4-pro_high,SciCode,0.46412037037037,0.3085
+895,claude-3-7-sonnet-20250219_unknown,TutorBench,0.4645,0.5105
+896,claude-sonnet-4-5-20250929_unknown,TerminalBench,0.465,0.639
+897,kimi-k2.5,PRBench Finance,0.465069,0.711
+898,gpt-4-turbo-2024-04-09,GPQA Diamond,0.4659090909090909,0.3605
+899,o3-2025-04-16_medium,DeepResearchBench,0.466,0.5935
+900,gpt-4-turbo-2024-04-09,MATH Level 5,0.467333836858006,0.348
+901,claude-sonnet-4-6_max,SciCode,0.467592592592593,0.6965
+902,mistral-small-2503,MATH Level 5,0.4677114803625378,0.516
+903,gpt-5.4-nano-2026-03-17_xhigh,SciCode,0.46875,0.573
+904,gemini-2.5-pro,AudioMultiChallenge,0.469,0.725
+905,Llama-2-13b,BIG-Bench Hard (BBH),0.4698,0.448
+906,MiniMax-M2.7,SciCode,0.469907407407407,0.7515
+907,Mixtral-8x7B-Instruct-v0.1,MMLU Chemistry,0.47,0.64
+908,claude-opus-4-8_unknown,GSO-Bench,0.4706,0.764
+909,Mistral-7B-v0.1,Adversarial NLI,0.471,0.436
+910,gemini-2.5-flash-preview-04-17,Aider Polyglot,0.471,0.6545
+911,gpt-5.6-sol_none,SciCode,0.471064814814815,0.6275
+912,claude-3-opus-20240229,GPQA Diamond,0.4715909090909091,0.465
+913,starcoder2-15b,ARC (AI2),0.472,0.081
+914,Baichuan2-13B-Chat,BIG-Bench Hard (BBH),0.472,0.376
+915,Yi-6B-Chat,BIG-Bench Hard (BBH),0.472,0.312
+916,gemini-1.5-flash-002,GPQA Diamond,0.4731691919191919,0.377
+917,gpt-5.5_none,SciCode,0.47337962962963,0.807
+918,grok-4.3_high,SciCode,0.47337962962963,0.485
+919,gpt-5.5_unknown,ExploitBench,0.474,0.635
+920,claude-3-haiku-20240307,GPQA Diamond Biology,0.474,0.6115
+921,Llama-3.1-8B-Instruct,GPQA Diamond Biology,0.474,0.6995
+922,claude-opus-4-1-20250805,TutorBench,0.474,0.4445
+923,claude-opus-4-8_medium,DeepResearchBench,0.4742885564429113,0.6375
+924,Llama-3.3-70B-Instruct,GPQA Diamond,0.4744318181818182,0.5175
+925,kimi-k2.7-code,SciCode,0.474537037037037,0.485
+926,mistral-small-2503,GPQA Diamond,0.4747474747474747,0.58
+927,Llama-3.1-8B-Instruct,WMDP Chemistry,0.475,0.331
+928,LLaMA-7B,ARC (AI2),0.476,0.5885
+929,gpt-5.1-2025-11-13_unknown,TerminalBench,0.476,0.178
+930,gpt-5.1-2025-11-13_medium,TerminalBench,0.476,0.438
+931,o3-2025-04-16_medium,PRBench Finance,0.4769309428,0.881
+932,LLaMA-13B,MMLU,0.477,0.51
+933,claude-sonnet-4-20250514_2K,DeepResearchBench,0.478,0.615
+934,falcon-7b,ARC (AI2),0.4786,0.707
+935,gpt-4o-2024-11-20,GPQA Diamond,0.4788510101010101,0.3915
+936,grok-4-0709,DeepResearchBench,0.479,0.714
+937,chatglm2-6b,MMLU,0.479,0.534
+938,mpt-30b,MMLU,0.479,0.5525
+939,claude-3-5-sonnet-20241022,CAD-Eval,0.48,0.805
+940,gpt-5.1-2025-11-13_unknown,PRBench Finance,0.4800999999999999,0.661
+941,claude-opus-5_low,SciCode,0.480324074074074,0.474
+942,gemini-3-flash-preview,BALROG,0.481,0.6105
+943,qwen-plus-2025-01-25,GPQA Diamond,0.4810606060606061,0.2585
+944,claude-opus-4-6_unknown,MultiNRC,0.4834,0.111
+945,kimi-k3_unknown,GBAEval,0.4834685537953759,0.67
+946,DeepSeek-V3,Aider Polyglot,0.484,0.8865
+947,mistral-large-2402,MMLU Pro Chemistry,0.484,0.263
+948,magistral-small-2506,GPQA Diamond,0.4842171717171717,0.4975
+949,gpt-realtime-2 (xHigh),AudioMultiChallenge,0.4845,0.5515
+950,gpt-5-nano-2025-08-07_minimal,GPQA Diamond,0.4848484848484848,0.5085
+951,gpt-4.1-2025-04-14,SWE-Bench Verified,0.4854166666666666,0.138
+952,o3-2025-04-16_medium,PRBench Legal,0.4857241633,0.95
+953,gpt-5-2025-08-07_high,DeepResearchBench,0.486,0.6215
+954,gpt-5.5-instant,SciCode,0.486111111111111,0.5975
+955,claude-sonnet-5_high,SciCode,0.486111111111111,0.569
+956,claude-opus-4-5-20251101_unknown,MultiNRC,0.4863,0.502
+957,gemma-7b,Adversarial NLI,0.487,0.546
+958,amazon.nova-micro-v1:0,GPQA Main Biology,0.487,0.705
+959,gpt-5.5_low,DeepResearchBench,0.4872669226885893,0.4325
+960,inkling-small,SciCode,0.487268518518519,0.3955
+961,claude-sonnet-4-6_unknown,GBAEval,0.4875663483204475,0.8485
+962,qwen3.7-max,SciCode,0.488425925925926,0.3885
+963,gemma-3-27b-it,GPQA Diamond,0.4886363636363636,0.5035
+964,gpt-4o-2024-05-13,GPQA Diamond,0.4889520202020202,0.341
+965,gpt-4.1-nano-2025-04-14,GPQA Diamond,0.4892676767676767,0.4635
+966,kimi-k2.5,SciCode,0.489583333333333,0.7245
+967,gpt-5-2025-08-07_unknown,PRBench Legal,0.4896127165,0.707
+968,Baichuan-2-13B-Base,BIG-Bench Hard (BBH),0.49,0.556
+969,claude-opus-4-20250514_2K,DeepResearchBench,0.49,0.6405
+970,gpt-3.5-turbo-0125,WMDP Chemistry,0.49,0.431
+971,gpt-5.1-2025-11-13_unknown,MultiNRC,0.49,0.6285
+972,o3-pro-2025-06-10_high,MultiNRC,0.49,0.5765
+973,claude-sonnet-4-5-20250929_unknown,TutorBench,0.49,0.3795
+974,mistral-large-2407,GPQA Diamond,0.4902146464646464,0.3325
+975,o3-pro-2025-06-10,PRBench Finance,0.4907887988,0.5675
+976,gpt-5.1-2025-11-13_none,TutorBench,0.4907999999999999,0.849
+977,qwen2.5-72b-instruct,GPQA Diamond,0.4914772727272727,0.367
+978,gpt-5.6-terra_low,SciCode,0.491898148148148,0.536
+979,gpt-4o-2024-08-06,GPQA Diamond,0.4921085858585858,0.2535
+980,claude-opus-4-8_low,DeepResearchBench,0.492676278234232,0.544
+981,grok-3-mini-beta_high,Aider Polyglot,0.493,0.3105
+982,gpt-5.1-2025-11-13_unknown,PRBench Legal,0.4932999999999999,0.8035
+983,gpt-5-2025-08-07_medium,DeepResearchBench,0.495,0.6515
+984,Meta-Llama-3-8B-Instruct,WMDP Chemistry,0.495,0.524
+985,gpt-5.5_medium,DeepResearchBench,0.4955079229440321,0.489
+986,gpt-5-2025-08-07_unknown,TerminalBench,0.496,0.1645
+987,gpt-5-2025-08-07_medium,TerminalBench,0.496,0.403
+988,gpt-5.6-terra_medium,SciCode,0.496527777777778,0.579
+989,o3-pro-2025-06-10,PRBench Legal,0.4967254409,0.647
+990,claude-opus-4-1-20250805,DeepResearchBench,0.497,0.845
+991,gpt-5-2025-08-07_minimal,DeepResearchBench,0.497,0.8665
+992,gemini-2.5-pro,DeepResearchBench,0.4971,0.7765
+993,claude-opus-4-20250514_unknown,TutorBench,0.4971,0.516
+994,gpt-4o-2024-11-20,MATH Level 5,0.4977341389728096,0.362
+995,Llama-3.1-405B-Instruct,MATH Level 5,0.4977341389728096,0.1975
+996,claude-opus-4-5-20251101,TutorBench,0.498202,0.187
+997,gpt-5.4-mini-2026-03-17_xhigh,SciCode,0.498842592592593,0.603
+998,deepseek-v4-flash-0731_max,SciCode,0.498842592592593,0.445
+999,INTELLECT-1-Instruct,MMLU,0.4989,0.527
+1000,gpt-5-pro-2025-10-06_unknown,PRBench Legal,0.4989389864999999,0.3805
+1001,LLaMA-33B,BIG-Bench Hard (BBH),0.5,0.3325
+1002,Llama-2-70b-hf,CSQA2,0.5,0.171
+1003,deepseek-v4-pro_max,SciCode,0.5,0.448
+1004,gpt-5.6-luna_xhigh,SciCode,0.5,0.5705
+1005,claude-3-sonnet-20240229,GPQA Main Biology,0.5,0.5235
+1006,amazon.nova-micro-v1:0,WMDP Chemistry,0.5,0.4165
+1007,gpt-5.6-terra_high,SciCode,0.501157407407407,0.5865
+1008,mimo-v2.5-pro,SciCode,0.502314814814815,0.5805
+1009,grok-build-0.1,SciCode,0.502314814814815,0.644
+1010,claude-opus-4-8_high,DeepResearchBench,0.5023412240360061,0.3475
+1011,mistral-large-2411,MATH Level 5,0.5028323262839879,0.32
+1012,Yi-6B,ARC (AI2),0.503,0.2805
+1013,o1-preview-2024-09-12,GPQA Diamond,0.5031565656565656,0.013
+1014,gpt-5.6-sol_max,PRBench Finance,0.5045000000000001,0.321
+1015,glm-5.2_max,SciCode,0.50462962962963,0.2175
+1016,claude-haiku-4-5-20251001_unknown,MultiChallenge,0.5049,0.364
+1017,Llama-4-Maverick-17B-128E-Instruct,GPQA Diamond Chemistry,0.505,0.6405
+1018,gpt-5.6-sol_max,PRBench Legal,0.505,0.3135
+1019,mpt-30b,ARC (AI2),0.506,0.482
+1020,gpt-5.6-luna_high,SciCode,0.506944444444444,0.593
+1021,claude-opus-5_medium,SciCode,0.506944444444444,0.5745
+1022,InternVL-Chat-V1-5,Video-MME,0.507,0.2365
+1023,claude-opus-4-1-20250805_unknown,TutorBench,0.5078,0.6915
+1024,Llama-2-13b-chat,MMLU,0.509,0.1635
+1025,Llama-3.1-405B-Instruct,GPQA Diamond,0.5091540404040404,0.4185
+1026,gpt-5-2025-08-07_low,DeepResearchBench,0.51,0.714
+1027,internlm-7b,MMLU,0.51,0.6785
+1028,mistral-large-2402,MMLU Chemistry,0.51,0.2785
+1029,gpt-4o-2024-05-13,MATH Level 5,0.5104796072507553,0.3085
+1030,gpt-5-pro-2025-10-06_unknown,PRBench Finance,0.5106359778,0.4675
+1031,Meta-Llama-3-70B-Instruct,MMLU Pro Chemistry,0.511,0.3205
+1032,kimi-k3_low,SciCode,0.511574074074074,0.741
+1033,claude-opus-4-5-20251101_unknown,TutorBench,0.511982,0.189
+1034,gpt-5.1-2025-11-13_none,MultiChallenge,0.5123,0.712
+1035,Qwen-VL-Max,Video-MME,0.513,0.205
+1036,gpt-5-2025-08-07_unknown,PRBench Finance,0.5132272595,0.829
+1037,mistral-large-2411,GPQA Diamond,0.5132575757575758,0.4975
+1038,o1-preview-2024-09-12,GPQA Main Chemistry,0.514,0.7305
+1039,muse-spark,SciCode,0.515046296296296,0.197
+1040,gemini-3.1-flash-lite,TutorBench,0.515049,0.8005
+1041,claude-3-7-sonnet-20250219_unknown,MultiChallenge,0.5158,0.6505
+1042,claude-3-5-sonnet-20241022,Aider Polyglot,0.516,0.8645
+1043,Baichuan-13B-Base,MMLU,0.516,0.5175
+1044,gpt-5.5_low,SciCode,0.516203703703704,0.5165
+1045,gpt-5.6-terra_xhigh,SciCode,0.516203703703704,0.5965
+1046,claude-3-5-sonnet-20240620,MATH Level 5,0.5168051359516617,0.1345
+1047,Qwen-7B,GSM8K,0.517,0.8565
+1048,claude-3-sonnet-20240229,WMDP Chemistry,0.517,0.2745
+1049,gemini-2.5-flash-preview-09-2025,The Agent Company,0.518,0.7915
+1050,Llama-4-Scout-17B-16E-Instruct,GPQA Diamond,0.5183080808080808,0.542
+1051,claude-opus-4-6_unknown,SWE-Bench Pro,0.519,0.551
+1052,Llama-3.1-8B-Instruct,MMLU Chemistry,0.52,0.7565
+1053,o3-2025-04-16_high,TutorBench,0.5209,0.557
+1054,gpt-5-2025-08-07_unknown,MultiNRC,0.5213,0.6805
+1055,o3-2025-04-16_unknown,SimpleQA Verified,0.522567703109328,0.811
+1056,claude-opus-4-6_unknown,PRBench Legal,0.5226500000000001,0.766
+1057,muse-spark,PRBench Legal,0.5229,0.5505
+1058,Mixtral-8x7B-Instruct-v0.1,MMLU Biology,0.523,0.0335
+1059,gpt-4.1-2025-04-14,Aider Polyglot,0.524,0.632
+1060,glm-5,TerminalBench,0.524,0.4675
+1061,DeepSeek-V3.2-Exp,The Agent Company,0.524,0.4545
+1062,Mixtral-8x7B-Instruct-v0.1,WMDP Biology,0.524,0.0065
+1063,muse-spark,PRBench Finance,0.5244,0.541
+1064,PaLM 62B,ARC (AI2),0.525,0.3105
+1065,internlm-20b,BIG-Bench Hard (BBH),0.525,0.18
+1066,gpt-5.6-luna_max,SciCode,0.525462962962963,0.5205
+1067,claude-fable-5_max,PRBench Legal,0.5256000000000001,0.3825
+1068,gpt-5.6-sol_unknown,GBAEval,0.5259227864005247,0.757
+1069,claude-sonnet-4-5-20250929_2K,DeepResearchBench,0.526,0.692
+1070,LongVA-7B,Video-MME,0.526,0.2755
+1071,claude-3-5-sonnet-20240620,GPQA Diamond Biology,0.526,0.287
+1072,Llama-3.1-405B-Instruct,GPQA Diamond Biology,0.526,0.315
+1073,gpt-4-0613,GPQA Diamond Biology,0.526,0.6365
+1074,Meta-Llama-3-70B-Instruct,GPQA Diamond Biology,0.526,0.6535
+1075,gpt-4o-mini-2024-07-18,MATH Level 5,0.5263406344410876,0.8885
+1076,gemini-3.6-flash_high,SciCode,0.52662037037037,0.324
+1077,LLaMA-13B,ARC (AI2),0.527,0.5495
+1078,DeepSeek-R1,GPQA Diamond Chemistry,0.527,0.312
+1079,o3-2025-04-16_medium,TutorBench,0.5276,0.7725
+1080,Phi-3-mini-4k-instruct,Adversarial NLI,0.528,0.3445
+1081,Baichuan-2-13B-Base,GSM8K,0.528,0.8385
+1082,Qwen2.5-Coder-3B,ARC (AI2),0.529,0.0645
+1083,text-davinci-001,CSQA2,0.529,0.603
+1084,long-llava-qwen2-7b,Video-MME,0.529,0.302
+1085,claude-3-sonnet-20240229,MMLU Pro Chemistry,0.529,0.4405
+1086,gemini-3.1-pro-preview,TutorBench,0.529926,0.1205
+1087,gpt-4-0613,MMLU Pro Chemistry,0.53,0.406
+1088,gemini-3.5-flash_high,SciCode,0.53125,0.453
+1089,Qwen-1_8B,ARC (AI2),0.532,0.8465
+1090,text-davinci-001,ARC (AI2),0.532,0.3835
+1091,gemma-2b,TriviaQA,0.532,0.079
+1092,Video-CCAM-7B-v1.2,Video-MME,0.532,0.311
+1093,gpt-5.5_unknown,GBAEval,0.5322037178151383,0.5745
+1094,claude-opus-4-6_medium,DeepResearchBench,0.5324070106776454,0.7025
+1095,gpt-4o-2024-08-06,MATH Level 5,0.5327605740181269,0.247
+1096,claude-opus-4-6_unknown,PRBench Finance,0.532792,0.781
+1097,grok-3-beta,Aider Polyglot,0.5329999999999999,0.5615
+1098,Qwen-14B,BIG-Bench Hard (BBH),0.534,0.2075
+1099,claude-sonnet-4-6_unknown,TerminalBench,0.534,0.4795
+1100,claude-sonnet-4-6,TerminalBench,0.534,0.3105
+1101,gpt-5.5_medium,SciCode,0.534722222222222,0.6125
+1102,claude-opus-4-8_max,SciCode,0.534722222222222,0.3995
+1103,kimi-k2.6,SciCode,0.534722222222222,0.838
+1104,gpt-5.2-2025-12-11_unknown,TutorBench,0.5349470000000001,0.594
+1105,claude-opus-4-6_unknown,TutorBench,0.5355,0.1795
+1106,claude-sonnet-5_max,SciCode,0.53587962962963,0.934
+1107,Qwen2.5-Coder-1.5B,MMLU,0.536,0.194
+1108,gemini-2.5-pro,MultiChallenge,0.5362,0.4495
+1109,gemini-3-pro-preview,TutorBench,0.536706,0.2815
+1110,claude-opus-4-6_max,TutorBench,0.5367999999999999,0.4615
+1111,PaLM 62B,MMLU,0.537,0.455
+1112,gemini-1.0-pro-001,WMDP Chemistry,0.537,0.5985
+1113,grok-2-1212,GPQA Diamond,0.5378787878787878,0.7595
+1114,o3-mini-2025-01-31_medium,Aider Polyglot,0.5379999999999999,0.5425
+1115,mistral-large-2402,GPQA Main Biology,0.5379999999999999,0.7445
+1116,grok-4.5_unknown,SimpleQA Verified,0.5381443298969072,0.6785
+1117,falcon-11b,GSM8K,0.5383,0.5055
+1118,claude-fable-5_max,PRBench Finance,0.5386,0.4865
+1119,gpt-5.6-terra_max,SciCode,0.539351851851852,0.5065
+1120,claude-3-7-sonnet-20250219,CAD-Eval,0.54,0.8595
+1121,o3-mini-2025-01-31_medium,CAD-Eval,0.54,0.6375
+1122,claude-3-haiku-20240307,MMLU Chemistry,0.54,0.6515
+1123,claude-3-sonnet-20240229,MMLU Chemistry,0.54,0.4535
+1124,gpt-5.5_high,DeepResearchBench,0.5400960770059647,0.542
+1125,claude-3-5-sonnet-20240620,GPQA Diamond,0.5404040404040404,0.445
+1126,grok-4.5_high,SciCode,0.540509259259259,0.569
+1127,gpt-5.1-2025-11-13_unknown,TutorBench,0.540871,0.516
+1128,Baichuan-2-7B-Base,MMLU,0.5416,0.825
+1129,claude-opus-5_high,SciCode,0.542824074074074,0.6
+1130,Yi-34B,BIG-Bench Hard (BBH),0.543,0.1415
+1131,chatglm2-6b,LAMBADA,0.543,0.0145
+1132,Mistral-7B-v0.1,GSM8K,0.544,0.3545
+1133,falcon-180B,GSM8K,0.544,0.1955
+1134,LLaMA-65B,GSM8K,0.544,0.319
+1135,Llama-2-34b,ARC (AI2),0.545,0.299
+1136,amazon.nova-micro-v1:0,MMLU Pro Biology,0.545,0.003
+1137,claude-opus-4-7_max,SciCode,0.545138888888889,0.6725
+1138,INTELLECT-1-Instruct,ARC (AI2),0.5452,0.5255
+1139,kimi-k2.5,TutorBench,0.545605,0.7495
+1140,T5-Large,CSQA2,0.546,0.2895
+1141,o3-pro-2025-06-10,TutorBench,0.5462,0.393
+1142,gemini-3-pro-preview,AudioMultiChallenge,0.5465,0.4685
+1143,o1-preview-2024-09-12,GPQA Diamond Chemistry,0.5479999999999999,0.695
+1144,claude-sonnet-4-6_high,DeepResearchBench,0.5486826034317638,0.8885
+1145,inkling-small,AudioMultiChallenge,0.5487,0.5975
+1146,claude-opus-5_xhigh,SciCode,0.549768518518518,0.605
+1147,Qwen-14B-Chat,BIG-Bench Hard (BBH),0.55,0.3175
+1148,claude-sonnet-4-5-20250929,Cybench,0.55,0.7435
+1149,gpt-3.5-turbo-0125,MMLU Chemistry,0.55,0.8905
+1150,muse-spark,SWE-Bench Pro,0.55,0.4315
+1151,muse-spark-1.1,PRBench Finance,0.5501,0.6045
+1152,gemini-2.5-flash-preview-05-20_24K,Aider Polyglot,0.551,0.5235
+1153,DeepSeek-V3-0324,Aider Polyglot,0.551,0.7435
+1154,gemma-7b,BIG-Bench Hard (BBH),0.551,0.4125
+1155,Baichuan2-13B-Chat,MMLU,0.551,0.4395
+1156,xiaoyi-deepresearch,DeepResearchBench,0.5513,0.7225
+1157,gpt-5-2025-08-07_unknown,DeepResearchBench,0.5513,0.8475
+1158,Mixtral-8x7B-v0.1,Adversarial NLI,0.552,0.4045
+1159,claude-3-5-sonnet-20241022,GPQA Diamond,0.553030303030303,0.181
+1160,claude-opus-4-6_high,DeepResearchBench,0.5531381702863989,0.684
+1161,claude-sonnet-4-5-20250929_unknown,MultiChallenge,0.5532,0.522
+1162,gpt-5-2025-08-07_unknown,TutorBench,0.5533,0.5635
+1163,kimi-k2-thinking,MultiChallenge,0.5542,0.6065
+1164,gpt-5.6-sol_low,SciCode,0.554398148148148,0.706
+1165,Nemotron-4 15B,ARC (AI2),0.555,0.2075
+1166,Video-XL-7B,Video-MME,0.555,0.3235
+1167,gpt-5.4-nano-2026-03-17_none,GPQA Diamond,0.5555555555555556,0.488
+1168,Yi-9B,ARC (AI2),0.556,0.1415
+1169,Llama-2-13b,MMLU,0.556,0.519
+1170,gemini-2.5-pro-preview-06-05,TutorBench,0.5565,0.87
+1171,claude-opus-5_max,SciCode,0.556712962962963,0.487
+1172,o3-mini-2025-01-31_medium,GPQA Main Chemistry,0.557,0.6765
+1173,DeepSeek-R1,GPQA Main Chemistry,0.557,0.607
+1174,DeepSeek-R1-Distill-Llama-70B,GPQA Diamond,0.5574494949494949,0.113
+1175,Llama-2-13b,ScienceQA,0.5578,0.3715
+1176,Phi-3-medium-128k-instruct,Adversarial NLI,0.558,0.356
+1177,VITA,Video-MME,0.558,0.3615
+1178,gpt-5.5_high,SciCode,0.559027777777778,0.4375
+1179,o1-2024-12-17_medium,CAD-Eval,0.56,0.5325
+1180,kangaroo,Video-MME,0.56,0.3515
+1181,amazon.nova-micro-v1:0,MMLU Chemistry,0.56,0.876
+1182,gpt-4-0613,MMLU Chemistry,0.56,0.5755
+1183,gpt-5.6-sol_xhigh,SciCode,0.560185185185185,0.5985
+1184,claude-opus-4-6_unknown,MultiChallenge,0.5602,0.0675
+1185,phi-4,GPQA Diamond,0.5606060606060606,0.7145
+1186,qwen2.5-32b-instruct,MATH Level 5,0.5607061933534743,0.63
+1187,Mistral-7B-v0.1,BIG-Bench Hard (BBH),0.561,0.369
+1188,Llama-3.1-8B-Instruct,MMLU,0.561,0.038
+1189,VITA-1.5,Video-MME,0.561,0.3585
+1190,qwen-max-2025-01-25,GPQA Diamond,0.5612373737373737,0.585
+1191,gpt-5.5_xhigh,SciCode,0.561342592592593,0.5615
+1192,gpt-5.6-sol_max,SciCode,0.561342592592593,0.4625
+1193,qwen-turbo-2024-11-01,MATH Level 5,0.5623111782477341,0.7525
+1194,dolly-v2-12b,BoolQ,0.563,0.147
+1195,o4-mini-2025-04-16_medium,GPQA Main Chemistry,0.563,0.4135
+1196,claude-sonnet-4-20250514,Aider Polyglot,0.564,0.5255
+1197,amazon.nova-lite-v1:0,GPQA Main Biology,0.564,0.6445
+1198,mistral-large-2402,WMDP Chemistry,0.564,0.5355
+1199,gpt-5.6-sol_medium,SciCode,0.564814814814815,0.6045
+1200,PaLM 540B,GSM8K,0.565,0.17
+1201,Llama-3.2-11B-Vision-Instruct,MMLU,0.565,0.238
+1202,DeepSeek-V3,GPQA Diamond,0.5653409090909091,0.3865
+1203,gpt-5.4-2026-03-05_xhigh,SciCode,0.565972222222222,0.6125
+1204,claude-3-haiku-20240307,WMDP Chemistry,0.5660000000000001,0.6525
+1205,o3-2025-04-16_high,MultiChallenge,0.5661999999999999,0.4315
+1206,gpt-5.4-pro-2026-03-05_unknown,TutorBench,0.566249,0.3515
+1207,Inkling_unknown,AudioMultiChallenge,0.5664,0.552
+1208,code-davinci-002,GSM8K,0.568,0.426
+1209,DeepSeek-R1,Aider Polyglot,0.569,0.6005
+1210,falcon-40b,MMLU,0.569,0.746
+1211,gpt-5.6-sol_high,SciCode,0.569444444444444,0.6205
+1212,claude-3-5-sonnet-20241022,MATH Level 5,0.5694864048338368,0.0515
+1213,gemini-3.1-pro-preview,BALROG,0.57,0.598
+1214,gpt-3.5-turbo-0613,CSQA2,0.57,0.39
+1215,Meta-Llama-3-70B-Instruct,MMLU Biology,0.57,0.017
+1216,Meta-Llama-3-70B-Instruct,MMLU Chemistry,0.57,0.681
+1217,muse-spark-1.1,PRBench Legal,0.5705,0.789
+1218,claude-opus-4-6_max,MultiNRC,0.5706,0.9095
+1219,gemini-2.0-flash-thinking-exp-01-21,GPQA Diamond,0.5707070707070707,0.6805
+1220,claude-sonnet-4-20250514_unknown,MultiChallenge,0.5710999999999999,0.833
+1221,Gopher (280B),TriviaQA,0.572,0.0645
+1222,claude-opus-4-1-20250805_unknown,MultiChallenge,0.5720000000000001,0.6985
+1223,gemini-1.5-pro-002,GPQA Diamond,0.5722853535353535,0.659
+1224,Meta-Llama-3-8B-Instruct,Adversarial NLI,0.573,0.709
+1225,DeepSeek-Coder-V2-Lite-Base,ARC (AI2),0.573,0.192
+1226,grok-4-20,TerminalBench,0.573,0.379
+1227,TimeMarker,Video-MME,0.573,0.365
+1228,babbage,BoolQ,0.574,0.3645
+1229,internlm-chat-20b,MMLU,0.574,0.857
+1230,o1-2024-12-17_medium,GPQA Main Chemistry,0.574,0.565
+1231,claude-3-opus-20240229,WMDP Chemistry,0.574,0.281
+1232,amazon.nova-lite-v1:0,WMDP Chemistry,0.574,0.4205
+1233,gemini-2.5-pro,SWE-Bench Verified,0.5755693581780539,0.0885
+1234,gpt-5-nano-2025-08-07_low,GPQA Diamond,0.5757575757575758,0.503
+1235,Meta-Llama-3-70B-Instruct,WMDP Chemistry,0.5760000000000001,0.5555
+1236,starcoder2-15b,GSM8K,0.577,0.5755
+1237,gpt-3.5-turbo-0613,GSM8K,0.5777,0.298
+1238,gpt-5.1-codex,TerminalBench,0.578,0.5735
+1239,qwen3.6-plus,SWE-Bench Verified,0.5785123966942148,0.034
+1240,claude-3-7-sonnet-20250219,GPQA Diamond Biology,0.579,0.2445
+1241,claude-3-5-sonnet-20241022,GPQA Diamond Biology,0.579,0.3405
+1242,DeepSeek-V3,GPQA Diamond Biology,0.579,0.3865
+1243,gpt-4-turbo-2024-04-09,GPQA Diamond Biology,0.579,0.611
+1244,Llama-3.1-70B-Instruct,GPQA Diamond Biology,0.579,0.6525
+1245,mistral-large-2407,GPQA Diamond Biology,0.579,0.5335
+1246,amazon.nova-lite-v1:0,GPQA Diamond Biology,0.579,0.727
+1247,gpt-4-0613,MMLU Biology,0.58,0.017
+1248,mistral-large-2407,MMLU Chemistry,0.58,0.1435
+1249,Phi-3-small-8k-instruct,Adversarial NLI,0.581,0.2945
+1250,gpt-3.5-turbo-1106,Adversarial NLI,0.581,0.6345
+1251,gemini-3-pro-preview,BALROG,0.581,0.8105
+1252,ada,BoolQ,0.581,0.3945
+1253,Phi-3-small-8k-instruct,TriviaQA,0.581,0.022
+1254,Llama-2-13b-chat,BIG-Bench Hard (BBH),0.582,0.835
+1255,muse-spark-1.1_xhigh,SciCode,0.582175925925926,0.61
+1256,gpt-5.4-2026-03-05_xhigh,MultiNRC,0.5829,0.237
+1257,LLaMA-65B,BIG-Bench Hard (BBH),0.584,0.4295
+1258,Qwen-1_8B,LAMBADA,0.584,0.105
+1259,falcon-11b,MMLU,0.584,0.374
+1260,phi-2,MMLU,0.584,0.294
+1261,Llama-2-70b-chat,BIG-Bench Hard (BBH),0.585,0.542
+1262,claude-opus-4-20250514_unknown,MultiChallenge,0.5861999999999999,0.722
+1263,kimi-k3_unknown,SciCode,0.586805555555556,0.599
+1264,kimi-k3_max,SciCode,0.586805555555556,0.745
+1265,Nemotron-4 15B,BIG-Bench Hard (BBH),0.587,0.741
+1266,Llama-2-70b-chat,GSM8K,0.587,0.517
+1267,LLaMA-33B,MMLU,0.587,0.467
+1268,Nemotron-4 15B,MMLU,0.587,0.4195
+1269,gemini-3.1-pro-preview,SciCode,0.58912037037037,0.916
+1270,gemini-3-pro-preview,MultiNRC,0.5896,0.82
+1271,claude-opus-4-5-20251101_unknown,MultiChallenge,0.5897,0.296
+1272,gpt-5-mini-2025-08-07_unknown,MultiChallenge,0.5899,0.867
+1273,stablelm-tuned-alpha-7b,BoolQ,0.59,0.287
+1274,Llama-4-Maverick-17B-128E-Instruct,GPQA Main Chemistry,0.59,0.988
+1275,muse-spark,MultiNRC,0.5905,0.275
+1276,Kimi-K2-Instruct,Aider Polyglot,0.591,0.587
+1277,moonshotai/kimi-k2-0905,Aider Polyglot,0.591,0.5095
+1278,claude-opus-4-5-20251101_128K,TerminalBench,0.591,0.562
+1279,gpt-5.4-2026-03-05_xhigh,SWE-Bench Pro,0.591,0.619
+1280,Baichuan-2-13B-Base,MMLU,0.592,0.706
+1281,mPLUG-Owl3-7B-241101,Video-MME,0.593,0.4565
+1282,phi-2,BIG-Bench Hard (BBH),0.594,0.651
+1283,o1-mini-2024-09-12_medium,GPQA Diamond,0.5950126262626263,0.4925
+1284,mistral-medium-2505,GPQA Diamond,0.5953282828282829,0.2095
+1285,qwen3-235b-a22b,Aider Polyglot,0.596,0.8315
+1286,Qwen3-235B-A22B-Instruct-2507,Aider Polyglot,0.596,0.7105
+1287,PaLM 2-S,ARC (AI2),0.596,0.168
+1288,opt-1.3b,BoolQ,0.596,0.34
+1289,claude-3-7-sonnet-20250219_16K,GPQA Main Chemistry,0.596,0.6625
+1290,Llama-2-70b-chat,MMLU,0.599,0.321
+1291,Mistral-7B-Instruct-v0.3,MMLU,0.599,0.5965
+1292,gpt-4-1106-vision-preview,Video-MME,0.599,0.438
+1293,claude-sonnet-4-5-20250929_unknown,Cybench,0.6,0.7095
+1294,Gopher (280B),MMLU,0.6,0.6135
+1295,claude-3-5-sonnet-20240620,Video-MME,0.6,0.4365
+1296,claude-3-5-sonnet-20241022,Video-MME,0.6,0.4025
+1297,DeepSeek-V3,MMLU Chemistry,0.6,0.0625
+1298,Llama-3.1-70B-Instruct,MMLU Chemistry,0.6,0.4585
+1299,claude-3-opus-20240229,MMLU Chemistry,0.6,0.4135
+1300,amazon.nova-lite-v1:0,MMLU Chemistry,0.6,0.6765
+1301,claude-fable-5_max,SciCode,0.601851851851852,0.6845
+1302,T5-3B,CSQA2,0.602,0.2655
+1303,Llama-2-13b,ARC (AI2),0.603,0.517
+1304,mistral-large-2407,GPQA Main Biology,0.603,0.5245
+1305,claude-3-opus-20240229,GPQA Main Biology,0.603,0.6655
+1306,claude-3-7-sonnet-20250219,Aider Polyglot,0.604,0.9105
+1307,o3-mini-2025-01-31_high,Aider Polyglot,0.604,0.508
+1308,gpt-5.1-codex-max,TerminalBench,0.604,0.5215
+1309,claude-haiku-4-5-20251001,GPQA Diamond,0.6047979797979798,0.1245
+1310,amazon.nova-pro-v1:0,Lech Mazur Writing,0.605,0.0615
+1311,DeepSeek-Coder-V2-Lite-Base,MMLU,0.605,0.333
+1312,instructblip-vicuna-7b,ScienceQA,0.605,0.3125
+1313,claude-3-5-sonnet-20241022,WMDP Chemistry,0.605,0.133
+1314,gemini-3.1-flash-lite,MultiChallenge,0.6061,0.861
+1315,Qwen2.5-Coder-7B,ARC (AI2),0.609,0.109
+1316,MiniCPM-V-2_6,Video-MME,0.609,0.4555
+1317,claude-3-7-sonnet-20250219,SWE-Bench Verified,0.609504132231405,0.8325
+1318,chatglm2-6b,ARC (AI2),0.61,0.794
+1319,Yi-6B-Chat,MMLU,0.61,0.698
+1320,gpt-4o-2024-08-06,MMLU Chemistry,0.61,0.2605
+1321,amazon.nova-pro-v1:0,MMLU Chemistry,0.61,0.4555
+1322,grok-2-1212,MMLU Chemistry,0.61,0.393
+1323,gpt-4-turbo-2024-04-09,MMLU Chemistry,0.61,0.4695
+1324,gpt-4-0613,WMDP Chemistry,0.61,0.7425
+1325,amazon.nova-lite-v1:0,MMLU Pro Chemistry,0.61,0.52
+1326,Cerebras-GPT-13B,BoolQ,0.611,0.3145
+1327,Mixtral-8x7B-Instruct-v0.1,MMLU Pro Biology,0.611,0.3505
+1328,Qwen-14B-Chat,GSM8K,0.612,0.571
+1329,InternVL2-40B,Video-MME,0.612,0.4735
+1330,claude-sonnet-4-20250514_32K,Aider Polyglot,0.613,0.368
+1331,Qwen-14B,GSM8K,0.613,0.5535
+1332,kimi-k2.5,MultiChallenge,0.6139,0.655
+1333,o3-mini-2025-01-31_medium,Lech Mazur Writing,0.615,0.0095
+1334,claude-3-5-sonnet-20241022,GPQA Main Biology,0.615,0.32
+1335,muse-spark-1.1,SWE-Bench Pro,0.615,0.532
+1336,gpt-3.5-turbo-0613,BIG-Bench Hard (BBH),0.6159,0.508
+1337,gpt-5.1-codex-mini,TerminalBench,0.616,0.5655
+1338,mpt-7b,TriviaQA,0.616,0.2745
+1339,o1-2024-12-17_high,Aider Polyglot,0.617,0.403
+1340,o3-mini-2025-01-31_high,Lech Mazur Writing,0.617,0.0065
+1341,gpt-neo-2.7B,BoolQ,0.618,0.281
+1342,gpt2-xl,BoolQ,0.618,0.371
+1343,falcon-40b,ARC (AI2),0.6186,0.682
+1344,gemini-1.5-flash-002,MATH Level 5,0.6186744712990937,0.7725
+1345,text-curie-001,BoolQ,0.62,0.507
+1346,o4-mini-2025-04-16_medium,CAD-Eval,0.62,0.677
+1347,Llama-4-Maverick-17B-128E-Instruct,Lech Mazur Writing,0.62,0.0345
+1348,gpt-5.4-pro-2026-03-05_unknown,MultiNRC,0.6227,0.6085
+1349,Llama-4-Scout-17B-16E-Instruct,MATH Level 5,0.6227341389728097,0.6605
+1350,o3-2025-04-16_medium,SWE-Bench Verified,0.6231884057971014,0.191
+1351,o1-mini-2024-09-12_high,GPQA Diamond,0.6237373737373737,0.28
+1352,VideoLLAMA2-7B,Video-MME,0.624,0.488
+1353,o3-pro-2025-06-10_high,MultiChallenge,0.624,0.565
+1354,Mistral-7B-Instruct-v0.2,MMLU,0.625,0.9795
+1355,Mistral-7B-v0.1,MMLU,0.625,0.4285
+1356,phi-4,Lech Mazur Writing,0.626,0.091
+1357,Llama-2-34b,MMLU,0.626,0.7755
+1358,Qwen1.5-7B,MMLU,0.626,0.3965
+1359,gemini-1.5-pro-001,GPQA Main Biology,0.628,0.5445
+1360,internlm-20b,GSM8K,0.629,0.601
+1361,claude-sonnet-4-5-20250929,OS World (Screenshot),0.629,0.7305
+1362,grok-2-1212,MMLU Pro Chemistry,0.629,0.1085
+1363,claude-3-7-sonnet-20250219,MMLU Chemistry,0.63,0.068
+1364,amazon.nova-pro-v1:0,WMDP Chemistry,0.63,0.5335
+1365,instructblip-vicuna-13b,ScienceQA,0.631,0.315
+1366,claude-opus-4-5-20251101,TerminalBench,0.631,0.7845
+1367,claude-opus-4-5-20251101_unknown,TerminalBench,0.631,0.613
+1368,qwen2.5-72b-instruct,MATH Level 5,0.631703172205438,0.682
+1369,gpt-5-2025-08-07_unknown,MultiChallenge,0.6319,0.5295
+1370,Baichuan-2-7B-Base,BoolQ,0.632,0.0135
+1371,claude-3-7-sonnet-20250219_16K,GPQA Diamond Biology,0.632,0.2485
+1372,o1-2024-12-17_medium,GPQA Diamond Biology,0.632,0.2855
+1373,gpt-4.5-preview-2025-02-27,GPQA Diamond Biology,0.632,0.44
+1374,grok-2-1212,GPQA Diamond Biology,0.632,0.742
+1375,mistral-large-2402,GPQA Diamond Biology,0.632,0.93
+1376,claude-opus-5,SimpleQA Verified,0.632996632996633,0.7945
+1377,kimi-k2.5,OS World (Screenshot),0.633,0.6265
+1378,T5-Small,SuperGLUE,0.633,0.3
+1379,LLaMA-65B,MMLU,0.634,0.4415
+1380,o4-mini-2025-04-16_medium,GPQA Diamond Chemistry,0.634,0.608
+1381,o3-mini-2025-01-31_medium,GPQA Diamond Chemistry,0.634,0.8005
+1382,gpt-5.1-2025-11-13_unknown,MultiChallenge,0.6341,0.619
+1383,Llama-3.1-70B-Instruct,WMDP Chemistry,0.635,0.6285
+1384,grok-2-1212,MATH Level 5,0.6351963746223565,0.7885
+1385,grok-2-1212,Lech Mazur Writing,0.636,0.1235
+1386,gpt-5.6-luna_none,GPQA Diamond,0.6363636363636364,0.372
+1387,Qwen2-VL-7B-Instruct,Video-MME,0.639,0.8885
+1388,MiniCPM-o-2_6,Video-MME,0.639,0.552
+1389,gemini-2.5-pro-preview-03-25,CAD-Eval,0.64,0.53
+1390,Yi-6B,MMLU,0.64,0.9205
+1391,Phi-3-mini-4k-instruct,TriviaQA,0.64,0.0785
+1392,claude-3-5-sonnet-20241022,MMLU Chemistry,0.64,0.194
+1393,claude-3-5-sonnet-20240620,MMLU Chemistry,0.64,0.4195
+1394,claude-3-7-sonnet-20250219,GPQA Main Biology,0.6409999999999999,0.3235
+1395,amazon.nova-pro-v1:0,GPQA Main Biology,0.6409999999999999,0.788
+1396,Llama-3.1-405B-Instruct,GPQA Main Biology,0.6409999999999999,0.657
+1397,internlm-7b,BoolQ,0.641,0.015
+1398,starcoder2-15b,MMLU,0.641,0.629
+1399,LiveCC-7B-Instruct,Video-MME,0.641,0.559
+1400,gpt-5.4-mini-2026-03-17_none,GPQA Diamond,0.6414141414141414,0.5035
+1401,gemini-2.0-flash-001,GPQA Diamond,0.6414141414141414,0.6835
+1402,NVILA-8B,Video-MME,0.642,0.5705
+1403,DeepSeek-Coder-V2-Base,ARC (AI2),0.643,0.104
+1404,gemini-3-flash-preview,TerminalBench,0.643,0.853
+1405,claude-3-7-sonnet-20250219_16K,GPQA Diamond Chemistry,0.645,0.694
+1406,o1-2024-12-17_medium,GPQA Diamond Chemistry,0.645,0.712
+1407,falcon-7b,TriviaQA,0.646,0.408
+1408,Chinchilla (70B),TriviaQA,0.646,0.1395
+1409,ByteVideoLLM-14B,Video-MME,0.646,0.563
+1410,gpt-5-mini-2025-08-07_medium,SWE-Bench Verified,0.6466942148760331,0.6155
+1411,gemini-3.1-pro-preview,MultiNRC,0.6474,0.8665
+1412,gpt-4o-mini-2024-07-18,Video-MME,0.648,0.7025
+1413,claude-3-haiku-20240307,MMLU Biology,0.648,0.485
+1414,DeepSeek-V3,MATH Level 5,0.6485083081570997,0.262
+1415,claude-3-7-sonnet-20250219_32K,Aider Polyglot,0.649,0.5695
+1416,PaLM 2-M,ARC (AI2),0.649,0.195
+1417,Llama-2-70b-hf,BIG-Bench Hard (BBH),0.649,0.443
+1418,gpt-neox-20b,BoolQ,0.649,0.259
+1419,o1-mini-2024-09-12_medium,Lech Mazur Writing,0.649,0.0735
+1420,gpt-5.2-2025-12-11_medium,TerminalBench,0.649,0.5955
+1421,gpt-5.2-2025-12-11_unknown,TerminalBench,0.649,0.8575
+1422,phi-4,MATH Level 5,0.6493580060422961,0.669
+1423,opt-13b,BoolQ,0.65,0.484
+1424,Qwen-14B-Chat,MMLU,0.65,0.579
+1425,gpt-4.5-preview-2025-02-27,MMLU Chemistry,0.65,0.118
+1426,c4ai-command-r-08-2024,MMLU,0.652,0.42
+1427,Llama-3.1-8B-Instruct,MMLU Biology,0.652,0.6865
+1428,amazon.nova-micro-v1:0,MMLU Biology,0.652,0.5975
+1429,gpt-4-turbo-2024-04-09,WMDP Chemistry,0.652,0.6315
+1430,gpt-5-pro-2025-10-06_unknown,MultiNRC,0.652,0.655
+1431,claude-sonnet-5_unknown,GBAEval,0.6526299757455419,0.864
+1432,qwen-plus-2025-01-25,MATH Level 5,0.6527567975830816,0.709
+1433,VideoChat-Flash-Qwen2-7B_res448,Video-MME,0.653,0.59
+1434,gpt-j-6b,BoolQ,0.654,0.474
+1435,gpt-4.5-preview-2025-02-27,GPQA Main Biology,0.654,0.37
+1436,Llama-3.1-70B-Instruct,GPQA Main Biology,0.654,0.8505
+1437,qwq-plus,GPQA Diamond,0.6540404040404041,0.507
+1438,grok-4.5_unknown,GBAEval,0.6541267565853209,0.8895
+1439,muse-spark-1.1,MultiNRC,0.6559,0.3625
+1440,curie,BoolQ,0.656,0.539
+1441,LLaVA-Video-7B-Qwen2-TPO,Video-MME,0.656,0.5935
+1442,gemini-2.0-pro-exp-02-05,GPQA Diamond,0.6565656565656566,0.6035
+1443,gemini-3-pro-preview,MultiChallenge,0.6567000000000001,0.579
+1444,Qwen2.5-Coder-1.5B,GSM8K,0.658,0.8305
+1445,gpt-4.1-mini-2025-04-14,GPQA Diamond,0.6584595959595959,0.765
+1446,LLaVA-Video-7B-Qwen2,Video-MME,0.659,0.6085
+1447,Qwen2.5-Coder-14B,ARC (AI2),0.66,0.1005
+1448,claude-3-7-sonnet-20250219,GPQA Diamond,0.6603535353535354,0.628
+1449,gemini-1.0-pro-001,MMLU Biology,0.6609999999999999,0.698
+1450,gemma-7b,MMLU,0.661,0.7
+1451,InternVL-Chat-ViT-6B-Vicuna-7B,ScienceQA,0.662,0.362
+1452,VideoLLAMA3-7B,Video-MME,0.662,0.592
+1453,claude-opus-4-5-20251101,OS World (Screenshot),0.6629999999999999,0.644
+1454,Qwen-14B,MMLU,0.663,0.6325
+1455,LLaVA-OneVision 72B,Video-MME,0.663,0.6235
+1456,Llama-3.1-8B-Instruct,MMLU Pro Biology,0.664,0.374
+1457,mistral-large-2407,WMDP Chemistry,0.664,0.616
+1458,gpt-5.2-codex,TerminalBench,0.665,0.72
+1459,gpt-5.1-2025-11-13_none,GPQA Diamond,0.6666666666666666,0.382
+1460,gemini-2.5-pro-preview-05-06,GPQA Diamond,0.6666666666666666,0.151
+1461,claude-sonnet-4-20250514,GPQA Diamond,0.6666666666666666,0.199
+1462,gpt-4o-2024-08-06,GPQA Main Biology,0.667,0.773
+1463,DeepSeek-V3,GPQA Main Biology,0.667,0.597
+1464,gpt-4-turbo-2024-04-09,GPQA Main Biology,0.667,0.8495
+1465,llava-v1.5-7b,ScienceQA,0.668,0.357
+1466,gpt-4.1-2025-04-14,GPQA Diamond,0.6691919191919192,0.4845
+1467,Llama-4-Maverick-17B-128E-Instruct-FP8,GPQA Diamond,0.6698232323232324,0.6795
+1468,Baichuan-2-13B-Base,BoolQ,0.67,0.0095
+1469,internlm-7b,LAMBADA,0.67,0.236
+1470,DeepSeek-Coder-V2-Lite-Base,GSM8K,0.671,0.71
+1471,qwen-max-2025-01-25,MATH Level 5,0.6718277945619335,0.5775
+1472,gpt-4o-mini-2024-07-18,Lech Mazur Writing,0.6719999999999999,0.379
+1473,Yi-34B,GSM8K,0.672,0.5675
+1474,claude-3-5-sonnet-20240620,WMDP Chemistry,0.672,0.573
+1475,grok-2-1212,WMDP Chemistry,0.672,0.7155
+1476,gpt-3.5-turbo-0125,MMLU,0.673,0.4505
+1477,Oryx-1.5-32B,Video-MME,0.673,0.6435
+1478,Llama-4-Scout-17B-16E-Instruct,WMDP Chemistry,0.674,0.6955
+1479,gpt-5-nano-2025-08-07_medium,GPQA Diamond,0.6742424242424242,0.422
+1480,LLaMA-33B,ARC (AI2),0.675,0.6165
+1481,Chinchilla (70B),MMLU,0.675,0.591
+1482,ViLAMP-llava-qwen,Video-MME,0.675,0.642
+1483,grok-3-beta,GPQA Diamond,0.6758207070707071,0.4335
+1484,gpt-4-turbo-2024-04-09,MMLU Pro Chemistry,0.6759999999999999,0.4425
+1485,Llama-3.1-70B-Instruct,MMLU Pro Chemistry,0.6759999999999999,0.6075
+1486,Aria,Video-MME,0.676,0.6535
+1487,DeepSeek-V3-0324,GPQA Diamond,0.6761363636363636,0.6015
+1488,Meta-Llama-3-8B-Instruct,TriviaQA,0.677,0.2145
+1489,falcon-180B,ARC (AI2),0.678,0.3795
+1490,T5-11B,CSQA2,0.678,0.3195
+1491,Qwen-7B,LAMBADA,0.679,0.191
+1492,claude-3-5-sonnet-20240620,GPQA Main Biology,0.679,0.7545
+1493,grok-2-1212,GPQA Main Biology,0.679,0.8555
+1494,gpt-5.1-2025-11-13_high,SWE-Bench Verified,0.6797520661157025,0.1995
+1495,Qwen-1_8B,BoolQ,0.68,0.319
+1496,Qwen2.5-Coder-7B,MMLU,0.68,0.3175
+1497,Llama-3.1-405B-Instruct,MMLU Chemistry,0.68,0.834
+1498,o3-mini-2025-01-31_low,GPQA Diamond,0.6818181818181818,0.6215
+1499,claude-3-7-sonnet-20250219,MATH Level 5,0.6818353474320241,0.106
+1500,Qwen-VL-Chat,ScienceQA,0.682,0.5355
+1501,Yi-9B,MMLU,0.684,0.624
+1502,o3-2025-04-16_medium,GPQA Diamond Biology,0.684,0.252
+1503,o1-preview-2024-09-12,GPQA Diamond Biology,0.684,0.663
+1504,DeepSeek-R1,GPQA Diamond Biology,0.684,0.4965
+1505,Llama-4-Maverick-17B-128E-Instruct,GPQA Diamond Biology,0.684,0.7535
+1506,gemini-1.5-pro-001,GPQA Diamond Biology,0.684,0.828
+1507,gpt-4o-2024-08-06,WMDP Chemistry,0.684,0.682
+1508,muse-spark,TutorBench,0.6855,0.994
+1509,qwen1.5-14B,MMLU,0.686,0.4335
+1510,StableBeluga2,MMLU,0.686,0.3465
+1511,gpt-4.5-preview-2025-02-27,GPQA Diamond,0.6868686868686869,0.771
+1512,mistral-small-2402,MMLU,0.687,0.422
+1513,claude-3-sonnet-20240229,MMLU Biology,0.687,0.7085
+1514,Meta-Llama-3-8B-Instruct,MMLU,0.688,0.621
+1515,mistral-large-2402,MMLU,0.688,0.209
+1516,Phi-3-mini-4k-instruct,MMLU,0.688,0.2995
+1517,qwen3-235b-a22b,MATH Level 5,0.6885699899295065,0.078
+1518,gpt-3.5-turbo-0613,MMLU,0.689,0.664
+1519,claude-3-7-sonnet-20250219,WMDP Chemistry,0.6890000000000001,0.3955
+1520,amazon.nova-pro-v1:0,MMLU Pro Chemistry,0.6890000000000001,0.529
+1521,mistral-large-2402,MMLU Biology,0.69,0.747
+1522,mistral-large-2407,Lech Mazur Writing,0.6900000000000001,0.323
+1523,claude-opus-4-20250514,GPQA Diamond,0.6919191919191919,0.131
+1524,PaLM 2-L,ARC (AI2),0.692,0.1515
+1525,DeepSeek-R1,GPQA Diamond,0.6922348484848484,0.386
+1526,gpt-5.4-pro-2026-03-05_unknown,MultiChallenge,0.6923,0.5925
+1527,gpt-5.6-sol_unknown,SimpleQA Verified,0.692384769539078,0.858
+1528,StableBeluga2,BIG-Bench Hard (BBH),0.693,0.6075
+1529,RedPajama-INCITE-7B-Base,BoolQ,0.693,0.574
+1530,PaLM 540B,MMLU,0.693,0.547
+1531,gemma-2b,BoolQ,0.694,0.2135
+1532,c4ai-command-r-plus-08-2024,MMLU,0.694,0.4405
+1533,MM1-3B-Chat,ScienceQA,0.694,0.4125
+1534,gemini-3-pro-preview,TerminalBench,0.6940000000000001,0.671
+1535,gpt-5-nano-2025-08-07_high,GPQA Diamond,0.6944444444444444,0.3585
+1536,internlm-7b,ARC (AI2),0.695,0.92
+1537,LLaMA-65B,ARC (AI2),0.695,0.503
+1538,claude-3-haiku-20240307,MMLU Pro Biology,0.695,0.317
+1539,Llama-2-70b-hf,GSM8K,0.696,0.412
+1540,StableBeluga2,GSM8K,0.696,0.294
+1541,gemini-1.0-pro-001,WMDP Biology,0.698,0.2845
+1542,Llama-2-70b-hf,MMLU,0.699,0.53
+1543,claude-opus-4-6,TerminalBench,0.699,0.5325
+1544,gpt-4.1-nano-2025-04-14,MATH Level 5,0.6999622356495468,0.902
+1545,mpt-7b,LAMBADA,0.7,0.571
+1546,gemini-1.0-pro-001,MMLU,0.7,0.529
+1547,text-davinci-002,MMLU,0.7,0.7295
+1548,gemini-1.0-pro-001,MMLU Pro Biology,0.7,0.5135
+1549,gemini-1.5-pro-001,MMLU Chemistry,0.7,0.8555
+1550,Llama-4-Scout-17B-16E-Instruct,MMLU Chemistry,0.7,0.936
+1551,InternVL-Chat-ViT-6B-Vicuna-13B,ScienceQA,0.701,0.4345
+1552,DeepSeek-V3,WMDP Chemistry,0.701,0.6475
+1553,o1-2024-12-17_medium,Lech Mazur Writing,0.702,0.0935
+1554,DeepSeek-V3.2-Exp,Aider Polyglot,0.7020000000000001,0.6065
+1555,deepseek-chat,Aider Polyglot,0.7020000000000001,0.7495
+1556,LinVT,Video-MME,0.703,0.6955
+1557,gemini-1.5-flash-001,Video-MME,0.703,0.896
+1558,gemini-1.5-pro-002,MATH Level 5,0.7039274924471299,0.7035
+1559,bloom,BoolQ,0.704,0.454
+1560,gemini-3.5-flash_unknown,SimpleQA Verified,0.704112337011033,0.946
+1561,Qwen2.5-Coder-32B,ARC (AI2),0.705,0.117
+1562,o1-preview-2024-09-12,GPQA Main Biology,0.705,0.6285
+1563,open_llama_7b,BoolQ,0.706,0.585
+1564,falcon-180B,MMLU,0.706,0.6735
+1565,Mixtral-8x7B-v0.1,MMLU,0.706,0.3985
+1566,llava-v1.6-vicuna-7b,ScienceQA,0.706,0.438
+1567,LLaVA-Video-72B-Qwen2,Video-MME,0.706,0.6935
+1568,amazon.nova-lite-v1:0,MMLU Biology,0.706,0.711
+1569,claude-opus-4-20250514,SWE-Bench Verified,0.7066115702479339,0.9025
+1570,claude-opus-4-20250514,Aider Polyglot,0.7070000000000001,0.7305
+1571,qwen3-235b-a22b,GPQA Diamond,0.7070707070707071,0.7505
+1572,amazon.nova-micro-v1:0,MMLU,0.708,0.558
+1573,o3-mini-2025-01-31_medium,WMDP Chemistry,0.708,0.352
+1574,claude-opus-4-8_unknown,GBAEval,0.7090450062635527,0.867
+1575,LLaMA-7B,TriviaQA,0.71,0.602
+1576,claude-3-opus-20240229,MMLU Biology,0.71,0.5985
+1577,Qwen-14B,LAMBADA,0.711,0.1885
+1578,text-davinci-001,TriviaQA,0.712,0.456
+1579,Qwen2-VL-72B-Instruct,Video-MME,0.712,0.9115
+1580,deepseek-chat,GPQA Diamond,0.7121212121212122,0.298
+1581,claude-haiku-4-5-20251001_32K,GPQA Diamond,0.7121212121212122,0.4
+1582,claude-sonnet-4-5-20250929,SWE-Bench Verified,0.7128099173553719,0.8235
+1583,StableBeluga2,LAMBADA,0.713,0.108
+1584,gemini-1.5-pro-001,WMDP Chemistry,0.713,0.7625
+1585,gemini-3.1-pro-preview,MultiChallenge,0.7137,0.7765
+1586,DeepSeek-R1-0528,Aider Polyglot,0.7140000000000001,0.728
+1587,gpt-5-2025-08-07_medium,SWE-Bench Verified,0.7148760330578512,0.5055
+1588,gemini-2.0-flash-exp,Lech Mazur Writing,0.7150000000000001,0.515
+1589,o3-2025-04-16_medium,GPQA Main Chemistry,0.716,0.8585
+1590,Llama-3.1-405B-Instruct,WMDP Chemistry,0.716,0.8475
+1591,gpt-5-mini-2025-08-07_medium,GPQA Diamond,0.7165404040404041,0.2485
+1592,Phi-3-mini-4k-instruct,BIG-Bench Hard (BBH),0.717,0.638
+1593,Yi-34B-Chat,BIG-Bench Hard (BBH),0.717,0.9585
+1594,amazon.nova-micro-v1:0,WMDP Biology,0.7170000000000001,0.369
+1595,gpt-5-mini-2025-08-07_minimal,GPQA Diamond,0.7171717171717171,0.4965
+1596,gpt-5-2025-08-07_minimal,GPQA Diamond,0.7171717171717171,0.4345
+1597,internlm-20b,LAMBADA,0.718,0.2295
+1598,text-davinci-001,SuperGLUE,0.718,0.434
+1599,o1-2024-12-17_medium,GPQA Main Biology,0.718,0.4025
+1600,Qwen2.5-72B,TriviaQA,0.719,0.1335
+1601,gpt-4o-2024-08-06,Video-MME,0.719,0.8645
+1602,gpt-4o-2024-11-20,Video-MME,0.7190000000000001,0.8825
+1603,gemini-1.5-pro-001,MMLU Biology,0.7190000000000001,0.4585
+1604,claude-3-opus-20240229,MMLU Pro Chemistry,0.7190000000000001,0.806
+1605,claude-opus-4-20250514_32K,Aider Polyglot,0.72,0.5195
+1606,o4-mini-2025-04-16_high,Aider Polyglot,0.72,0.747
+1607,claude-3-haiku-20240307,ScienceQA,0.72,0.634
+1608,o3-mini-2025-01-31_medium,MMLU Chemistry,0.72,0.378
+1609,glm-5,SWE-Bench Verified,0.7207792207792207,0.4915
+1610,gemma-2-9b-it,MMLU,0.721,0.6085
+1611,claude-sonnet-4-6,OS World (Screenshot),0.721,0.6945
+1612,InternVL2_5-78B,Video-MME,0.721,0.7605
+1613,davinci,BoolQ,0.722,0.557
+1614,gpt-5.4-nano-2026-03-17_low,GPQA Diamond,0.7222222222222222,0.5305
+1615,gemma-7b,TriviaQA,0.723,0.383
+1616,Llama-3.1-8B-Instruct,WMDP Biology,0.723,0.48
+1617,o4-mini-2025-04-16_medium,WMDP Chemistry,0.723,0.297
+1618,MM1-7B-Chat,ScienceQA,0.726,0.487
+1619,Llama-3.1-405B-Instruct,MMLU Biology,0.726,0.5945
+1620,qwen3-max-2025-09-23,GPQA Diamond,0.726010101010101,0.336
+1621,Inflection-1,MMLU,0.727,0.404
+1622,llava-v1.6-mistral-7b,ScienceQA,0.728,0.4505
+1623,qwen2.5-max,Lech Mazur Writing,0.729,0.4555
+1624,qwen2.5-7b-instruct,MMLU,0.729,0.7095
+1625,gemini-2.5-pro-exp-03-25,Aider Polyglot,0.7290000000000001,0.3785
+1626,gemini-2.5-pro-preview-03-25,Aider Polyglot,0.7290000000000001,0.5825
+1627,amazon.nova-pro-v1:0,MMLU Biology,0.7290000000000001,0.7435
+1628,grok-2-1212,MMLU Biology,0.7290000000000001,0.7145
+1629,gpt-4o-2024-08-06,MMLU Pro Chemistry,0.7290000000000001,0.4435
+1630,gemini-3-pro-preview,SWE-Bench Verified,0.7293388429752066,0.222
+1631,Llama-4-Maverick-17B-128E-Instruct-FP8,MATH Level 5,0.7301737160120846,0.249
+1632,o3-mini-2025-01-31_medium,GPQA Main Biology,0.731,0.5405
+1633,claude-instant-1.2,MMLU,0.732,0.287
+1634,Llama-3.1-70B-Instruct,MMLU Biology,0.732,0.8135
+1635,deepseek-v4-pro_none,GPQA Diamond,0.7323232323232324,0.4875
+1636,gpt-5.2-2025-12-11_none,GPQA Diamond,0.7323232323232324,0.2115
+1637,claude-opus-4-1-20250805,GPQA Diamond,0.7323232323232324,0.275
+1638,Baichuan-2-7B-Base,LAMBADA,0.733,0.614
+1639,LLaMA-7B,LAMBADA,0.733,0.7045
+1640,Llama-2-7b,LAMBADA,0.733,0.6115
+1641,Switch-Base,SuperGLUE,0.733,0.3815
+1642,claude-opus-4-1-20250805,SWE-Bench Verified,0.7334710743801653,0.937
+1643,glm-4.5,Lech Mazur Writing,0.734,0.4035
+1644,claude-instant-1.1,MMLU,0.734,0.398
+1645,mistral-large-2402,MMLU Pro Biology,0.7340000000000001,0.398
+1646,claude-3-5-haiku-20241022,Lech Mazur Writing,0.735,0.6795
+1647,grok-3-mini-beta_low,Lech Mazur Writing,0.735,0.248
+1648,claude-2.1,MMLU,0.735,0.562
+1649,Yi-34B-Chat,MMLU,0.735,0.8535
+1650,Qwen2.5-VL-72B-Instruct,Video-MME,0.735,0.899
+1651,o3-mini-2025-01-31_medium,MMLU Biology,0.735,0.17
+1652,gpt-5-2025-08-07_high,SWE-Bench Verified,0.7355371900826446,0.682
+1653,llava-v1.6-vicuna-13b,ScienceQA,0.736,0.4665
+1654,mpt-30b,TriviaQA,0.736,0.661
+1655,llama3-llava-next-8b,ScienceQA,0.737,0.471
+1656,Llama-2-7b,TriviaQA,0.737,0.679
+1657,o4-mini-2025-04-16_medium,GPQA Diamond Biology,0.737,0.6165
+1658,o3-mini-2025-01-31_medium,GPQA Diamond Biology,0.737,0.718
+1659,gpt-4o-2024-08-06,GPQA Diamond Biology,0.737,0.9365
+1660,gemini-3.1-flash-lite_minimal,GPQA Diamond,0.7373737373737373,0.4795
+1661,claude-sonnet-4-5-20250929,GPQA Diamond,0.7373737373737373,0.1725
+1662,kimi-k2.5,SWE-Bench Verified,0.737603305785124,0.6945
+1663,gpt-5.2-2025-12-11_high,SWE-Bench Verified,0.737603305785124,0.449
+1664,claude-mythos-preview-early,ExploitBench,0.738,0.5825
+1665,gemini-2.0-flash-thinking-exp-01-21,Lech Mazur Writing,0.738,0.56
+1666,claude-3-haiku-20240307,MMLU,0.738,0.634
+1667,Phi-3-medium-128k-instruct,TriviaQA,0.739,0.312
+1668,DeepSeek-V3,MMLU Biology,0.7390000000000001,0.5375
+1669,mistral-large-2407,MMLU Biology,0.7390000000000001,0.739
+1670,o3-2025-04-16_medium,CAD-Eval,0.74,0.761
+1671,Baichuan-2-13B-Base,LAMBADA,0.74,0.481
+1672,Llama-4-Scout-17B-16E-Instruct,MMLU Biology,0.74,0.773
+1673,claude-3-7-sonnet-20250219_16K,MMLU Chemistry,0.74,0.386
+1674,o1-preview-2024-09-12,MMLU Chemistry,0.74,0.832
+1675,gemma-3-27b-it,MATH Level 5,0.740370090634441,0.969
+1676,text-davinci-001,ScienceQA,0.7404,0.9065
+1677,blip2-opt-2.7b,ScienceQA,0.7417,0.4785
+1678,glm-5.1,SWE-Bench Verified,0.7417,0.684
+1679,DeepSeek-V3.2-Exp_thinking,Aider Polyglot,0.742,0.841
+1680,deepseek-reasoner,Aider Polyglot,0.742,0.4465
+1681,gemini-3.5-flash-lite_minimal,GPQA Diamond,0.7424242424242424,0.4885
+1682,gemini-3.1-flash-lite_low,GPQA Diamond,0.7424242424242424,0.5035
+1683,o1-2024-12-17_low,GPQA Diamond,0.7424242424242424,0.5035
+1684,o3-mini-2025-01-31_medium,GPQA Diamond,0.742739898989899,0.811
+1685,xgen-7b-8k-base,BoolQ,0.743,0.612
+1686,Mixtral-8x7B-v0.1,GSM8K,0.744,0.388
+1687,qwen1.5-32B,MMLU,0.744,0.439
+1688,claude-3-7-sonnet-20250219_16K,GPQA Main Biology,0.7440000000000001,0.513
+1689,claude-fable-5_unknown,GBAEval,0.7447198828312318,0.7895
+1690,Gopher (280B),LAMBADA,0.745,0.4735
+1691,claude-3-7-sonnet-20250219_16K,MMLU Biology,0.745,0.1715
+1692,DeepSeek-R1,MMLU Biology,0.745,0.229
+1693,claude-3-5-sonnet-20240620,MMLU Biology,0.745,0.696
+1694,grok-3-mini-beta_high,GPQA Diamond,0.7462121212121212,0.7225
+1695,gpt-5.4-2026-03-05_none,GPQA Diamond,0.7474747474747475,0.496
+1696,gpt-5.3-codex_high,SWE-Bench Verified,0.7479338842975206,0.5585
+1697,o3-2025-04-16_medium,MMLU Biology,0.748,0.0595
+1698,gpt-4o-2024-08-06,MMLU Biology,0.748,0.7645
+1699,gpt-4-turbo-2024-04-09,MMLU Biology,0.748,0.8745
+1700,gpt-4.5-preview-2025-02-27,WMDP Chemistry,0.748,0.7145
+1701,falcon-7b,LAMBADA,0.749,0.8215
+1702,falcon-11B-vlm,ScienceQA,0.749,0.519
+1703,mpt-7b,BoolQ,0.75,0.682
+1704,o4-mini-2025-04-16_medium,Lech Mazur Writing,0.75,0.253
+1705,gemini-1.5-pro-001-feb24,Video-MME,0.75,0.93
+1706,gemini-1.5-pro-001,Video-MME,0.75,0.9275
+1707,o4-mini-2025-04-16_medium,MMLU Chemistry,0.75,0.41
+1708,Llama-4-Maverick-17B-128E-Instruct,MMLU Chemistry,0.75,0.942
+1709,gpt-5-mini-2025-08-07_high,GPQA Diamond,0.75,0.3855
+1710,gpt-4-0613,BIG-Bench Hard (BBH),0.7512,0.6835
+1711,LLaMA-13B,LAMBADA,0.752,0.6995
+1712,Qwen2.5-Coder-14B,MMLU,0.752,0.458
+1713,PaLM 2-S,TriviaQA,0.752,0.4185
+1714,Mistral-7B-v0.1,TriviaQA,0.752,0.487
+1715,o1-2024-12-17_medium,WMDP Chemistry,0.752,0.503
+1716,claude-sonnet-4-6,SWE-Bench Verified,0.7520661157024794,0.5275
+1717,o4-mini-2025-04-16_low,GPQA Diamond,0.7525252525252525,0.528
+1718,Qwen-7B,ARC (AI2),0.753,0.9105
+1719,falcon-7b,BoolQ,0.753,0.746
+1720,Qwen3-30B-A3B,Lech Mazur Writing,0.753,0.5195
+1721,muse-spark-1.1,MultiChallenge,0.753,0.735
+1722,gemini-3-flash-preview,SWE-Bench Verified,0.7541322314049587,0.7295
+1723,claude-3-7-sonnet-20250219,MMLU Biology,0.755,0.522
+1724,Llama-4-Maverick-17B-128E-Instruct,MMLU Biology,0.755,0.6735
+1725,claude-3-7-sonnet-20250219_16K,WMDP Chemistry,0.755,0.496
+1726,muse-spark,MultiChallenge,0.7552,0.8165
+1727,DeepSeek-V3-0324,MATH Level 5,0.75547583081571,0.2135
+1728,DeepSeek-R1,GPQA Main Biology,0.7559999999999999,0.6455
+1729,Llama-4-Maverick-17B-128E-Instruct,GPQA Main Biology,0.7559999999999999,0.896
+1730,gpt-4.5-preview-2025-02-27,Lech Mazur Writing,0.756,0.463
+1731,gemini-3.1-pro-preview-customtools,SWE-Bench Verified,0.756198347107438,0.5525
+1732,Qwen2.5-Coder-3B,GSM8K,0.757,0.6305
+1733,gemma-2-27b-it,MMLU,0.757,0.5655
+1734,Phi-3-small-8k-instruct,MMLU,0.757,0.359
+1735,gemma-4-31b-it_minimal,GPQA Diamond,0.7575757575757576,0.484
+1736,gemini-3.5-flash-lite_low,GPQA Diamond,0.7575757575757576,0.4945
+1737,gpt-oss-120b_high,GPQA Diamond,0.7575757575757576,0.7915
+1738,claude-sonnet-4-20250514_16K,GPQA Diamond,0.7575757575757576,0.505
+1739,o1-2024-12-17_medium,GPQA Diamond,0.7575757575757576,0.7005
+1740,phi-1_5,BoolQ,0.758,0.64
+1741,GLaM (MoE),TriviaQA,0.758,0.349
+1742,o1-preview-2024-09-12,MMLU Biology,0.758,0.575
+1743,gpt-4.5-preview-2025-02-27,MMLU Biology,0.758,0.5215
+1744,claude-3-5-sonnet-20241022,MMLU Biology,0.758,0.6695
+1745,phi-2,ARC (AI2),0.759,0.783
+1746,claude-3-sonnet-20240229,MMLU,0.759,0.6095
+1747,Llama-4-Scout-17B-16E-Instruct,MMLU Pro Chemistry,0.759,0.7975
+1748,opt-66b,BoolQ,0.76,0.8865
+1749,Yi-34B-Chat,GSM8K,0.76,0.8365
+1750,Llama-3.1-405B-Instruct,MMLU Pro Chemistry,0.7609999999999999,0.7175
+1751,T5-Base,SuperGLUE,0.762,0.435
+1752,claude-opus-4-20250514_16K,GPQA Diamond,0.7626262626262627,0.442
+1753,grok-3-mini-beta_low,GPQA Diamond,0.7626262626262627,0.855
+1754,Yi-34B,MMLU,0.763,0.923
+1755,DeepSeek-R1-0528,GPQA Diamond,0.7632575757575758,0.5585
+1756,Qwen-7B,BoolQ,0.764,0.2505
+1757,T5-Small,BoolQ,0.764,0.5555
+1758,grok-3-beta,Lech Mazur Writing,0.764,0.4535
+1759,LLaMA-7B,BoolQ,0.765,0.7235
+1760,Llama-2-13b,LAMBADA,0.765,0.636
+1761,gemini-2.5-flash-preview-04-17_24K,Lech Mazur Writing,0.765,0.5215
+1762,o4-mini-2025-04-16_medium,MMLU Biology,0.765,0.2695
+1763,claude-3-5-sonnet-20240620,MMLU Pro Chemistry,0.765,0.593
+1764,qwen3.6-max-preview,SWE-Bench Verified,0.7665289256198347,0.574
+1765,kimi-k2.6,SWE-Bench Verified,0.7665289256198347,0.6255
+1766,claude-opus-4-5-20251101,SWE-Bench Verified,0.7665289256198347,0.7435
+1767,claude-3-sonnet-20240229,WMDP Biology,0.767,0.537
+1768,claude-opus-4-1-20250805_27K,GPQA Diamond,0.7676767676767676,0.464
+1769,claude-3-7-sonnet-20250219_32K,GPQA Diamond,0.7676767676767676,0.6265
+1770,claude-3-7-sonnet-20250219_16K,GPQA Diamond,0.7676767676767676,0.7575
+1771,o1-2024-12-17_high,GPQA Diamond,0.7676767676767676,0.57
+1772,o1-2024-12-17_medium,MMLU Biology,0.768,0.349
+1773,claude-3-sonnet-20240229,MMLU Pro Biology,0.768,0.623
+1774,gpt-5.4-2026-03-05_high,SWE-Bench Verified,0.768595041322314,0.395
+1775,o3-2025-04-16_medium,Aider Polyglot,0.769,0.5875
+1776,gemini-2.5-pro-preview-05-06,Aider Polyglot,0.769,0.9445
+1777,o3-2025-04-16_unknown,Aider Polyglot,0.769,0.3735
+1778,grok-4-0709,Lech Mazur Writing,0.769,0.2335
+1779,DeepSeek-V3-0324,Lech Mazur Writing,0.77,0.5295
+1780,amazon.nova-lite-v1:0,MMLU,0.77,0.464
+1781,claude-1.3,MMLU,0.77,0.397
+1782,o3-2025-04-16_medium,MMLU Chemistry,0.77,0.263
+1783,o1-2024-12-17_medium,MMLU Chemistry,0.77,0.6795
+1784,DeepSeek-R1,MMLU Chemistry,0.77,0.7925
+1785,o3-mini-2025-01-31_high,GPQA Diamond,0.7702020202020202,0.7425
+1786,gpt-oss-120b,Lech Mazur Writing,0.771,0.533
+1787,LLaMA-33B,LAMBADA,0.772,0.6035
+1788,amazon.nova-lite-v1:0,WMDP Biology,0.772,0.4405
+1789,gpt-5.5_none,GPQA Diamond,0.7727272727272727,0.335
+1790,gpt-5.6-terra_none,GPQA Diamond,0.7727272727272727,0.427
+1791,claude-opus-4-1-20250805_16K,GPQA Diamond,0.7727272727272727,0.453
+1792,qwen3.7-max,SWE-Bench Verified,0.7727272727272727,0.5595
+1793,falcon-40b,LAMBADA,0.773,0.766
+1794,mistral-medium-2505,Lech Mazur Writing,0.773,0.5655
+1795,claude-3-haiku-20240307,WMDP Biology,0.773,0.6825
+1796,Chinchilla (70B),LAMBADA,0.774,0.5005
+1797,o3-2025-04-16_medium,GPQA Diamond Chemistry,0.774,0.8815
+1798,text-davinci-001,BoolQ,0.775,0.358
+1799,o1-preview-2024-09-12,WMDP Chemistry,0.775,0.8725
+1800,Llama-4-Maverick-17B-128E-Instruct,WMDP Chemistry,0.775,0.9135
+1801,deepseek-v4-pro_max,SWE-Bench Verified,0.7763975155279503,0.5635
+1802,LLaMA-65B,LAMBADA,0.777,0.536
+1803,claude-3-5-sonnet-20241022,MMLU Pro Chemistry,0.777,0.2635
+1804,o4-mini-2025-04-16_medium,GPQA Diamond,0.7777777777777778,0.735
+1805,gemini-1.5-flash-0514,MMLU,0.778,0.428
+1806,Mixtral-8x22B-v0.1,MMLU,0.778,0.4335
+1807,claude-sonnet-4-20250514_59K,GPQA Diamond,0.7781991873045173,0.5065
+1808,Llama-2-7b,BoolQ,0.779,0.6515
+1809,PaLM 540B,LAMBADA,0.779,0.4715
+1810,gemini-1.5-flash-001,MMLU,0.779,0.687
+1811,LLaMA-13B,TriviaQA,0.779,0.781
+1812,Phi-3.5-mini-instruct,BoolQ,0.78,0.0215
+1813,Phi-3-medium-128k-instruct,MMLU,0.78,0.749
+1814,amazon.nova-lite-v1:0,MMLU Pro Biology,0.7809999999999999,0.4125
+1815,text-davinci-003,GSM8K,0.782,0.4235
+1816,o4-mini-2025-04-16_medium,GPQA Main Biology,0.782,0.643
+1817,claude-sonnet-4-20250514_32K,GPQA Diamond,0.7828282828282829,0.5995
+1818,Llama-2-70b-hf,ARC (AI2),0.783,0.6335
+1819,gemma-7b,ARC (AI2),0.783,0.8395
+1820,DeepSeek-V2,MMLU,0.784,0.367
+1821,gpt-5.3-codex,TerminalBench,0.784,0.9105
+1822,grok-2-1212,MMLU Pro Biology,0.784,0.126
+1823,gpt-5.4-nano-2026-03-17_high,GPQA Diamond,0.7847,0.6105
+1824,Inflection-1,LAMBADA,0.785,0.3925
+1825,claude-2.0,MMLU,0.785,0.85
+1826,claude-3-7-sonnet-20250219_64K,GPQA Diamond,0.7850378787878788,0.6525
+1827,Mistral-7B-v0.1,ARC (AI2),0.786,0.8135
+1828,gpt-4.5-preview-2025-02-27,MATH Level 5,0.7862537764350453,0.356
+1829,LLaMA-13B,BoolQ,0.787,0.663
+1830,claude-instant-1.2,TriviaQA,0.787,0.4505
+1831,DeepSeek-R1,WMDP Chemistry,0.787,0.764
+1832,glm-5.2_max,SWE-Bench Verified,0.787,0.398
+1833,claude-opus-4-6,SWE-Bench Verified,0.7871900826446281,0.461
+1834,claude-sonnet-4-6_max,GPQA Diamond,0.7878787878787878,0.3285
+1835,claude-fable-5_low,GPQA Diamond,0.7878787878787878,0.5065
+1836,claude-sonnet-4-5-20250929_16K,GPQA Diamond,0.7878787878787878,0.508
+1837,mistral-large-2402,WMDP Biology,0.7879999999999999,0.7205
+1838,Meta-Llama-3-70B-Instruct,MMLU Pro Biology,0.7879999999999999,0.741
+1839,DeepSeek-V2,BIG-Bench Hard (BBH),0.788,0.4525
+1840,Llama-2-70b-hf,LAMBADA,0.789,0.501
+1841,claude-instant-1.1,TriviaQA,0.789,0.4795
+1842,amazon.nova-pro-v1:0,GPQA Diamond Biology,0.789,0.9955
+1843,Meta-Llama-3-70B-Instruct,WMDP Biology,0.789,0.6775
+1844,chatglm2-6b,BoolQ,0.79,0.6775
+1845,mpt-30b,BoolQ,0.79,0.6805
+1846,gemini-2.5-pro-preview-06-05,Aider Polyglot,0.7909999999999999,0.49
+1847,Phi-3-small-8k-instruct,BIG-Bench Hard (BBH),0.791,0.6695
+1848,Qwen2.5-Coder-32B,MMLU,0.791,0.53
+1849,opt-175b,BoolQ,0.793,0.905
+1850,Meta-Llama-3-70B-Instruct,MMLU,0.793,0.7885
+1851,Yi-large,MMLU,0.793,0.449
+1852,gemini-3.5-flash_high,SWE-Bench Verified,0.7933884297520661,0.476
+1853,Gopher (280B),BoolQ,0.794,0.3545
+1854,claude-3-7-sonnet-20250219,Lech Mazur Writing,0.794,0.7155
+1855,gemini-1.5-pro-001,WMDP Biology,0.795,0.3645
+1856,claude-opus-5_unknown,GBAEval,0.7959852171423216,0.8865
+1857,grok-4-0709,Aider Polyglot,0.7959999999999999,0.76
+1858,grok-4-0709_high,Aider Polyglot,0.7959999999999999,0.5345
+1859,gpt-4-turbo,MMLU,0.796,0.4585
+1860,Llama-2-13b,TriviaQA,0.796,0.7745
+1861,o4-mini-2025-04-16_high,GPQA Diamond,0.7960858585858586,0.77
+1862,gemini-2.0-flash-exp,MMLU,0.797,0.474
+1863,gemini-1.0-pro-vision,ScienceQA,0.797,0.5815
+1864,video-SALMONN-2plus,Video-MME,0.797,0.896
+1865,gpt-4-0613,WMDP Biology,0.797,0.7325
+1866,o3-2025-04-16_low,GPQA Diamond,0.797979797979798,0.5315
+1867,DeepSeek-V3,MMLU Pro Chemistry,0.7979999999999999,0.592
+1868,Qwen2.5-72B,BIG-Bench Hard (BBH),0.798,0.318
+1869,falcon-180B,LAMBADA,0.798,0.6185
+1870,claude-opus-4-6_unknown,TerminalBench,0.798,0.8905
+1871,gemma-3-27b-it,Lech Mazur Writing,0.799,0.9095
+1872,qwen2.5-14b-instruct,MMLU,0.799,0.4535
+1873,falcon-40b,TriviaQA,0.799,0.8215
+1874,mistral-large-2407,MMLU,0.8,0.3695
+1875,DeepSeek-V2,TriviaQA,0.8,0.459
+1876,Qwen3-235B-A22B-Thinking-2507,GPQA Diamond,0.8005050505050505,0.927
+1877,Llama-3.1-70B-Instruct,MMLU,0.801,0.5575
+1878,QwQ-32B_16K,Lech Mazur Writing,0.8019999999999999,0.5485
+1879,gemini-3.1-pro-preview,TerminalBench,0.802,0.8835
+1880,claude-opus-4-7_unknown,TerminalBench,0.802,0.5455
+1881,claude-3-5-sonnet-20241022,Lech Mazur Writing,0.8029999999999999,0.8175
+1882,Llama-3.2-90B-Vision-Instruct,MMLU,0.803,0.639
+1883,claude-sonnet-5_max,GPQA Diamond,0.803030303030303,0.2575
+1884,gemini-2.5-pro-exp-03-25,Lech Mazur Writing,0.805,0.4245
+1885,gemini-1.5-pro-001,MMLU Pro Chemistry,0.805,0.837
+1886,gpt-5.5-pre-release_xhigh,SWE-Bench Verified,0.8057851239669421,0.435
+1887,claude-opus-4-5-20251101,GPQA Diamond,0.8068181818181818,0.103
+1888,Qwen2.5-Coder-3B-Instruct,GSM8K,0.807,0.419
+1889,vicuna-13b-v1.3,BoolQ,0.808,0.716
+1890,o3-2025-04-16_medium,GPQA Diamond,0.8080808080808081,0.4725
+1891,claude-sonnet-4-20250514,Lech Mazur Writing,0.8089999999999999,0.674
+1892,gemini-2.5-pro-preview-05-06,Lech Mazur Writing,0.8089999999999999,0.663
+1893,claude-instant-1.1,GSM8K,0.809,0.433
+1894,o3-2025-04-16_medium,WMDP Chemistry,0.809,0.594
+1895,Llama-3.1-70B-Instruct,WMDP Biology,0.81,0.6285
+1896,claude-3-7-sonnet-20250219_16K,Lech Mazur Writing,0.8109999999999999,0.678
+1897,gpt-4-0613,MMLU Pro Biology,0.812,0.891
+1898,gpt-5-2025-08-07_low,Aider Polyglot,0.813,0.424
+1899,o3-2025-04-16_high,Aider Polyglot,0.813,0.5765
+1900,gpt-4-turbo-2024-04-09,MMLU,0.813,0.584
+1901,Phi-3-medium-128k-instruct,BIG-Bench Hard (BBH),0.814,0.9725
+1902,T5-Base,BoolQ,0.814,0.4285
+1903,PaLM 540B,TriviaQA,0.814,0.69
+1904,claude-sonnet-4-20250514_16K,Lech Mazur Writing,0.8140000000000001,0.6275
+1905,mistral-medium-2505,MATH Level 5,0.8162764350453172,0.492
+1906,o1-preview-2024-09-12,MATH Level 5,0.8164652567975831,0.5675
+1907,internlm-20b,ARC (AI2),0.817,0.884
+1908,PaLM 2-M,TriviaQA,0.817,0.6735
+1909,claude-sonnet-4-5-20250929_32K,GPQA Diamond,0.817258883248731,0.535
+1910,gpt-4o-2024-11-20,Lech Mazur Writing,0.818,0.957
+1911,gpt-5.4-2026-03-05_unknown,TerminalBench,0.818,0.839
+1912,mistral-large-2407,WMDP Biology,0.818,0.6005
+1913,gemini-3.1-flash-lite_high,GPQA Diamond,0.8181818181818182,0.5105
+1914,o3-2025-04-16_high,GPQA Diamond,0.8181818181818182,0.323
+1915,DeepSeek-R1-0528,Lech Mazur Writing,0.819,0.6595
+1916,grok-2-1212,WMDP Biology,0.8190000000000001,0.635
+1917,claude-3-opus-20240229,WMDP Biology,0.8190000000000001,0.6585
+1918,Llama-3.1-70B-Instruct,MMLU Pro Biology,0.8190000000000001,0.5635
+1919,claude-opus-4-5-20251101_unknown,Cybench,0.82,0.7025
+1920,amazon.nova-pro-v1:0,MMLU,0.82,0.6285
+1921,amazon.nova-pro-v1:0,WMDP Biology,0.82,0.662
+1922,o3-2025-04-16_medium,GPQA Main Biology,0.821,0.625
+1923,gemini-2.0-flash-001,MATH Level 5,0.8216578549848943,0.739
+1924,Mixtral-8x7B-v0.1,TriviaQA,0.822,0.6735
+1925,Llama-4-Scout-17B-16E-Instruct,WMDP Biology,0.823,0.612
+1926,gpt-5.6-luna_low,GPQA Diamond,0.8232323232323232,0.495
+1927,qwen3.5-flash,GPQA Diamond,0.8232323232323232,0.6095
+1928,claude-sonnet-4-5-20250929_59K,GPQA Diamond,0.8232323232323232,0.5545
+1929,Llama-2-13b,BoolQ,0.824,0.675
+1930,Llama-3.1-8B-Instruct,GSM8K,0.824,0.8865
+1931,gemini-1.5-flash-001,GSM8K,0.824,0.502
+1932,gpt-4-0613,MMLU,0.824,0.915
+1933,qwen2-72b-instruct,MMLU,0.824,0.811
+1934,Qwen3-235B-A22B-Thinking-2507,Lech Mazur Writing,0.8240000000000001,0.753
+1935,Mistral-Nemo-Base-2407,BoolQ,0.825,0.117
+1936,claude-3-7-sonnet-20250219,MMLU Pro Chemistry,0.826,0.4025
+1937,gemini-1.5-pro-001-feb24,MMLU,0.827,0.521
+1938,T5-Large,SuperGLUE,0.827,0.5505
+1939,Llama-3.1-405B,TriviaQA,0.827,0.484
+1940,gpt-4-turbo-2024-04-09,WMDP Biology,0.8270000000000001,0.7135
+1941,gpt-5.2-2025-12-11_low,GPQA Diamond,0.827020202020202,0.5625
+1942,Meta-Llama-3-8B-Instruct,ARC (AI2),0.828,0.8645
+1943,Llama-3.1-8B-Instruct,BoolQ,0.828,0.2445
+1944,gpt-5.6-sol_none,GPQA Diamond,0.8282828282828283,0.4585
+1945,Llama-3.1-405B,BIG-Bench Hard (BBH),0.829,0.382
+1946,DeepSeek-V3,TriviaQA,0.829,0.506
+1947,gpt-4o-2024-08-06,WMDP Biology,0.8290000000000001,0.6345
+1948,qwen3-235b-a22b,Lech Mazur Writing,0.8300000000000001,0.851
+1949,DeepSeek-R1,Lech Mazur Writing,0.8300000000000001,0.8105
+1950,gpt-4.1-2025-04-14,MATH Level 5,0.8300604229607251,0.4
+1951,gemini-2.5-pro-preview-06-05_32K,Aider Polyglot,0.831,0.55
+1952,falcon-40b,BoolQ,0.831,0.838
+1953,claude-opus-4-20250514,Lech Mazur Writing,0.8310000000000001,0.755
+1954,gpt-5-mini-2025-08-07_medium,Lech Mazur Writing,0.8310000000000001,0.734
+1955,Mistral-7B-Instruct-v0.2,BoolQ,0.832,0.915
+1956,gemma-7b,BoolQ,0.832,0.459
+1957,gemini-3-flash-preview,GPQA Diamond,0.8320707070707071,0.297
+1958,claude-3-5-sonnet-20241022,WMDP Biology,0.833,0.5115
+1959,mistral-large-2407,MMLU Pro Biology,0.833,0.4355
+1960,qwen3.6-flash,GPQA Diamond,0.8333333333333334,0.579
+1961,gemini-3.5-flash-lite_high,GPQA Diamond,0.8333333333333334,0.576
+1962,claude-fable-5_high,GPQA Diamond,0.8333333333333334,0.529
+1963,claude-sonnet-4-6_high,GPQA Diamond,0.8333333333333334,0.4125
+1964,claude-sonnet-4-6_medium,GPQA Diamond,0.8333333333333334,0.542
+1965,glm-4.7,GPQA Diamond,0.8333333333333334,0.825
+1966,mistral-large-2407,MMLU Pro Chemistry,0.8340000000000001,0.9915
+1967,deepseek-reasoner,GPQA Diamond,0.8342352092352093,0.6355
+1968,gemini-2.0-pro-exp-02-05,MATH Level 5,0.8345921450151057,0.5965
+1969,claude-opus-4-7_max,SWE-Bench Verified,0.8347107438016529,0.814
+1970,vicuna-13b-v1.1,BoolQ,0.835,0.852
+1971,gpt-5.4-mini-2026-03-17_high,GPQA Diamond,0.8358585858585859,0.537
+1972,claude-opus-4-20250514_16K,Lech Mazur Writing,0.836,0.7255
+1973,DeepSeek-V3,WMDP Biology,0.836,0.576
+1974,Llama-2-34b,BoolQ,0.837,0.7175
+1975,Chinchilla (70B),BoolQ,0.837,0.3925
+1976,LLaMA-33B,TriviaQA,0.838,0.869
+1977,gemini-2.5-pro,Lech Mazur Writing,0.8380000000000001,0.6955
+1978,qwen3.6-35b-a3b,GPQA Diamond,0.8383838383838383,0.9155
+1979,gemini-2.5-pro-exp-03-25,GPQA Diamond,0.8383838383838383,0.6345
+1980,Qwen2.5-Coder-7B,GSM8K,0.839,0.7455
+1981,o3-2025-04-16_medium,Lech Mazur Writing,0.8390000000000001,0.6735
+1982,gemini-1.5-pro-001-feb24,BIG-Bench Hard (BBH),0.84,0.6615
+1983,amazon.nova-pro-v1:0,MMLU Pro Biology,0.841,0.6615
+1984,Mistral-Nemo-Base-2407,GSM8K,0.842,0.619
+1985,gpt-4o-2024-05-13,MMLU,0.842,0.681
+1986,kimi-k2-thinking-turbo,GPQA Diamond,0.8421717171717171,0.536
+1987,o1-mini-2024-09-12_medium,MATH Level 5,0.8425226586102719,0.863
+1988,Llama-3.1-405B-Instruct,WMDP Biology,0.843,0.745
+1989,claude-sonnet-4-20250514,MATH Level 5,0.8436555891238671,0.2215
+1990,Qwen-14B,ARC (AI2),0.844,0.924
+1991,o3-pro-2025-06-10_medium,Lech Mazur Writing,0.844,0.6305
+1992,Llama-3.1-405B,MMLU,0.844,0.473
+1993,claude-opus-4-1-20250805_16K,Lech Mazur Writing,0.845,0.7695
+1994,Llama-3.1-405B-Instruct,MMLU,0.845,0.6695
+1995,o1-preview-2024-09-12,MMLU Pro Chemistry,0.845,0.642
+1996,Phi-3.5-MoE-instruct,BoolQ,0.846,0.152
+1997,claude-3-opus-20240229,MMLU,0.846,0.8185
+1998,Llama-2-34b,TriviaQA,0.846,0.9065
+1999,Switch-Large,SuperGLUE,0.847,0.4345
+2000,claude-opus-4-1-20250805,Lech Mazur Writing,0.8470000000000001,0.811
+2001,gpt-5.5_unknown,TerminalBench,0.8470000000000001,0.338
+2002,PaLM 62B,BoolQ,0.848,0.853
+2003,phi-4,MMLU,0.848,0.674
+2004,gpt-4-0613,TriviaQA,0.848,0.7705
+2005,claude-3-5-sonnet-20240620,WMDP Biology,0.848,0.7365
+2006,Megatron-Turing NLG 530B,BoolQ,0.8483,0.4365
+2007,kimi-k3_low,GPQA Diamond,0.8484848484848485,0.3555
+2008,qwen3.5-plus,GPQA Diamond,0.8484848484848485,0.4845
+2009,gpt-5.4-2026-03-05_low,GPQA Diamond,0.8484848484848485,0.658
+2010,gemini-2.5-pro-preview-06-05,GPQA Diamond,0.8484848484848485,0.621
+2011,Phi-3-mini-4k-instruct,ARC (AI2),0.849,0.774
+2012,gemma-2-9b,GSM8K,0.849,0.566
+2013,o3-pro-2025-06-10_high,Aider Polyglot,0.8490000000000001,0.4145
+2014,gpt-4o-2024-08-06,MMLU Pro Biology,0.8490000000000001,0.524
+2015,mpt-30b-instruct,BoolQ,0.85,0.7985
+2016,Qwen2.5-72B,MMLU,0.85,0.6665
+2017,o1-preview-2024-09-12,WMDP Biology,0.85,0.595
+2018,gpt-5.1-2025-11-13_medium,GPQA Diamond,0.8503787878787878,0.585
+2019,claude-opus-4-20250514,MATH Level 5,0.850453172205438,0.112
+2020,gpt-4-turbo-2024-04-09,MMLU Pro Biology,0.851,0.753
+2021,text-davinci-002,ARC (AI2),0.852,0.918
+2022,PaLM 540B,ARC (AI2),0.852,0.8705
+2023,o3-mini-2025-01-31_medium,WMDP Biology,0.852,0.4755
+2024,gemini-2.5-pro,GPQA Diamond,0.8529040404040404,0.8755
+2025,qwen2.5-72b-instruct,MMLU,0.853,0.7705
+2026,claude-opus-4-8_none,GPQA Diamond,0.8535353535353535,0.52
+2027,gpt-5-2025-08-07_medium,GPQA Diamond,0.8535353535353535,0.5305
+2028,T5-Large,BoolQ,0.854,0.45
+2029,claude-3-opus-20240229,MMLU Pro Biology,0.8540000000000001,0.8185
+2030,glm-5.1,GPQA Diamond,0.8547979797979798,0.5285
+2031,claude-opus-4-5-20251101_16K,GPQA Diamond,0.8547979797979798,0.5145
+2032,Kimi-K2-Instruct,Lech Mazur Writing,0.8560000000000001,0.9015
+2033,claude-instant-1.1,ARC (AI2),0.857,0.7145
+2034,gemma-2-9b,BoolQ,0.857,0.2565
+2035,gpt-4.5-preview-2025-02-27,MMLU Pro Chemistry,0.857,0.6405
+2036,gemini-1.5-flash-001,BoolQ,0.858,0.2675
+2037,DeepSeek-Coder-V2-Base,GSM8K,0.858,0.6325
+2038,gpt-3.5-turbo-1106,TriviaQA,0.858,0.8655
+2039,gemini-3.6-flash_minimal,GPQA Diamond,0.8585858585858586,0.502
+2040,claude-fable-5_max,GPQA Diamond,0.8585858585858586,0.007
+2041,gemini-1.5-pro-001,MMLU,0.859,0.695
+2042,gpt-5-2025-08-07_medium,Lech Mazur Writing,0.86,0.706
+2043,LLaMA-65B,TriviaQA,0.86,0.9095
+2044,claude-3-7-sonnet-20250219,WMDP Biology,0.86,0.6595
+2045,claude-opus-4-5-20251101_32K,GPQA Diamond,0.860479797979798,0.5175
+2046,StableBeluga2,ARC (AI2),0.861,0.8365
+2047,LLaMA-33B,BoolQ,0.861,0.802
+2048,PaLM 2-L,TriviaQA,0.861,0.778
+2049,gpt-5-2025-08-07_high,GPQA Diamond,0.8617424242424242,0.6595
+2050,Qwen-14B,BoolQ,0.862,0.6655
+2051,Phi-3.5-mini-instruct,GSM8K,0.862,0.7295
+2052,claude-3-7-sonnet-20250219_16K,MATH Level 5,0.8625377643504532,0.2195
+2053,claude-instant-1.2,ARC (AI2),0.863,0.68
+2054,Llama-3.3-70B-Instruct,MMLU,0.863,0.889
+2055,claude-3-7-sonnet-20250219_16K,WMDP Biology,0.863,0.507
+2056,o1-2024-12-17_medium,WMDP Biology,0.863,0.4785
+2057,DeepSeek-R1,WMDP Biology,0.863,0.535
+2058,gemini-3.6-flash_low,GPQA Diamond,0.8636363636363636,0.501
+2059,claude-opus-4-7_max,GPQA Diamond,0.8636363636363636,0.152
+2060,gemini-3.5-flash_minimal,GPQA Diamond,0.8636363636363636,0.552
+2061,text-davinci-001,LAMBADA,0.864,0.986
+2062,gpt-4-0314,MMLU,0.864,0.9385
+2063,T5-3B,SuperGLUE,0.864,0.558
+2064,claude-3-5-sonnet-20240620,MMLU,0.865,0.755
+2065,Llama-4-Maverick-17B-128E-Instruct,WMDP Biology,0.866,0.779
+2066,gpt-5-2025-08-07_medium,Aider Polyglot,0.867,0.6885
+2067,Qwen2.5-Coder-7B-Instruct,GSM8K,0.867,0.4365
+2068,claude-instant-1.2,GSM8K,0.867,0.547
+2069,claude-1.3,TriviaQA,0.867,0.777
+2070,gpt-4.5-preview-2025-02-27,WMDP Biology,0.867,0.7095
+2071,o3-2025-04-16_medium,MMLU Pro Chemistry,0.867,0.0175
+2072,gpt-5.4-mini-2026-03-17_xhigh,GPQA Diamond,0.8686868686868687,0.4765
+2073,Llama-4-Maverick-17B-128E-Instruct,MMLU Pro Chemistry,0.8690000000000001,0.9435
+2074,claude-haiku-4-5-20251001,MATH Level 5,0.8691465256797583,0.568
+2075,gpt-3.5-turbo-0613,BoolQ,0.87,0.682
+2076,Llama-3.1-405B-Instruct,MMLU Pro Biology,0.87,0.7355
+2077,grok-4-0709,GPQA Diamond,0.87,0.9485
+2078,LLaMA-65B,BoolQ,0.871,0.7485
+2079,DeepSeek-R1-Distill-Qwen-14B,MATH Level 5,0.8712235649546828,0.96
+2080,Megatron-Turing NLG 530B,LAMBADA,0.8715,0.9395
+2081,gpt-4.1-mini-2025-04-14,MATH Level 5,0.8729229607250756,0.8825
+2082,Mixtral-8x7B-v0.1,ARC (AI2),0.873,0.852
+2083,o4-mini-2025-04-16_medium,WMDP Biology,0.873,0.553
+2084,o3-mini-2025-01-31_medium,MMLU Pro Chemistry,0.873,0.4475
+2085,qwen3.6-max-preview,GPQA Diamond,0.8737373737373737,0.3965
+2086,gpt-5.6-terra_low,GPQA Diamond,0.8737373737373737,0.4875
+2087,claude-sonnet-4-6_32K,GPQA Diamond,0.8737373737373737,0.5655
+2088,gpt-3.5-turbo-1106,ARC (AI2),0.874,0.909
+2089,Mistral-7B-v0.1,BoolQ,0.874,0.7905
+2090,DeepSeek-V3,BIG-Bench Hard (BBH),0.875,0.7665
+2091,internlm-20b,BoolQ,0.875,0.776
+2092,claude-2.0,TriviaQA,0.875,0.9045
+2093,o3-2025-04-16_medium,WMDP Biology,0.875,0.4
+2094,DeepSeek-Coder-V2-Lite-Instruct,GSM8K,0.876,0.421
+2095,Llama-2-70b-hf,TriviaQA,0.876,0.908
+2096,kimi-k2.5,GPQA Diamond,0.876,0.778
+2097,gpt-5.1-2025-11-13_high,GPQA Diamond,0.8762626262626263,0.5585
+2098,text-davinci-002,BoolQ,0.877,0.7465
+2099,o1-2024-12-17_medium,MMLU Pro Chemistry,0.877,0.273
+2100,claude-3-7-sonnet-20250219_16K,MMLU Pro Chemistry,0.878,0.282
+2101,glm-5,GPQA Diamond,0.8781725888324873,0.7015
+2102,kimi-k2.7-code,GPQA Diamond,0.8787878787878788,0.654
+2103,qwen3.7-plus,GPQA Diamond,0.8787878787878788,0.6285
+2104,claude-opus-5_low,GPQA Diamond,0.8787878787878788,0.562
+2105,gpt-5.2-2025-12-11_medium,GPQA Diamond,0.8787878787878788,0.398
+2106,gpt-5-2025-08-07_high,Aider Polyglot,0.88,0.7965
+2107,grok-3-mini-beta_high,MATH Level 5,0.8806646525679759,0.405
+2108,text-davinci-003,BoolQ,0.881,0.498
+2109,PaLM 2-S,BoolQ,0.881,0.692
+2110,gpt-4o-2024-11-20,MMLU,0.881,0.9225
+2111,gpt-5.2-2025-12-11_high,GPQA Diamond,0.8819444444444444,0.571
+2112,gemini-1.5-pro-001,MMLU Pro Biology,0.883,0.787
+2113,Llama-4-Scout-17B-16E-Instruct,MMLU Pro Biology,0.883,0.897
+2114,o4-mini-2025-04-16_medium,MMLU Pro Chemistry,0.883,0.2595
+2115,qwen3.6-plus,GPQA Diamond,0.8838383838383839,0.851
+2116,claude-opus-4-6_max,GPQA Diamond,0.8838383838383839,0.5955
+2117,claude-opus-4-8_low,GPQA Diamond,0.8838383838383839,0.527
+2118,gpt-4o-2024-05-13,ScienceQA,0.885,0.952
+2119,o3-2025-04-16_medium,MMLU Pro Biology,0.8859999999999999,0.017
+2120,DeepSeek-V3,MMLU Pro Biology,0.8859999999999999,0.659
+2121,Llama-2-70b-hf,BoolQ,0.886,0.7175
+2122,PaLM 2-M,BoolQ,0.886,0.623
+2123,gpt-4o-mini-2024-07-18,BoolQ,0.887,0.431
+2124,PaLM 540B,BoolQ,0.887,0.744
+2125,Phi-3.5-MoE-instruct,GSM8K,0.887,0.6025
+2126,Qwen2.5-Coder-14B,GSM8K,0.887,0.6565
+2127,claude-3-5-sonnet-20241022,MMLU Pro Biology,0.887,0.5875
+2128,claude-3-5-sonnet-20240620,MMLU Pro Biology,0.887,0.8145
+2129,grok-3-beta,MATH Level 5,0.8874622356495468,0.6115
+2130,claude-opus-4-6_64K,GPQA Diamond,0.8876262626262627,0.5265
+2131,grok-4.3_high,GPQA Diamond,0.8882575757575758,0.7145
+2132,gemini-3.5-flash_low,GPQA Diamond,0.8888888888888888,0.5445
+2133,gpt-5.4-2026-03-05_medium,GPQA Diamond,0.8888888888888888,0.518
+2134,T5-11B,SuperGLUE,0.889,0.5585
+2135,falcon-180B,BoolQ,0.89,0.8005
+2136,o1-preview-2024-09-12,MMLU Pro Biology,0.8909999999999999,0.485
+2137,o1-mini-2024-09-12_high,MATH Level 5,0.8918051359516617,0.7405
+2138,gemini-1.5-pro-001,BIG-Bench Hard (BBH),0.892,0.9445
+2139,claude-3-7-sonnet-20250219,MMLU Pro Biology,0.893,0.488
+2140,grok-4.20-0309-reasoning,GPQA Diamond,0.8933080808080808,0.583
+2141,gemini-3-flash-preview_high,GPQA Diamond,0.8939393939393939,0.505
+2142,StableBeluga2,BoolQ,0.894,0.7245
+2143,o3-mini-2025-01-31_medium,MMLU Pro Biology,0.895,0.2565
+2144,DeepSeek-R1,MMLU Pro Chemistry,0.895,0.62
+2145,deepseek-v4-pro_max,GPQA Diamond,0.8964646464646465,0.5315
+2146,Inflection-1,BoolQ,0.897,0.6275
+2147,muse-spark,GPQA Diamond,0.898,0.1525
+2148,DeepSeek-R1-Distill-Llama-70B,MATH Level 5,0.8989803625377644,0.8745
+2149,gpt-5.6-sol_low,GPQA Diamond,0.898989898989899,0.39
+2150,gpt-5.4-2026-03-05_high,GPQA Diamond,0.898989898989899,0.4085
+2151,T5-3B,BoolQ,0.899,0.5905
+2152,gpt-4-0613,GSM8K,0.8999,0.8275
+2153,claude-3-7-sonnet-20250219_32K,MATH Level 5,0.9003021148036254,0.3165
+2154,claude-opus-4-7_xhigh,GPQA Diamond,0.9015151515151516,0.3175
+2155,Llama-4-Maverick-17B-128E-Instruct,MMLU Pro Biology,0.904,0.789
+2156,claude-sonnet-5_xhigh,GPQA Diamond,0.9053030303030304,0.656
+2157,claude-opus-4-6_32K,GPQA Diamond,0.9053030303030304,0.5665
+2158,gpt-5.5_low,GPQA Diamond,0.9065656565656566,0.561
+2159,Phi-3-small-8k-instruct,ARC (AI2),0.907,0.8255
+2160,DeepSeek-R1,MMLU Pro Biology,0.907,0.368
+2161,kimi-k2.6,GPQA Diamond,0.9078282828282828,0.8
+2162,PaLM 2-L,BoolQ,0.909,0.637
+2163,o4-mini-2025-04-16_medium,MMLU Pro Biology,0.909,0.234
+2164,qwen3.7-max,GPQA Diamond,0.9090909090909092,0.6445
+2165,deepseek-v4-pro_high,GPQA Diamond,0.9090909090909092,0.7675
+2166,grok-3-mini-beta_low,MATH Level 5,0.9093655589123868,0.6205
+2167,deepseek-v4-flash-0731_max,GPQA Diamond,0.9103535353535354,0.6635
+2168,claude-opus-4-8_max,GPQA Diamond,0.9103535353535354,0.286
+2169,gpt-4.5-preview-2025-02-27,MMLU Pro Biology,0.911,0.693
+2170,Qwen2.5-Coder-32B,GSM8K,0.911,0.6235
+2171,claude-3-7-sonnet-20250219_64K,MATH Level 5,0.9116314199395772,0.296
+2172,T5-11B,BoolQ,0.912,0.576
+2173,gpt-4o-mini-2024-07-18,GSM8K,0.913,0.7565
+2174,Phi-3.5-vision-instruct,ScienceQA,0.913,0.791
+2175,gpt-5.2-2025-12-11_xhigh,GPQA Diamond,0.914,0.589
+2176,Phi-3-medium-128k-instruct,ARC (AI2),0.916,0.94
+2177,gpt-5.6-luna_max,GPQA Diamond,0.9160353535353536,0.5795
+2178,glm-5.2_max,GPQA Diamond,0.918560606060606,0.4625
+2179,kimi-k3_high,GPQA Diamond,0.9191919191919192,0.552
+2180,gpt-4-0314,GSM8K,0.92,0.753
+2181,o1-2024-12-17_medium,MMLU Pro Biology,0.921,0.4375
+2182,DeepSeek-V2,ARC (AI2),0.922,0.818
+2183,claude-3-7-sonnet-20250219_16K,MMLU Pro Biology,0.922,0.456
+2184,gemini-3-pro-preview,GPQA Diamond,0.9261363636363636,0.822
+2185,qwen3.8-max_xhigh,GPQA Diamond,0.9267676767676768,0.5745
+2186,gemini-3.5-flash_high,GPQA Diamond,0.928030303030303,0.572
+2187,claude-opus-5,GPQA Diamond,0.9292929292929292,0.6035
+2188,claude-opus-4-6_unknown,Cybench,0.93,0.896
+2189,Qwen2.5-Coder-32B-Instruct,GSM8K,0.93,0.6505
+2190,DeepSeek-R1,MATH Level 5,0.9305135951661632,0.725
+2191,kimi-k3_max,GPQA Diamond,0.9311868686868688,0.4985
+2192,gpt-5.4-2026-03-05_xhigh,GPQA Diamond,0.933,0.531
+2193,gpt-5.6-terra_max,GPQA Diamond,0.933080808080808,0.631
+2194,grok-4.5_high,GPQA Diamond,0.9343434343434344,0.717
+2195,gpt-5.6-sol_max,GPQA Diamond,0.9349747474747476,0.4335
+2196,claude-opus-5_max,GPQA Diamond,0.9387626262626264,0.532
+2197,gpt-5.5-pro-pre-release_xhigh,GPQA Diamond,0.9392135642135644,0.526
+2198,gpt-5.5-pre-release_xhigh,GPQA Diamond,0.9400252525252524,0.604
+2199,gemini-3.1-pro-preview,GPQA Diamond,0.941,0.822
+2200,gemini-3.6-flash_high,GPQA Diamond,0.9412878787878788,0.6525
+2201,Qwen2.5-Coder-14B-Instruct,GSM8K,0.942,0.4365
+2202,o1-2024-12-17_medium,MATH Level 5,0.9441087613293052,0.6735
+2203,gemini-3.1-pro-preview_high,GPQA Diamond,0.9444444444444444,0.8445
+2204,Qwen2.5-72B,ARC (AI2),0.945,0.848
+2205,DeepSeek-Coder-V2-Instruct,GSM8K,0.945,0.458
+2206,gpt-5.4-pro-2026-03-05_xhigh,GPQA Diamond,0.946,0.6065
+2207,o1-2024-12-17_high,MATH Level 5,0.947129909365559,0.536
+2208,gpt-5-nano-2025-08-07_high,MATH Level 5,0.9490181268882176,0.772
+2209,o3-mini-2025-01-31_medium,MATH Level 5,0.9516616314199396,0.888
+2210,gpt-5-nano-2025-08-07_medium,MATH Level 5,0.952416918429003,0.913
+2211,Llama-3.1-405B,ARC (AI2),0.953,0.8345
+2212,DeepSeek-V3,ARC (AI2),0.953,0.853
+2213,gemini-2.5-pro-preview-03-25,MATH Level 5,0.9556268882175226,0.46
+2214,gemini-2.5-pro-preview-05-06,MATH Level 5,0.959025679758308,0.7935
+2215,claude-haiku-4-5-20251001_32K,MATH Level 5,0.9636087945413192,0.805
+2216,o3-mini-2025-01-31_high,MATH Level 5,0.9648791540785498,0.8115
+2217,DeepSeek-R1-0528,MATH Level 5,0.9663897280966768,0.736
+2218,gpt-5-mini-2025-08-07_medium,MATH Level 5,0.9679003021148036,0.7445
+2219,qwen3-max-2025-09-23,MATH Level 5,0.9712990936555892,0.7805
+2220,claude-sonnet-4-5-20250929_32K,MATH Level 5,0.9773413897280968,0.5215
+2221,o3-2025-04-16_high,MATH Level 5,0.9777190332326284,0.4105
+2222,o4-mini-2025-04-16_high,MATH Level 5,0.978285498489426,0.823
+2223,gpt-5-mini-2025-08-07_high,MATH Level 5,0.978474320241692,0.8125
+2224,gpt-5-2025-08-07_medium,MATH Level 5,0.9792296072507553,0.3455
+2225,gpt-5-2025-08-07_high,MATH Level 5,0.9813066465256798,0.413
+2226,claude-haiku-4-5-20251001_32K,SimpleQA Verified,0.059,0.0195
+2227,claude-3-5-haiku-20241022,SimpleQA Verified,0.067,0.184
+2228,gemma-4-31b-it,SimpleQA Verified,0.0956256358087487,0.033
+2229,gpt-5.4-nano-2026-03-17_high,SimpleQA Verified,0.12,0.071
+2230,gpt-5-nano-2025-08-07_high,SimpleQA Verified,0.122,0.108
+2231,claude-sonnet-4-5-20250929,SimpleQA Verified,0.13,0.071
+2232,gpt-oss-120b_high,SimpleQA Verified,0.139,0.176
+2233,qwen3.5-flash,SimpleQA Verified,0.197592778335005,0.1525
+2234,gpt-5-mini-2025-08-07_high,SimpleQA Verified,0.21,0.27
+2235,grok-3-mini-beta_high,SimpleQA Verified,0.211,0.3415
+2236,qwen3.6-flash,SimpleQA Verified,0.2116349047141424,0.171
+2237,o4-mini-2025-04-16_low,SimpleQA Verified,0.219,0.319
+2238,claude-sonnet-5_max,SimpleQA Verified,0.223,0.1735
+2239,claude-sonnet-4-5-20250929_59K,SimpleQA Verified,0.236,0.233
+2240,o4-mini-2025-04-16_high,SimpleQA Verified,0.239,0.342
+2241,claude-sonnet-5_xhigh,SimpleQA Verified,0.25,0.138
+2242,qwen3.5-plus,SimpleQA Verified,0.2600401606425703,0.2185
+2243,DeepSeek-R1-0528,SimpleQA Verified,0.274,0.4275
+2244,deepseek-reasoner,SimpleQA Verified,0.275,0.319
+2245,gpt-5.4-mini-2026-03-17_high,SimpleQA Verified,0.286,0.3115
+2246,claude-sonnet-4-6_32K,SimpleQA Verified,0.29,0.25
+2247,glm-4.7,SimpleQA Verified,0.315,0.4485
+2248,kimi-k2-thinking-turbo,SimpleQA Verified,0.316,0.377
+2249,kimi-k2.5,SimpleQA Verified,0.339,0.41
+2250,deepseek-v4-flash-0731_max,SimpleQA Verified,0.3466933867735471,0.2795
+2251,gpt-5.2-2025-12-11_low,SimpleQA Verified,0.347,0.485
+2252,claude-opus-4-1-20250805_27K,SimpleQA Verified,0.348,0.5935
+2253,grok-4.20-0309-reasoning,SimpleQA Verified,0.351,0.322
+2254,gpt-5.2-2025-12-11_medium,SimpleQA Verified,0.354,0.3195
+2255,glm-5.1,SimpleQA Verified,0.3728643216080402,0.474
+2256,grok-4.3_high,SimpleQA Verified,0.38,0.4585
+2257,glm-5.2_max,SimpleQA Verified,0.381,0.2535
+2258,gpt-5.2-2025-12-11_high,SimpleQA Verified,0.382,0.4035
+2259,ministral-3b-2410,MMLU-Pro,0.383061835106383,0.1295
+2260,kimi-k2.6,SimpleQA Verified,0.387,0.4315
+2261,gpt-5.2-2025-12-11_xhigh,SimpleQA Verified,0.389,0.3495
+2262,kimi-k2.7-code,SimpleQA Verified,0.392,0.4765
+2263,claude-opus-4-8_max,SimpleQA Verified,0.395,0.276
+2264,claude-opus-4-6_max,SimpleQA Verified,0.4104104104104104,0.469
+2265,gemma-3-4b-it,MMLU-Pro,0.4109873670212766,0.3485
+2266,gpt-5.6-luna_max,SimpleQA Verified,0.417,0.3855
+2267,claude-opus-4-5-20251101_32K,SimpleQA Verified,0.418,0.542
+2268,kimi-k3_max,SimpleQA Verified,0.427,0.324
+2269,ministral-8b-2410,MMLU-Pro,0.4276928191489361,0.22
+2270,gpt-5.6-terra_max,SimpleQA Verified,0.431,0.3635
+2271,claude-opus-4-6,SimpleQA Verified,0.431,0.388
+2272,gpt-5.4-2026-03-05_xhigh,SimpleQA Verified,0.4483450351053159,0.359
+2273,qwen3.8-max_xhigh,SimpleQA Verified,0.4629258517034068,0.4385
+2274,claude-opus-4-6_32K,SimpleQA Verified,0.464859437751004,0.5045
+2275,gpt-3.5-turbo-1106,MMLU-Pro,0.4690824468085106,0.2205
+2276,gpt-5.4-pro-2026-03-05_xhigh,SimpleQA Verified,0.478,0.3945
+2277,grok-4-0709,SimpleQA Verified,0.479,0.7925
+2278,gemini-1.5-flash-8b-001,MMLU-Pro,0.4821309840425531,0.192
+2279,gpt-5.1-2025-11-13_high,SimpleQA Verified,0.489,0.6615
+2280,qwen3.6-plus,SimpleQA Verified,0.4909819639278557,0.759
+2281,Qwen3-235B-A22B-Thinking-2507,SimpleQA Verified,0.501002004008016,0.9085
+2282,claude-opus-4-7_xhigh,SimpleQA Verified,0.506,0.5345
+2283,gpt-5-2025-08-07_high,SimpleQA Verified,0.506,0.7735
+2284,codestral-2501,MMLU-Pro,0.5157912234042553,0.4465
+2285,o3-2025-04-16_high,SimpleQA Verified,0.53,0.819
+2286,grok-4.5_high,SimpleQA Verified,0.535,0.617
+2287,open-mixtral-8x22b,MMLU-Pro,0.551279920212766,0.403
+2288,gemini-2.5-pro,SimpleQA Verified,0.56,0.893
+2289,claude-opus-5_max,SimpleQA Verified,0.567,0.5985
+2290,qwen3.6-max-preview,SimpleQA Verified,0.5692771084337349,0.7745
+2291,deepseek-v4-pro_max,SimpleQA Verified,0.57,0.7665
+2292,ministral-8b-2410,MMLU,0.5727816550348953,0.126
+2293,granite-4.0-h-small,MMLU-Pro,0.5737800315903234,0.3785
+2294,ministral-3b-2410,MMLU,0.5760575416607321,0.232
+2295,gemma-3-12b-it,MMLU-Pro,0.5805352393617021,0.6765
+2296,Qwen3-235B-A22B-Thinking-2507,MMLU-Pro,0.5835272606382979,0.0005
+2297,qwen3.7-max,SimpleQA Verified,0.5851703406813628,0.7925
+2298,claude-3-5-haiku-20241022,MMLU-Pro,0.613031914893617,0.3425
+2299,gpt-4o-mini-2024-07-18,MMLU-Pro,0.6236702127659575,0.5295
+2300,gemma-3-4b-it,MMLU,0.6274747187010398,0.562
+2301,gpt-5.5-pre-release_xhigh,SimpleQA Verified,0.631,0.7385
+2302,gpt-5.5-pro-pre-release_xhigh,SimpleQA Verified,0.645,0.7195
+2303,gemini-1.5-flash-002,MMLU-Pro,0.647161499459729,0.4065
+2304,Qwen3-235B-A22B-Instruct-2507,MMLU-Pro,0.660904255319149,0.034
+2305,gemma-3-27b-it,MMLU-Pro,0.6621509308510638,0.488
+2306,muse-spark,SimpleQA Verified,0.663,0.7835
+2307,gpt-3.5-turbo-1106,MMLU,0.6640079760717846,0.378
+2308,Qwen3-235B-A22B-Thinking-2507,MMLU,0.66735507762427,0.0
+2309,gpt-oss-20b,MMLU-Pro,0.6710438829787234,0.657
+2310,gemini-3-flash-preview,SimpleQA Verified,0.674,0.947
+2311,qwen3-max-2025-09-23,SimpleQA Verified,0.6746746746746747,0.982
+2312,codestral-2501,MMLU,0.6759008688221051,0.396
+2313,claude-fable-5_xhigh,SimpleQA Verified,0.683,0.795
+2314,gemini-3.5-flash_high,SimpleQA Verified,0.684,0.8565
+2315,gemini-3.6-flash_high,SimpleQA Verified,0.687,0.8555
+2316,mistral-large-2411,MMLU-Pro,0.7001329787234043,0.645
+2317,gemini-1.5-pro-002,MMLU-Pro,0.7007978723404256,0.5165
+2318,gpt-5.6-sol_max,SimpleQA Verified,0.716,0.8515
+2319,claude-3-7-sonnet-20250219,MMLU-Pro,0.718500664893617,0.293
+2320,o1-mini-2024-09-12_unknown,MMLU-Pro,0.7198304521276596,0.5305
+2321,gemini-3-pro-preview,SimpleQA Verified,0.729,0.9415
+2322,gpt-4o-2024-08-06,MMLU-Pro,0.7298869680851063,0.7675
+2323,grok-2-1212,MMLU-Pro,0.7411070478723404,0.8955
+2324,gemini-1.5-flash-8b-001,MMLU,0.750106822389973,0.707
+2325,gemini-2.0-flash-001,MMLU-Pro,0.761469414893617,0.6735
+2326,gemma-3-12b-it,MMLU,0.7712576556046147,0.791
+2327,grok-3,MMLU-Pro,0.7716921542553191,0.3685
+2328,gemini-3.1-pro-preview,SimpleQA Verified,0.773,0.968
+2329,open-mixtral-8x22b,MMLU,0.7748896168636946,0.751
+2330,claude-3-5-sonnet-20241022,MMLU-Pro,0.7757646276595744,0.7825
+2331,o3-mini-2025-01-31_unknown,MMLU-Pro,0.7771775265957447,0.577
+2332,granite-4.0-h-small,MMLU,0.7771921076999786,0.624
+2333,o4-mini-2025-04-16,MMLU-Pro,0.7794215425531915,0.174
+2334,DeepSeek-V3,MMLU-Pro,0.7815824468085106,0.859
+2335,gpt-oss-120b,MMLU-Pro,0.784906914893617,0.6445
+2336,claude-3-5-haiku-20241022,MMLU,0.8097849309215212,0.6485
+2337,gpt-4.1-2025-04-14,MMLU-Pro,0.8103390957446809,0.779
+2338,grok-3-mini_unknown,MMLU-Pro,0.8121675531914894,0.5965
+2339,gpt-4o-mini-2024-07-18,MMLU,0.8137729668138441,0.7625
+2340,gemini-1.5-flash-002,MMLU,0.81398661159379,0.5425
+2341,gemma-3-27b-it,MMLU,0.8151260504201681,0.564
+2342,gpt-oss-20b,MMLU,0.8221051132317334,0.701
+2343,gemini-2.5-flash-preview-05-20,MMLU-Pro,0.828873005319149,0.7945
+2344,DeepSeek-V3.1,MMLU-Pro,0.8310498444986131,0.758
+2345,gemini-3.5-flash-lite,MMLU-Pro,0.8323636968085106,0.5735
+2346,claude-sonnet-4-20250514,MMLU-Pro,0.8372672872340425,0.8295
+2347,o1-2024-12-17_unknown,MMLU-Pro,0.8386801861702128,0.525
+2348,o1-mini-2024-09-12_unknown,MMLU,0.8396239851872953,0.468
+2349,DeepSeek-R1-0528,MMLU-Pro,0.8401761968085106,0.6815
+2350,gpt-5.6-sol_unknown,MMLU-Pro,0.8439162234042553,0.0995
+2351,gpt-5.6-luna_unknown,MMLU-Pro,0.8441655585106383,0.398
+2352,gemini-3.1-flash-lite,MMLU-Pro,0.8449135638297872,0.6175
+2353,mistral-large-2411,MMLU,0.8513032331576699,0.746
+2354,o3-mini-2025-01-31_unknown,MMLU,0.8587808004557755,0.3925
+2355,gpt-5.6-terra_unknown,MMLU-Pro,0.8633643617021277,0.3825
+2356,o3-2025-04-16_unknown,MMLU-Pro,0.8636136968085106,0.4715
+2357,grok-4-0709,MMLU-Pro,0.8658627858627859,0.714
+2358,gemini-2.5-pro-preview-06-05,MMLU-Pro,0.8668550531914894,0.552
+2359,gemma-4-31b-it,MMLU-Pro,0.8672706117021277,0.7205
+2360,claude-opus-4-20250514,MMLU-Pro,0.8686003989361702,0.871
+2361,gemini-1.5-pro-002,MMLU,0.868964534966529,0.7745
+2362,gpt-5-2025-08-07_unknown,MMLU-Pro,0.87109375,0.3125
+2363,gemini-2.0-flash-001,MMLU,0.876940606751175,0.664
+2364,gpt-oss-120b,MMLU,0.8772966813844182,0.511
+2365,claude-opus-4-1-20250805,MMLU-Pro,0.8788970834730138,0.9005
+2366,grok-2-1212,MMLU,0.8800740635237145,0.916
+2367,gpt-4o-2024-08-06,MMLU,0.8808574277168495,0.8835
+2368,claude-opus-4-8_unknown,MMLU-Pro,0.8866356382978723,0.1475
+2369,Qwen3-235B-A22B-Instruct-2507,MMLU,0.8891756272401433,0.556
+2370,grok-3-mini_unknown,MMLU,0.8916108816407919,0.461
+2371,gemini-3-flash-preview,MMLU-Pro,0.8941988031914894,0.6685
+2372,grok-4.5_unknown,MMLU-Pro,0.89453125,0.4525
+2373,claude-3-5-sonnet-20241022,MMLU,0.8948155533399801,0.807
+2374,DeepSeek-V3,MMLU,0.8951004130465746,0.8565
+2375,gemini-3.5-flash_unknown,MMLU-Pro,0.8956117021276596,0.56
+2376,DeepSeek-V3.1,MMLU,0.896168636946304,0.5165
+2377,gemini-3.6-flash_unknown,MMLU-Pro,0.897938829787234,0.6775
+2378,o4-mini-2025-04-16,MMLU,0.9004415325452215,0.3405
+2379,grok-3,MMLU,0.9010824668850592,0.558
+2380,claude-3-7-sonnet-20250219,MMLU,0.901652186298248,0.783
+2381,gpt-4.1-2025-04-14,MMLU,0.9031476997578692,0.6885
+2382,DeepSeek-R1-0528,MMLU,0.9031476997578692,0.4345
+2383,gemini-3.5-flash-lite,MMLU,0.9125480700754878,0.5105
+2384,gemini-3.1-pro-preview,MMLU-Pro,0.9128699700698372,0.4755
+2385,claude-sonnet-4-20250514,MMLU,0.9139011536818116,0.694
+2386,grok-4-0709,MMLU,0.9164648910411622,0.445
+2387,claude-opus-5,MMLU-Pro,0.9168051861702128,0.4955
+2388,gemma-4-31b-it,MMLU,0.9182452642073778,0.5085
+2389,gpt-5.6-luna_unknown,MMLU,0.9188861985472156,0.384
+2390,o1-2024-12-17_unknown,MMLU,0.91917105825381,0.514
+2391,o3-2025-04-16_unknown,MMLU,0.9227318045862412,0.348
+2392,gemini-2.5-pro-preview-06-05,MMLU,0.9235863837060247,0.3855
+2393,claude-opus-4-20250514,MMLU,0.928286568864834,0.7075
+2394,claude-opus-4-8_unknown,MMLU,0.9300669420310496,0.1115
+2395,gpt-5.6-terra_unknown,MMLU,0.9329867540236434,0.3935
+2396,claude-opus-4-1-20250805,MMLU,0.9339225889229452,0.7355
+2397,gpt-5-2025-08-07_unknown,MMLU,0.934767127189859,0.306
+2398,gemini-3.5-flash_unknown,MMLU,0.9359777809428856,0.3545
+2399,gemini-3-pro-preview,MMLU,0.9386127332,0.2755
+2400,claude-opus-5,MMLU,0.9415787973781704,0.2385
+2401,gemini-3.6-flash_unknown,MMLU,0.9417461900014245,0.471
+2402,grok-4.5_unknown,MMLU,0.9453781512605042,0.3725
+2403,Inkling_xhigh,SimpleQA Verified,0.439,0.5835
+2404,Inkling_xhigh,GPQA Diamond,0.872,0.6055
+2405,Average Human,Adversarial NLI,0.849,0.9885
+2406,Average Human,BIG-Bench Hard (BBH),0.677,0.3565
+2407,Top Performer,BIG-Bench Hard (BBH),0.944,0.506
+2408,Average Human,BoolQ,0.9,0.7195
+2409,Average Human,CSQA2,0.903,0.973
+2410,Committee of Average Humans,CSQA2,0.941,0.69
+2411,Domain Expert,GPQA Diamond,0.812,0.767
+2412,Skilled Generalist,GPQA Diamond,0.219,0.0035
+2413,Skilled Generalist,GPQA Diamond Biology,0.22,0.005
+2414,Skilled Generalist,GPQA Diamond Chemistry,0.22,0.203
+2415,Skilled Generalist,GPQA Main Biology,0.43,0.2755
+2416,Skilled Generalist,GPQA Main Chemistry,0.31,0.728
+2417,Skilled Generalist,GSM8K,0.9677,0.9875
+2418,Domain Expert,MATH Level 5,0.9,0.171
+2419,Skilled Generalist,MATH Level 5,0.4,0.865
+2420,Average Human,MMLU,0.345,0.0
+2421,High School Top Performer,MMLU,0.898,0.032
+2422,High School Top Performer,MMLU Biology,0.9,0.8215
+2423,High School Top Performer,MMLU Chemistry,0.9,0.6
+2424,Skilled Generalist,OS World (Screenshot),0.724,0.974
+2425,Committee of Domain Experts,PRBench Finance,0.796,0.659
+2426,Committee of Domain Experts,PRBench Legal,0.796,0.712
+2427,Average Human,ScienceQA,0.884,0.98
+2428,Average Human,SuperGLUE,0.898,0.8675
+2429,Average Human,TriviaQA,0.797,0.571
+2430,Skilled Generalist,SimpleQA Verified,0.944,1.0
+2431,Domain Expert,BioLP-bench,0.384,0.4405
+2432,Domain Expert,GPQA Diamond Biology,0.831,0.8545
+2433,Domain Expert,GPQA Main Biology,0.667,0.128
+2434,Domain Expert,WMDP Biology,0.605,0.0
+2435,Domain Expert,GPQA Main Chemistry,0.72,0.946
+2436,Domain Expert,GPQA Diamond Chemistry,0.831,0.992
+2437,Domain Expert,WMDP Chemistry,0.433,0.0

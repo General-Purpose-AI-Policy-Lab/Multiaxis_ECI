@@ -1,0 +1,15 @@
+{
+  "n_obs": 5123,
+  "n_nonzero_score": 5041,
+  "n_zero_score": 82,
+  "n_one_score": 7,
+  "zero_diag_threshold": 0.005,
+  "rmse": 0.05706576064893978,
+  "mae": 0.03885347432091832,
+  "bayesian_r2": 0.9401392485938813,
+  "ks_stat": 0.09419547079856974,
+  "ks_p": 2.5263199789204755e-39,
+  "pit_mean": 0.5039044497417561,
+  "pit_var": 0.05456757708389466,
+  "zero_pred_below_threshold": 0.56
+}

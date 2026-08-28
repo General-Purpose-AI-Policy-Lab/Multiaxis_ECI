@@ -1,0 +1,27 @@
+{
+ "trace": "trace_mirt_k2_floors.nc",
+ "n_chains": 4,
+ "K": 2,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.6) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -14.1,
+  -6.1,
+  0.0,
+  -6.0
+ ],
+ "modes": [
+  {
+   "chains": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "mean_logp": 5016.59815751753,
+   "min_matched_corr": 0.947,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  }
+ ]
+}

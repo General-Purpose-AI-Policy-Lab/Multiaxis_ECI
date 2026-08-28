@@ -1,0 +1,7 @@
+method_a,method_b,axis,abs_corr
+varimax,wop,axis1,1.0
+varimax,matchalign,axis1,1.0
+varimax,promax,axis1,1.0
+wop,matchalign,axis1,1.0
+wop,promax,axis1,1.0
+matchalign,promax,axis1,1.0

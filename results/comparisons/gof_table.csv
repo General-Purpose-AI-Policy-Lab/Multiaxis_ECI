@@ -1,12 +1,3 @@
 fit,type,K,free_loadings,R2,RMSE,MAE,PIT_var,eta_rhat,divergences,max_phi
-K=3 cy ladder0 · none,exploratory,3,324,0.9566,0.0454,0.0299,0.0462,1.6,181,0.914
-K=3 cy ladder1 · lin+BM · A,exploratory,3,324,0.9581,0.0468,0.0315,0.0528,1.01,33,0.667
-K=3 cy ladder1 · lin+BM · B,exploratory,3,324,0.9558,0.0483,0.0321,0.0524,1.008,9,0.907
-K=3 cy ladder2 · human · A,exploratory,3,324,0.9568,0.0466,0.0303,0.0487,1.012,27,0.495
-K=3 cy ladder2 · human · B,exploratory,3,324,0.9557,0.0472,0.0308,0.0493,1.015,3,0.623
-K=3 cy ladder3 · both · A,exploratory,3,324,0.9587,0.0463,0.0311,0.0522,1.027,359,0.586
-K=3 cy ladder3 · both · B,exploratory,3,324,0.9582,0.046,0.0311,0.0517,1.033,2,0.808
-K=3 cy · positive · mode A,exploratory,3,324,0.9586,0.0464,0.0311,0.0524,1.005,36,0.63
-K=3 cy · positive · mode B,exploratory,3,324,0.958,0.0462,0.0312,0.0516,1.009,24,0.697
-K=3 cy · signed · mode α,exploratory,3,324,0.9608,0.0447,0.0301,0.0512,1.007,52,0.276
-K=3 cy · signed · mode β,exploratory,3,324,0.9604,0.0448,0.0299,0.0506,1.005,240,0.06
+K=4 −2bench · pooled · merge · flagship,exploratory,4,392,0.9645,0.0413,0.0275,0.0464,1.142,78,0.947
+K=2 demo,exploratory,2,192,0.9362,0.059,0.0388,0.0541,1.271,0,0.221

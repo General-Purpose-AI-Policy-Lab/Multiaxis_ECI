@@ -1,8 +1,0 @@
-priors=False chains=4 draws=1000  obs=3704
-Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
-
-==== NO-SG K=3 nopriors 4x1000 ====
-identified: {"eta_max_rhat": 1.7252, "eta_mean_rhat": 1.0458, "eta_frac_gt_1.01": 0.5575, "D_max_rhat": 1.9175, "sigma_b_max_rhat": 1.7475, "tau_CD_max_rhat": 1.0141}
-divergences: 0 / 4000
-LL per chain: [6648.1 6681.1 6648.9 6681.4]  spread: 33.3
-chain D-dist max: 1.24

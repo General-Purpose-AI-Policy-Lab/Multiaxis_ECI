@@ -1,0 +1,15 @@
+{
+  "n_obs": 4265,
+  "n_nonzero_score": 4204,
+  "n_zero_score": 61,
+  "n_one_score": 5,
+  "zero_diag_threshold": 0.005,
+  "rmse": NaN,
+  "mae": NaN,
+  "bayesian_r2": NaN,
+  "ks_stat": NaN,
+  "ks_p": NaN,
+  "pit_mean": NaN,
+  "pit_var": NaN,
+  "zero_pred_below_threshold": NaN
+}
