@@ -80,3 +80,18 @@ slides/
 # Legacy PPCA/ARD posterior dumps (regenerable, >100 MB, over GitHub's file limit)
 results/**/*.nc
 CLAUDE.md
+
+# LaTeX writes this at the repo root when a compile is started from here
+texput.log
+
+# LessWrong post draft + figures: a local deliverable, like memo/ and slides/.
+lw_post/
+
+# Per-fit caches rebuilt from the trace on demand. The theta view is a 2.5 GB
+# float32 dump, over GitHub's file limit on its own.
+results/**/*.f32.npy
+results/**/lw_forecast_cache_*.pkl
+results/**/rhat_cache.npz
+
+# Per-fit run logs
+results/**/*.log
