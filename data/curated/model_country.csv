@@ -1,0 +1,836 @@
+model_version,country,organization,method,notes
+Baichuan-13B-Base,CN,Baichuan,org_map,lead org: Baichuan
+Baichuan-2-13B-Base,CN,Baichuan,org_map,lead org: Baichuan
+Baichuan-2-7B-Base,CN,Baichuan,org_map,lead org: Baichuan
+Baichuan-7B,CN,Baichuan,org_map,lead org: Baichuan
+Baichuan2-13B-Chat,CN,,prefix,name-prefix match: 'baichuan'
+ByteVideoLLM-14B,CN,,prefix,name-prefix match: 'bytevideollm'
+Chat-Uni-Vi-7B-v1.5 + 100k SG-WV,CN,,prefix,name-prefix match: 'chat-uni-vi'
+Chat-UniVi-7B-v1.5,CN,,prefix,name-prefix match: 'chat-univi'
+CodeQwen1.5-7B,CN,,prefix,name-prefix match: 'qwen'
+DeepSeek-Coder-V2-Base,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-Coder-V2-Instruct,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-Coder-V2-Lite-Base,CN,,prefix,name-prefix match: 'deepseek'
+DeepSeek-Coder-V2-Lite-Instruct,CN,,prefix,name-prefix match: 'deepseek'
+DeepSeek-R1,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-R1-0528,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-R1-Distill-Llama-70B,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-R1-Distill-Qwen-14B,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-R1-Distill-Qwen-32B,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-R1_high,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V2,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V2.5,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3-0324,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3-Base,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3.1,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3.1-Terminus,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3.1_thinking,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3.2-Exp,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3.2-Exp_thinking,CN,DeepSeek,org_map,lead org: DeepSeek
+DeepSeek-V3.2-Speciale,CN,DeepSeek,org_map,lead org: DeepSeek
+Eurus-2-7B-PRIME,CN,"Tsinghua University,University of Illinois Urbana-Champaign (UIUC),Shanghai AI Lab,Peking University,Shanghai Jiao Tong University,CUHK Shenzhen Research Institute",org_map,lead org: Tsinghua University
+GLM-4.5-Air,CN,"Z.ai (Zhipu AI),Tsinghua University",org_map,lead org: Z.ai (Zhipu AI)
+InternVL-Chat-V1-5,CN,,prefix,name-prefix match: 'internvl'
+InternVL-Chat-ViT-6B-Vicuna-13B,CN,,prefix,name-prefix match: 'internvl'
+InternVL-Chat-ViT-6B-Vicuna-7B,CN,,prefix,name-prefix match: 'internvl'
+InternVL2-40B,CN,Shanghai AI Lab,org_map,lead org: Shanghai AI Lab
+InternVL2_5-78B,CN,"Shanghai AI Lab,SenseTime,Tsinghua University,Nanjing University,Fudan University,Chinese University of Hong Kong (CUHK),Shanghai Jiao Tong University",org_map,lead org: Shanghai AI Lab
+Kimi-Audio-7B-Instruct,CN,Moonshot,org_map,lead org: Moonshot
+Kimi-K2-Instruct,CN,Moonshot,org_map,lead org: Moonshot
+Kimi-K2-Instruct-0905,CN,Moonshot,org_map,lead org: Moonshot
+LLaVA-OneVision 72B,CN,,prefix,name-prefix match: 'llava-onevision'
+LLaVA-Video-72B-Qwen2,CN,,prefix,name-prefix match: 'llava-video'
+LLaVA-Video-7B-Qwen2,CN,,prefix,name-prefix match: 'llava-video'
+LLaVA-Video-7B-Qwen2-TPO,CN,,prefix,name-prefix match: 'llava-video'
+LongVA-7B,CN,,prefix,name-prefix match: 'longva'
+Manus 1.0,CN,Butterfly Effect (Monica),org_map,lead org: Butterfly Effect (Monica)
+Manus 1.5,CN,Butterfly Effect (Monica),org_map,lead org: Butterfly Effect (Monica)
+Manus_1.6 (Max),CN,Butterfly Effect (Monica),org_map,lead org: Butterfly Effect (Monica)
+MiMo-Audio-7B-Instruct,CN,other,prefix,name-prefix match: 'mimo'
+MiMo-Audio-7B-Instruct (Thinking),CN,other,prefix,name-prefix match: 'mimo'
+MiniCPM-V-2_6,CN,,prefix,name-prefix match: 'minicpm'
+MiniCPM-o-2_6,CN,,prefix,name-prefix match: 'minicpm'
+MiniMax-M1-80k,CN,MiniMax,org_map,lead org: MiniMax
+MiniMax-M2,CN,MiniMax,org_map,lead org: MiniMax
+MiniMax-M2.1,CN,MiniMax,org_map,lead org: MiniMax
+MiniMax-M2.5,CN,MiniMax,org_map,lead org: MiniMax
+MiniMax-M2.7,CN,MiniMax,org_map,lead org: MiniMax
+MiniMax-M3,CN,MiniMax,org_map,lead org: MiniMax
+Oryx-1.5-32B,CN,,prefix,name-prefix match: 'oryx'
+QwQ-32B,CN,Alibaba,org_map,lead org: Alibaba
+QwQ-32B-Preview,CN,Alibaba,org_map,lead org: Alibaba
+QwQ-32B_16K,CN,Alibaba,org_map,lead org: Alibaba
+Qwen-14B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen-14B-Chat,CN,Alibaba,org_map,lead org: Alibaba
+Qwen-1_8B,CN,,prefix,name-prefix match: 'qwen'
+Qwen-7B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen-VL-Chat,CN,,prefix,name-prefix match: 'qwen'
+Qwen-VL-Max,CN,,prefix,name-prefix match: 'qwen'
+Qwen1.5-7B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2-VL-72B-Instruct,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2-VL-7B-Instruct,CN,,prefix,name-prefix match: 'qwen'
+Qwen2.5-72B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-Coder-0.5B,CN,,prefix,name-prefix match: 'qwen'
+Qwen2.5-Coder-1.5B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-Coder-14B,CN,,prefix,name-prefix match: 'qwen'
+Qwen2.5-Coder-14B-Instruct,CN,,prefix,name-prefix match: 'qwen'
+Qwen2.5-Coder-32B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-Coder-32B-Instruct,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-Coder-3B,CN,,prefix,name-prefix match: 'qwen'
+Qwen2.5-Coder-3B-Instruct,CN,,prefix,name-prefix match: 'qwen'
+Qwen2.5-Coder-7B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-Coder-7B-Instruct,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-Omni-7B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen2.5-VL-72B-Instruct,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-235B-A22B-Instruct-2507,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-235B-A22B-Thinking-2507,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-30B-A3B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-32B,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-Coder-480B-A35B-Instruct,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-Coder-480B-A35B-Instruct_high,CN,Alibaba,org_map,lead org: Alibaba
+Qwen3-Next-80B-A3B-Instruct,CN,,prefix,name-prefix match: 'qwen'
+Qwen3-Omni-30B-A3B-Instruct,CN,Alibaba,org_map,lead org: Alibaba
+Ring-2.6-1T,CN,Ant Group,org_map,lead org: Ant Group
+ST-LLM,CN,,prefix,name-prefix match: 'st-llm'
+SliME-Llama3-8B,CN,,prefix,name-prefix match: 'slime'
+TimeMarker,CN,,prefix,name-prefix match: 'timemarker'
+VITA,CN,,prefix,name-prefix match: 'vita'
+VITA-1.5,CN,,prefix,name-prefix match: 'vita'
+ViLAMP-llava-qwen,CN,,prefix,name-prefix match: 'vilamp'
+Video-CCAM-7B-v1.2,CN,,prefix,name-prefix match: 'video-ccam'
+Video-LLaVA-7B,CN,,prefix,name-prefix match: 'video-llava'
+Video-XL-7B,CN,,prefix,name-prefix match: 'video-xl'
+VideoChat-Flash-Qwen2-7B_res448,CN,,prefix,name-prefix match: 'qwen'
+VideoLLAMA2-7B,CN,,prefix,name-prefix match: 'videollama'
+VideoLLAMA3-7B,CN,,prefix,name-prefix match: 'videollama'
+Yi-1.5-34B-Chat,CN,01.AI,org_map,lead org: 01.AI
+Yi-34B,CN,01.AI,org_map,lead org: 01.AI
+Yi-34B-Chat,CN,01.AI,org_map,lead org: 01.AI
+Yi-6B,CN,01.AI,org_map,lead org: 01.AI
+Yi-6B-Chat,CN,01.AI,org_map,lead org: 01.AI
+Yi-9B,CN,,prefix,name-prefix match: 'yi-'
+Yi-large,CN,01.AI,org_map,lead org: 01.AI
+chatglm2-6b,CN,,prefix,name-prefix match: 'chatglm'
+deepseek-chat,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-coder-1.3b-base,CN,"DeepSeek,Peking University",org_map,lead org: DeepSeek
+deepseek-coder-33b-base,CN,"DeepSeek,Peking University",org_map,lead org: DeepSeek
+deepseek-coder-6.7b-base,CN,"DeepSeek,Peking University",org_map,lead org: DeepSeek
+deepseek-llm-67b-chat,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-reasoner,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v3.2,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-flash-0731_high,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-flash-0731_max,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-flash_high,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-flash_max,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-pro_high,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-pro_max,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-pro_none,CN,DeepSeek,org_map,lead org: DeepSeek
+deepseek-v4-pro_unknown,CN,DeepSeek,org_map,lead org: DeepSeek
+glm-4.5,CN,"Z.ai (Zhipu AI),Tsinghua University",org_map,lead org: Z.ai (Zhipu AI)
+glm-4.5_thinking,CN,"Z.ai (Zhipu AI),Tsinghua University",org_map,lead org: Z.ai (Zhipu AI)
+glm-4.5_thinking_high,CN,"Z.ai (Zhipu AI),Tsinghua University",org_map,lead org: Z.ai (Zhipu AI)
+glm-4.6,CN,"Z.ai (Zhipu AI),Tsinghua University",org_map,lead org: Z.ai (Zhipu AI)
+glm-4.7,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-4.7_high,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-5,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-5.1,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-5.2_high,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-5.2_max,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-5.2_none,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+glm-5.2_unknown,CN,Z.ai (Zhipu AI),org_map,lead org: Z.ai (Zhipu AI)
+internlm-20b,CN,,prefix,name-prefix match: 'internlm'
+internlm-7b,CN,,prefix,name-prefix match: 'internlm'
+internlm-chat-20b,CN,,prefix,name-prefix match: 'internlm'
+kangaroo,CN,,prefix,name-prefix match: 'kangaroo'
+kimi-k2-0711-preview,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k2-thinking,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k2-thinking-turbo,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k2.5,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k2.5_high,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k2.6,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k2.7-code,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k3_high,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k3_low,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k3_max,CN,Moonshot,org_map,lead org: Moonshot
+kimi-k3_unknown,CN,Moonshot,org_map,lead org: Moonshot
+llama3-llava-next-8b,CN,,prefix,name-prefix match: 'llama3-llava-next'
+long-llava-qwen2-7b,CN,,prefix,name-prefix match: 'long-llava'
+mPLUG-Owl3-7B-241101,CN,,prefix,name-prefix match: 'mplug'
+mimo-v2-flash,CN,Xiaomi Corp,org_map,lead org: Xiaomi Corp
+mimo-v2-pro,CN,Xiaomi Corp,org_map,lead org: Xiaomi Corp
+mimo-v2-pro_high,CN,Xiaomi Corp,org_map,lead org: Xiaomi Corp
+mimo-v2.5,CN,Xiaomi Corp,org_map,lead org: Xiaomi Corp
+mimo-v2.5-pro,CN,Xiaomi Corp,org_map,lead org: Xiaomi Corp
+moonshotai/kimi-k2-0905,CN,Moonshot,org_map,lead org: Moonshot
+parasail-qwen3-235b-a22b-instruct-2507,CN,Alibaba,org_map,lead org: Alibaba
+qwen-max-2025-01-25,CN,Alibaba,org_map,lead org: Alibaba
+qwen-plus-2025-01-25,CN,Alibaba,org_map,lead org: Alibaba
+qwen-plus-2025-04-28,CN,Alibaba,org_map,lead org: Alibaba
+qwen-turbo-2024-11-01,CN,Alibaba,org_map,lead org: Alibaba
+qwen1.5-110b-chat,CN,Alibaba,org_map,lead org: Alibaba
+qwen1.5-14B,CN,Alibaba,org_map,lead org: Alibaba
+qwen1.5-32B,CN,Alibaba,org_map,lead org: Alibaba
+qwen1.5-32b-chat,CN,Alibaba,org_map,lead org: Alibaba
+qwen1.5-72b-chat,CN,Alibaba,org_map,lead org: Alibaba
+qwen2-72b-instruct,CN,Alibaba,org_map,lead org: Alibaba
+qwen2.5-14b-instruct,CN,Alibaba,org_map,lead org: Alibaba
+qwen2.5-32b-instruct,CN,Alibaba,org_map,lead org: Alibaba
+qwen2.5-72b-instruct,CN,Alibaba,org_map,lead org: Alibaba
+qwen2.5-7b-instruct,CN,Alibaba,org_map,lead org: Alibaba
+qwen2.5-max,CN,Alibaba,org_map,lead org: Alibaba
+qwen3-235b-a22b,CN,Alibaba,org_map,lead org: Alibaba
+qwen3-coder-next,CN,,prefix,name-prefix match: 'qwen'
+qwen3-max-2025-09-23,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-27B,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-9B,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-flash,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-flash_none,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-plus,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-plus_high,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.5-plus_none,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-35b-a3b,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-flash,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-flash_none,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-max-preview,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-max-preview_none,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-plus,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.6-plus_none,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.7-max,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.7-plus,CN,Alibaba,org_map,lead org: Alibaba
+qwen3.8-max_xhigh,CN,Alibaba,org_map,lead org: Alibaba
+qwq-plus,CN,Alibaba,org_map,lead org: Alibaba
+sharegpt4video-8b,CN,,prefix,name-prefix match: 'sharegpt4video'
+step-3.7-flash,CN,StepFun,org_map,lead org: StepFun
+video-SALMONN-2plus,CN,ByteDance,org_map,lead org: ByteDance
+video_chat2_mistral,CN,,prefix,name-prefix match: 'video_chat2'
+xiaoyi-deepresearch,CN,,prefix,name-prefix match: 'xiaoyi'
+yi-lightning,CN,01.AI,org_map,lead org: 01.AI
+Aria,Other,,prefix,name-prefix match: 'aria'
+INTELLECT-1-Instruct,Other,"Prime Intellect,Hugging Face,Arcee AI",org_map,lead org: Prime Intellect
+LinVT,Other,,unresolved,"no organization, no matching name prefix"
+LiveCC-7B-Instruct,Other,,prefix,name-prefix match: 'livecc'
+Mistral-7B-Instruct-v0.1,Other,Mistral AI,org_map,lead org: Mistral AI
+Mistral-7B-Instruct-v0.2,Other,Mistral AI,org_map,lead org: Mistral AI
+Mistral-7B-Instruct-v0.3,Other,Mistral AI,org_map,lead org: Mistral AI
+Mistral-7B-v0.1,Other,Mistral AI,org_map,lead org: Mistral AI
+Mistral-Nemo-Base-2407,Other,Mistral AI,org_map,lead org: Mistral AI
+Mistral-Nemo-Instruct-2407,Other,Mistral AI,org_map,lead org: Mistral AI
+Mixtral-8x22B-Instruct-v0.1,Other,Mistral AI,org_map,lead org: Mistral AI
+Mixtral-8x22B-v0.1,Other,Mistral AI,org_map,lead org: Mistral AI
+Mixtral-8x7B-Instruct-v0.1,Other,Mistral AI,org_map,lead org: Mistral AI
+Mixtral-8x7B-v0.1,Other,Mistral AI,org_map,lead org: Mistral AI
+Pixtral-12B-2409,Other,Mistral AI,org_map,lead org: Mistral AI
+StableBeluga2,Other,Stability AI,org_map,lead org: Stability AI
+Voxtral-Small-24B-2507,Other,Mistral AI,org_map,lead org: Mistral AI
+c4ai-command-a-03-2025,Other,Cohere,org_map,lead org: Cohere
+c4ai-command-r-08-2024,Other,,prefix,name-prefix match: 'c4ai'
+c4ai-command-r-plus-08-2024,Other,"Cohere,Cohere for AI",org_map,lead org: Cohere
+codestral-2405,Other,Mistral AI,org_map,lead org: Mistral AI
+codestral-2501,Other,Mistral AI,org_map,lead org: Mistral AI
+command-a-plus-05-2026,Other,Cohere,org_map,lead org: Cohere
+devstral-small-2512,Other,Mistral AI,org_map,lead org: Mistral AI
+falcon-11B-vlm,Other,,prefix,name-prefix match: 'falcon'
+falcon-11b,Other,Technology Innovation Institute,org_map,lead org: Technology Innovation Institute
+falcon-180B,Other,Technology Innovation Institute,org_map,lead org: Technology Innovation Institute
+falcon-40b,Other,Technology Innovation Institute,org_map,lead org: Technology Innovation Institute
+falcon-40b-instruct,Other,Technology Innovation Institute,org_map,lead org: Technology Innovation Institute
+falcon-7b,Other,Technology Innovation Institute,org_map,lead org: Technology Innovation Institute
+magistral-medium-2506,Other,Mistral AI,org_map,lead org: Mistral AI
+magistral-medium-2509,Other,Mistral AI,org_map,lead org: Mistral AI
+magistral-small-2506,Other,Mistral AI,org_map,lead org: Mistral AI
+magistral-small-2509,Other,Mistral AI,org_map,lead org: Mistral AI
+ministral-3b-2410,Other,Mistral AI,org_map,lead org: Mistral AI
+ministral-8b-2410,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-large-2402,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-large-2407,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-large-2411,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-large-2512,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-medium-2505,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-medium-2508,Other,,prefix,name-prefix match: 'mistral-medium'
+mistral-medium-2604,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-medium-2604_high,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-small-2402,Other,,prefix,name-prefix match: 'mistral-small'
+mistral-small-2501,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-small-2503,Other,Mistral AI,org_map,lead org: Mistral AI
+mistral-small-2506,Other,Mistral AI,org_map,lead org: Mistral AI
+ml-elephant,Other,,unresolved,"no organization, no matching name prefix"
+open-mistral-7b,Other,Mistral AI,org_map,lead org: Mistral AI
+open-mistral-nemo-2407,Other,Mistral AI,org_map,lead org: Mistral AI
+open-mixtral-8x22b,Other,Mistral AI,org_map,lead org: Mistral AI
+open-mixtral-8x7b,Other,Mistral AI,org_map,lead org: Mistral AI
+pixtral-large-2411,Other,Mistral AI,org_map,lead org: Mistral AI
+reka-flash-3,Other,Reka AI,org_map,lead org: Reka AI
+solar-pro-3,Other,Upstage,org_map,lead org: Upstage
+stablelm-tuned-alpha-7b,Other,,prefix,name-prefix match: 'stablelm'
+tiny-recursion-model,Other,,prefix,name-prefix match: 'tiny-recursion-model'
+vicuna-13b-v1.1,Other,,prefix,name-prefix match: 'vicuna'
+vicuna-13b-v1.3,Other,"Large Model Systems Organization,University of California (UC) Berkeley",org_map,lead org: Large Model Systems Organization
+Cerebras-GPT-13B,US,Cerebras Systems,org_map,lead org: Cerebras Systems
+ChatGPT agent,US,OpenAI,org_map,lead org: OpenAI
+Chinchilla (70B),US,Google DeepMind,org_map,lead org: Google DeepMind
+Composer 2.5,US,Cursor,org_map,lead org: Cursor
+Dracarys2-72B-Instruct,US,,prefix,name-prefix match: 'dracarys2'
+Dracarys2-Llama-3.1-70B-Instruct,US,,prefix,name-prefix match: 'dracarys2'
+GLaM (MoE),US,Google DeepMind,org_map,lead org: Google DeepMind
+Gopher (280B),US,Google DeepMind,org_map,lead org: Google DeepMind
+Hermes-2-Theta-Llama-3-70B,US,"Nous Research,Arcee AI",org_map,lead org: Nous Research
+Inflection-1,US,Inflection AI,org_map,lead org: Inflection AI
+Inkling,US,Thinking Machines,org_map,lead org: Thinking Machines
+Inkling_high,US,Thinking Machines,org_map,lead org: Thinking Machines
+Inkling_unknown,US,thinkingmachines,org_map,lead org: thinkingmachines
+Inkling_xhigh,US,Thinking Machines,org_map,lead org: Thinking Machines
+LFM2-Audio-1.5B,US,other,prefix,name-prefix match: 'lfm'
+LLaMA-13B,US,Meta AI,org_map,lead org: Meta AI
+LLaMA-33B,US,Meta AI,org_map,lead org: Meta AI
+LLaMA-65B,US,Meta AI,org_map,lead org: Meta AI
+LLaMA-7B,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-13b,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-13b-chat,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-34b,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-70b-chat,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-70b-chat-hf,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-70b-hf,US,Meta AI,org_map,lead org: Meta AI
+Llama-2-7b,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.1-405B,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.1-405B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.1-70B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.1-8B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.1-Tulu-3-70B-DPO,US,"Allen Institute for AI,University of Washington",org_map,lead org: Allen Institute for AI
+Llama-3.2-11B-Vision-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.2-1B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.2-3B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.2-90B-Vision-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-3.3-70B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-4-Maverick-17B-128E-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Llama-4-Maverick-17B-128E-Instruct-FP8,US,Meta AI,org_map,lead org: Meta AI
+Llama-4-Scout-17B-16E-Instruct,US,Meta AI,org_map,lead org: Meta AI
+MM1-3B-Chat,US,,prefix,name-prefix match: 'mm1'
+MM1-7B-Chat,US,,prefix,name-prefix match: 'mm1'
+Megatron-Turing NLG 530B,US,"Microsoft,NVIDIA",org_map,lead org: Microsoft
+Meta-Llama-3-70B,US,Meta AI,org_map,lead org: Meta AI
+Meta-Llama-3-70B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+Meta-Llama-3-8B,US,Meta AI,org_map,lead org: Meta AI
+Meta-Llama-3-8B-Instruct,US,Meta AI,org_map,lead org: Meta AI
+NVILA-8B,US,"NVIDIA,Massachusetts Institute of Technology (MIT),University of California (UC) Berkeley,University of California San Diego,University of Washington,Tsinghua University",org_map,lead org: NVIDIA
+Nemotron-4 15B,US,NVIDIA,org_map,lead org: NVIDIA
+OLMo-2-1124-13B-Instruct,US,"Allen Institute for AI,University of Washington,New York University (NYU)",org_map,lead org: Allen Institute for AI
+PaLM 2-L,US,,prefix,name-prefix match: 'palm'
+PaLM 2-M,US,,prefix,name-prefix match: 'palm'
+PaLM 2-S,US,,prefix,name-prefix match: 'palm'
+PaLM 540B,US,Google Research,org_map,lead org: Google Research
+PaLM 62B,US,,prefix,name-prefix match: 'palm'
+Phi-3-medium-128k-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-3-mini-4k-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-3-small-8k-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-3.5-MoE-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-3.5-mini-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-3.5-vision-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-4-mini-instruct,US,Microsoft,org_map,lead org: Microsoft
+Phi-4-multimodal-instruct,US,Microsoft,org_map,lead org: Microsoft
+RedPajama-INCITE-7B-Base,US,,prefix,name-prefix match: 'redpajama'
+Switch-Base,US,,prefix,name-prefix match: 'switch'
+Switch-Large,US,,prefix,name-prefix match: 'switch'
+T5-11B,US,Google DeepMind,org_map,lead org: Google DeepMind
+T5-3B,US,Google DeepMind,org_map,lead org: Google DeepMind
+T5-Base,US,,prefix,name-prefix match: 't5'
+T5-Large,US,,prefix,name-prefix match: 't5'
+T5-Small,US,,prefix,name-prefix match: 't5'
+WizardLM-2-8x22B,US,Microsoft,org_map,lead org: Microsoft
+ada,US,OpenAI,org_map,lead org: OpenAI
+amazon.nova-lite-v1:0,US,Amazon,org_map,lead org: Amazon
+amazon.nova-micro-v1:0,US,Amazon,org_map,lead org: Amazon
+amazon.nova-pro-v1:0,US,Amazon,org_map,lead org: Amazon
+babbage,US,OpenAI,org_map,lead org: OpenAI
+blip2-opt-2.7b,US,Salesforce Research,org_map,lead org: Salesforce Research
+bloom,US,"Hugging Face,BigScience",org_map,lead org: Hugging Face
+chatgpt-4o-01-29-2025,US,OpenAI,org_map,lead org: OpenAI
+chatgpt-4o-03-27-2025,US,OpenAI,org_map,lead org: OpenAI
+chutes/Llama-4-Scout-17B-16E Instruct,US,Meta AI,org_map,lead org: Meta AI
+claude-1.3,US,Anthropic,org_map,lead org: Anthropic
+claude-2.0,US,Anthropic,org_map,lead org: Anthropic
+claude-2.1,US,Anthropic,org_map,lead org: Anthropic
+claude-3-5-haiku-20241022,US,Anthropic,org_map,lead org: Anthropic
+claude-3-5-sonnet-20240620,US,Anthropic,org_map,lead org: Anthropic
+claude-3-5-sonnet-20241022,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_12K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_15K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_1K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_2K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_64K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_8K,US,Anthropic,org_map,lead org: Anthropic
+claude-3-7-sonnet-20250219_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-3-haiku-20240307,US,Anthropic,org_map,lead org: Anthropic
+claude-3-opus-20240229,US,Anthropic,org_map,lead org: Anthropic
+claude-3-sonnet-20240229,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5_high,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5_low,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5_max,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-fable-5_xhigh,US,Anthropic,org_map,lead org: Anthropic
+claude-haiku-4-5-20251001,US,Anthropic,org_map,lead org: Anthropic
+claude-haiku-4-5-20251001_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-haiku-4-5-20251001_1K,US,Anthropic,org_map,lead org: Anthropic
+claude-haiku-4-5-20251001_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-haiku-4-5-20251001_8K,US,Anthropic,org_map,lead org: Anthropic
+claude-haiku-4-5-20251001_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-instant-1.1,US,Anthropic,org_map,lead org: Anthropic
+claude-instant-1.2,US,Anthropic,org_map,lead org: Anthropic
+claude-mythos-preview-early,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805_24K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805_27K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-1-20250805_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_12K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_1K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_27K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_2K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_8K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-20250514_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_128K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_48K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_64K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_8K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_none,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-5-20251101_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_120K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_64K,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_low,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_max,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-6_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7_low,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7_max,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-7_xhigh,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_low,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_max,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_none,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-4-8_xhigh,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5_high,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5_low,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5_max,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-opus-5_xhigh,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_12K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_1K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_2K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_59K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_8K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-20250514_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_12K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_1K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_2K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_48K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_59K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_8K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_high,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-5-20250929_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_16K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_32K,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_high,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_low,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_max,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-4-6_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-5_high,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-5_low,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-5_max,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-5_medium,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-5_unknown,US,Anthropic,org_map,lead org: Anthropic
+claude-sonnet-5_xhigh,US,Anthropic,org_map,lead org: Anthropic
+code-davinci-002,US,OpenAI,org_map,lead org: OpenAI
+codex-mini-2025-05-16,US,,prefix,name-prefix match: 'codex'
+cogito-671b-v2.1,US,Deep Cogito,org_map,lead org: Deep Cogito
+computer-use-preview-2025-03-11,US,,prefix,name-prefix match: 'computer-use-preview'
+curie,US,OpenAI,org_map,lead org: OpenAI
+davinci,US,OpenAI,org_map,lead org: OpenAI
+davinci-002,US,OpenAI,org_map,lead org: OpenAI
+dbrx-instruct,US,Databricks,org_map,lead org: Databricks
+dolly-v2-12b,US,Databricks,org_map,lead org: Databricks
+gdm-ai-co-mathematician,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.0-pro-001,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.0-pro-vision,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-flash-001,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-flash-002,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-flash-0514,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-flash-8b-001,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-pro-001,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-pro-001-feb24,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-1.5-pro-002,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-flash-001,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-flash-exp,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-flash-lite,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-flash-lite-001,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-flash-lite-preview-02-05,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-flash-thinking-exp-01-21,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.0-pro-exp-02-05,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-deep-think-2025-08-01-webapp,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-lite-preview-06-17-thinking,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-lite-preview-06-17_16K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-lite-preview-09-2025,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-native-audio-preview-12-2025 (non-thinking),US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-native-audio-preview-12-2025 (thinking),US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-04-17,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-04-17_16K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-04-17_24K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-05-20,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-05-20_16K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-05-20_1K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-05-20_24K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-05-20_8K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-09-2025,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-flash-preview-09-2025_16k,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro-exp-03-25,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro-preview-03-25,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro-preview-05-06,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro-preview-06-05,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro-preview-06-05_1K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro-preview-06-05_32K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro_16K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro_32K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro_8K,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-2.5-pro_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-deep-think-preview,US,,prefix,name-prefix match: 'gemini'
+gemini-3-flash-preview,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-flash-preview_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-flash-preview_low,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-flash-preview_medium,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-flash-preview_minimal,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-pro-preview,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3-pro-preview_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-flash-lite,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-flash-lite_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-flash-lite_low,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-flash-lite_minimal,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-flash-live-preview,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-pro-preview,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-pro-preview-customtools,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-pro-preview_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-pro-preview_low,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.1-pro-preview_medium,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash-lite,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash-lite_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash-lite_low,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash-lite_minimal,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash_low,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash_medium,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash_minimal,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.5-flash_unknown,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.6-flash_high,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.6-flash_low,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.6-flash_minimal,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-3.6-flash_unknown,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-exp-1206,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemini-robotics-er-1.5-preview,US,,prefix,name-prefix match: 'gemini'
+gemini-robotics-er-1.6-preview,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-2-27b-it,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-2-9b,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-2-9b-it,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-2b,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-3-12b-it,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-3-27b-it,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-3-4b-it,US,,prefix,name-prefix match: 'gemma'
+gemma-3n-E4B-it,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-4-26b-a4b,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-4-26b-a4b-it,US,,prefix,name-prefix match: 'gemma'
+gemma-4-31b-it,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-4-31b-it_minimal,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-4-31b-it_none,US,Google DeepMind,org_map,lead org: Google DeepMind
+gemma-7b,US,Google DeepMind,org_map,lead org: Google DeepMind
+gpt-3.5-turbo-0125,US,OpenAI,org_map,lead org: OpenAI
+gpt-3.5-turbo-0613,US,OpenAI,org_map,lead org: OpenAI
+gpt-3.5-turbo-1106,US,OpenAI,org_map,lead org: OpenAI
+gpt-3.5-turbo-instruct,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-0125-preview,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-0314,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-0613,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-1106-preview,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-1106-vision-preview,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-32k-0314,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-turbo,US,OpenAI,org_map,lead org: OpenAI
+gpt-4-turbo-2024-04-09,US,OpenAI,org_map,lead org: OpenAI
+gpt-4.1-2025-04-14,US,OpenAI,org_map,lead org: OpenAI
+gpt-4.1-mini-2025-04-14,US,OpenAI,org_map,lead org: OpenAI
+gpt-4.1-nano-2025-04-14,US,OpenAI,org_map,lead org: OpenAI
+gpt-4.5-preview-2025-02-27,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o-2024-05-13,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o-2024-08-06,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o-2024-11-20,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o-audio-preview-2025-06-03,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o-mini-2024-07-18,US,OpenAI,org_map,lead org: OpenAI
+gpt-4o-mini-audio-preview-2024-12-17,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-2025-08-07_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-2025-08-07_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-2025-08-07_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-2025-08-07_minimal,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-2025-08-07_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-chat,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-codex,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-codex_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-mini-2025-08-07_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-mini-2025-08-07_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-mini-2025-08-07_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-mini-2025-08-07_minimal,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-mini-2025-08-07_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-nano-2025-08-07_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-nano-2025-08-07_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-nano-2025-08-07_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-nano-2025-08-07_minimal,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-nano-2025-08-07_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-pro-2025-10-06_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-pro-2025-10-06_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5-pro-2025-10-06_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-2025-11-13_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-2025-11-13_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-2025-11-13_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-2025-11-13_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-2025-11-13_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-codex,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-codex-max,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.1-codex-mini,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-2025-12-11_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-2025-12-11_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-2025-12-11_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-2025-12-11_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-2025-12-11_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-2025-12-11_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-codex,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-pro-2025-12-11,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-pro-2025-12-11-webapp,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-pro-2025-12-11_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-pro-2025-12-11_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.2-pro-2025-12-11_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.3-codex,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.3-codex_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.3-codex_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-2026-03-05_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-2026-03-05_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-2026-03-05_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-2026-03-05_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-2026-03-05_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-2026-03-05_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-mini-2026-03-17_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-mini-2026-03-17_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-mini-2026-03-17_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-mini-2026-03-17_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-mini-2026-03-17_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-mini-2026-03-17_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-nano-2026-03-17_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-nano-2026-03-17_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-nano-2026-03-17_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-nano-2026-03-17_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-nano-2026-03-17_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-nano-2026-03-17_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-pro-2026-03-05-web-app,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-pro-2026-03-05_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-pro-2026-03-05_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.4-pro-2026-03-05_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-codex,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-instant,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-pre-release_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-pro-pre-release_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-pro-pre-release_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-pro_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-pro_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5-pro_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.5_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6 (sol),US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_max,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-luna_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_max,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_promax,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_prounknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-sol_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_low,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_max,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_none,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-5.6-terra_xhigh,US,OpenAI,org_map,lead org: OpenAI
+gpt-j-6b,US,"EleutherAI,LAION",org_map,lead org: EleutherAI
+gpt-neo-2.7B,US,EleutherAI,org_map,lead org: EleutherAI
+gpt-neox-20b,US,EleutherAI,org_map,lead org: EleutherAI
+gpt-oss-120b,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-120b_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-120b_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-120b_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-20b,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-20b_high,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-20b_medium,US,OpenAI,org_map,lead org: OpenAI
+gpt-oss-20b_unknown,US,OpenAI,org_map,lead org: OpenAI
+gpt-realtime-1.5,US,OpenAI,org_map,lead org: OpenAI
+gpt-realtime-2,US,OpenAI,org_map,lead org: OpenAI
+gpt-realtime-2 (xHigh),US,OpenAI,org_map,lead org: OpenAI
+gpt-realtime-2025-08-28,US,OpenAI,org_map,lead org: OpenAI
+gpt-realtime-mini-2025-12-15,US,OpenAI,org_map,lead org: OpenAI
+gpt2-xl,US,OpenAI,org_map,lead org: OpenAI
+granite-4.0-h-small,US,,prefix,name-prefix match: 'granite'
+granite-4.1-30b,US,IBM,org_map,lead org: IBM
+grok-2-1212,US,xAI,org_map,lead org: xAI
+grok-3,US,xAI,org_map,lead org: xAI
+grok-3-beta,US,xAI,org_map,lead org: xAI
+grok-3-mini-beta_high,US,xAI,org_map,lead org: xAI
+grok-3-mini-beta_low,US,xAI,org_map,lead org: xAI
+grok-3-mini-beta_medium,US,xAI,org_map,lead org: xAI
+grok-3-mini_high,US,xAI,org_map,lead org: xAI
+grok-3-mini_low,US,xAI,org_map,lead org: xAI
+grok-3-mini_unknown,US,,prefix,name-prefix match: 'grok'
+grok-4-0709,US,xAI,org_map,lead org: xAI
+grok-4-0709_high,US,xAI,org_map,lead org: xAI
+grok-4-1,US,xAI,org_map,lead org: xAI
+grok-4-1-fast-non-reasoning,US,xAI,org_map,lead org: xAI
+grok-4-1-fast-reasoning,US,xAI,org_map,lead org: xAI
+grok-4-20,US,xAI,org_map,lead org: xAI
+grok-4-20_high,US,xAI,org_map,lead org: xAI
+grok-4-3,US,xAI,org_map,lead org: xAI
+grok-4-fast,US,xAI,org_map,lead org: xAI
+grok-4-fast-reasoning,US,,prefix,name-prefix match: 'grok'
+grok-4-heavy-web-app,US,xAI,org_map,lead org: xAI
+grok-4.20-0309-reasoning,US,xAI,org_map,lead org: xAI
+grok-4.3_high,US,xAI,org_map,lead org: xAI
+grok-4.5_high,US,xAI,org_map,lead org: xAI
+grok-4.5_low,US,xAI,org_map,lead org: xAI
+grok-4.5_medium,US,xAI,org_map,lead org: xAI
+grok-4.5_unknown,US,xAI,org_map,lead org: xAI
+grok-build-0.1,US,xAI,org_map,lead org: xAI
+grok-code-fast-1,US,,prefix,name-prefix match: 'grok'
+inkling-small,US,Thinking Machines,org_map,lead org: Thinking Machines
+inkling-small_high,US,Thinking Machines,org_map,lead org: Thinking Machines
+inkling-small_low,US,Thinking Machines,org_map,lead org: Thinking Machines
+inkling-small_medium,US,Thinking Machines,org_map,lead org: Thinking Machines
+inkling-small_minimal,US,Thinking Machines,org_map,lead org: Thinking Machines
+inkling-small_none,US,Thinking Machines,org_map,lead org: Thinking Machines
+inkling-small_xhigh,US,Thinking Machines,org_map,lead org: Thinking Machines
+instructblip-vicuna-13b,US,,prefix,name-prefix match: 'instructblip'
+instructblip-vicuna-7b,US,,prefix,name-prefix match: 'instructblip'
+laguna-m.1,US,Poolside,org_map,lead org: Poolside
+laguna-xs.2,US,Poolside,org_map,lead org: Poolside
+learnlm-1.5-pro-experimental,US,,prefix,name-prefix match: 'learnlm'
+llava-v1.5-7b,US,,prefix,name-prefix match: 'llava-v1.5-7b'
+llava-v1.6-mistral-7b,US,,prefix,name-prefix match: 'llava-v1.6-mistral-7b'
+llava-v1.6-vicuna-13b,US,,prefix,name-prefix match: 'llava-v1.6-vicuna-13b'
+llava-v1.6-vicuna-7b,US,,prefix,name-prefix match: 'llava-v1.6-vicuna-7b'
+mercury-2,US,Inception Labs,org_map,lead org: Inception Labs
+mpt-30b,US,MosaicML,org_map,lead org: MosaicML
+mpt-30b-instruct,US,MosaicML,org_map,lead org: MosaicML
+mpt-7b,US,MosaicML,org_map,lead org: MosaicML
+muse-spark,US,Meta AI,org_map,lead org: Meta AI
+muse-spark-1.1,US,Meta AI,org_map,lead org: Meta AI
+muse-spark-1.1_high,US,Meta AI,org_map,lead org: Meta AI
+muse-spark-1.1_xhigh,US,Meta AI,org_map,lead org: Meta AI
+nemotron-3-super,US,NVIDIA,org_map,lead org: NVIDIA
+nemotron-3-ultra,US,NVIDIA,org_map,lead org: NVIDIA
+nova-2.0-pro-preview_low,US,Amazon,org_map,lead org: Amazon
+nova-2.0-pro-preview_medium,US,Amazon,org_map,lead org: Amazon
+nova-2.0-pro-preview_none,US,Amazon,org_map,lead org: Amazon
+nova-premier,US,Amazon,org_map,lead org: Amazon
+o1-2024-12-17_high,US,OpenAI,org_map,lead org: OpenAI
+o1-2024-12-17_low,US,OpenAI,org_map,lead org: OpenAI
+o1-2024-12-17_medium,US,OpenAI,org_map,lead org: OpenAI
+o1-2024-12-17_unknown,US,OpenAI,org_map,lead org: OpenAI
+o1-mini-2024-09-12_high,US,OpenAI,org_map,lead org: OpenAI
+o1-mini-2024-09-12_medium,US,OpenAI,org_map,lead org: OpenAI
+o1-mini-2024-09-12_unknown,US,OpenAI,org_map,lead org: OpenAI
+o1-preview,US,OpenAI,org_map,lead org: OpenAI
+o1-preview-2024-09-12,US,OpenAI,org_map,lead org: OpenAI
+o1-pro-2025-03-19,US,OpenAI,org_map,lead org: OpenAI
+o1-pro-2025-03-19_low,US,OpenAI,org_map,lead org: OpenAI
+o3-2025-04-16_high,US,OpenAI,org_map,lead org: OpenAI
+o3-2025-04-16_low,US,OpenAI,org_map,lead org: OpenAI
+o3-2025-04-16_medium,US,OpenAI,org_map,lead org: OpenAI
+o3-2025-04-16_unknown,US,OpenAI,org_map,lead org: OpenAI
+o3-mini-2025-01-31_high,US,OpenAI,org_map,lead org: OpenAI
+o3-mini-2025-01-31_low,US,OpenAI,org_map,lead org: OpenAI
+o3-mini-2025-01-31_medium,US,OpenAI,org_map,lead org: OpenAI
+o3-mini-2025-01-31_unknown,US,OpenAI,org_map,lead org: OpenAI
+o3-pro-2025-06-10,US,OpenAI,org_map,lead org: OpenAI
+o3-pro-2025-06-10_high,US,OpenAI,org_map,lead org: OpenAI
+o3-pro-2025-06-10_low,US,OpenAI,org_map,lead org: OpenAI
+o3-pro-2025-06-10_medium,US,OpenAI,org_map,lead org: OpenAI
+o4-mini,US,OpenAI,org_map,lead org: OpenAI
+o4-mini-2025-04-16,US,OpenAI,org_map,lead org: OpenAI
+o4-mini-2025-04-16_high,US,OpenAI,org_map,lead org: OpenAI
+o4-mini-2025-04-16_low,US,OpenAI,org_map,lead org: OpenAI
+o4-mini-2025-04-16_medium,US,OpenAI,org_map,lead org: OpenAI
+o4-mini-2025-04-16_unknown,US,OpenAI,org_map,lead org: OpenAI
+open_llama_7b,US,,prefix,name-prefix match: 'open_llama'
+openai/gpt-oss-120b_low,US,OpenAI,org_map,lead org: OpenAI
+openhands-lm-32b-v0.1,US,,prefix,name-prefix match: 'openhands-lm'
+opt-1.3b,US,Meta AI,org_map,lead org: Meta AI
+opt-13b,US,,prefix,name-prefix match: 'opt-13b'
+opt-175b,US,Meta AI,org_map,lead org: Meta AI
+opt-66b,US,Meta AI,org_map,lead org: Meta AI
+phi-1_5,US,Microsoft,org_map,lead org: Microsoft
+phi-2,US,Microsoft,org_map,lead org: Microsoft
+phi-4,US,Microsoft Research,org_map,lead org: Microsoft Research
+sonar,US,,prefix,name-prefix match: 'sonar'
+sonar-pro,US,Perplexity,org_map,lead org: Perplexity
+starcoder2-15b,US,"Hugging Face,ServiceNow,NVIDIA,BigCode",org_map,lead org: Hugging Face
+starcoder2-3b,US,"Hugging Face,ServiceNow,NVIDIA,BigCode",org_map,lead org: Hugging Face
+starcoder2-7b,US,"Hugging Face,ServiceNow,NVIDIA,BigCode",org_map,lead org: Hugging Face
+swe-1.6,US,Cognition,org_map,lead org: Cognition
+swe-1.7,US,Cognition,org_map,lead org: Cognition
+text-ada-001,US,OpenAI,org_map,lead org: OpenAI
+text-babbage-001,US,OpenAI,org_map,lead org: OpenAI
+text-curie-001,US,OpenAI,org_map,lead org: OpenAI
+text-davinci-001,US,OpenAI,org_map,lead org: OpenAI
+text-davinci-002,US,OpenAI,org_map,lead org: OpenAI
+text-davinci-003,US,,prefix,name-prefix match: 'text-davinci'
+tml-interaction-small,US,thinkingmachines,org_map,lead org: thinkingmachines
+trinity-large-thinking,US,Arcee AI,org_map,lead org: Arcee AI
+xgen-7b-8k-base,US,Salesforce,org_map,lead org: Salesforce

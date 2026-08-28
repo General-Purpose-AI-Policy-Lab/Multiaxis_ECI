@@ -1,0 +1,56 @@
+# Open benchmarks: access=public AND verified=yes in benchmark_access.csv,
+# minus retired + curated exclusions. Final, post 3-pass fact-check 2026-08-27.
+ARC (AI2)
+Adversarial NLI
+Aider Polyglot
+AudioMultiChallenge
+BALROG
+BIG-Bench Hard (BBH)
+BioLP-bench
+BoolQ
+CAD-Eval
+CL-Bench
+CL-Bench Life
+CSQA2
+Cybench
+DeepResearchBench
+ExploitBench
+GBAEval
+GDP.pdf
+GPQA Diamond
+GPQA Diamond Biology
+GPQA Diamond Chemistry
+GPQA Main Biology
+GPQA Main Chemistry
+GSM8K
+GSO-Bench
+LAMBADA
+Lech Mazur Writing
+MATH Level 5
+MMLU
+MMLU Biology
+MMLU Chemistry
+MMLU Pro Biology
+MMLU Pro Chemistry
+MMLU-Pro
+MultiChallenge
+MultiNRC
+OS World (Screenshot)
+PRBench Finance
+PRBench Legal
+PostTrainBench
+SWE-Bench Pro
+SWE-Bench Verified
+SciCode
+ScienceQA
+SimpleQA Verified
+SpatialViz-Bench
+SuperGLUE
+TerminalBench
+The Agent Company
+TriviaQA
+TutorBench
+Video-MME
+VisualToolBench
+WMDP Biology
+WMDP Chemistry
