@@ -66,11 +66,13 @@ LABEL_LOW = {
 # still-sparse 2023 band: close to the 2024-2026 cloud the leaders point into,
 # without touching it.
 LABEL_HIGH_BENCH = ["Remote Labor Index", "Humanity's Last Exam"]
+# Display override: wrapped onto two lines and lifted, so the text block ends
+# before the 2025 benchmark whiskers instead of running into them.
+LABEL_WRAP = {"Humanity's Last Exam": "Humanity's<br>Last Exam"}
 HIGH_COL_X = "2024-03-01"
 # Two slots only (RLI, HLE): the model labels sit RIGHT of their own points
-# instead, where the top-right corner above the tier names is empty. The
-# second slot stays near HLE's own height so its leader stays short.
-HIGH_COL_Y = [216, 172]
+# instead, where the top-right corner above the tier names is empty.
+HIGH_COL_Y = [216, 179]
 N_TOP_MODELS = 3
 _EFFORTS = {"unknown", "max", "xhigh", "high", "medium", "low", "minimal",
             "promax", "proxhigh", "prohigh", "promedium", "prolow"}
@@ -214,6 +216,9 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     # then fan out without crossing.
     high.sort(key=lambda t: -float(t[0]["mean"]))
     for (r, color), y in zip(high, HIGH_COL_Y):
+        if r["name"] in LABEL_WRAP:
+            r = r.copy()
+            r["name"] = LABEL_WRAP[r["name"]]
         _label(r, (HIGH_COL_X, y), color)
 
     # Top models: one column in the TOP-RIGHT corner, past the last point and
