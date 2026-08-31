@@ -1,6 +1,6 @@
 # Multi-Axis ECI
 
-Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines* (GPAI Policy Lab, August 2026). It follows [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1), see [`Multi-axis-Rosetta`](https://github.com/General-Purpose-AI-Policy-Lab/Multi-axis-Rosetta).
+Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines* (GPAI Policy Lab, August 2026). It follows [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1), see [`rosetta-human-baselines`](https://github.com/General-Purpose-AI-Policy-Lab/rosetta-human-baselines).
 
 The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many benchmark scores into one number per model, following the [Rosetta Stone paper](https://arxiv.org/abs/2512.00193). The previous post put human baseline tiers on that same scale, which exposed a problem. Humans score near-perfectly on abstract-reasoning benchmarks like ARC-AGI or VPCT and near chance on GPQA-type benchmarks, while many models show the opposite pattern. No single ordering produces both.
 
