@@ -1,12 +1,12 @@
 # ECI Bayesian Recreation
 
 Code and data behind the forthcoming post *A Four-Axis Bayesian Epoch Capabilities Index
-with Human Baselines* (GPAI Policy Lab, August 2026) — **link to be added on publication** —
-and its predecessor [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1).
+with Human Baselines* (GPAI Policy Lab, August 2026), whose link goes here once it is
+published, and its predecessor [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1).
 
-The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many benchmark scores into one number per model, following the [Rosetta Stone paper](https://arxiv.org/abs/2512.00193). The previous post put human baseline tiers on that same scale. Doing so exposed a problem one axis cannot hold: humans score near-perfectly on abstract-reasoning benchmarks like ARC-AGI or VPCT and near chance on GPQA-type benchmarks, while many models show the opposite pattern. No single ordering produces both.
+The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many benchmark scores into one number per model, following the [Rosetta Stone paper](https://arxiv.org/abs/2512.00193). The previous post put human baseline tiers on that same scale, which exposed a problem. Humans score near-perfectly on abstract-reasoning benchmarks like ARC-AGI or VPCT and near chance on GPQA-type benchmarks, while many models show the opposite pattern. No single ordering produces both.
 
-This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT** — an item-response model with a Beta likelihood — where every ability comes with its uncertainty and the nine human tiers are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index. Four axes come out of the fit, named after the benchmarks whose loadings are most collinear with them:
+This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT**, an item-response model with a Beta likelihood. Every ability comes with its uncertainty, and the nine human tiers are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index. Four axes come out of the fit, named after the benchmarks whose loadings are most collinear with them:
 
 <img src="results/mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise/axis_share_heatmap.png" width="560" alt="Benchmark axis share, top 20 per axis">
 
@@ -66,26 +66,26 @@ Full model math, priors and identification: [docs/model_math.md](docs/model_math
 
 ## Method
 
-Each test-taker *m* has K abilities θ forming a skill profile, the way a student can be strong in algebra and weak in essay writing. Each benchmark weighs those skills through K non-negative loadings *A*, which also set how sharply it separates test-takers — what psychometrics calls discrimination. Difficulty *D* is the bar the weighted skills must clear, and a chance floor *c*, fixed per benchmark and never estimated, starts the curve where guessing does:
+Each test-taker *m* has K abilities θ forming a skill profile, the way a student can be strong in algebra and weak in essay writing. Each benchmark weighs those skills through K non-negative loadings *A*, which also set how sharply it separates test-takers, what psychometrics calls discrimination. Difficulty *D* is the bar the weighted skills must clear, and a chance floor *c*, fixed per benchmark and never estimated, starts the curve where guessing does:
 
 <p align="center"><em>µ = c<sub>b</sub> + (1 − c<sub>b</sub>) σ( Σ<sub>k</sub> A<sub>b,k</sub> θ<sub>m,k</sub> − D<sub>b</sub> )</em>,  &nbsp; observed <em>y ~ Beta(µφ<sub>b</sub>, (1−µ)φ<sub>b</sub>)</em></p>
 
 This is the *compensatory* family: a strong skill can make up for a weak one inside the sum. The non-compensatory and semi-compensatory alternatives are implemented too (`fits/fit_nc.py`, `fits/fit_interaction.py`); the first did not converge, the second converged only under heavy constraints and predicted worse.
 
-**The data is sparse — the test-taker by benchmark matrix is filled at about 6%, and the average test-taker has six scores.** Many arrangements of abilities and loadings explain those scores equally well, so unconstrained runs land on different solutions. Two ordering priors identify the fit:
+**The data is sparse.** The test-taker by benchmark matrix is filled at about 6%, and the average test-taker has six scores. Many arrangements of abilities and loadings explain those scores equally well, so unconstrained runs land on different solutions. Two ordering priors identify the fit:
 
-- `--human-merge` — a **hard** partial order on the human tiers: a Domain Expert is at least as good as a Skilled Generalist, a committee at least as good as its members, on every axis. It says nothing about the size of the gaps, and leaves genuinely incomparable tiers unordered.
-- `--lineage-prior --lineage-bm` — a **soft** prior along each vendor's release chain: a release is nudged above its predecessor, more over a longer gap, but can regress if the data says so. Thinking-effort variants attach to their base release and are not ordered among themselves.
+- `--human-merge` sets a **hard** partial order on the human tiers. A Domain Expert is at least as good as a Skilled Generalist, a committee at least as good as its members, on every axis. It says nothing about the size of the gaps, and leaves genuinely incomparable tiers unordered.
+- `--lineage-prior --lineage-bm` add a **soft** prior along each vendor's release chain. A release is nudged above its predecessor, more over a longer gap, but can regress if the data says so. Thinking-effort variants attach to their base release and are not ordered among themselves.
 
 Without priors the runs split into two sets of axes; with the human ordering alone they still disagree; with both, they agree. On leave-one-out cross-validation the final model beats the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33.
 
-Four defaults are not flags: non-negative loadings, the fixed-c chance floors, hierarchical benchmark noise, and four retired benchmarks (FrontierMath v1, FrontierMath Tier 4 v1, AlgoTune, MindCube) dropped at load time for every fit. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
+Four things are on by default with no flag over them: non-negative loadings, the fixed-c chance floors, hierarchical benchmark noise, and four retired benchmarks (FrontierMath v1, FrontierMath Tier 4 v1, AlgoTune, MindCube) dropped at load time for every fit. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
 
 ## Reading the results
 
 **Axes have no fixed names, so they are labelled after sampling.** Swapping two axes leaves every prediction unchanged, because the swap moves the loadings `A` and the abilities `theta` together and only their product reaches the likelihood. Each draw picks its own labels, and they are fixed afterwards: within every draw axes are sorted strongest first. So "axis 2" means "the second strongest axis" in every draw.
 
-Whether the chains agree on those axes is a separate question and a separate number. Each chain's mean loading columns are matched to the pooled mean over every permutation and sign — all 24 of them at K=4 — and the median correlation is reported per axis. That is a diagnostic, not a relabelling: it says which axis the chains disagree about, which the identified r-hat cannot. Convergence is judged on identified quantities only (`eta`, `D`, `sigma_b`), because raw per-axis r-hat on `A` and `theta` is permutation-inflated.
+Whether the chains agree on those axes is a different question, with its own number. Each chain's mean loading columns are matched to the pooled mean over every permutation and sign (all 24 of them at K=4), and the median correlation is reported per axis. Nothing is relabelled by this; the number says which axis the chains disagree about, which the identified r-hat cannot. Convergence is judged on identified quantities only (`eta`, `D`, `sigma_b`), because raw per-axis r-hat on `A` and `theta` is permutation-inflated.
 
 **An ability is trustworthy only where it was measured.** A test-taker's ability on an axis rests on benchmarks that load on that axis. Models from 2021-2023 took only easy benchmarks, so their hard-axis ability is extrapolated, not measured, and can land high with a wide interval. Figures drop those rows through `mirt_informed_mask` (posterior SD < 0.4); the fit and the diagnostics keep every row.
 
@@ -93,9 +93,13 @@ Whether the chains agree on those axes is a separate question and a separate num
 
 ## Limitations
 
-The data is the first one: we need more of it and of better quality, especially for the human baselines, and the 6% fill rate is what forced the extra assumptions above. The second, shared with the Rosetta Stone paper and the ECI generally, is that we fit benchmark-level scores rather than item-level answers, so the MIRT assumptions are not fully respected. The third is calibration: the predictive intervals are wider than the data requires, which makes the model more conservative than it should be.
+Three carry over from the post:
 
-On the **Legacy QA** axis specifically, the human lead is a comparison against a frozen pool of pre-mid-2024 models — the eight benchmarks that define the axis most purely were never run on a frontier model. It is a data artifact, not a finding, and it is left out of the forecasts.
+- **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
+- **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
+- **Calibration.** The predictive intervals come out wider than the data requires, which makes the model more conservative than it should be.
+
+On the **Legacy QA** axis specifically, the human lead is a comparison against a frozen pool of pre-mid-2024 models. The eight benchmarks that define the axis most purely were never run on a frontier model, so this is a data artifact rather than a finding, and the axis is left out of the forecasts.
 
 ## Data
 
@@ -114,4 +118,4 @@ That notebook is being superseded by [`eval-data-pipeline`](https://github.com/G
 
 CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `data/curated/` and `results/`.
 
-The upstream benchmark scores carry their own terms — Epoch AI is CC-BY and requires attribution, RAND is cited under RR-A3797-1, and Scale SEAL has no open license. What to credit when republishing: [NOTICE.md](NOTICE.md).
+The upstream benchmark scores carry their own terms. Epoch AI is CC-BY and requires attribution, RAND is cited under RR-A3797-1, and Scale SEAL has no open license. What to credit when republishing: [NOTICE.md](NOTICE.md).
