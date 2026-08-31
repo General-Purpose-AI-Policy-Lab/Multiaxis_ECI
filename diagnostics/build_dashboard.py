@@ -151,7 +151,7 @@ def _trace_path(fit):
 # file, so a build never loads a multi-GB trace to re-detect. Mode views are
 # ADDITIONS: the whole-fit figures stay, and no diagnostic number is ever
 # mode-restricted (convergence, PPC and PIT describe the whole fit; see the
-# "Diagnose a fit" section of README.md).
+# "Diagnose a fit" section of docs/cli.md).
 
 def _modes_path(fit):
     """Where this fit's mode split lives — same trace-stem rule as

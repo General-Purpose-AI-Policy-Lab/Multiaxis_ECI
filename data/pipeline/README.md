@@ -4,15 +4,19 @@ One notebook (`pipeline.ipynb`) that pulls a dated snapshot of Epoch AI's
 public benchmark ZIP (CC-BY, refreshed ~weekly) and assembles a
 `benchmarks_merged.csv` matching the schema `data.py` already consumes.
 
-This notebook is the authoritative refresh path for
+This notebook is the current refresh path for
 `data/processed/benchmarks_merged.csv`.
 
-> **Related repository.** [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline)
-> covers the same upstream feeds (Epoch, Kaggle, RAND, Scale SEAL) with a
-> different, UUID-keyed schema. It does **not** feed this repository: `data.py`
-> consumes `data/processed/benchmarks_merged.csv`, produced by the notebook in
-> this directory. Read that repo's README before assuming the two are
-> interchangeable.
+> **Being superseded.** [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline)
+> is the successor to this notebook: same upstream feeds, extracted into a
+> standalone repository, with a UUID-keyed schema (three CSV linked by
+> `model_id` / `benchmark_id`), per-source alias dictionaries, and a determinism
+> check that a re-run reproduces the database bit-for-bit.
+>
+> **The migration is not done.** `data.py` still reads the flat
+> `benchmarks_merged.csv` this notebook writes, and the two schemas are not
+> interchangeable yet, so this remains the path to run for now. New feed work
+> belongs in the successor repository rather than here.
 
 ## Refresh workflow
 
