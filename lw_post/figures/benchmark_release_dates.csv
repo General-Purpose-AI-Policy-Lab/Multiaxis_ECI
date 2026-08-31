@@ -1,0 +1,93 @@
+benchmark,release_date,source,confidence
+APEX Agents,,Epoch AI internal eval; no public release date found,
+ARC (AI2),2018-03-14,https://arxiv.org/abs/1803.05457,high
+Adversarial NLI,2019-10-31,https://arxiv.org/abs/1910.14599,high
+Aider Polyglot,2024-12-21,https://aider.chat/2024/12/21/polyglot.html,high
+AlgoTune,2025-07-21,https://arxiv.org/abs/2507.15887,approx
+AudioMultiChallenge,,Scale SEAL leaderboard; no dated publication found,
+BALROG,2024-11-20,https://arxiv.org/abs/2411.13543,high
+BIG-Bench Hard (BBH),2022-10-17,https://arxiv.org/abs/2210.09261,high
+BioLP-bench,2024-08-21,https://doi.org/10.1101/2024.08.21.608694 (bioRxiv),approx
+BlueprintBench 2,,no public release date found,
+BoolQ,2019-05-24,https://arxiv.org/abs/1905.10044,high
+CAD-Eval,,no public release date found,
+CL-Bench,,no public release date found,
+CL-Bench Life,,no public release date found,
+CSQA2,2021-11-01,CommonsenseQA 2.0 (NeurIPS 2021 Datasets & Benchmarks); https://arxiv.org/abs/2201.05320,approx
+Chess Puzzles,,Epoch AI internal eval; no public release date found,
+CritPt,,no public release date found,
+CursorBench,,no public release date found,
+Cybench,2024-08-15,https://arxiv.org/abs/2408.08926,high
+DeepResearchBench,2025-06-13,https://arxiv.org/abs/2506.11763,approx
+DeepSWE,,no public release date found,
+EBR-bench,,no public release date found,
+EnigmaEval,2025-02-13,https://arxiv.org/abs/2502.08859,approx
+ExploitBench,,no public release date found,
+Fiction.LiveBench,,rolling community leaderboard; no dated release,
+ForecastBench,2024-09-30,https://arxiv.org/abs/2409.19839,high
+FrontierCode,,Epoch AI internal eval; no public release date found,
+FrontierMath,2024-11-07,https://arxiv.org/abs/2411.04872,high
+FrontierMath Tier 4,2025-07-01,Epoch AI Tier 4 announcement; https://epoch.ai/frontiermath,approx
+FrontierMath Tier 4 v1,2025-07-01,Epoch AI Tier 4 announcement; https://epoch.ai/frontiermath,approx
+FrontierMath v1,2024-11-07,https://arxiv.org/abs/2411.04872,high
+GBAEval,,no public release date found,
+GDP.pdf,,Epoch AI internal eval; no public release date found,
+GDPval,2025-09-25,https://openai.com/index/gdpval/,high
+GPQA Diamond,2023-11-20,https://arxiv.org/abs/2311.12022,high
+GPQA Diamond Biology,2023-11-20,https://arxiv.org/abs/2311.12022 (subset),high
+GPQA Diamond Chemistry,2023-11-20,https://arxiv.org/abs/2311.12022 (subset),high
+GPQA Main Biology,2023-11-20,https://arxiv.org/abs/2311.12022 (subset),high
+GPQA Main Chemistry,2023-11-20,https://arxiv.org/abs/2311.12022 (subset),high
+GSM8K,2021-10-27,https://arxiv.org/abs/2110.14168,high
+GSO-Bench,2025-05-29,https://arxiv.org/abs/2505.23671,approx
+GeoBench,,no public release date found,
+Humanity's Last Exam,2025-01-23,https://arxiv.org/abs/2501.14249,high
+LAB-Bench Cloning,2024-07-14,https://arxiv.org/abs/2407.10362 (LAB-Bench subset),high
+LAB-Bench LitQA2,2024-07-14,https://arxiv.org/abs/2407.10362 (LAB-Bench subset),high
+LAB-Bench Protocol,2024-07-14,https://arxiv.org/abs/2407.10362 (LAB-Bench subset),high
+LAB-Bench SeqQA,2024-07-14,https://arxiv.org/abs/2407.10362 (LAB-Bench subset),high
+LAMBADA,2016-06-20,https://arxiv.org/abs/1606.06031,high
+Lech Mazur Writing,,rolling community leaderboard; no dated release,
+LiveBench,2024-06-27,https://arxiv.org/abs/2406.19314,high
+MATH Level 5,2021-03-05,https://arxiv.org/abs/2103.03874 (MATH; Level 5 subset),high
+MCP Atlas,,Scale SEAL leaderboard; no dated publication found,
+METR Time Horizons,2025-03-19,https://arxiv.org/abs/2503.14499,high
+MMLU,2020-09-07,https://arxiv.org/abs/2009.03300,high
+MMLU Biology,2020-09-07,https://arxiv.org/abs/2009.03300 (subset),high
+MMLU Chemistry,2020-09-07,https://arxiv.org/abs/2009.03300 (subset),high
+MMLU Pro Biology,2024-06-03,https://arxiv.org/abs/2406.01574 (subset),high
+MMLU Pro Chemistry,2024-06-03,https://arxiv.org/abs/2406.01574 (subset),high
+MMLU-Pro,2024-06-03,https://arxiv.org/abs/2406.01574,high
+MindCube,2025-06-26,https://arxiv.org/abs/2506.21458,approx
+MultiChallenge,2025-01-29,https://arxiv.org/abs/2501.17399,approx
+MultiNRC,2025-07-23,https://arxiv.org/abs/2507.17476,approx
+Mystery Game Puzzles,,Epoch AI internal eval; no public release date found,
+OS World (Screenshot),2024-04-11,https://arxiv.org/abs/2404.07972,high
+OS World 2,,no public release date found,
+OTIS Mock AIME 2024-2025,2025-02-01,Epoch AI OTIS Mock AIME eval; https://epoch.ai/benchmarks,approx
+PRBench Finance,,Scale SEAL leaderboard; no dated publication found,
+PRBench Legal,,Scale SEAL leaderboard; no dated publication found,
+PostTrainBench,,no public release date found,
+ProofBench,,no public release date found,
+Remote Labor Index,2025-10-22,https://www.remotelabor.ai/,approx
+SEAL Instruction Following,,Scale SEAL leaderboard; no dated publication found,
+SEAL Tool Use (Enterprise),,Scale SEAL leaderboard; no dated publication found,
+SWE-Bench Pro,2025-09-23,https://scale.com/leaderboard/swe_bench_pro_public,approx
+SWE-Bench Pro (Private),2025-09-23,https://scale.com/leaderboard/swe_bench_pro_commercial,approx
+SWE-Bench Verified,2024-08-13,https://openai.com/index/introducing-swe-bench-verified/,high
+SciCode,2024-07-18,https://arxiv.org/abs/2407.13168,high
+ScienceQA,2022-09-20,https://arxiv.org/abs/2209.09513,high
+SimpleQA Verified,2025-08-07,Google DeepMind SimpleQA Verified; https://www.kaggle.com/benchmarks/deepmind/simpleqa-verified,approx
+SpatialViz-Bench,2025-07-10,https://arxiv.org/abs/2507.07610,approx
+SuperGLUE,2019-05-02,https://arxiv.org/abs/1905.00537,high
+Surface Evolver Bench,,no public release date found,
+TerminalBench,2025-05-01,terminal-bench 1.0; https://www.tbench.ai/,approx
+The Agent Company,2024-12-18,https://arxiv.org/abs/2412.14161,high
+TriviaQA,2017-05-09,https://arxiv.org/abs/1705.03551,high
+TutorBench,,Scale SEAL leaderboard; no dated publication found,
+Video-MME,2024-05-31,https://arxiv.org/abs/2405.21075,high
+Visual Task Assessment (VISTA),,Scale SEAL leaderboard; no dated publication found,
+VisualToolBench,,Scale SEAL leaderboard; no dated publication found,
+WMDP Biology,2024-03-05,https://arxiv.org/abs/2403.03218 (subset),high
+WMDP Chemistry,2024-03-05,https://arxiv.org/abs/2403.03218 (subset),high
+WeirdML,2025-01-01,https://htihle.github.io/weirdml.html,approx

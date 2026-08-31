@@ -269,38 +269,30 @@ class FitSpec:
 # K=4, positive loadings, merged human order + Brownian lineage prior, 3PL
 # floors, pooled noise, the exploration scope. THE forecasting base.
 # FrontierMath v1 and AlgoTune are out of this scope through the retirement
-# list, so no drop flag names them and the tag no longer carries `_drop`.
-# `loading_prior` and `floors` are named explicitly although both now hold the
+# list, so no drop flag names them and the tag carries no `_drop`.
+# `loading_prior` and `floors` are named explicitly although both hold the
 # default: the flagship is a statement of one fit, and a later default change
-# must not silently redefine it. The trace on disk predates the token removals
-# and lives in
-# `mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise`,
-# which a consumer reaches by an explicit path, not by this spec's `trace_path`.
+# must not silently redefine it.
 FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
                    lineage_prior=True, lineage_bm=True, floors=True)
-# Where that trace actually sits. The folder and filename were written under the
-# earlier tag grammar (`_dropFrontierMathv1AlgoTune` + `_poolednoise`), which
-# `FLAGSHIP.trace_path` no longer derives, so the path is stated once here and
-# every consumer reads it from this constant. Its results folder,
-# `FLAGSHIP_TRACE.parent`, holds the fit's CSVs and caches too.
+# The one path every consumer reads, so the figures, the dashboard card and the
+# post cannot name different traces. `FLAGSHIP_TRACE.parent` is the fit's
+# results folder and holds its CSVs and caches. 10 chains x 12,000 draws over
+# 829 test-takers and 96 benchmarks, which is the current exploration scope.
 FLAGSHIP_TRACE = (RESULTS_DIR
-                  / ("mirt_humanmerge_lineageprior_lineagebm"
-                     "_dropFrontierMathv1AlgoTune_floors_poolednoise")
-                  / ("trace_mirt_k4_humanmerge_lineageprior_lineagebm"
-                     "_dropFrontierMathv1AlgoTune_floors_poolednoise.nc"))
-# Chains 6 and 9 sit in the second solution: they lift the whole human block on
-# the legacy-QA axis by about 2.3 logits while the machine rows move by 0.25.
-# Reading the majority means the reported fit is one solution, not an average of
-# two, so the majority is the DEFAULT and a caller must opt out to re-admit them.
-FLAGSHIP_MAJORITY_CHAINS = [0, 1, 2, 3, 4, 5, 7, 8]
+                  / "mirt_humanmerge_lineageprior_lineagebm"
+                  / "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc")
+# One posterior mode over all ten chains (`mirt_modes_<trace-stem>.json`), so
+# every chain is read. A multimodal flagship would name its majority here and
+# `open_flagship` would default to it.
+FLAGSHIP_CHAINS = None
 # Every flagship summary is a median or an interval, which 20,000 draws pin as
 # well as 200,000.
 FLAGSHIP_THIN = 10
 
 
-def open_flagship(keep=None, thin: int = FLAGSHIP_THIN,
-                  chains=FLAGSHIP_MAJORITY_CHAINS):
-    """The flagship posterior, majority chains, thinned. `chains=None` for all."""
+def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
+    """The flagship posterior, thinned. `chains=None` reads every chain."""
     return FLAGSHIP.open_posterior(keep=keep, thin=thin, chains=chains,
                                    path=FLAGSHIP_TRACE)
 

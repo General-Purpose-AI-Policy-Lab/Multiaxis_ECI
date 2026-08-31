@@ -1,0 +1,6 @@
+pair,delta_elpd,se,delta_elpd_k_ok,n_k_ok_rows
+step1 - step0,1391.81,85.54,760.99,3471
+step2 - step1,-18.08,25.96,5.97,3139
+step3 - step2,172.03,32.33,131.94,3311
+step3 - step0,1545.76,94.07,1046.28,3846
+step3 - stepx,339.51,24.44,204.01,3755

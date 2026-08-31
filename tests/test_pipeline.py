@@ -2197,10 +2197,9 @@ class TestFitSpec:
             "loading_prior": "normal", "floors": True, "pooled_noise": True}
 
     def test_legacy_flagship_trace_name_resolves(self):
-        # The on-disk flagship trace predates both the retirement list and the
-        # token removal. Its `mirt_spec` attr names the drop flags, so the
-        # round-trip guard must accept a folder tag that carries tokens the
-        # current grammar no longer writes.
+        # A trace whose `mirt_spec` attr names the drop flags sits in a folder
+        # whose tag carries tokens the current grammar does not write, so the
+        # round-trip guard must accept that pairing.
         import dataclasses as dc
         legacy = dc.replace(analysis.FLAGSHIP,
                             drop_benchmarks=("FrontierMath v1", "AlgoTune"))
