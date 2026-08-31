@@ -57,7 +57,7 @@ GATE_SURVIVE = 0.2   # posterior-median gate above this counts as an active axis
 
 
 def gate_table(idata, data, K):
-    """Posterior gate g per (non-anchor benchmark, axis): median, 94% HDI, and a
+    """Posterior gate g per (non-anchor benchmark, axis): median, 95% HDI, and a
     `survived` flag (median > GATE_SURVIVE). Anchor rows are excluded (fixed gate)."""
     g = idata.posterior["g"].values.reshape(-1, data.n_benchmarks, K)  # (S, B, K)
     fm = idata.constant_data["free_cell_mask"].values                  # (B, K)
@@ -68,7 +68,7 @@ def gate_table(idata, data, K):
             if fm[bi, k] == 0.0:
                 continue
             gk = g[:, bi, k]
-            lo, hi = az.hdi(gk, hdi_prob=0.94)
+            lo, hi = az.hdi(gk, hdi_prob=0.95)
             med = float(np.median(gk))
             rows.append({"benchmark": bench[bi], "axis": AXES[k],
                          "category": str(data.bench_category[bi]),

@@ -75,13 +75,13 @@ def prior_median(interaction_scale):
 
 def _gamma_row(col, pmed):
     """Summary of one gamma posterior column against its prior median."""
-    lo, hi = az.hdi(col, hdi_prob=0.94)
+    lo, hi = az.hdi(col, hdi_prob=0.95)
     return {"gamma_median": float(np.median(col)), "hdi_low": float(lo),
             "hdi_high": float(hi), "p_above_prior": float((col > pmed).mean())}
 
 
 def gamma_table(idata, data, K, interaction_scale):
-    """Per-(benchmark, axis-pair) interaction gamma: median, 94% HDI, p_above_prior.
+    """Per-(benchmark, axis-pair) interaction gamma: median, 95% HDI, p_above_prior.
 
     Masked (founder off-triangle) cells are skipped. gamma >= 0 by construction,
     so there is no HDI-vs-zero verdict: p_above_prior near 0.5 means the cell is
@@ -106,7 +106,7 @@ def gamma_table(idata, data, K, interaction_scale):
 
 
 def gamma_pooled_table(idata, K, interaction_scale):
-    """One shared gamma per axis-pair (pooled fit): median, 94% HDI, p_above_prior.
+    """One shared gamma per axis-pair (pooled fit): median, 95% HDI, p_above_prior.
 
     Reads `gamma_pooled` (pair,) — the stage-1 readout of whether benchmarks need
     both skills on average per axis-pair. Columns as in gamma_table.

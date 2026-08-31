@@ -125,7 +125,7 @@ FOREST_KINDS = (
 
 
 def forest_grid_fig(dfs, titles, ncols: int = 2,
-                    x_title: str = "ability (median, 94% interval)",
+                    x_title: str = "ability (median, 95% interval)",
                     title: str = "Top models, frontier releases and human tiers per axis",
                     row_px: int = 22, width: int = 1180) -> go.Figure:
     """One forest per axis on a grid, sharing a single figure-level legend.
@@ -223,7 +223,7 @@ def loadings_grid_fig(load_df: pd.DataFrame, titles: dict | None = None,
             tickmode="array", tickvals=names,
             ticktext=[f"{b}  {s:.2f}" for b, s in zip(names, d["axis_share"])],
             tickfont=dict(size=9), automargin=True, row=row, col=col)
-        fig.update_xaxes(title_text="loading (median, 94% interval)",
+        fig.update_xaxes(title_text="loading (median, 95% interval)",
                          zeroline=True, zerolinecolor="#222", row=row, col=col)
     fig.update_layout(
         title=dict(text=title or f"The {top_n} benchmarks that define each axis, "

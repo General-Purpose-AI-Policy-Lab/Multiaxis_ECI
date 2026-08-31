@@ -164,7 +164,7 @@ def difficulty_table(trace, data, axes) -> pd.DataFrame:
             bk = bk[np.isfinite(bk)]
             if bk.size == 0:
                 continue
-            lo, hi = az.hdi(bk, hdi_prob=0.94)
+            lo, hi = az.hdi(bk, hdi_prob=0.95)
             rows.append({"axis": axes[k], "benchmark": bench_names[bi],
                          "category": str(data.bench_category[bi]),
                          "difficulty_median": float(np.median(bk)),

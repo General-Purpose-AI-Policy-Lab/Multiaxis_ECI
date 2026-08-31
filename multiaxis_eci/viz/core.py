@@ -290,7 +290,7 @@ def all_models_forest_fig(stats_df: pd.DataFrame,
         ))
 
     n = len(stats_df)
-    title = f"All {n} models — posterior median {metric} with 94% interval"
+    title = f"All {n} models — posterior median {metric} with 95% interval"
     if anchors:
         anchor_str = ", ".join(label for _, label in anchors)
         title = f"{title}<br><sub>anchored: {anchor_str}</sub>"
@@ -380,7 +380,7 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
 
     Recreates the EpochAI-style chart: latent IRT scale on Y, release date on X.
     Models in teal, benchmarks in pink, both with interval bars at the width the
-    caller's stats frame carries (94% on the 1D path, 50% on the MIRT
+    caller's stats frame carries (95% on the 1D path, 50% on the MIRT
     timelines — the on-figure titles set by callers say which). Human groups
     appear as dashed horizontal mean lines, labeled via `human_labels` (default
     HUMAN_LEVEL_LABELS_FR; pass {} for the raw English tier names)."""

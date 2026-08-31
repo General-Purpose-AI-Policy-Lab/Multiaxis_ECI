@@ -19,7 +19,7 @@ class ECITransform:
         return self.a + self.b * C
 
 
-def post_stats(samples: np.ndarray, hdi_prob: float = 0.94):
+def post_stats(samples: np.ndarray, hdi_prob: float = 0.95):
     """Posterior median plus the central `hdi_prob` interval.
 
     The interval cuts equal tails, so the median always sits inside it. A
@@ -85,7 +85,7 @@ def eci_transform(C_flat: np.ndarray, data: ECIData) -> ECITransform:
 
 
 def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
-    """Per-SOTA-model posterior mean + 94% HDI for C and ECI.
+    """Per-SOTA-model posterior mean + 95% HDI for C and ECI.
 
     Release dates come from the dataset (earliest per model), with
     `config.RELEASE_DATES` filling dateless previews. Models listed in
@@ -123,7 +123,7 @@ def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
 
 def all_models_stats_df(trace, data: ECIData,
                           metric: str = "C") -> pd.DataFrame:
-    """Posterior median + central 94% interval for every model.
+    """Posterior median + central 95% interval for every model.
 
     metric='C'   → raw capability (the default — interpretable as logit units
                    relative to whatever anchor the trace was anchored at).
@@ -143,9 +143,9 @@ def all_models_stats_df(trace, data: ECIData,
         raise ValueError(f"metric must be 'C' or 'ECI', got {metric!r}")
 
     # Same summary as post_stats, vectorized over models: median and the
-    # equal-tailed 94% interval, down the draw axis.
+    # equal-tailed 95% interval, down the draw axis.
     means = np.median(samples, axis=0)
-    lo, hi = np.quantile(samples, [0.03, 0.97], axis=0)
+    lo, hi = np.quantile(samples, [0.025, 0.975], axis=0)
 
     df = pd.DataFrame({
         "name":      data.mlookup["model"].values,
@@ -199,7 +199,7 @@ def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFram
 
 
 def human_stats_df(trace, data: ECIData) -> pd.DataFrame:
-    """Posterior mean + 94% HDI of C for each fitted human group.
+    """Posterior mean + 95% HDI of C for each fitted human group.
 
     Humans are now full test-takers in the IRT (added to the dataset as
     rows in load_eci_data). This returns one row per group: name, mean,
@@ -219,7 +219,7 @@ def human_stats_df(trace, data: ECIData) -> pd.DataFrame:
 
 
 def forest_stats_from_draws(draws: np.ndarray, names: list[str]) -> pd.DataFrame:
-    """Posterior mean + 94% HDI per entry of pre-flattened (n_samples, n) draws, sorted."""
+    """Posterior mean + 95% HDI per entry of pre-flattened (n_samples, n) draws, sorted."""
     rows = []
     for i, n in enumerate(names):
         mean, lo, hi = post_stats(draws[:, i])
@@ -228,7 +228,7 @@ def forest_stats_from_draws(draws: np.ndarray, names: list[str]) -> pd.DataFrame
 
 
 def forest_stats_df(trace, var_name: str, names: list[str]) -> pd.DataFrame:
-    """Posterior mean + 94% HDI for every entry of a vector-valued variable, sorted."""
+    """Posterior mean + 95% HDI for every entry of a vector-valued variable, sorted."""
     post = trace.posterior[var_name].values
     return forest_stats_from_draws(post.reshape(-1, post.shape[-1]), names)
 

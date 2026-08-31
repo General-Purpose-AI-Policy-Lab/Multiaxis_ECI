@@ -15,11 +15,11 @@ def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = 0.4) -> np.ndarr
     Filters out models whose ability is extrapolated rather than measured
     (sparse old models can land at misleadingly high ability with wide CIs).
 
-    Default 0.4 (history 0.6 → 0.3 → 0.4): 0.6 corresponds to a 94% CI width
-    of ~2.3 — far too wide on this scale, it admitted ~10 pre-2023 models at
+    Default 0.4 (history 0.6 → 0.3 → 0.4): 0.6 corresponds to a 95% CI width
+    of ~2.35 — far too wide on this scale, it admitted ~10 pre-2023 models at
     frontier levels. 0.3 removed them but froze thin axes' record chains
     (axis 4: 2 post-Oct-2024 records, the forecast line detached from the
-    data). 0.4 (94% CI width ~1.5) keeps the ghosts out while giving every
+    data). 0.4 (95% CI width ~1.57) keeps the ghosts out while giving every
     axis a usable record set — the measured-model definition shared by every
     graph (2026-08-13).
     """
