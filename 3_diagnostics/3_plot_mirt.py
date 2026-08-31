@@ -2,7 +2,7 @@
 
 Single-fit deep-dive. Rotation/identity handling (`analysis.prepare_fit`) and
 every figure builder (`viz/`) are the dashboard's
-(`3_3_diagnostics/4_build_dashboard.py`); this script adds the single-fit-only
+(`3_diagnostics/4_build_dashboard.py`); this script adds the single-fit-only
 comparative views (axis frontiers, ability scatter-matrix) and the K-vs-1D
 block.
 
@@ -12,9 +12,9 @@ to name. Per-figure PNG/HTML are written to `plots/<out>/` (git-ignored) for
 iterating on one freshly-fit trace without rebuilding the whole dashboard.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python 3_3_diagnostics/3_plot_mirt.py \
+  python 3_diagnostics/3_plot_mirt.py \
       --trace results/mirt_humanprior/trace_mirt_k3_humanprior.nc
-  ~/miniforge3/envs/pymc_env/bin/python 3_3_diagnostics/3_plot_mirt.py --folder results/
+  python 3_diagnostics/3_plot_mirt.py --folder results/
 
 A multi-GB trace goes through `--thin` (the flagship uses
 `analysis.FLAGSHIP_THIN`): every figure here is a median or an interval, and

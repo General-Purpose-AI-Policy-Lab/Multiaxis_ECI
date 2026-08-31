@@ -39,9 +39,9 @@ Outputs:
                                             and matched loading corr per mode.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/diagnose_chains.py \
+  python 3_diagnostics/diagnose_chains.py \
       --trace results/mirt_loglog/trace_mirt_k2_loglog.nc --name k2_loglog --fig
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/diagnose_chains.py \
+  python 3_diagnostics/diagnose_chains.py \
       --trace results/mirt_loglog/trace_mirt_k2_loglog.nc --write-modes
 """
 from __future__ import annotations

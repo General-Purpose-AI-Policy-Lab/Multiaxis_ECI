@@ -11,7 +11,7 @@ data join: chains that lost too many nodes to the join are absent, and node
 positions are the ones the psi vector actually uses.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/plot_lineage.py
+  python 3_diagnostics/plot_lineage.py
 """
 from __future__ import annotations
 

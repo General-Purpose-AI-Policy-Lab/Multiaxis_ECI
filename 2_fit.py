@@ -677,7 +677,7 @@ def run_exploration(args, parser) -> None:
         print("\n--plots: rendering figures", flush=True)
         plot_fit(spec.trace_path, idata=idata_k, axes=args.K)
     else:
-        print("Figures: run 3_3_diagnostics/3_plot_mirt.py --trace "
+        print("Figures: run 3_diagnostics/3_plot_mirt.py --trace "
               f"{spec.trace_path}")
 
 

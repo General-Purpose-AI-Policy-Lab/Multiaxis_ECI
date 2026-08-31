@@ -4,7 +4,7 @@ Every flag `2_fit.py` accepts, where a fit's output lands, and the commands that
 plot, diagnose and publish it. The [README](../README.md) covers the two runs
 that matter; this file is the rest of the surface.
 
-`python 2_2_fit.py --help` is the generated version of the flag tables below.
+`python 2_fit.py --help` is the generated version of the flag tables below.
 
 ## Flags
 
@@ -93,7 +93,7 @@ the only thing a plotting or diagnostic caller has to name.
 ## Plot a fit
 
 ```bash
-python 3_3_diagnostics/3_plot_mirt.py --trace \
+python 3_diagnostics/3_plot_mirt.py --trace \
   results/mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise/trace_mirt_k3_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise.nc
 ```
 
@@ -105,8 +105,8 @@ destination. Full catalogue: [plots.md](plots.md).
 ### Plot everything
 
 ```bash
-python 3_3_diagnostics/3_plot_mirt.py --folder results/ --dry-run   # decisions only
-python 3_3_diagnostics/3_plot_mirt.py --folder results/             # render
+python 3_diagnostics/3_plot_mirt.py --folder results/ --dry-run   # decisions only
+python 3_diagnostics/3_plot_mirt.py --folder results/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder
@@ -158,7 +158,7 @@ apparent split. It defaults to the flagship K=4 fit when `--trace` is omitted.
 ## Build the dashboard
 
 ```bash
-python 3_3_diagnostics/4_build_dashboard.py --force-all
+python 3_diagnostics/4_build_dashboard.py --force-all
 ```
 
 Renders every registered fit into the tracked repo-root `index.html`: a fit
@@ -177,10 +177,10 @@ snapshot it was built from, not as something the repo regenerates on demand.
 Cards are managed by command, not by editing source.
 
 ```bash
-python 3_3_diagnostics/4_build_dashboard.py --list
-python 3_3_diagnostics/4_build_dashboard.py --add TRACE --name NAME --label LABEL
-python 3_3_diagnostics/4_build_dashboard.py --remove NAME
-python 3_3_diagnostics/4_build_dashboard.py --force NAME       # re-render one card
+python 3_diagnostics/4_build_dashboard.py --list
+python 3_diagnostics/4_build_dashboard.py --add TRACE --name NAME --label LABEL
+python 3_diagnostics/4_build_dashboard.py --remove NAME
+python 3_diagnostics/4_build_dashboard.py --force NAME       # re-render one card
 ```
 
 `--add` reads the fit's identity off the trace with `FitSpec.from_trace`,
@@ -194,6 +194,6 @@ unreadable; `--nav` overrides the menu entry; `--forecast` adds the trend,
 crossover and exceedance figures.
 
 `--list` prints every card with an `origin` column, `code` for the entries in
-`build_dashboard.py` and `json` for the ones `--add` wrote. `--remove` drops a
+`4_build_dashboard.py` and `json` for the ones `--add` wrote. `--remove` drops a
 `json` entry. Validation runs before any trace opens, so a typo in a spec flag
 fails in the first second rather than mid-render.

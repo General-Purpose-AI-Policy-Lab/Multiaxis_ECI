@@ -16,7 +16,7 @@ actually fit on, so GoF is comparable WITHIN a scope; the global R²/RMSE remain
 readable across scopes but per-benchmark rows are not apples-to-apples between
 them.
 
-Run:  ~/miniforge3/envs/pymc_env/bin/python 3_3_diagnostics/4_build_dashboard.py
+Run:  python 3_diagnostics/4_build_dashboard.py
 """
 from __future__ import annotations
 
@@ -101,7 +101,7 @@ FITS = [
 # collaborator gets the same dashboard; the file is a plain list of entries with
 # the spec serialised by `dataclasses.asdict` and the trace path stored
 # explicitly, which is what lets a legacy folder name keep resolving.
-FITS_JSON = ROOT / "diagnostics" / "dashboard_fits.json"
+FITS_JSON = ROOT / "3_diagnostics" / "dashboard_fits.json"
 
 
 def _json_fits() -> list[dict]:
@@ -640,7 +640,7 @@ def main():
         return
 
     CMP_DIR.mkdir(parents=True, exist_ok=True)
-    raw = pd.read_csv(ROOT / "data" / "processed" / "benchmarks_merged.csv")
+    raw = pd.read_csv(ROOT / "1_data" / "processed" / "benchmarks_merged.csv")
 
     # Fits span several data scopes. Each spec loads its own scope once — the
     # same loads, drops and clips its fit ran — so the n_models sanity-check and
@@ -763,8 +763,8 @@ def main():
     # same schema as the processed file), one legend-toggleable trace per
     # benchmark.
     extra_csvs = [
-        ROOT / "data" / "curated" / "cyber_benchmarks.csv",
-        ROOT / "data" / "curated" / "simpleqa_original" / "simpleqa_original.csv",
+        ROOT / "1_data" / "curated" / "cyber_benchmarks.csv",
+        ROOT / "1_data" / "curated" / "simpleqa_original" / "simpleqa_original.csv",
     ]
     raw_all = pd.concat(
         [raw] + [pd.read_csv(f) for f in extra_csvs if f.exists()],
@@ -869,7 +869,7 @@ draws, ESS and divergences for every card whose trace is still on disk.
 
 ## Regenerate
 
-One command: `python 3_3_diagnostics/4_build_dashboard.py` (`--force <name>` for one
+One command: `python 3_diagnostics/4_build_dashboard.py` (`--force <name>` for one
 card, `--force-all` for every card, `--png` for static stills → git-ignored
 `plots/dashboard/`).
 """

@@ -2296,3 +2296,64 @@ def test_dashboard_json_registry_round_trip(tmp_path, monkeypatch):
     assert bd._trace_path(entry) == analysis.FLAGSHIP_TRACE
     assert (entry["origin"], entry["forecast"]) == ("json", True)
     assert [f["name"] for f in bd.all_fits()][-1] == "tmp_card"
+
+
+import re as _re
+
+
+class TestLayoutPaths:
+    """The 2026-08 restructure renamed data/ -> 1_data/, diagnostics/ ->
+    3_diagnostics/, fit.py -> 2_fit.py and hoisted the library into
+    multiaxis_eci/. Paths built piecewise (`ROOT / "data" / "curated"`) survive
+    a rename silently: they still evaluate to a Path, and only blow up when
+    something reads them. These lock the layout so the next rename fails here
+    instead of in a user's run.
+
+    This file is excluded from its own scans: the patterns below are literals
+    in it, so it would always match itself.
+    """
+
+    _SELF = Path(__file__).resolve()
+    _SKIP_PARTS = {".git", "__pycache__", ".pytest_cache", "results", "plots"}
+
+    @classmethod
+    def _files(cls, suffixes):
+        return [p for p in PROJECT_ROOT.rglob("*")
+                if p.is_file() and p.suffix in suffixes
+                and not cls._SKIP_PARTS & set(p.parts)
+                and p.resolve() != cls._SELF]
+
+    def test_no_prerename_path_literals(self):
+        stale = _re.compile(r'/ *"(data|diagnostics)"|"(diagnostics|eci)/')
+        hits = [f"{p.relative_to(PROJECT_ROOT)}:{i}"
+                for p in self._files({".py"})
+                for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
+                if stale.search(line)]
+        assert not hits, f"pre-rename path literals: {hits}"
+
+    def test_no_doubled_order_prefixes(self):
+        """A rename pass that replaces the long path then the short one turns
+        `diagnostics/x.py` into `3_diagnostics/3_x.py` and then into
+        `3_3_diagnostics/3_x.py`."""
+        doubled = _re.compile(r"\b([123])_\1_(data|fit|diagnostics|pipeline)")
+        hits = [str(p.relative_to(PROJECT_ROOT))
+                for p in self._files({".py", ".md", ".sh", ".ipynb"})
+                if doubled.search(p.read_text(encoding="utf-8", errors="ignore"))]
+        assert not hits, f"doubled order prefixes: {hits}"
+
+    def test_layout_entry_points_exist(self):
+        for rel in ["1_data", "1_data/1_pipeline/pipeline.ipynb", "1_data/curated",
+                    "1_data/processed/benchmarks_merged.csv", "2_fit.py",
+                    "3_diagnostics/4_build_dashboard.py", "3_diagnostics/dashboard_fits.json",
+                    "multiaxis_eci/config.py", "multiaxis_eci/scripts.py",
+                    "notebooks", "docs/cli.md", "LICENSE", "NOTICE.md"]:
+            assert (PROJECT_ROOT / rel).exists(), f"missing: {rel}"
+
+    def test_no_hardcoded_home_paths(self):
+        """A personal home path in a docstring or a notebook output is both a
+        leak and a command nobody else can run."""
+        home = _re.compile(r"/Users/[a-z]|miniforge3/envs")
+        hits = [str(p.relative_to(PROJECT_ROOT))
+                for p in self._files({".py", ".md", ".sh", ".ipynb", ".toml"})
+                if home.search(p.read_text(encoding="utf-8", errors="ignore"))]
+        assert not hits, f"hardcoded home / env paths: {hits}"

@@ -5,7 +5,7 @@ Country map: 1_data/curated/model_country.csv. Scope flags mirror fit.py's
 --open-only / --closed-only. Both selection variants (informed-only and
 SOTA-admitted) land in the CSV; figures show informed-only.
 
-Run: python 3_3_diagnostics/1_country_frontier.py [--open-only|--closed-only]
+Run: python 3_diagnostics/1_country_frontier.py [--open-only|--closed-only]
 """
 from __future__ import annotations
 
@@ -95,7 +95,7 @@ def load_matched(trace_path: Path, scope: str, allow_stale: bool):
 
 def load_country_map() -> dict:
     """model_version -> 'US'/'CN'/'Other' from the built (override-merged) map."""
-    df = pd.read_csv(ROOT / "data" / "curated" / "model_country.csv")
+    df = pd.read_csv(ROOT / "1_data" / "curated" / "model_country.csv")
     return dict(zip(df["model_version"], df["country"]))
 
 

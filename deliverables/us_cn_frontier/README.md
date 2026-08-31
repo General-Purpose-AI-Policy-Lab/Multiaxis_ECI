@@ -13,8 +13,8 @@ Rebuild inputs when data changes:
 
 ```
 python 1_data/4_build_country_map.py
-python 3_3_diagnostics/1_country_frontier.py [--open-only|--closed-only] --fit-start 2024-10-01 --y-range 50,255
-python 3_3_diagnostics/2_plot_crossovers.py
+python 3_diagnostics/1_country_frontier.py [--open-only|--closed-only] --fit-start 2024-10-01 --y-range 50,255
+python 3_diagnostics/2_plot_crossovers.py
 python deliverables/us_cn_frontier/make_tables.py
 ```
 

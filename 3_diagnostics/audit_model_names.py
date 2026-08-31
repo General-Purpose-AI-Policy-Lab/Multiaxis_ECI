@@ -46,7 +46,7 @@ a decision, not a defect: alias the row, correct its id, or accept the upstream
 naming and leave it.
 
 Run after every refresh:
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/audit_model_names.py
+  python 3_diagnostics/audit_model_names.py
 """
 from pathlib import Path
 import glob
@@ -60,10 +60,10 @@ sys.path.insert(0, str(ROOT))
 
 from multiaxis_eci.data import _EFFORT_SUFFIX_RE  # noqa: E402  the one effort vocabulary
 
-SNAPSHOTS = ROOT / "data" / "pipeline" / "snapshots"
-ALIASES = ROOT / "data" / "pipeline" / "canonical" / "model_aliases.csv"
-PROCESSED = ROOT / "data" / "processed" / "benchmarks_merged.csv"
-QUEUE = ROOT / "data" / "pipeline" / "output" / "name_audit.csv"
+SNAPSHOTS = ROOT / "1_data" / "1_pipeline" / "snapshots"
+ALIASES = ROOT / "1_data" / "1_pipeline" / "canonical" / "model_aliases.csv"
+PROCESSED = ROOT / "1_data" / "processed" / "benchmarks_merged.csv"
+QUEUE = ROOT / "1_data" / "1_pipeline" / "output" / "name_audit.csv"
 
 # Label effort spellings -> the suffix vocabulary. Ordered longest-first so
 # "x-high" is consumed before the "high" inside it would match.
@@ -302,7 +302,7 @@ def check_lineage():
       c. a base model's effort variants are split across in_chain yes/no, so
          part of a ladder carries the lineage prior and part runs free.
     """
-    path = ROOT / "data" / "curated" / "lineage_map.csv"
+    path = ROOT / "1_data" / "curated" / "lineage_map.csv"
     if not path.exists():
         return (pd.DataFrame(),) * 3
     m = pd.read_csv(path, keep_default_na=False, dtype=str)

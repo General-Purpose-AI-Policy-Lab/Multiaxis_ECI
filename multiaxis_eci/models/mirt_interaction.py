@@ -11,7 +11,7 @@ recovers the compensatory model. One-sided because "having both skills hurts"
 is not a hypothesis this project holds. HalfNormal keeps its mode at 0, so no
 conjunction stays reachable — it reads as posterior mass piled against the
 boundary, never as an interval containing 0, which is why the readout is
-`p_above_prior` (fits/fit_interaction.py) and not an HDI-vs-zero test.
+`p_above_prior` (multiaxis_eci/fits/fit_interaction.py) and not an HDI-vs-zero test.
 
 Abilities enter the PRODUCT through softplus and the linear term through raw
 theta. On raw zero-centred theta the bilinear product pays the same bonus to a

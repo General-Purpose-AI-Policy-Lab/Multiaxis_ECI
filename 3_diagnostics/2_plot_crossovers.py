@@ -1,10 +1,10 @@
 """Human-tier crossover dates as a 2x3 panel grid: US/CN x scope, where the
 scopes are all benchmarks / open-only / closed-only.
 
-Reads the per-scope CSVs 3_3_diagnostics/1_country_frontier.py writes — no trace is
+Reads the per-scope CSVs 3_diagnostics/1_country_frontier.py writes — no trace is
 loaded, so this re-renders instantly after a country_frontier run.
 
-  python 3_3_diagnostics/2_plot_crossovers.py
+  python 3_diagnostics/2_plot_crossovers.py
 """
 from __future__ import annotations
 

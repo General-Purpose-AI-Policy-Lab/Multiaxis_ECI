@@ -1,6 +1,6 @@
 """Re-render ONLY the frontier-forecast figures of one dashboard card.
 
-`build_dashboard.py --force <fit>` re-renders the whole card: posterior
+`4_build_dashboard.py --force <fit>` re-renders the whole card: posterior
 predictive over every draw, LOO, ESS on the log-likelihood. On the 10x20000
 flagship that is ~25 minutes, and none of it is touched by a change to the
 forecast rule. This path reads the abilities alone, rebuilds the 3 figures per
@@ -111,16 +111,16 @@ def main():
                  + ", ".join(f["name"] for f in fits))
     card = _cache_load(fit["name"])
     if card is None:
-        sys.exit(f"no cached card for {args.fit!r} — run build_dashboard.py "
+        sys.exit(f"no cached card for {args.fit!r} — run 4_build_dashboard.py "
                  f"--force {args.fit} once first")
 
     if (fit.get("kind", "comp") != "comp"
             or fit["spec"].loading_prior == "signed"):
         sys.exit(f"{args.fit!r} is not a raw-frame compensatory fit — its forecast "
-                 f"frame needs the loadings, so use build_dashboard.py --force")
+                 f"frame needs the loadings, so use 4_build_dashboard.py --force")
 
     data = fit["spec"].load_data()[0]
-    raw = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "benchmarks_merged.csv")
+    raw = pd.read_csv(PROJECT_ROOT / "1_data" / "processed" / "benchmarks_merged.csv")
     trace = _trace_path(fit)
     theta = np.asarray(_load_theta(trace, fit.get("drop_chains")), dtype=np.float64)
 
@@ -141,7 +141,7 @@ def main():
           f"(replaced {len(stale)})", flush=True)
 
     if not args.no_html:
-        subprocess.run([sys.executable, str(ROOT / "diagnostics" / "build_dashboard.py")],
+        subprocess.run([sys.executable, str(ROOT / "3_diagnostics" / "4_build_dashboard.py")],
                        check=True, cwd=ROOT)
 
 

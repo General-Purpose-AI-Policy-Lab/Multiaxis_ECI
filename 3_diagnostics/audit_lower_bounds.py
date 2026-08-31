@@ -34,8 +34,8 @@ sys.path.insert(0, str(ROOT))
 from multiaxis_eci import config
 from multiaxis_eci.data import BENCHMARK_CLIPS_FILE, BENCHMARK_FLOORS_FILE, load_eci_data
 
-PROCESSED = ROOT / "data" / "processed" / "benchmarks_merged.csv"
-HUMAN_FILE = ROOT / "data" / "curated" / "human_baselines.csv"
+PROCESSED = ROOT / "1_data" / "processed" / "benchmarks_merged.csv"
+HUMAN_FILE = ROOT / "1_data" / "curated" / "human_baselines.csv"
 
 # a model dated on/after this counts as recent for the below-floor who-split
 FRONTIER_DATE = "2025-06-01"

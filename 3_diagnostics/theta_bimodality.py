@@ -57,8 +57,8 @@ Axes are named axis1..axisK. The trace carries no `mirt_axis_names`, so any
 semantic name would be invented.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/theta_bimodality.py
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/theta_bimodality.py \
+  python 3_diagnostics/theta_bimodality.py
+  python 3_diagnostics/theta_bimodality.py \
       --trace results/mirt_loglog/trace_mirt_k2_loglog.nc
 """
 from __future__ import annotations

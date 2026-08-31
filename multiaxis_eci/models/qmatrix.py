@@ -33,7 +33,7 @@ QMATRIX_VARIANTS = {"qmatrix3": QMATRIX3_CAT_TO_AXIS, "qmatrix3x": QMATRIX3X_CAT
 # science axis would be. Strict simple structure (one axis per category).
 #
 # Kept SEPARATE from QMATRIX_VARIANTS on purpose: the non-compensatory driver
-# (fits/fit_nc.py) maps every entry of QMATRIX_VARIANTS onto its THREE axis
+# (multiaxis_eci/fits/fit_nc.py) maps every entry of QMATRIX_VARIANTS onto its THREE axis
 # names (AXES[3]); a 4th axis index (3) here would make that mapping raise. The
 # compensatory driver merges this in locally instead.
 AXIS_LABELS_K4 = ["reasoning/math", "agentic/coding", "knowledge/science", "multimodal"]

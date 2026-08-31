@@ -21,9 +21,9 @@ PLT fixes rotation but not the near-tied-axes basins, so expect to read gamma
 mode-restricted there.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_interaction.py --prior-check
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_interaction.py --human-prior --lineage-prior
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_interaction.py --loading-prior normal \\
+  python fits/fit_interaction.py --prior-check
+  python fits/fit_interaction.py --human-prior --lineage-prior
+  python fits/fit_interaction.py --loading-prior normal \\
       --floors --human-prior --lineage-prior --gamma-pooling pooled
 """
 from __future__ import annotations

@@ -3,7 +3,7 @@
 Runs analysis.alignment_report (varimax / wop / matchalign / promax — four
 independent post-hoc identifications of the SAME posterior) on an existing
 trace and writes the comparison artefacts. This is the only writer of those
-files; `3_3_diagnostics/3_plot_mirt.py` reads them back.
+files; `3_diagnostics/3_plot_mirt.py` reads them back.
 
 The fit's flag set and its data scope come from `analysis.FitSpec.from_trace`,
 so K and the scope are the trace's own, never a CLI guess.
@@ -20,7 +20,7 @@ Outputs (beside the trace, in its own folder):
                                   (sign-confident highlighted) + agreement map.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/align_mirt.py \
+  python 3_diagnostics/align_mirt.py \
       --trace results/mirt_signed_humanprior_lineageprior/trace_mirt_k3_signed_humanprior_lineageprior.nc
 """
 from __future__ import annotations

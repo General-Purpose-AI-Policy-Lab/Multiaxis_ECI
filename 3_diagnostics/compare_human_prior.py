@@ -21,7 +21,7 @@ Plus one shared figure (in comparison/):
   cmp_human_prior_loo       — divergences and PSIS-LOO ELPD, ordered vs independent,
      for both K. Shows the prior is convergence- and prediction-neutral.
 
-Run:  ~/miniforge3/envs/pymc_env/bin/python 3_diagnostics/compare_human_prior.py
+Run:  python 3_diagnostics/compare_human_prior.py
 """
 from __future__ import annotations
 

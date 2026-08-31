@@ -22,10 +22,10 @@ What it does:
      difficulty / residuals / GoF under results/mirt_nc/.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_nc.py --K 3 --prior-check
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_nc.py --K 3
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_nc.py --K 4
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_nc.py --K 3 --qvariant no-agentic
+  python fits/fit_nc.py --K 3 --prior-check
+  python fits/fit_nc.py --K 3
+  python fits/fit_nc.py --K 4
+  python fits/fit_nc.py --K 3 --qvariant no-agentic
 """
 from __future__ import annotations
 

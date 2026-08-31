@@ -45,7 +45,7 @@ def _validate_qmatrix(qmatrix: np.ndarray, n_benchmarks: int) -> np.ndarray:
         warnings.warn(
             "non-compensatory Q-matrix is strict simple structure (every benchmark "
             "loads exactly one axis) — the product link degenerates to K independent "
-            "1D IRTs (no conjunction). Use a multi-loaded Q (e.g. fits/fit_nc.py "
+            "1D IRTs (no conjunction). Use a multi-loaded Q (e.g. multiaxis_eci/fits/fit_nc.py "
             "--qvariant full / qmatrix3x) to actually test conjunction.",
             stacklevel=2)
     return Q.astype(float)

@@ -15,8 +15,8 @@ What it does:
      scores, the surviving-gate structure, and GoF under results/mirt_sparse/.
 
 Run:
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_sparse.py --prior-check
-  ~/miniforge3/envs/pymc_env/bin/python fits/fit_sparse.py --human-prior --lineage-prior
+  python fits/fit_sparse.py --prior-check
+  python fits/fit_sparse.py --human-prior --lineage-prior
 """
 from __future__ import annotations
 

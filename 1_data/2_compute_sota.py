@@ -8,7 +8,7 @@ top-line model is always shown even when it hasn't set a new all-time record.
 
 Refresh: re-run after a data/fit refresh. Reviewed like the other curated maps.
 
-  ~/miniforge3/envs/pymc_env/bin/python 1_data/2_compute_sota.py
+  python 1_data/2_compute_sota.py
 """
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from multiaxis_eci.models.mirt import build_mirt_model  # noqa: E402
 
 WINDOW_MONTHS = 24        # "recent era" cutoff for both the envelope and flagships
 MIN_OBS = 4               # Epoch's ≥4-benchmark rule for envelope record-setters
-OUT = ROOT / "data" / "curated" / "sota_models.txt"
+OUT = ROOT / "1_data" / "curated" / "sota_models.txt"
 
 # Flagship lineage chains (the frontier tier). Small / mini / flash / open /
 # fast lines are intentionally excluded — a chain is flagship if it is the

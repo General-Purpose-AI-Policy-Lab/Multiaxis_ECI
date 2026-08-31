@@ -8,12 +8,12 @@
 #   python 2_fit.py --preset canonical --closed-only --chains 4 --draws 2000 --tune 2000
 set -e
 cd "$(dirname "$0")/../.."
-PY=~/miniforge3/envs/pymc_env/bin/python
+PY=python
 
-$PY 3_3_diagnostics/1_country_frontier.py               --fit-start 2024-10-01 --y-range 50,255
-$PY 3_3_diagnostics/1_country_frontier.py --open-only   --fit-start 2024-10-01 --y-range 50,255
-$PY 3_3_diagnostics/1_country_frontier.py --closed-only --fit-start 2024-10-01 --y-range 50,255
-$PY 3_3_diagnostics/2_plot_crossovers.py
+$PY 3_diagnostics/1_country_frontier.py               --fit-start 2024-10-01 --y-range 50,255
+$PY 3_diagnostics/1_country_frontier.py --open-only   --fit-start 2024-10-01 --y-range 50,255
+$PY 3_diagnostics/1_country_frontier.py --closed-only --fit-start 2024-10-01 --y-range 50,255
+$PY 3_diagnostics/2_plot_crossovers.py
 $PY deliverables/us_cn_frontier/make_tables.py
 
 for t in canonical canonical_open canonical_closed; do
