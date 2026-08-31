@@ -1,8 +1,8 @@
 # Multi-Axis ECI
 
-Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index
-with Human Baselines* (GPAI Policy Lab, August 2026), whose link goes here once it is
-published, and its predecessor [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1).
+Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines* (GPAI Policy Lab, August 2026). Its link goes here once it is published.
+
+It follows [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1), which is a separate piece of work with its own code in [`Multi-axis-Rosetta`](https://github.com/General-Purpose-AI-Policy-Lab/Multi-axis-Rosetta). Nothing here reproduces that post.
 
 The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many benchmark scores into one number per model, following the [Rosetta Stone paper](https://arxiv.org/abs/2512.00193). The previous post put human baseline tiers on that same scale, which exposed a problem. Humans score near-perfectly on abstract-reasoning benchmarks like ARC-AGI or VPCT and near chance on GPQA-type benchmarks, while many models show the opposite pattern. No single ordering produces both.
 
@@ -29,33 +29,28 @@ Pinned working versions: pymc 5.28.5, arviz 0.23.4, pytensor 2.38.3, plotly 6.x.
 
 ## Run
 
-The K=4 fit is the project's main one: the only card the dashboard forecasts from, and the base the post's figures read.
+Main project fit with K=4.
 
 ```bash
-python fit.py --K 4 --human-merge --lineage-prior --lineage-bm
+python 2_fit.py --K 4 --human-merge --lineage-prior --lineage-bm
 ```
 
 The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI deliverables to `results/canonical/`:
 
 ```bash
-python fit.py --preset canonical
+python 2_fit.py --preset canonical
 ```
 
 ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2024-10-22) = 130 and GPT-5 (2025-08-07, medium) = 150, matching Epoch's dashboard. Every other flag, where a fit's output lands, and the plot / diagnose / dashboard commands: [docs/cli.md](docs/cli.md).
 
 ```
 .
-├── fit.py               # the fit CLI (canonical preset + exploration)
-├── config.py            # paths, priors, sampling defaults, ECI anchors, forecast rule
-├── data.py              # load_eci_data() -> ECIData
-├── models/              # model builders (mirt.py is the main family)
-├── fits/                # drivers for the non-compensatory / sparse / interaction families
-├── analysis/            # FitSpec, ECI transform, rotations, convergence, forecasts
-├── viz/                 # Plotly figure builders
-├── diagnostics/         # post-fit command-line tools: diagnose, plot, build, audit
+├── 1_data/              # step 1: the pipeline notebook, the curated-input builders, the tables
+├── 2_fit.py             # step 2: the fit CLI (canonical preset + exploration)
+├── 3_diagnostics/       # step 3: post-fit tools, the numbered four in reproduction order
+├── eci/                 # the library: config, data loading, models, analysis, figures
 ├── notebooks/           # one-off investigations, kept for the record, not maintained
 ├── evals/               # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
-├── data/                # pipeline notebook, processed table, curated files
 ├── results/             # one folder per fit; canonical/ is the index
 ├── deliverables/        # figure + table sets built for a specific write-up
 ├── docs/                # model math, CLI reference, figure catalogue
@@ -63,7 +58,9 @@ ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (202
 └── index.html           # the all-fits dashboard (tracked)
 ```
 
-Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [diagnostics/README.md](diagnostics/README.md). What each notebook investigated: [notebooks/README.md](notebooks/README.md).
+Numbered entries are the reproduction path, in order. Everything else is a library, an output folder or a reference. Inside `1_data/` and `3_diagnostics/` the same rule applies.
+
+Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [3_diagnostics/README.md](3_diagnostics/README.md). What each notebook investigated: [notebooks/README.md](notebooks/README.md).
 
 ## Method
 
@@ -71,7 +68,7 @@ Each test-taker *m* has K abilities θ forming a skill profile, the way a studen
 
 <p align="center"><em>µ = c<sub>b</sub> + (1 − c<sub>b</sub>) σ( Σ<sub>k</sub> A<sub>b,k</sub> θ<sub>m,k</sub> − D<sub>b</sub> )</em>,  &nbsp; observed <em>y ~ Beta(µφ<sub>b</sub>, (1−µ)φ<sub>b</sub>)</em></p>
 
-This is the *compensatory* family: a strong skill can make up for a weak one inside the sum. The non-compensatory and semi-compensatory alternatives are implemented too (`fits/fit_nc.py`, `fits/fit_interaction.py`); the first did not converge, the second converged only under heavy constraints and predicted worse.
+This is the *compensatory* family: a strong skill can make up for a weak one inside the sum. The non-compensatory and semi-compensatory alternatives are implemented too (`multiaxis_multiaxis_eci/fits/fit_nc.py`, `multiaxis_multiaxis_eci/fits/fit_interaction.py`); the first did not converge, the second converged only under heavy constraints and predicted worse.
 
 **The data is sparse.** The test-taker by benchmark matrix is filled at about 6%, and the average test-taker has six scores. Many arrangements of abilities and loadings explain those scores equally well, so unconstrained runs land on different solutions. Two ordering priors identify the fit:
 
@@ -94,8 +91,6 @@ Whether the chains agree on those axes is a different question, with its own num
 
 ## Limitations
 
-Three carry over from the post:
-
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
 - **Calibration.** The predictive intervals come out wider than the data requires, which makes the model more conservative than it should be.
@@ -104,7 +99,7 @@ On the **Legacy QA** axis specifically, the human lead is a comparison against a
 
 ## Data
 
-`data.py` reads `data/processed/benchmarks_merged.csv`, produced by the in-repo notebook `data/pipeline/pipeline.ipynb` (Restart Kernel → Run All; see [data/pipeline/README.md](data/pipeline/README.md)).
+`multiaxis_multiaxis_eci/data.py` reads `1_data/processed/benchmarks_merged.csv`, produced by the in-repo notebook `1_data/1_pipeline/pipeline.ipynb` (Restart Kernel → Run All; see [1_data/1_pipeline/README.md](1_data/1_pipeline/README.md)).
 
 That notebook is being superseded by [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline), a standalone repository covering the same feeds with a UUID-keyed schema and a determinism check. The migration is not done: this repo still fits the in-repo notebook's output, and the two schemas are not interchangeable yet.
 
@@ -117,6 +112,6 @@ That notebook is being superseded by [`eval-data-pipeline`](https://github.com/G
 
 ## License
 
-CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `data/curated/` and `results/`.
+CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `1_data/curated/` and `results/`.
 
 The upstream benchmark scores carry their own terms. Epoch AI is CC-BY and requires attribution, RAND is cited under RR-A3797-1, and Scale SEAL has no open license. What to credit when republishing: [NOTICE.md](NOTICE.md).

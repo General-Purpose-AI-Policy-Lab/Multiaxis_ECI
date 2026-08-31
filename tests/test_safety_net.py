@@ -9,7 +9,7 @@ Those two benchmarks are on the curated exclusion list, so only include_all
 scopes see them: each affected golden moved by exactly -325.632421.
 
 All goldens were re-pinned on 2026-07-27 when the pipeline began auto-swapping
-its output into data/processed (97 -> 96 benchmarks after BTF3 was parked for
+its output into 1_data/processed (97 -> 96 benchmarks after BTF3 was parked for
 lacking a sourceable chance floor), and again when FrontierMath v1 was restored
 as its own pair of items (96 -> 98 benchmarks, 4447 obs / 765 models), and a
 third time when GBAEval's two harness-failure rows were dropped (4447 -> 4445
@@ -98,7 +98,7 @@ data._EFFORT_SUFFIX_RE the same day; verified inert here (no default-path
 consumer — only collapse_effort_variants and the lineage collapse read it).
 
 21 goldens were re-pinned a fifth time on 2026-08-06 after the name-audit
-corrections (diagnostics/audit_model_names.py; same snapshot, zero score
+corrections (3_diagnostics/audit_model_names.py; same snapshot, zero score
 deltas). The pipeline's Name-config parser now consumes an optional
 "Thinking," prefix, so Opus 4.5's "(Thinking, None)" ARC pair moved off the
 bare id onto claude-opus-4-5-20251101_none; gpt-5.2's AlgoTune row was
@@ -177,7 +177,7 @@ at 0 minus the replaced ZeroSumNormal terms. No other golden moves.
 
 All 29 goldens were re-pinned on 2026-08-27 for the retirement of two
 benchmarks. FrontierMath v1 and AlgoTune moved to
-data/curated/retired_benchmarks.txt, which load_eci_data drops for every fit
+1_data/curated/retired_benchmarks.txt, which load_eci_data drops for every fit
 before any scope flag is read, so no configuration sees them: v1 is superseded
 by v2 (about +0.20 level shift on Tiers 1-3, ranking intact at paired
 r = 0.988) and AlgoTune's 1 - 1/speedup score shares its scale with no other
@@ -200,7 +200,7 @@ benchmarks unchanged. Data only; no model math moved. Values rise by +18 to
 
 All 29 goldens were re-pinned a third time on 2026-08-27 for the retirement of
 FrontierMath Tier 4 v1, which joins FrontierMath v1 and AlgoTune in
-data/curated/retired_benchmarks.txt on the same rule: both v1 columns are
+1_data/curated/retired_benchmarks.txt on the same rule: both v1 columns are
 superseded by the v2 problem set, and Tier 4 v1 additionally caps at 0.60
 answerable items where v2 does not, so no configuration may pool the two
 versions in one loading row. Scope: 4,261 -> 4,189 obs / 787 -> 781 models /
@@ -220,7 +220,7 @@ flat to identify a difficulty and a loading row. Scope: 4,189 -> 4,184 obs /
 the full set. Values rise by +0.6 to +95.6 nats.
 
 The 29th golden, floors + fixed-d ceilings, was DELETED the same day with the
-fixed-ceiling apparatus itself: --ceilings, data/curated/benchmark_upper_bounds.csv
+fixed-ceiling apparatus itself: --ceilings, 1_data/curated/benchmark_upper_bounds.csv
 and the ceiling_d argument of build_mirt_model are gone, both curated walls
 having been retired with their benchmarks. That the golden had already
 collapsed onto the floors-only value is the evidence it locked nothing. The
@@ -244,13 +244,13 @@ import numpy as np
 import pymc as pm
 import pytest
 
-from config import HUMAN_ORDER, HUMAN_ORDER_MERGED
-from data import load_eci_data
-from lineage import build_lineage_structure
-from models.mirt import _human_structure, build_mirt_model
-from models.mirt_interaction import build_mirt_interaction_model
-from models.mirt_nc import build_mirt_nc_model
-from models.mirt_sparse import build_mirt_sparse_model
+from multiaxis_eci.config import HUMAN_ORDER, HUMAN_ORDER_MERGED
+from multiaxis_eci.data import load_eci_data
+from multiaxis_eci.lineage import build_lineage_structure
+from multiaxis_eci.models.mirt import _human_structure, build_mirt_model
+from multiaxis_eci.models.mirt_interaction import build_mirt_interaction_model
+from multiaxis_eci.models.mirt_nc import build_mirt_nc_model
+from multiaxis_eci.models.mirt_sparse import build_mirt_sparse_model
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -355,7 +355,7 @@ class TestGoldenLogp:
         # twin by exactly the three Normal(0, PRIOR_TIME_BETA) prior terms
         # (-0.677). The shift ARITHMETIC is locked by
         # TestMIRT::test_time_prior_shifts_theta_by_beta_times_year instead.
-        from data import release_time_covariate
+        from multiaxis_eci.data import release_time_covariate
         lin = build_lineage_structure(data.mlookup)
         model = build_mirt_model(
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
@@ -441,7 +441,7 @@ class TestGoldenLogp:
             total_logp(model), -191022.646777, rtol=self.RTOL)
 
     def test_mirt_k3_signed_floors(self, data_all):
-        from data import clip_scores_to_floors, load_benchmark_floors
+        from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
         floors = load_benchmark_floors(data_all)
         clipped = clip_scores_to_floors(data_all, floors)
         model = build_mirt_model(clipped, K=3, loading_prior="signed",
@@ -457,7 +457,7 @@ class TestGoldenLogp:
     def test_mirt_k4_bifactor_full_options(self, data_all):
         # The live exploratory base, bifactor loadings: both theta priors,
         # Brownian lineage, 3PL floors, estimated noise ceiling.
-        from data import clip_scores_to_floors, load_benchmark_floors
+        from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
         floors = load_benchmark_floors(data_all)
         clipped = clip_scores_to_floors(data_all, floors)
         model = build_mirt_model(
@@ -476,7 +476,7 @@ class TestGoldenLogp:
             total_logp(model), -76217.967914, rtol=self.RTOL)
 
     def test_nc_k3_full(self, data_all):
-        from fits.fit_nc import build_qmatrix
+        from multiaxis_eci.fits.fit_nc import build_qmatrix
         Q, _ = build_qmatrix(data_all, 3, "full")
         np.testing.assert_allclose(
             total_logp(build_mirt_nc_model(data_all, Q)),
@@ -518,7 +518,7 @@ class TestGoldenLogp:
     def test_interaction_k3_normal_floors_pooled(self, data):
         # non-negative loadings (no founders) + fixed-c 3PL + pooled gamma —
         # the production semi-compensatory configuration.
-        from data import clip_scores_to_floors, load_benchmark_floors
+        from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
         floors = load_benchmark_floors(data)
         clipped = clip_scores_to_floors(data, floors)
         model = build_mirt_interaction_model(
@@ -729,7 +729,7 @@ class TestThetaTCells:
         # The block spans the unstructured rows plus one base per human root and
         # per chain founder — never the ordered increments, which carry their own
         # non-Gaussian shape.
-        from models.mirt import _human_structure
+        from multiaxis_eci.models.mirt import _human_structure
         lin = build_lineage_structure(data.mlookup)
         names = data.mlookup["model"].tolist()
         rows_h, _, _, n_roots, _ = _human_structure(HUMAN_ORDER, names)
@@ -836,7 +836,7 @@ class TestStreamedDraws:
     def test_partial_store_reads_back_and_saves(self, tmp_path):
         from nutpie import zarr_store
 
-        from persistence import load_live_draws, save_trace
+        from multiaxis_eci.persistence import load_live_draws, save_trace
         store = tmp_path / "live_draws.zarr"
         with pm.Model(coords={"g": ["a", "b", "c"]}):
             x = pm.Normal("x", dims="g")
@@ -1014,7 +1014,7 @@ class TestCapabilityDraws:
         return az.from_dict(posterior=posterior, dims=dims)
 
     def test_reads_C_from_1d_trace(self):
-        from analysis import capability_draws
+        from multiaxis_eci.analysis import capability_draws
         rng = np.random.default_rng(0)
         C = rng.normal(size=(2, 5, 7))
         idata = self._idata({"C": C}, {"C": ["model"]})
@@ -1023,7 +1023,7 @@ class TestCapabilityDraws:
         np.testing.assert_allclose(out, C.reshape(-1, 7))
 
     def test_reads_theta_from_k1_trace(self):
-        from analysis import capability_draws
+        from multiaxis_eci.analysis import capability_draws
         rng = np.random.default_rng(1)
         theta = rng.normal(size=(2, 5, 7, 1))
         idata = self._idata({"theta": theta}, {"theta": ["model", "latent"]})
@@ -1032,7 +1032,7 @@ class TestCapabilityDraws:
         np.testing.assert_allclose(out, theta[..., 0].reshape(-1, 7))
 
     def test_raises_on_multi_axis_trace(self):
-        from analysis import capability_draws
+        from multiaxis_eci.analysis import capability_draws
         theta = np.zeros((1, 3, 4, 2))
         idata = self._idata({"theta": theta}, {"theta": ["model", "latent"]})
         with pytest.raises(ValueError, match="K=2"):
@@ -1046,7 +1046,7 @@ class TestPublicAPISurface:
     in the same commit — never earlier.
     """
     SURFACE = {
-        "analysis": [
+        "multiaxis_eci.analysis": [
             "all_models_stats_df", "eci_transform", "flat_C", "forest_stats_df",
             "human_stats_df", "sota_stats_df", "timeline_stats_df", "post_stats",
             "apply_rotation", "factor_corr_df", "factor_scores_df",
@@ -1060,7 +1060,7 @@ class TestPublicAPISurface:
             "mirt_crossover_df", "mirt_frontier_forecast",
             "mirt_human_axis_stats", "_release_dates",
         ],
-        "viz": [
+        "multiaxis_eci.viz": [
             "all_models_forest_fig", "capability_timeline_fig",
             "density_overlay_fig", "forest_fig", "hyperparams_fig",
             "pit_ecdf_fig", "pit_hist_fig", "pred_vs_obs_fig",
@@ -1073,16 +1073,16 @@ class TestPublicAPISurface:
             "forest_grid_fig", "loadings_grid_fig", "subplot_grid",
             "crossover_dotwhisker_fig", "exceedance_prob_fig",
         ],
-        "ppc": [
+        "multiaxis_eci.ppc": [
             "compute_gof", "posterior_predictive_mirt",
             "posterior_predictive_mirt_nc", "posterior_predictive_mirt_sparse",
             "posterior_predictive_mirt_interaction", "pit_values",
         ],
-        "persistence": [
+        "multiaxis_eci.persistence": [
             "load_trace", "save_df", "save_json", "save_pit", "save_summary",
             "save_trace",
         ],
-        "data": [
+        "multiaxis_eci.data": [
             "PROCESSED_FILE", "drop_model_observations", "drop_zero_scores",
             "load_eci_data", "find_model_idx",
             "drop_model_benchmark_cells", "load_excluded_benchmarks",
@@ -1090,8 +1090,8 @@ class TestPublicAPISurface:
             "load_benchmark_floors", "clip_scores_to_floors",
             "release_time_covariate",
         ],
-        "lineage": ["build_lineage_structure", "LINEAGE_MAP"],
-        "models": ["build_mirt_model", "build_mirt_nc_model",
+        "multiaxis_eci.lineage": ["build_lineage_structure", "LINEAGE_MAP"],
+        "multiaxis_eci.models": ["build_mirt_model", "build_mirt_nc_model",
                    "build_mirt_sparse_model", "build_mirt_interaction_model",
                    "INTERACTION_SCALE", "QMATRIX_VARIANTS", "axes_as_list"],
     }
@@ -1110,7 +1110,7 @@ class TestPublicAPISurface:
 class TestCLISurface:
     def test_fit_help_exits_clean(self):
         result = subprocess.run(
-            [sys.executable, str(ROOT / "fit.py"), "--help"],
+            [sys.executable, str(ROOT / "2_fit.py"), "--help"],
             capture_output=True, text=True, timeout=120)
         assert result.returncode == 0
         assert "--loading-prior" in result.stdout
@@ -1118,6 +1118,6 @@ class TestCLISurface:
 
     def test_fit_unknown_arg_fails(self):
         result = subprocess.run(
-            [sys.executable, str(ROOT / "fit.py"), "--nonsense"],
+            [sys.executable, str(ROOT / "2_fit.py"), "--nonsense"],
             capture_output=True, text=True, timeout=120)
         assert result.returncode != 0

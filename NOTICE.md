@@ -1,14 +1,14 @@
 # NOTICE: third-party data
 
 The `LICENSE` (CC-BY-4.0) covers what this project produces: the model code,
-the analysis and diagnostics layer, the curated files under `data/curated/`, and
+the analysis and diagnostics layer, the curated files under `1_data/curated/`, and
 the fitted results under `results/`.
 
 It does **not** cover the upstream benchmark scores those results are derived
 from. Each source carries its own terms. Anyone republishing this analysis must
 credit Epoch AI, the RAND report and Scale AI.
 
-Full per-section detail: [`data/pipeline/README.md`](data/pipeline/README.md).
+Full per-section detail: [`1_data/1_pipeline/README.md`](1_data/1_pipeline/README.md).
 
 ## Benchmark score sources
 
@@ -17,7 +17,7 @@ Full per-section detail: [`data/pipeline/README.md`](data/pipeline/README.md).
 | [`epoch.ai/data/benchmark_data.zip`](https://epoch.ai/data/benchmark_data.zip) and [`epoch.ai/data/benchmarks.csv`](https://epoch.ai/data/benchmarks.csv) | **CC-BY** (Epoch AI), attribution required |
 | RAND **RR-A3797-1** (Dev et al. 2025, *Toward Comprehensive Benchmarking of the Biological Knowledge of Frontier LLMs*) | Cite [RR-A3797-1](https://www.rand.org/pubs/research_reports/RRA3797-1.html) |
 | [Scale SEAL leaderboards](https://labs.scale.com/leaderboard) | **No open license.** Scale AI Terms of Service applies. Aggregated as research with attribution; confirm terms at <https://scale.com/legal/terms> before redistributing |
-| SimpleQA original scores (`data/curated/simpleqa_original/`) | MIT, from the upstream benchmark repository |
+| SimpleQA original scores (`1_data/curated/simpleqa_original/`) | MIT, from the upstream benchmark repository |
 
 The Epoch Capabilities Index this project recreates is Epoch AI's:
 <https://epoch.ai/eci>.

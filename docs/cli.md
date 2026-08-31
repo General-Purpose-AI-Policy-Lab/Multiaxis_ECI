@@ -1,10 +1,10 @@
 # CLI reference
 
-Every flag `fit.py` accepts, where a fit's output lands, and the commands that
+Every flag `2_fit.py` accepts, where a fit's output lands, and the commands that
 plot, diagnose and publish it. The [README](../README.md) covers the two runs
 that matter; this file is the rest of the surface.
 
-`python fit.py --help` is the generated version of the flag tables below.
+`python 2_2_fit.py --help` is the generated version of the flag tables below.
 
 ## Flags
 
@@ -21,7 +21,7 @@ unmarked to both.
 | `--sampler {pymc,nutpie,numpyro}` | NUTS backend. Default `nutpie` |
 | `--target-accept X` | `[expl]` default 0.95. Raise toward 0.99 if divergences appear |
 | `--seed N` | `[expl]` override seed 42. Nutpie is deterministic given seed + data + model, so a multi-run recipe must vary this |
-| `--stream-draws` | `[expl]` nutpie writes every draw to `results/<fit>/live_draws.zarr` as it lands, so a killed run keeps what it had. Read a partial store with `persistence.load_live_draws` |
+| `--stream-draws` | `[expl]` nutpie writes every draw to `results/<fit>/live_draws.zarr` as it lands, so a killed run keeps what it had. Read a partial store with `multiaxis_eci.persistence.load_live_draws` |
 
 **Model**
 
@@ -30,8 +30,8 @@ unmarked to both.
 | `--K N` | `[expl]` latent dimension. Default 4 |
 | `--loading-prior {normal,signed,pt1,bifactor}` | `[expl]` default `normal`, non-negative. `signed` allows a contrast axis and is rotation-invariant; `pt1` is `normal` under product-to-one loadings per axis (Epoch's identification); `bifactor` is a dense general column plus horseshoe specifics, `--K >= 2` |
 | `--link {linear,loglog}` | `[expl]` `linear` is the 2PL; `loglog` is a disjunctive best-axis family |
-| `--human-prior` | `[expl]` order human tiers by `config.HUMAN_ORDER`, a tree partial order |
-| `--human-merge` | `[expl]` instead use `config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents |
+| `--human-prior` | `[expl]` order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order |
+| `--human-merge` | `[expl]` instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents |
 | `--lineage-prior` | `[expl]` soft vendor release-chain prior: each release's mean step over its predecessor is positive, but a node can regress |
 | `--lineage-bm` | `[expl]` with `--lineage-prior`: index the chain by time, so each step scales with the release gap in years |
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
@@ -48,11 +48,11 @@ unmarked to both.
 | `--drop-benchmarks A,B` | `[expl]` drop the named benchmarks (comma-separated, exact names) for a sensitivity run |
 | `--cyber` | `[expl]` append the cyber ECI benchmarks |
 | `--open-only` | `[canon]` keep only benchmarks whose items are public; results go to `results/canonical_open/` |
-| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks NOT public+verified in `data/curated/benchmark_access.csv`; results go to `results/canonical_closed/` |
-| `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`data/curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
+| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks NOT public+verified in `1_data/curated/benchmark_access.csv`; results go to `results/canonical_closed/` |
+| `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_data/curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
 | `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
 | `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
-| `--eci-data-only` | `[canon]` fit `data/raw/eci_data.csv`, the original reference ECI dataset, instead of the processed file |
+| `--eci-data-only` | `[canon]` fit `1_data/raw/eci_data.csv`, the original reference ECI dataset, instead of the processed file |
 
 **Likelihood**
 
@@ -93,7 +93,7 @@ the only thing a plotting or diagnostic caller has to name.
 ## Plot a fit
 
 ```bash
-python diagnostics/plot_mirt.py --trace \
+python 3_3_diagnostics/3_plot_mirt.py --trace \
   results/mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise/trace_mirt_k3_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise.nc
 ```
 
@@ -105,8 +105,8 @@ destination. Full catalogue: [plots.md](plots.md).
 ### Plot everything
 
 ```bash
-python diagnostics/plot_mirt.py --folder results/ --dry-run   # decisions only
-python diagnostics/plot_mirt.py --folder results/             # render
+python 3_3_diagnostics/3_plot_mirt.py --folder results/ --dry-run   # decisions only
+python 3_3_diagnostics/3_plot_mirt.py --folder results/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder
@@ -127,9 +127,9 @@ count over its denominator.
 Two scripts go further when chains disagree.
 
 ```bash
-python diagnostics/diagnose_chains.py --trace TRACE --name LABEL
-python diagnostics/diagnose_chains.py --trace TRACE --write-modes
-python diagnostics/theta_bimodality.py --trace TRACE
+python 3_diagnostics/diagnose_chains.py --trace TRACE --name LABEL
+python 3_diagnostics/diagnose_chains.py --trace TRACE --write-modes
+python 3_diagnostics/theta_bimodality.py --trace TRACE
 ```
 
 `diagnose_chains.py` asks whether the chains found one solution or several. It
@@ -158,7 +158,7 @@ apparent split. It defaults to the flagship K=4 fit when `--trace` is omitted.
 ## Build the dashboard
 
 ```bash
-python diagnostics/build_dashboard.py --force-all
+python 3_3_diagnostics/4_build_dashboard.py --force-all
 ```
 
 Renders every registered fit into the tracked repo-root `index.html`: a fit
@@ -177,15 +177,15 @@ snapshot it was built from, not as something the repo regenerates on demand.
 Cards are managed by command, not by editing source.
 
 ```bash
-python diagnostics/build_dashboard.py --list
-python diagnostics/build_dashboard.py --add TRACE --name NAME --label LABEL
-python diagnostics/build_dashboard.py --remove NAME
-python diagnostics/build_dashboard.py --force NAME       # re-render one card
+python 3_3_diagnostics/4_build_dashboard.py --list
+python 3_3_diagnostics/4_build_dashboard.py --add TRACE --name NAME --label LABEL
+python 3_3_diagnostics/4_build_dashboard.py --remove NAME
+python 3_3_diagnostics/4_build_dashboard.py --force NAME       # re-render one card
 ```
 
 `--add` reads the fit's identity off the trace with `FitSpec.from_trace`,
 validates it, appends it to the tracked registry
-`diagnostics/dashboard_fits.json`, and renders nothing. `--name` is the cache
+`3_diagnostics/dashboard_fits.json`, and renders nothing. `--name` is the cache
 key and the `--force` target, so it must be unique; `--label` is the section
 header and nav entry. Four options refine the card: `--type` is one of `data`,
 `baseline`, `exploratory` (the default), `confirmed`; `--short` is the axis

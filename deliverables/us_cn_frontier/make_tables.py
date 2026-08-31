@@ -1,7 +1,7 @@
 """Summary-table image for the 3-scope US/CN frontier comparison.
 
 Reads the per-scope frontier CSVs plus the per-draw npz dumps
-diagnostics/country_frontier.py writes, computes deltas vs the all-benchmarks
+3_3_diagnostics/1_country_frontier.py writes, computes deltas vs the all-benchmarks
 scope per draw (cross-scope draws are independent posteriors), and renders
 one PNG of the two tables.
 
@@ -20,7 +20,7 @@ from plotly.subplots import make_subplots
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-import config  # noqa: E402
+from multiaxis_eci import config  # noqa: E402
 
 TAGS = {"all": "canonical", "open": "canonical_open", "closed": "canonical_closed"}
 OUT = Path(__file__).parent / "summary_tables.png"

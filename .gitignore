@@ -39,7 +39,7 @@ results/**/*factor_scores*.csv
 results/**/*.html
 
 # Data pipeline snapshots (one dated folder per fetch; regenerable)
-data/pipeline/snapshots/
+1_data/1_pipeline/snapshots/
 
 # Backup files
 *.bak
@@ -61,7 +61,7 @@ nohup.out
 *.bak-*
 
 # Pipeline per-stage intermediates (regenerable by the notebook)
-data/pipeline/intermediate/
+1_data/1_pipeline/intermediate/
 
 # Eval harness artifacts (evals/*): run outputs are large and regenerable, the
 # dataset is third-party and fetched on demand, and a key file must never be
@@ -95,3 +95,6 @@ results/**/rhat_cache.npz
 
 # Per-fit run logs
 results/**/*.log
+
+# Agent tooling
+.claude/

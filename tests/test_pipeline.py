@@ -6,7 +6,7 @@ Layout
 * analysis helpers — anchor pinning, ECI affine, timeline split, human levels
 * model + sampler  — tiny NUTS run, verifies the full Beta IRT compiles + samples
 * PPC + plots      — every plot builder returns a valid go.Figure
-* CLI              — argparse contract for fit.py
+* CLI              — argparse contract for 2_fit.py
 
 The analysis / plot tests run against a synthetic InferenceData built from a
 seeded RNG — no NUTS needed, so they finish in a fraction of a second. The
@@ -30,10 +30,10 @@ import pymc as pm
 import pytensor
 import pytest
 
-import analysis
-import analysis.rotation as rotation
-import viz
-from analysis import (
+from multiaxis_eci import analysis
+import multiaxis_eci.analysis.rotation as rotation
+from multiaxis_eci import viz
+from multiaxis_eci.analysis import (
     align_factor_signs, align_rotations, alignment_report, all_models_stats_df,
     apply_rotation, canonicalize_factors,
     eci_transform,
@@ -43,27 +43,27 @@ from analysis import (
     promax_rotate, sota_stats_df, timeline_stats_df, trace_anchors,
     trace_loading_prior,
 )
-from config import (
+from multiaxis_eci.config import (
     ANCHOR_HIGH, ANCHOR_LOW, DATA_DIR, ECI_EPS, HUMAN_ORDER,
     PROJECT_ROOT, RELEASE_DATES, SOTA_MODELS, ZERO_DIAG_THRESHOLD,
 )
-from data import (
+from multiaxis_eci.data import (
     ECIData, clip_scores_to_floors, drop_model_benchmark_cells,
     drop_model_observations, drop_zero_scores, find_model_idx,
     load_benchmark_floors, load_eci_data,
 )
-from lineage import LINEAGE_MAP, build_lineage_structure
-from models.qmatrix import QMATRIX_VARIANTS, axes_as_list
-from models.mirt import build_mirt_model
-from models.mirt_nc import _validate_qmatrix, build_mirt_nc_model
-from persistence import save_pit, save_summary, save_trace
-from viz import (
+from multiaxis_eci.lineage import LINEAGE_MAP, build_lineage_structure
+from multiaxis_eci.models.qmatrix import QMATRIX_VARIANTS, axes_as_list
+from multiaxis_eci.models.mirt import build_mirt_model
+from multiaxis_eci.models.mirt_nc import _validate_qmatrix, build_mirt_nc_model
+from multiaxis_eci.persistence import save_pit, save_summary, save_trace
+from multiaxis_eci.viz import (
     all_models_forest_fig, capability_timeline_fig, density_overlay_fig,
     forest_fig, forest_grid_fig, hyperparams_fig, loadings_grid_fig,
     pit_ecdf_fig, pit_hist_fig, pred_vs_obs_fig,
     residuals_per_benchmark_fig, sota_forest_fig, subplot_grid,
 )
-from ppc import (
+from multiaxis_eci.ppc import (
     _beta_draw, _flatten_over_chains, _thin_sel, boundary_mask, compute_gof,
     pit_values, posterior_predictive_mirt, posterior_predictive_mirt_nc,
 )
@@ -80,14 +80,14 @@ def raw_df(data: ECIData) -> pd.DataFrame:
     """Mirror of what load_eci_data() actually keeps post-filtering.
 
     Data prep (merge/dedup) is done by the preprocessing notebook and lives in
-    the complete `data/processed/benchmarks_merged.csv` (every benchmark). With
+    the complete `1_data/processed/benchmarks_merged.csv` (every benchmark). With
     the canonical defaults (collapse_effort_variants=False,
     drop_low_obs_models=False) the modeling-stage transforms that change the row
     count are (1) the unconditional retirement drop, (2) the curated exclusion
     filter applied at fit time and (3) the human-baseline merge, so this mirror
     applies all three.
     """
-    from data import (PROCESSED_FILE, _load_human_baselines_as_models,
+    from multiaxis_eci.data import (PROCESSED_FILE, _load_human_baselines_as_models,
                       load_excluded_benchmarks, load_retired_benchmarks)
 
     df = pd.read_csv(PROCESSED_FILE)
@@ -174,7 +174,7 @@ class TestData:
         assert d_all.is_human.sum() >= d.is_human.sum()
 
     def test_eci_data_merge_adds_mmlu_and_bbh(self, data):
-        """The pipeline (`data/pipeline/pipeline.ipynb`) contributes MMLU + BBH
+        """The pipeline (`1_data/1_pipeline/pipeline.ipynb`) contributes MMLU + BBH
         with the SOTA models attached under their versioned IDs (not the
         eci_data.csv "pretty" names). Contract duplicated here so a future
         pipeline change that drops these benchmarks or those mappings is
@@ -206,10 +206,10 @@ class TestData:
         """Smoke test: the processed file exists, has the expected 9 columns,
         and carries every benchmark (exclusions are applied at fit time by
         load_eci_data, not during data generation)."""
-        from data import PROCESSED_FILE, load_excluded_benchmarks
+        from multiaxis_eci.data import PROCESSED_FILE, load_excluded_benchmarks
         assert PROCESSED_FILE.exists(), (
-            f"{PROCESSED_FILE} missing — run data/pipeline/pipeline.ipynb and "
-            f"copy output/benchmarks_merged.csv into data/processed/"
+            f"{PROCESSED_FILE} missing — run 1_data/1_pipeline/pipeline.ipynb and "
+            f"copy output/benchmarks_merged.csv into 1_data/processed/"
         )
         df = pd.read_csv(PROCESSED_FILE)
         assert set(df.columns) == {
@@ -235,7 +235,7 @@ class TestData:
         The old `.decode("unicode_escape")` treated bytes as Latin-1 and mangled
         multi-byte chars into mojibake (dagger -> 'â' + C1 control bytes). Guard
         against that regression: no model name may contain a C1 control char."""
-        from data import PROCESSED_FILE
+        from multiaxis_eci.data import PROCESSED_FILE
         df = pd.read_csv(PROCESSED_FILE)
         bad = [m for m in df["model_version"].astype(str).unique()
                if any(0x80 <= ord(c) <= 0x9f for c in m)]
@@ -276,7 +276,7 @@ class TestData:
         np.testing.assert_array_equal(clipped.n_eff, data.n_eff)
 
     def test_low_obs_flag(self, data):
-        from config import LOW_OBS_THRESHOLD
+        from multiaxis_eci.config import LOW_OBS_THRESHOLD
         assert data.is_low_obs.dtype == bool
         assert data.is_low_obs.shape == (data.n_models,)
         # Humans are exempt from the flag regardless of obs count.
@@ -341,7 +341,7 @@ class TestEraFilter:
             assert tier in present, f"{tier} must survive the era filter"
         assert ANCHOR_LOW[0] in present and ANCHOR_HIGH[0] in present
         # every dated surviving model is >= cutoff
-        from data import PROCESSED_FILE
+        from multiaxis_eci.data import PROCESSED_FILE
         raw = pd.read_csv(PROCESSED_FILE)
         d = pd.to_datetime(raw["release_date"], errors="coerce")
         per_model = d.groupby(raw["model_version"]).max().dropna()
@@ -359,7 +359,7 @@ class TestEraFilter:
         # a pre-cutoff staple survives; the post-cutoff ECI anchor is gone
         assert ANCHOR_LOW[0] in present            # Claude 3.5 Sonnet, 2024-10
         assert ANCHOR_HIGH[0] not in present       # GPT-5, 2025-08
-        from data import PROCESSED_FILE
+        from multiaxis_eci.data import PROCESSED_FILE
         raw = pd.read_csv(PROCESSED_FILE)
         d = pd.to_datetime(raw["release_date"], errors="coerce")
         per_model = d.groupby(raw["model_version"]).max().dropna()
@@ -397,7 +397,7 @@ class TestScopeFlags:
     def test_dropping_a_retired_benchmark_is_a_silent_no_op(self, data_all):
         """The retirement list already removed them, so naming one changes
         nothing and raises no warning."""
-        from data import load_retired_benchmarks
+        from multiaxis_eci.data import load_retired_benchmarks
         retired = sorted(load_retired_benchmarks())
         assert retired, "retired_benchmarks.txt is empty"
         with warnings.catch_warnings():
@@ -412,7 +412,7 @@ class TestScopeFlags:
     def test_cyber_is_additive_and_never_shadows_a_pipeline_row(self, data_all):
         """Cyber rows land only on models already fit, only on benchmarks the
         pipeline does not supply, and leave every existing observation intact."""
-        from data import CURATED_DIR
+        from multiaxis_eci.data import CURATED_DIR
 
         assert load_eci_data(include_all_benchmarks=True,
                              fit_cyber=False).n_obs == data_all.n_obs, \
@@ -594,7 +594,7 @@ class TestPPC:
         assert (0.0 <= pit).all() and (pit <= 1.0).all()
 
     def test_boundary_mask_covers_both_edges(self, data):
-        from config import ECI_EPS
+        from multiaxis_eci.config import ECI_EPS
         m = boundary_mask(data)
         assert m[data.zero_score_mask].all()                 # exact zeros out
         assert m[data.scores >= 1.0 - ECI_EPS].all()         # exact ones out
@@ -768,7 +768,7 @@ class TestCLI:
     def test_help_exits_clean(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "fit.py"), "--help"],
+            [py, str(PROJECT_ROOT / "2_fit.py"), "--help"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -781,7 +781,7 @@ class TestCLI:
     def test_unknown_arg_fails(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "fit.py"), "--bogus-flag"],
+            [py, str(PROJECT_ROOT / "2_fit.py"), "--bogus-flag"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -791,7 +791,7 @@ class TestCLI:
     def test_invalid_preset_fails(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "fit.py"), "--preset", "nonsense"],
+            [py, str(PROJECT_ROOT / "2_fit.py"), "--preset", "nonsense"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -1474,7 +1474,7 @@ class TestMIRT:
         plus the covariate broadcast across axes — so a covariate applied to the
         wrong rows, transposed, or double-counted fails here. The golden-logp
         locks cannot see this: time_beta is 0 at the initial point."""
-        from data import release_time_covariate
+        from multiaxis_eci.data import release_time_covariate
         lin = build_lineage_structure(data.mlookup)
         t = release_time_covariate(data.mlookup, lin)
         kw = dict(K=3, human_order=HUMAN_ORDER, lineage=lin)
@@ -1501,7 +1501,7 @@ class TestMIRT:
         """Centering keeps the trend out of the overall level the ZeroSumNormal
         pins; the founder-date rule keeps it constant within a chain, so lineage
         increments still measure within-chain climb. Undated rows sit at 0."""
-        from data import release_time_covariate
+        from multiaxis_eci.data import release_time_covariate
         lin = build_lineage_structure(data.mlookup)
         t = release_time_covariate(data.mlookup, lin)
         assert t.shape == (data.n_models,)
@@ -1517,7 +1517,7 @@ class TestMIRT:
                 assert t[names.index(tier)] == 0.0
 
     def test_time_prior_rejects_misaligned_covariate(self, data):
-        from data import release_time_covariate
+        from multiaxis_eci.data import release_time_covariate
         with pytest.raises(ValueError, match="theta-row order"):
             release_time_covariate(data.mlookup.iloc[::-1])
         with pytest.raises(ValueError, match="one centered year per model row"):
@@ -1580,7 +1580,7 @@ class TestMIRT:
         """A monotone linear frontier recovers its slope, projects a below-cloud
         human tier to a PAST crossover (passed) and an above-cloud tier to a
         FUTURE date."""
-        from analysis import mirt_crossover_df, mirt_frontier_forecast
+        from multiaxis_eci.analysis import mirt_crossover_df, mirt_frontier_forecast
 
         rng = np.random.default_rng(0)
         S = 600
@@ -1672,7 +1672,7 @@ def _model_var_names(model):
 def _bq(data, K=3, variant="full"):
     """Lazy import of the diagnostics Q-matrix builder (keeps its module-level
     directory creation out of test-collection time)."""
-    from fits.fit_nc import build_qmatrix
+    from multiaxis_eci.fits.fit_nc import build_qmatrix
     return build_qmatrix(data, K, variant)
 
 
@@ -1700,7 +1700,7 @@ class TestMIRTNonComp:
         """qmatrix4 = qmatrix3 with Multimodal pulled out as a strict 4th axis.
         Kept OUT of QMATRIX_VARIANTS so the non-comp driver's 3-axis name mapping
         (OVERRIDE_MAPS) never sees a 4th index."""
-        from models.qmatrix import (AXIS_LABELS_K4, QMATRIX4_CAT_TO_AXIS,
+        from multiaxis_eci.models.qmatrix import (AXIS_LABELS_K4, QMATRIX4_CAT_TO_AXIS,
                                   QMATRIX_VARIANTS)
         # strict simple structure: every category -> a single int axis
         assert all(isinstance(v, int) for v in QMATRIX4_CAT_TO_AXIS.values())
@@ -1714,7 +1714,7 @@ class TestMIRTNonComp:
     def test_qmatrix4x_crossloads(self):
         """qmatrix4x = qmatrix4 + qmatrix3x's cross-loads (coding & PhD-science
         also tap reasoning, axis 0); multimodal stays single (axis 3)."""
-        from models.qmatrix import (QMATRIX4_CAT_TO_AXIS, QMATRIX4X_CAT_TO_AXIS,
+        from multiaxis_eci.models.qmatrix import (QMATRIX4_CAT_TO_AXIS, QMATRIX4X_CAT_TO_AXIS,
                                   QMATRIX_VARIANTS)
         crossed = {"Autonomous SWE", "Agentic Computer Use", "Biology", "Chemistry"}
         for cat in crossed:
@@ -2155,7 +2155,7 @@ class TestFitSpec:
         for p in ("normal", "signed", "signedhs", "pt1", "bifactor")
     ])
     def test_tag_round_trips_through_parse_tag(self, kwargs):
-        from analysis.fitspec import _parse_tag
+        from multiaxis_eci.analysis.fitspec import _parse_tag
         prereq = {"lineage_bm": {"lineage_prior": True}}
         for f in list(kwargs):
             kwargs.update(prereq.get(f, {}))
@@ -2171,7 +2171,7 @@ class TestFitSpec:
         # present = on, ABSENT = off. Three attrless traces on disk sit in
         # folders with no token (mirt_humanprior, mirt_loglog) and were fit
         # without floors, so an absent token must not inherit the True default.
-        from analysis.fitspec import _parse_tag
+        from multiaxis_eci.analysis.fitspec import _parse_tag
         assert _parse_tag("_floors")["floors"] is True
         assert _parse_tag("_humanprior")["floors"] is False
         assert _parse_tag("")["floors"] is False
@@ -2192,7 +2192,7 @@ class TestFitSpec:
     def test_legacy_poolednoise_token_still_parses(self):
         # Folders written while the tag carried the token must still resolve, and
         # they name the value the default already holds.
-        from analysis.fitspec import _parse_tag
+        from multiaxis_eci.analysis.fitspec import _parse_tag
         assert _parse_tag("_floors_poolednoise") == {
             "loading_prior": "normal", "floors": True, "pooled_noise": True}
 
@@ -2239,10 +2239,27 @@ class TestFitSpec:
             analysis.FitSpec(K=2, lineage_bm=True)
 
 
+
+def _load_script(relpath):
+    """Import a numbered script by path.
+
+    The reproduction-path scripts are prefixed (`3_diagnostics/3_plot_mirt.py`),
+    and a module name cannot start with a digit, so `import` cannot reach them.
+    Everything importable lives in `multiaxis_eci/`; these are entry points, loaded here
+    the only way Python allows.
+    """
+    import importlib.util
+    path = PROJECT_ROOT / relpath
+    name = "_script_" + path.stem.lstrip("0123456789_")
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
 def test_plot_mirt_folder_decision():
     """`--folder` must refuse the two filenames that are not fits of their own,
     and thin one draw per 2 GB so the 38 GB flagship fits in 26 GB of RAM."""
-    from diagnostics.plot_mirt import folder_decision
+    folder_decision = _load_script("3_diagnostics/3_plot_mirt.py").folder_decision
     assert folder_decision("trace.nc", 1_694_555_488)[0] is not None
     assert folder_decision("trace_mirt_k1.nc", 141_356)[0] is not None
     assert folder_decision("trace_mirt_k2_loglog.nc", 20_333_520) == (None, 1)
@@ -2263,7 +2280,7 @@ def test_dashboard_json_registry_round_trip(tmp_path, monkeypatch):
     """
     import dataclasses as dc
     import json as _json
-    from diagnostics import build_dashboard as bd
+    bd = _load_script("3_diagnostics/4_build_dashboard.py")
 
     spec = dc.replace(analysis.FLAGSHIP, drop_benchmarks=("FrontierMath v1",))
     reg = tmp_path / "dashboard_fits.json"

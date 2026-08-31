@@ -3,17 +3,17 @@
 # scopes (all / open-only / closed-only) on ONE shared ECI scale.
 #
 # Prerequisites: the three quick fits exist —
-#   python fit.py --preset canonical --chains 4 --draws 2000 --tune 2000
-#   python fit.py --preset canonical --open-only --chains 4 --draws 2000 --tune 2000
-#   python fit.py --preset canonical --closed-only --chains 4 --draws 2000 --tune 2000
+#   python 2_fit.py --preset canonical --chains 4 --draws 2000 --tune 2000
+#   python 2_fit.py --preset canonical --open-only --chains 4 --draws 2000 --tune 2000
+#   python 2_fit.py --preset canonical --closed-only --chains 4 --draws 2000 --tune 2000
 set -e
 cd "$(dirname "$0")/../.."
 PY=~/miniforge3/envs/pymc_env/bin/python
 
-$PY diagnostics/country_frontier.py               --fit-start 2024-10-01 --y-range 50,255
-$PY diagnostics/country_frontier.py --open-only   --fit-start 2024-10-01 --y-range 50,255
-$PY diagnostics/country_frontier.py --closed-only --fit-start 2024-10-01 --y-range 50,255
-$PY diagnostics/plot_crossovers.py
+$PY 3_3_diagnostics/1_country_frontier.py               --fit-start 2024-10-01 --y-range 50,255
+$PY 3_3_diagnostics/1_country_frontier.py --open-only   --fit-start 2024-10-01 --y-range 50,255
+$PY 3_3_diagnostics/1_country_frontier.py --closed-only --fit-start 2024-10-01 --y-range 50,255
+$PY 3_3_diagnostics/2_plot_crossovers.py
 $PY deliverables/us_cn_frontier/make_tables.py
 
 for t in canonical canonical_open canonical_closed; do

@@ -35,6 +35,6 @@ draws, ESS and divergences for every card whose trace is still on disk.
 
 ## Regenerate
 
-One command: `python diagnostics/build_dashboard.py` (`--force <name>` for one
+One command: `python 3_diagnostics/4_build_dashboard.py` (`--force <name>` for one
 card, `--force-all` for every card, `--png` for static stills → git-ignored
 `plots/dashboard/`).
