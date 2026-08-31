@@ -9,7 +9,7 @@ dashboard cannot drift apart. Differences from the dashboard call:
   * labels are English and the type is scaled up for a shared figure
 
 Usage:
-    python lw_post/figures/make_timeline_plotly.py [--results DIR] [--tag _draft]
+    python blogpost/figures/make_timeline_plotly.py [--results DIR] [--tag _draft]
 """
 from __future__ import annotations
 

@@ -11,7 +11,7 @@ project convention: positional row matching after an assert that the observed
 vectors are byte-identical, plus a sensitivity restricted to rows where BOTH
 sides have Pareto-k < 0.7.
 
-Run: python lw_post/ladder/ladder.py
+Run: python blogpost/ladder/ladder.py
 """
 from __future__ import annotations
 

@@ -20,7 +20,7 @@ Statistics are the project's `post_stats` convention: posterior median and a 95%
 CENTRAL quantile interval, not an HDI.
 
 Usage:
-    python lw_post/figures/make_human_modes_plotly.py [--trace FILE] [--tag ""]
+    python blogpost/figures/make_human_modes_plotly.py [--trace FILE] [--tag ""]
 """
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ from theta_bimodality import PERM_STRIDE, axis_permutations, residual_groups  # 
 from multiaxis_eci.viz.core import save_print  # noqa: E402
 
 
-# None drops the in-figure title: the LessWrong caption carries the
+# None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.
 # "Human tiers, the two chain groups of the flagship fit".
 TITLE = None

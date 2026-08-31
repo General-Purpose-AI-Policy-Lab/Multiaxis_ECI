@@ -209,7 +209,7 @@ SOTA_MODELS: list[str] = _load_sota_models()
 # SimpleBench all load on it and are still being run).
 FORECAST_NO_SOTA_AXES: set[int] = {3}
 
-# The frontier-forecast fit shared by the dashboard, the memo and the LW post:
+# The frontier-forecast fit shared by the dashboard, the memo and the blog post:
 # records only, fit from the reasoning-model cutoff, SD<0.4 cloud, 50% HDIs.
 # Each caller still supplies its own sota_exempt/back_start/horizon_date.
 FORECAST_KW = dict(fit_basis="records", fit_start="2024-10-01", sd_cap=0.4,

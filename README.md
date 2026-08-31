@@ -52,7 +52,8 @@ ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (202
 ├── multiaxis_eci/       # the library: config, data loading, models, analysis, figures
 ├── notebooks/           # one-off investigations, kept for the record, not maintained
 ├── evals/               # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
-├── results/             # one folder per fit; canonical/ is the index
+├── results/             # one folder per fit; canonical/ is the index, Old/ the archive
+├── blogpost/            # the research post's figures and its LOO ladder (the deliverable)
 ├── deliverables/        # figure + table sets built for a specific write-up
 ├── docs/                # model math, CLI reference, figure catalogue
 ├── tests/               # fast unit tests + golden logp locks

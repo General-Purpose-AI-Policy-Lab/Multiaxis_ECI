@@ -19,7 +19,7 @@ positive fraction has a heavy right tail) is clipped at the limit and marked
 with an open right-arrow instead of stretching the shared window.
 
 Usage:
-    python lw_post/figures/make_crossover_plotly.py [--trace FILE] [--tag ""]
+    python blogpost/figures/make_crossover_plotly.py [--trace FILE] [--tag ""]
 """
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
 from multiaxis_eci.viz.core import FUTURE_COLOR as FUTURE, PASSED_COLOR as PAST, save_print  # noqa: E402
 
 
-# None drops the in-figure title: the LessWrong caption carries the
+# None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again.
 TITLE = None
 

@@ -14,7 +14,7 @@ fit's forecast. Axis identity is checked against `make_all.EXPECTED_TOPS`
 before the cache is written, so a reused cache is a checked one.
 
 Usage:
-    python lw_post/figures/make_trend_plotly.py [--trace FILE] [--tag ""]
+    python blogpost/figures/make_trend_plotly.py [--trace FILE] [--tag ""]
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.viz.core import save_print  # noqa: E402
 
 
-# None drops the in-figure title: the LessWrong caption carries the
+# None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.
 # "Frontier trend per axis, against the human tiers".
 TITLE = None

@@ -1,4 +1,4 @@
-"""The two forecast figures for the LessWrong post.
+"""The two forecast figures for the blog post.
 
 Same fit and same forecast code as the memo (`memo/make_memo_figs.py`): flagship
 K=4 fit, majority chains, raw display frame, records basis from Oct 2024,
@@ -18,7 +18,7 @@ scope). Every interval on both figures is a 50% HDI.
                             crossing. Axis 2's dates are shown with the
                             backward-extrapolation caveat on the panel.
 
-  python lw_post/figures/make_forecast_figs.py
+  python blogpost/figures/make_forecast_figs.py
 
 The trend-object pickle beside the trace is always reused when it exists, so a
 layout edit never reloads the 38 GB trace.

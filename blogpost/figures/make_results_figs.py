@@ -1,10 +1,10 @@
-"""The two per-axis result figures for the LessWrong post.
+"""The two per-axis result figures for the blog post.
 
 Same code path as the memo (`memo/make_memo_figs.py`): the flagship K=4 fit,
 majority chains only, raw display frame. Only the axis display strings and the
 output location change, so the post and the memo cannot drift apart.
 
-  python lw_post/figures/make_results_figs.py
+  python blogpost/figures/make_results_figs.py
 """
 from __future__ import annotations
 

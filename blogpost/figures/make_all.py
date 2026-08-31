@@ -1,10 +1,10 @@
-"""One entry point for the LessWrong post's Plotly figures.
+"""One entry point for the blog post's Plotly figures.
 
 Every figure here reads the flagship fit through `analysis.FLAGSHIP` /
 `open_flagship`, so the fit identity, the majority-chain policy and the forecast
 settings are the ones the rest of the repo uses. Nothing is hand-copied.
 
-    python lw_post/figures/make_all.py all
+    python blogpost/figures/make_all.py all
     ...                                                    crossover
     ...                                                    trend
     ...                                                    timeline

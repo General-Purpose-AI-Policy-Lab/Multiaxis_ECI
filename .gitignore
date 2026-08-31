@@ -84,11 +84,11 @@ CLAUDE.md
 # LaTeX writes this at the repo root when a compile is started from here
 texput.log
 
-# The LessWrong post's figures and its LOO ladder are tracked: they are the
+# The research blog post's figures and its LOO ladder are tracked: they are the
 # deliverable itself, not a render of one. Their interactive Plotly twins are
 # not, on the same grounds as the results/ HTML above — ~4.7 MB each of inlined
 # JS that no diff compresses, rebuilt by figures/make_all.py from the trace.
-lw_post/**/*.html
+blogpost/**/*.html
 
 # Per-fit caches rebuilt from the trace on demand. The theta view is a 2.5 GB
 # float32 dump, over GitHub's file limit on its own.

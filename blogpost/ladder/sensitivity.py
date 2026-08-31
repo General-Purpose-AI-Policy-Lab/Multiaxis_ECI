@@ -8,7 +8,7 @@ For each fit this recomputes elpd at the ladder thinning and at twice-coarser
 thinning, and at reff = 0.05 / 0.5 / 1.0, then re-derives the headline paired
 deltas from the coarser pointwise densities.
 
-Run: python lw_post/ladder/sensitivity.py
+Run: python blogpost/ladder/sensitivity.py
 """
 from __future__ import annotations
 

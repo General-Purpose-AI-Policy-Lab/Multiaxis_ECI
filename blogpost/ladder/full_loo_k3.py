@@ -8,7 +8,7 @@ BOTH fits have Pareto-k < 0.7.
 Also recomputes the K4 reference full-draw LOO as a reproduction check
 against the already-staged 7,710.4 +- 76.3.
 
-Run: python lw_post/ladder/full_loo_k3.py
+Run: python blogpost/ladder/full_loo_k3.py
 """
 from __future__ import annotations
 

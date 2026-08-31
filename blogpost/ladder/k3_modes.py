@@ -5,7 +5,7 @@ dlogp -77.1). This says WHERE the two solutions differ: per-mode mean loadings
 after the same permutation/sign match diagnose_chains uses, the benchmarks whose
 axis share moves most, and the takers whose ability moves most.
 
-Run: python lw_post/ladder/k3_modes.py
+Run: python blogpost/ladder/k3_modes.py
 """
 from __future__ import annotations
 

@@ -288,7 +288,7 @@ class FitSpec:
 # ── the flagship fit ────────────────────────────────────────────────────────
 # K=4, positive loadings, merged human order + Brownian lineage prior, 3PL
 # floors, pooled noise, the exploration scope. THE forecasting base — the fit
-# the LW post reports (10 chains x 12,000 draws on the 2026-08 snapshot:
+# the blog post reports (10 chains x 12,000 draws on the 2026-08 snapshot:
 # 4,923 obs / 829 test-takers / 96 benchmarks, R² 0.9643).
 # FrontierMath v1 and AlgoTune are out of this scope through the retirement
 # list, so no drop flag names them and the tag carries no `_drop`.

@@ -10,7 +10,7 @@ mode-restricted. Axis identity is checked against `make_all.EXPECTED_TOPS`
 before any label is applied.
 
 Usage:
-    python lw_post/figures/make_forests_plotly.py [--trace FILE] [--tag _draft]
+    python blogpost/figures/make_forests_plotly.py [--trace FILE] [--tag _draft]
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ from multiaxis_eci.viz import forest_grid_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_print  # noqa: E402
 
 
-# None drops the in-figure title: the LessWrong caption carries the
+# None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.
 # "Top models, frontier releases and human tiers per axis".
 TITLE = None

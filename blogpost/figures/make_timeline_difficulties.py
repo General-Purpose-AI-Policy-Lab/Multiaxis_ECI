@@ -1,4 +1,4 @@
-"""1D ECI timeline with benchmark difficulties, for the LessWrong post.
+"""1D ECI timeline with benchmark difficulties, for the blog post.
 
 Three series on one pair of axes:
   * every dated AI test-taker, x = release date, y = anchored ECI (80% interval)
@@ -12,7 +12,7 @@ is formed per posterior draw, so the interval is real posterior uncertainty and
 not a propagated point estimate.
 
 Usage:
-    python lw_post/figures/make_timeline_difficulties.py [--results DIR] [--tag _draft]
+    python blogpost/figures/make_timeline_difficulties.py [--results DIR] [--tag _draft]
 """
 from __future__ import annotations
 

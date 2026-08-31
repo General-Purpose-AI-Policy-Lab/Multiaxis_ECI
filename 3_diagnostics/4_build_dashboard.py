@@ -88,7 +88,7 @@ FITS = [
               "matched corr 0.818), 37/120,000 divergences; the chains split "
               "6/4 on the human tiers and 18 older models on the Agentic axis "
               "(majority = chains 2,4,5,6,7,9) · R² 0.9643 — "
-              "THE forecasting base (the LW post's fit)",
+              "THE forecasting base (the blog post's fit)",
      "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
      "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True},

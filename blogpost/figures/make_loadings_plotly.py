@@ -8,7 +8,7 @@ whisker and share definitions are the ones the fit's CSVs use. Axis identity
 is checked against `make_all.EXPECTED_TOPS` before any label is applied.
 
 Usage:
-    python lw_post/figures/make_loadings_plotly.py [--trace FILE] [--tag _draft]
+    python blogpost/figures/make_loadings_plotly.py [--trace FILE] [--tag _draft]
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ from multiaxis_eci.viz.core import save_print  # noqa: E402
 
 TOP_N = 20
 
-# None drops the in-figure title: the LessWrong caption carries the
+# None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.
 # f"The {TOP_N} benchmarks that define each axis, ranked by axis share".
 TITLE = None

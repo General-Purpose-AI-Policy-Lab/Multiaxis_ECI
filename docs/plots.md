@@ -2,7 +2,7 @@
 
 Every figure in this project is built by a `viz/` Plotly builder and read by
 one of four callers: the single-fit CLI, the folder sweep, the dashboard, and
-the LessWrong post's figure script. This file says where the output lands,
+the blog post's figure script. This file says where the output lands,
 which command produces it, what each figure shows, and the four reading
 conventions a figure cannot state on its own.
 
@@ -17,12 +17,12 @@ fit CLI: [../README.md](../README.md).
 | `plots/canonical/` | `2_fit.py --preset canonical` | no |
 | `plots/dashboard/` | `3_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `3_diagnostics/4_build_dashboard.py` | **yes** |
-| `lw_post/figures/` | `lw_post/figures/make_all.py` | **yes**, except `*.html` |
+| `blogpost/figures/` | `blogpost/figures/make_all.py` | **yes**, except `*.html` |
 
 `plots/` is gitignored entirely: figures there are regenerable from the traces,
 and one dashboard build writes hundreds of them. `index.html` is the tracked
 artifact and the thing you serve. It is self-contained, so a browser opens it
-with no server. `lw_post/figures/` is tracked because the post is a deliverable
+with no server. `blogpost/figures/` is tracked because the post is a deliverable
 rather than a render, but its interactive Plotly twins are not: ~4.7 MB each of
 inlined JS, rebuilt by `make_all.py`.
 
@@ -58,14 +58,14 @@ python 3_diagnostics/4_build_dashboard.py --list
 python 3_diagnostics/4_build_dashboard.py --force-all
 ```
 
-LessWrong post figures. Every one reads the flagship through
+Blog-post figures. Every one reads the flagship through
 `analysis.FLAGSHIP` / `FLAGSHIP_TRACE` / `open_flagship`, so the fit identity,
 the chain policy and the forecast settings are the repo's and no script names a
 trace of its own. `--cached` never opens the trace: it reuses the forecast cache
 pickle and fails if it is missing.
 
 ```bash
-python lw_post/figures/make_all.py all --cached
+python blogpost/figures/make_all.py all --cached
 ```
 
 ## Figure catalogue
@@ -152,7 +152,7 @@ its mean lands in the empty valley between the two lumps.
 
 **The forecast rule lives in one place.** `config.FORECAST_KW` is
 `fit_basis="records"`, `fit_start="2024-10-01"` (the reasoning-model cutoff),
-`sd_cap=0.4`, `hdi_prob=0.5`. The dashboard card, the memo and the LW post all
+`sd_cap=0.4`, `hdi_prob=0.5`. The dashboard card, the memo and the blog post all
 read it, so the three cannot drift apart on the basis, the cap or the interval
 width. The cloud and the trend fit share the one cap, which is what makes
 every fitted record also a plotted point.
