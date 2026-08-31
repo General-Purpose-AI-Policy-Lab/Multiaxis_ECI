@@ -2,7 +2,7 @@
 
 Epoch reports dimensionality as *explained variance* per principal component
 ("PC1 explains X% of score variance"), not as the raw ARD axis-strength (tau)
-spectrum that diagnostics/multidim_ppca_ard.ipynb prints. This script fits the
+spectrum that notebooks/multidim_ppca_ard.ipynb prints. This script fits the
 same probabilistic-PCA-with-ARD model on the column-centered logit score matrix
 (handling the missing cells the sparse benchmark table has), then converts the
 posterior loadings into the explained-variance framing:

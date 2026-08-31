@@ -1,20 +1,50 @@
 # Diagnostics
 
-Post-fit tools. They read fitted traces (the canonical one lives at
-`results/canonical/trace.nc`, from `python fit.py --preset canonical`;
-exploration traces live in `results/mirt*/`).
+Post-fit tools, all of them command-line scripts. They read fitted traces (the
+canonical one lives at `results/canonical/trace.nc`, from
+`python fit.py --preset canonical`; exploration traces live in
+`results/mirt*/`). The exploratory notebooks that used to sit here moved to
+[`../notebooks/`](../notebooks/README.md).
+
+Commands and their options: [`../docs/cli.md`](../docs/cli.md).
+
+## Examine a fit
 
 | Script | Purpose |
 |---|---|
-| `build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ `results/comparisons/*.csv`) |
-| `plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → `plots/<out>/` |
-| `align_mirt.py` | Per-draw rotation-alignment comparison on an existing signed trace (no re-sampling) |
-| `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit |
-| `compute_sota.py` | Recompute the data-driven SOTA list → `data/curated/sota_models.txt` |
-| `residual_corr.py` | Is 1D capability sufficient? (see below) |
+| `diagnose_chains.py` | Are the chains one converged solution, or do some sit in a separate likelihood basin? No re-sampling |
+| `theta_bimodality.py` | Which test-takers the chain split actually moves, per axis, before and after alignment |
+| `align_mirt.py` | Per-draw rotation-alignment comparison on an existing signed trace |
+| `residual_corr.py` | Is 1D capability sufficient? Observed minus model-implied benchmark correlations (see below) |
 | `ppca_explained_variance.py` | PPCA scree / explained-variance report on logit scores |
+| `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit |
+
+## Render figures
+
+| Script | Purpose |
+|---|---|
+| `plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → `plots/<out>/` |
+| `plot_crossovers.py` | Human-tier crossover dates as a 2x3 grid: US/CN x all / open-only / closed-only |
+| `plot_lineage.py` | Reference render of the lineage prior's structure, as a multi-page PDF |
+| `forecast_only.py` | Re-render only the frontier-forecast figures of one dashboard card |
+
+## Build and publish
+
+| Script | Purpose |
+|---|---|
+| `build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ `results/comparisons/*.csv`). Card registry: `dashboard_fits.json` |
+| `country_frontier.py` | US vs China frontier on a K=1 canonical trace: per-country record-setters, per-draw OLS trends, gap / lag / crossovers |
+
+## Maintain the curated data
+
+| Script | Purpose |
+|---|---|
+| `compute_sota.py` | Recompute the data-driven SOTA list → `data/curated/sota_models.txt` |
 | `build_lineage_map.py` | Draft builder for `data/curated/lineage_map.csv` |
-| `*.ipynb` | One-off investigation notebooks (kept for the record; imports may predate the current layout) |
+| `build_country_map.py` | Country of origin (US / CN / Other) for every model_version → `data/curated/model_country.csv` |
+| `fetch_cyber_eci.py` | Fetch Epoch's separate cyber-ECI benchmark table into a curated additive file |
+| `audit_lower_bounds.py` | Read-only check of the curated chance floors in `benchmark_lower_bounds.csv` |
+| `audit_model_names.py` | Read-only audit of upstream model identity against its own display name |
 
 ## `residual_corr.py`
 
@@ -42,7 +72,7 @@ concluding anything about latent structure.
 ### Run
 
 ```bash
-~/miniforge3/envs/pymc_env/bin/python diagnostics/residual_corr.py
+python diagnostics/residual_corr.py
 ```
 
 Outputs:

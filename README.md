@@ -52,7 +52,8 @@ ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (202
 ├── fits/                # drivers for the non-compensatory / sparse / interaction families
 ├── analysis/            # FitSpec, ECI transform, rotations, convergence, forecasts
 ├── viz/                 # Plotly figure builders
-├── diagnostics/         # dashboard build, per-fit plots, chain diagnosis, audits
+├── diagnostics/         # post-fit command-line tools: diagnose, plot, build, audit
+├── notebooks/           # one-off investigations, kept for the record, not maintained
 ├── evals/               # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
 ├── data/                # pipeline notebook, processed table, curated files
 ├── results/             # one folder per fit; canonical/ is the index
@@ -62,7 +63,7 @@ ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (202
 └── index.html           # the all-fits dashboard (tracked)
 ```
 
-Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md).
+Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [diagnostics/README.md](diagnostics/README.md). What each notebook investigated: [notebooks/README.md](notebooks/README.md).
 
 ## Method
 
