@@ -21,7 +21,7 @@ outputs are where a correction goes so the next run does not undo it.
 | Folder | Contents |
 |---|---|
 | `raw/` | The original reference ECI CSV. Only `--eci-data-only` reads it |
-| `processed/` | `benchmarks_merged.csv`, the table `multiaxis_multiaxis_eci/data.py` actually fits |
+| `processed/` | `benchmarks_merged.csv`, the table `multiaxis_eci/data.py` actually fits |
 | `curated/` | Hand-maintained inputs: chance floors, benchmark access classes, human baselines, exclusion and retirement lists, lineage and country maps, per-refresh row fixes |
 | `1_pipeline/canonical/` | The name and alias dictionaries the notebook resolves against |
 | `1_pipeline/output/` | The notebook's reports, including `pipeline_report.md` |

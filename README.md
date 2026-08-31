@@ -48,7 +48,7 @@ ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (202
 ├── 1_data/              # step 1: the pipeline notebook, the curated-input builders, the tables
 ├── 2_fit.py             # step 2: the fit CLI (canonical preset + exploration)
 ├── 3_diagnostics/       # step 3: post-fit tools, the numbered four in reproduction order
-├── eci/                 # the library: config, data loading, models, analysis, figures
+├── multiaxis_eci/       # the library: config, data loading, models, analysis, figures
 ├── notebooks/           # one-off investigations, kept for the record, not maintained
 ├── evals/               # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
 ├── results/             # one folder per fit; canonical/ is the index
@@ -68,7 +68,7 @@ Each test-taker *m* has K abilities θ forming a skill profile, the way a studen
 
 <p align="center"><em>µ = c<sub>b</sub> + (1 − c<sub>b</sub>) σ( Σ<sub>k</sub> A<sub>b,k</sub> θ<sub>m,k</sub> − D<sub>b</sub> )</em>,  &nbsp; observed <em>y ~ Beta(µφ<sub>b</sub>, (1−µ)φ<sub>b</sub>)</em></p>
 
-This is the *compensatory* family: a strong skill can make up for a weak one inside the sum. The non-compensatory and semi-compensatory alternatives are implemented too (`multiaxis_multiaxis_eci/fits/fit_nc.py`, `multiaxis_multiaxis_eci/fits/fit_interaction.py`); the first did not converge, the second converged only under heavy constraints and predicted worse.
+This is the *compensatory* family: a strong skill can make up for a weak one inside the sum. The non-compensatory and semi-compensatory alternatives are implemented too (`multiaxis_eci/fits/fit_nc.py`, `multiaxis_eci/fits/fit_interaction.py`); the first did not converge, the second converged only under heavy constraints and predicted worse.
 
 **The data is sparse.** The test-taker by benchmark matrix is filled at about 6%, and the average test-taker has six scores. Many arrangements of abilities and loadings explain those scores equally well, so unconstrained runs land on different solutions. Two ordering priors identify the fit:
 
@@ -95,11 +95,11 @@ Whether the chains agree on those axes is a different question, with its own num
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
 - **Calibration.** The predictive intervals come out wider than the data requires, which makes the model more conservative than it should be.
 
-On the **Legacy QA** axis specifically, the human lead is a comparison against a frozen pool of pre-mid-2024 models. The eight benchmarks that define the axis most purely were never run on a frontier model, so this is a data artifact rather than a finding, and the axis is left out of the forecasts.
+On the **Legacy QA** axis specifically, the human lead is a comparison against a frozen pool of pre-mid-2024 models. The eight benchmarks that define the axis most purely were never run on a frontier model, so this is a data artifact rather than a finding. The axis is left out of the headline forecasts (it gets no SOTA exemption), though the dashboard still renders its panel for diagnostic purposes.
 
 ## Data
 
-`multiaxis_multiaxis_eci/data.py` reads `1_data/processed/benchmarks_merged.csv`, produced by the in-repo notebook `1_data/1_pipeline/pipeline.ipynb` (Restart Kernel → Run All; see [1_data/1_pipeline/README.md](1_data/1_pipeline/README.md)).
+`multiaxis_eci/data.py` reads `1_data/processed/benchmarks_merged.csv`, produced by the in-repo notebook `1_data/1_pipeline/pipeline.ipynb` (Restart Kernel → Run All; see [1_data/1_pipeline/README.md](1_data/1_pipeline/README.md)).
 
 That notebook is being superseded by [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline), a standalone repository covering the same feeds with a UUID-keyed schema and a determinism check. The migration is not done: this repo still fits the in-repo notebook's output, and the two schemas are not interchangeable yet.
 

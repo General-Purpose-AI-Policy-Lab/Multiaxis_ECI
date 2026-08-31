@@ -2331,15 +2331,27 @@ class TestLayoutPaths:
                 if stale.search(line)]
         assert not hits, f"pre-rename path literals: {hits}"
 
-    def test_no_doubled_order_prefixes(self):
-        """A rename pass that replaces the long path then the short one turns
-        `diagnostics/x.py` into `3_diagnostics/3_x.py` and then into
-        `3_3_diagnostics/3_x.py`."""
-        doubled = _re.compile(r"\b([123])_\1_(data|fit|diagnostics|pipeline)")
-        hits = [str(p.relative_to(PROJECT_ROOT))
-                for p in self._files({".py", ".md", ".sh", ".ipynb"})
-                if doubled.search(p.read_text(encoding="utf-8", errors="ignore"))]
-        assert not hits, f"doubled order prefixes: {hits}"
+    def test_no_doubled_rename_artifacts(self):
+        """A rename pass that replaces a long form and then a short one applies
+        the second rule inside the first rule's output. It bit twice here:
+        `diagnostics/x.py` -> `3_diagnostics/3_x.py` -> `3_3_diagnostics/3_x.py`,
+        and `eci/data.py` -> `multiaxis_eci/data.py` ->
+        `multiaxis_multiaxis_eci/data.py`. Both forms read as plausible until
+        someone follows the path, so catch the shape rather than the instances:
+        any token immediately repeated after an underscore.
+        """
+        # `\b` cannot follow the second token when an underscore does, which is
+        # exactly the multiaxis_multiaxis_eci case, so the tail is `_` or a
+        # non-word character rather than a word boundary.
+        doubled = _re.compile(r"\b([123])_\1_(data|fit|diagnostics|pipeline)"
+                              r"|\b([a-z]{3,})_\3(?=_|[^\w]|$)")
+        hits = []
+        for f in self._files({".py", ".md", ".sh", ".ipynb", ".json", ".toml", ".txt"}):
+            for i, line in enumerate(f.read_text(encoding="utf-8", errors="ignore").splitlines(), 1):
+                m = doubled.search(line)
+                if m:
+                    hits.append(f"{f.relative_to(PROJECT_ROOT)}:{i}: {m.group(0)}")
+        assert not hits, f"doubled rename artifacts: {hits}"
 
     def test_layout_entry_points_exist(self):
         for rel in ["1_data", "1_data/1_pipeline/pipeline.ipynb", "1_data/curated",

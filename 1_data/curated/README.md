@@ -5,14 +5,14 @@ the table before editing:
 
 | File | Kind | Consumed by | Edit by hand? |
 |---|---|---|---|
-| `excluded_benchmarks.txt` | hand-maintained list | `multiaxis_multiaxis_eci/data.py` (applied at fit time, canonical preset only) | yes — one benchmark name per line, `#` comments allowed |
-| `human_baselines.csv` | hand-selected, this is the authoritative file | `multiaxis_multiaxis_eci/data.py` (humans as IRT test-takers); pipeline notebook (reads it as input) | yes — add new baselines here by hand. On refresh the notebook reads this file, canonicalizes benchmark names, appends RAND-extracted baselines, and round-trips it via `output/` |
+| `excluded_benchmarks.txt` | hand-maintained list | `multiaxis_eci/data.py` (applied at fit time, canonical preset only) | yes — one benchmark name per line, `#` comments allowed |
+| `human_baselines.csv` | hand-selected, this is the authoritative file | `multiaxis_eci/data.py` (humans as IRT test-takers); pipeline notebook (reads it as input) | yes — add new baselines here by hand. On refresh the notebook reads this file, canonicalizes benchmark names, appends RAND-extracted baselines, and round-trips it via `output/` |
 | `sota_models.txt` | generated | `config.SOTA_MODELS` (plot exemptions + drop-filter protection) | no — regenerate with `python 1_data/2_compute_sota.py` after a data/fit refresh |
 | `lineage_map.csv` | generated draft, then hand-reviewed | `lineage.py` (lineage prior), `1_data/2_compute_sota.py` (flagship chains) | yes — it is the reviewed source of truth; `1_data/3_build_lineage_map.py` drafts new rows |
 | `row_drops_YYYY-MM-DD.csv` | dated audit record | pipeline notebook (anti-join: these rows are removed on every refresh) | append-only — new audit, new dated file |
 | `row_fixes_YYYY-MM-DD.csv` | dated audit record | nothing reads it — it documents fixes that were applied through the notebook's name/config parsing; kept as the audit trail | append-only |
-| `benchmark_lower_bounds.csv` | hand-reviewed, sourced — authoritative (all 85 floors verified against primary sources 2026-07-13) | `multiaxis_multiaxis_eci/data.py` `load_benchmark_floors` for the `--floors` fixed-c 3PL fit (opt-in, exploration only) | yes — `benchmark, lower_bound, reason, source_url`; edit directly, then sanity-check with `3_diagnostics/audit_lower_bounds.py` |
-| `benchmark_score_clips.csv` | generated draft, then reviewed | `multiaxis_multiaxis_eci/data.py` `clip_scores_to_floors` APPLIES these row-level clips at fit time (`--floors` only) — the explicit record of every score the fit modifies; drift vs the current data/floors warns loudly | no — refresh with `3_diagnostics/audit_lower_bounds.py --write-clips` after a data or floor change, review the diff, commit |
+| `benchmark_lower_bounds.csv` | hand-reviewed, sourced — authoritative (all 85 floors verified against primary sources 2026-07-13) | `multiaxis_eci/data.py` `load_benchmark_floors` for the `--floors` fixed-c 3PL fit (opt-in, exploration only) | yes — `benchmark, lower_bound, reason, source_url`; edit directly, then sanity-check with `3_diagnostics/audit_lower_bounds.py` |
+| `benchmark_score_clips.csv` | generated draft, then reviewed | `multiaxis_eci/data.py` `clip_scores_to_floors` APPLIES these row-level clips at fit time (`--floors` only) — the explicit record of every score the fit modifies; drift vs the current data/floors warns loudly | no — refresh with `3_diagnostics/audit_lower_bounds.py --write-clips` after a data or floor change, review the diff, commit |
 
 The `_YYYY-MM-DD` suffix on the row-audit files is the date of the data audit
 that produced them. Each audit adds a new dated pair rather than editing an

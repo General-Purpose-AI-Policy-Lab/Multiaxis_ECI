@@ -7,7 +7,7 @@ pulls that table, keeps the benchmarks whose scores still discriminate, maps
 Epoch's display names onto our versioned model IDs, and writes
 `1_data/curated/cyber_benchmarks.csv` in the processed-file schema.
 
-The output is a curated file, not a pipeline stage: `multiaxis_multiaxis_eci/data.py` appends it at fit
+The output is a curated file, not a pipeline stage: `multiaxis_eci/data.py` appends it at fit
 time behind `--cyber`. Epoch states several of these values were read off
 published plots, a weaker provenance than the ZIP feeds. The file records no
 fetch date, so staleness against a refreshed processed table is not detectable

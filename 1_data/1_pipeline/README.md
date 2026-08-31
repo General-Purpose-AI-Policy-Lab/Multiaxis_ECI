@@ -2,7 +2,7 @@
 
 One notebook (`pipeline.ipynb`) that pulls a dated snapshot of Epoch AI's
 public benchmark ZIP (CC-BY, refreshed ~weekly) and assembles a
-`benchmarks_merged.csv` matching the schema `multiaxis_multiaxis_eci/data.py` already consumes.
+`benchmarks_merged.csv` matching the schema `multiaxis_eci/data.py` already consumes.
 
 This notebook is the current refresh path for
 `1_data/processed/benchmarks_merged.csv`.
@@ -13,7 +13,7 @@ This notebook is the current refresh path for
 > `model_id` / `benchmark_id`), per-source alias dictionaries, and a determinism
 > check that a re-run reproduces the database bit-for-bit.
 >
-> **The migration is not done.** `multiaxis_multiaxis_eci/data.py` still reads the flat
+> **The migration is not done.** `multiaxis_eci/data.py` still reads the flat
 > `benchmarks_merged.csv` this notebook writes, and the two schemas are not
 > interchangeable yet, so this remains the path to run for now. New feed work
 > belongs in the successor repository rather than here.
@@ -91,9 +91,9 @@ All at the top of section 00. Change them there.
 | Parameter | Default | Effect |
 |---|---|---|
 | `EPOCH_ZIP_URL` | `https://epoch.ai/data/benchmark_data.zip` | Source URL |
-| `APPLY_CURATED_EXCLUSIONS` | `False` | If `True`, drop benchmarks in `1_data/curated/excluded_benchmarks.txt` here. Kept **off** — the pipeline emits every benchmark and the exclusion list is applied at *fit time* by `multiaxis_multiaxis_eci/data.py` (`load_eci_data`, default), so the processed file is the complete record. |
+| `APPLY_CURATED_EXCLUSIONS` | `False` | If `True`, drop benchmarks in `1_data/curated/excluded_benchmarks.txt` here. Kept **off** — the pipeline emits every benchmark and the exclusion list is applied at *fit time* by `multiaxis_eci/data.py` (`load_eci_data`, default), so the processed file is the complete record. |
 | `DEDUP_POLICY` | `"max"` | Resolution for the rare case of disagreeing duplicates on `(model, benchmark)`. Exact-row dupes are always dropped regardless. |
-| `ECI_EPS` | `1e-3` | Open-interval clip for humans (matches `multiaxis_multiaxis_eci/data.py`). |
+| `ECI_EPS` | `1e-3` | Open-interval clip for humans (matches `multiaxis_eci/data.py`). |
 
 ## Provenance trace
 
