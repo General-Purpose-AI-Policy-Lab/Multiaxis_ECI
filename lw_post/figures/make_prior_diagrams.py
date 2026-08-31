@@ -3,9 +3,8 @@ style (light-gray rounded panel, green rounded-rect nodes, green "+delta"
 arrows). Style constants and helper functions (plate/edge/tbox/fedge/canvas)
 are copied verbatim from docs/make_prior_graph.py so the look matches exactly.
 
-  human_arrangement_lw.png  -> the tier-forest panel from
-                                memo/memo_assets/human_prior_graph.pdf (bottom
-                                panel only), re-rendered at high res.
+  human_arrangement_lw.png  -> the tier-forest panel of the prior graph, the
+                                bottom panel only, re-rendered at high res.
   model_family_example_lw.png -> a new illustrative one-family release chain
                                 with effort variants hanging off a release,
                                 in the same visual language.
@@ -91,7 +90,7 @@ def save(fig, name):
 
 # ================= Figure 1: human tier arrangement =================
 # Verbatim re-render of the bottom ("tier forest") panel of
-# docs/make_prior_graph.py page 3 / memo/memo_assets/human_prior_graph.pdf.
+# docs/make_prior_graph.py page 3.
 
 def make_human_arrangement():
     fig, ax = canvas(11.6, 7.4, (0.2, 11.5), (0.3, 7.75))

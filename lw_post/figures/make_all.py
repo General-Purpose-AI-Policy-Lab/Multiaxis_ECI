@@ -1,7 +1,7 @@
 """One entry point for the LessWrong post's Plotly figures.
 
 Every figure here reads the flagship fit through `analysis.FLAGSHIP` /
-`open_flagship`, so the fit identity, the majority-chain policy and the forecast
+`open_flagship`, so the fit identity, the chain policy and the forecast
 settings are the ones the rest of the repo uses. Nothing is hand-copied.
 
     ~/miniforge3/envs/pymc_env/bin/python lw_post/figures/make_all.py all
@@ -16,13 +16,13 @@ settings are the ones the rest of the repo uses. Nothing is hand-copied.
     ...                 skipped, they have no cache
     ...   --out DIR     write the figures somewhere other than this folder
 
-The three per-axis figures have a matplotlib twin in `make_results_figs.py` /
-`memo/make_memo_figs.py`; the Plotly ones here write `*_lw_plotly.png`, so the
-two sets can be compared side by side.
+The three per-axis figures have a matplotlib twin in `make_results_figs.py`,
+drawn by `figbase`; the Plotly ones here write `*_lw_plotly.png`, so the two
+sets can be compared side by side.
 
 The forecast cache is `results/mirt.../lw_forecast_cache_50.pkl`, next to the
 trace it was computed from, not in the temp dir: it is derived from one specific
-fit and it takes a 38 GB trace read to rebuild.
+fit and it takes a 14 GB trace read to rebuild.
 """
 from __future__ import annotations
 
@@ -45,6 +45,7 @@ from analysis import (FLAGSHIP, FLAGSHIP_TRACE, open_flagship,  # noqa: E402
                       prepare_fit)
 from config import AXIS_TITLES, FORECAST_KW, FORECAST_NO_SOTA_AXES  # noqa: E402
 from data import PROCESSED_FILE  # noqa: E402
+from figbase import FOREST_FRONTIER, pretty  # noqa: E402
 
 AXES = ["axis1", "axis2", "axis3"]      # Legacy QA is out of the forecast scope
 HDI = 0.5                               # every interval on both forecast figures
@@ -153,15 +154,6 @@ def two_column_layout(fig, col_dom, titles, k: int = 4) -> None:
 
 
 # ── per-axis result figures ─────────────────────────────────────────────────
-# `_pretty` (readable model labels) and `_FOREST_FRONTIER` (the frontier
-# releases pinned into every forest) are imported from the memo module rather
-# than copied, so the post and the memo cannot name a model differently.
-
-def _memo():
-    sys.path.insert(0, str(REPO / "memo"))
-    import make_memo_figs
-    return make_memo_figs
-
 
 def forest_frames(view, data, n_top: int = 11, sd_cap: float = 0.5) -> list:
     """Per axis, the forest rows: top models by mean ability at posterior
@@ -169,7 +161,6 @@ def forest_frames(view, data, n_top: int = 11, sd_cap: float = 0.5) -> list:
 
     Ascending by mean, so the strongest row lands at the top of the panel.
     """
-    mmf = _memo()
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     is_h = np.asarray(data.is_human, dtype=bool)
     frames = []
@@ -180,10 +171,10 @@ def forest_frames(view, data, n_top: int = 11, sd_cap: float = 0.5) -> list:
         top = [i for i in np.argsort(-mean) if not is_h[i] and sd[i] < sd_cap][:n_top]
         rows = ([(i, "model") for i in top]
                 + [(i, "frontier") for i in range(len(names))
-                   if names[i] in mmf._FOREST_FRONTIER and not is_h[i] and i not in top]
+                   if names[i] in FOREST_FRONTIER and not is_h[i] and i not in top]
                 + [(i, "human") for i in np.where(is_h)[0]])
         rows.sort(key=lambda r: mean[r[0]])
-        full = [names[i] if is_h[i] else mmf._pretty(names[i]) for i, _ in rows]
+        full = [names[i] if is_h[i] else pretty(names[i]) for i, _ in rows]
         # Word-boundary shortening (a mid-token cut makes two token-budget
         # variants of one model read identically). Plotly MERGES duplicate
         # categories into one row, so a label that collides after shortening
