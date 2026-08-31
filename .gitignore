@@ -15,14 +15,14 @@ build/
 # nutpie's store writes unconditionally. Thousands of chunk files each.
 **/live_draws.zarr/
 
-# Generated plots (regenerable via run.py) — incl. the optional --png dashboard stills
+# Generated plots (regenerable via 2_fit.py --plots / 3_diagnostics/3_plot_mirt.py) — incl. the optional --png dashboard stills
 plots/
 
-# Dashboard render cache (regenerable via diagnostics/build_dashboard.py);
+# Dashboard render cache (regenerable via 3_diagnostics/4_build_dashboard.py);
 # the dashboard itself is the tracked repo-root index.html.
 results/dashboard_cache/
 
-# Diagnostic outputs (regenerable via diagnostics/*.py)
+# Diagnostic outputs (regenerable via 3_diagnostics/*.py)
 results/residual_corr_*.csv
 
 # Per-row result dumps (regenerable from the traces on every fit). These are the

@@ -13,8 +13,8 @@ fit CLI: [../README.md](../README.md).
 
 | destination | written by | tracked? |
 |---|---|---|
-| `plots/mirt_k{K}{tag}/` | `3_diagnostics/3_plot_mirt.py`, and `fit.py --plots` | no |
-| `plots/canonical/` | `fit.py --preset canonical` | no |
+| `plots/mirt_k{K}{tag}/` | `3_diagnostics/3_plot_mirt.py`, and `2_fit.py --plots` | no |
+| `plots/canonical/` | `2_fit.py --preset canonical` | no |
 | `plots/dashboard/` | `3_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `3_diagnostics/4_build_dashboard.py` | **yes** |
 | `lw_post/figures/` | `lw_post/figures/make_all.py`, a local-only folder not in this repository | no |
@@ -100,7 +100,7 @@ Computed on the **whole** fit, never on a plot-side subset.
 |---|---|
 | `loadings_{k}_{axis}` | per-axis loading forest: which benchmarks load on axis k, sorted, with intervals and a reference line at 0. This is what names an axis |
 | `loadings_heatmap` | benchmark by axis, in **axis share** rather than raw loading: the fraction of a benchmark's squared loading-row norm pointing along the axis, top 20 per axis. Purity defines an axis better than steepness, since on raw loadings a long half-aligned row out-ranks a short pure one |
-| `factor_correlations` | correlation heatmap of the axis abilities, K >= 2. When the display frame is promax the title flags it and the raw ability correlation is annotated, so an oblique correlation is never read as the raw one |
+| `factor_correlations` | correlation heatmap of the axis abilities, K >= 2 (single-fit CLI figure; the dashboard filters it out of its cards and reports `max_phi` in the comparison table instead). When the display frame is promax the title flags it and the raw ability correlation is annotated, so an oblique correlation is never read as the raw one |
 | `axis_strength` | forest of per-axis strength, i.e. the loading column norms (or `tau_A` where the fit has a per-axis scale). How much of the fit each axis carries |
 | `qmatrix` | the allowed-loading pattern, for conjunctive and anchored fits only |
 

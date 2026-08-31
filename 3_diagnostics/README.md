@@ -21,6 +21,12 @@ Commands and their options: [`../docs/cli.md`](../docs/cli.md).
 | `3_plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → `plots/<out>/` |
 | `4_build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ `results/comparisons/*.csv`). Card registry: `dashboard_fits.json` |
 
+Step 4 needs traces (or their render cache) that are gitignored, so on a fresh
+clone every registered card is skipped with a warning and the build refuses to
+overwrite `index.html` — the tracked dashboard is the published artifact of the
+snapshot it was built from. Re-fit (steps in the root README), `--add` your
+trace as a card, then build.
+
 ## Toolbox: examine a fit
 
 | Script | Purpose |

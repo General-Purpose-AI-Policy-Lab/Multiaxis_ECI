@@ -61,7 +61,7 @@ models and look for a *systematic* offset — that is what n=33 can detect. It c
 model's ability precisely, and it does not need to: the modes disagree by 40-52pp on the cells
 this eval exists to fill.
 
-Eleven of the 31 RAND rows carry an effort suffix (`_16K`, `_medium`), so those need a matching
+Five of the 31 RAND rows carry an effort suffix (`_16K`, `_medium`), so those need a matching
 `--effort` to be comparable.
 
 ## Files

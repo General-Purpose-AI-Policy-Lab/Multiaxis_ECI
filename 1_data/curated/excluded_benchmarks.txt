@@ -1,5 +1,5 @@
 # Benchmarks excluded from the index — one name per line, '#' starts a comment.
-# Matches the `benchmark` column of all_normalized_benchmarks_updated.csv exactly.
+# Matches the `benchmark` column of processed/benchmarks_merged.csv exactly.
 #
 # Current list filters out "intentionally easy for humans" benchmarks —
 # keeping them (even with the scores dropped) would bias both capability

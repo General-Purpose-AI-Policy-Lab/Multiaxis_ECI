@@ -19,13 +19,13 @@ Scope: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 
 Any Python >= 3.11 environment works.
 
 ```bash
-pip install pymc arviz pytensor nutpie numpy pandas scipy plotly kaleido \
-            matplotlib requests pytest
+pip install "pymc==5.28.5" "arviz==0.23.4" "pytensor==2.38.3" "nutpie==0.16.7" \
+            "plotly>=6,<7" numpy pandas scipy kaleido matplotlib requests pytest
 plotly_get_chrome -y   # once per env; figure export raises without it
-python -m pytest -m "not slow"     # sanity check, ~4 min, 250 tests
+python -m pytest -m "not slow"     # sanity check, ~4 min cold, ~250 tests
 ```
 
-Pinned working versions: pymc 5.28.5, arviz 0.23.4, pytensor 2.38.3, plotly 6.x. `nutpie` (Rust NUTS) is the default sampler, 2-3x faster than PyMC NUTS on CPU.
+The pins are load-bearing, not a suggestion: arviz >= 1.0 replaces `InferenceData` with xarray's `DataTree`, and nutpie >= 0.16.8 hands a `DataTree` back from a zarr store, either of which breaks this code and the golden logp tests. The set above was verified against a fresh environment on 2026-08-31 (254/254 fast tests, with numpy 2.4.6, pandas 3.0.5, xarray 2026.7.0, zarr 3.3.0, plotly 6.9.0). `nutpie` (Rust NUTS) is the default sampler, 2-3x faster than PyMC NUTS on CPU.
 
 ## Run
 
@@ -87,7 +87,7 @@ Whether the chains agree on those axes is a different question, with its own num
 
 **An ability is trustworthy only where it was measured.** A test-taker's ability on an axis rests on benchmarks that load on that axis. Models from 2021-2023 took only easy benchmarks, so their hard-axis ability is extrapolated, not measured, and can land high with a wide interval. Figures drop those rows through `mirt_informed_mask` (posterior SD < 0.4); the fit and the diagnostics keep every row.
 
-**`results/canonical/trace.nc` predates the current data snapshot.** Re-fit before quoting any canonical number. The tracked `index.html` cannot be rebuilt from a fresh clone either: it renders from the `.nc` traces, which are gitignored (the K=4 trace alone is 38 GB). Treat the committed dashboard as a published artifact of the snapshot it was built from.
+**The tracked `results/canonical/` summaries match the current data snapshot** (their scope, 4,184 / 781 / 88, re-derives exactly from the tracked processed table). After any data refresh, re-fit before quoting a canonical number; `3_diagnostics/1_country_frontier.py` refuses a stale trace on its own. The tracked `index.html` cannot be rebuilt from a fresh clone: it renders from the `.nc` traces, which are gitignored (the K=4 trace alone is 38 GB). Treat the committed dashboard as a published artifact of the snapshot it was built from.
 
 ## Limitations
 

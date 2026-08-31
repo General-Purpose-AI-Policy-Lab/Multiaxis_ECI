@@ -82,7 +82,7 @@ before running.
 
 Sections run `00 → 10`, with `03b` (RAND), `03c` (Scale SEAL) and `03d`
 (live feed) between the Epoch load (03) and canonicalization (04); section 10
-copies the outputs into `data/{processed,curated}/`.
+copies the outputs into `1_data/{processed,curated}/`.
 
 ## Parameters
 

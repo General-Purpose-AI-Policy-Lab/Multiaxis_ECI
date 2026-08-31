@@ -21,7 +21,6 @@
       "drop_benchmarks": [],
       "private_bases": false,
       "floors": true,
-      "ceilings": false,
       "ceiling_noise": false,
       "known_se": false,
       "pooled_noise": true

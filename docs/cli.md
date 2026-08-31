@@ -36,7 +36,7 @@ unmarked to both.
 | `--lineage-bm` | `[expl]` with `--lineage-prior`: index the chain by time, so each step scales with the release gap in years |
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
 | `--time-prior` | `[expl]` add a learned per-axis linear trend in release year to the theta prior MEAN, so a thinly-evaluated model is shrunk toward its era's level rather than the whole population's. The slope is signed and centered at zero, so a flat population reduces to the plain prior |
-| `--theta-t` | `[expl]` cell-wise leptokurtic theta: each (model, axis) cell of the exchangeable block gets a Student-t(4) marginal via a per-cell scale mixture instead of a Gaussian one |
+| `--theta-t` | `[expl]` cell-wise leptokurtic theta: each (model, axis) cell of the exchangeable block gets a Student-t(4) marginal (direct closed-form density, no extra latents) instead of a Gaussian one |
 | `--private-bases` | `[expl]` give each human root and chain founder a private Normal(0,1) base and let the ZeroSumNormal span only the unstructured rows. Same marginal scale; changes how much of the population the location pin carries |
 
 **Data scope**
@@ -58,8 +58,8 @@ unmarked to both.
 
 | flag | effect |
 |---|---|
-| `--no-floors` | `[expl]` drop the chance floors, which are on by default |
-| `--no-pooled-noise` | `[expl]` drop the hierarchical `sigma_b`, which is on by default, and give a thin benchmark a free scale |
+| `--no-floors` | `[expl]` drop the chance floors, which are on by default. Emits the `_nofloors` tag token, so the sensitivity run gets its own folder |
+| `--no-pooled-noise` | `[expl]` drop the hierarchical `sigma_b`, which is on by default, and give a thin benchmark a free scale. Emits the `_unpooled` tag token |
 | `--ceiling-noise` | `[expl]` estimate a per-benchmark upper asymptote confined to a noise-sized gap, Beta(1,20). Grading noise, not walls |
 | `--known-se` | `[expl]` split the Beta noise: fixed per-cell instrument precision from the reported harness stderr (`n_eff = p(1-p)/se^2`), so `sigma_b` becomes excess-only. Cells without stderr are unchanged |
 
@@ -89,6 +89,23 @@ plots   plots/mirt_k4_humanmerge_lineageprior_lineagebm/
 
 `FitSpec.from_trace` reads that identity back off a trace, so a trace path is
 the only thing a plotting or diagnostic caller has to name.
+
+## Country frontier and crossovers (reproduction steps 1-2)
+
+```bash
+python 3_diagnostics/1_country_frontier.py
+python 3_diagnostics/2_plot_crossovers.py
+```
+
+`1_country_frontier.py` builds the US/China frontier comparison from the
+canonical traces (all three scopes). Flags: `--results-dir DIR` overrides the
+default `results/`; `--open-only` / `--closed-only` restrict to one access
+scope; `--allow-stale` proceeds when a trace predates the current data snapshot
+(otherwise it refuses); `--horizon DATE` sets the forecast horizon;
+`--fit-start DATE` (default `2024-10-01`) sets the trend-fit window;
+`--y-range LO,HI` pins the y-axis. `2_plot_crossovers.py` renders the
+crossover panels from the CSVs step 1 wrote; its "today" line is pinned to the
+published snapshot date in the source, not the wall clock.
 
 ## Plot a fit
 
@@ -139,6 +156,10 @@ sits in, then a verdict. On the small K=2 demo trace it reports `chains=4
 divergences=0`, a 14.1-nat logp spread, `eta r-hat: all=1.271`, and
 `VERDICT: ISLANDS | recommended drop_chains = none`. A verdict row is appended
 to `results/comparisons/chain_verdicts.csv`.
+
+Three refinements: `--fig` also renders the per-chain diagnostic figure,
+`--match-thresh X` overrides the loading-match threshold behind the basin
+assignment, and `--out-csv PATH` redirects the verdict row.
 
 `--write-modes` persists the split to
 `results/<fit>/mirt_modes_<trace-stem>.json` and stops, loading no data, so a
@@ -196,4 +217,6 @@ crossover and exceedance figures.
 `--list` prints every card with an `origin` column, `code` for the entries in
 `4_build_dashboard.py` and `json` for the ones `--add` wrote. `--remove` drops a
 `json` entry. Validation runs before any trace opens, so a typo in a spec flag
-fails in the first second rather than mid-render.
+fails in the first second rather than mid-render. A card whose trace and render
+cache are both absent (every card, on a fresh clone) is warned about and
+skipped, not fatal; the build exits non-zero only when NO card can render.

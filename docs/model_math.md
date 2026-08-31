@@ -216,13 +216,31 @@ $$
 Median $\sigma_b = 0.05$; 90% prior interval $\approx[0.022,\,0.114]$. LogNormal
 forces $\sigma_b>0$; the range keeps $\sigma_b\ll\tfrac12$ so $\phi_b>0$.
 
+That independent LogNormal is what `--preset canonical` fits. **Exploration
+fits (the flagship included) default to the hierarchical (pooled) variant**,
+where the population location and spread of the log noise are learned, so a
+thin benchmark's $\sigma_b$ shrinks toward the shared median instead of
+keeping a free scale the panel cannot pin:
+
+$$
+\sigma_b = \exp(\mu_s + \tau_s\, z_b),
+\qquad
+\mu_s \sim \mathcal{N}(\log 0.05,\;0.5),\quad
+\tau_s \sim \mathrm{HalfNormal}(0.5),\quad
+z_b \sim \mathcal{N}(0,1),
+$$
+
+(non-centered; constants `PRIOR_SIGMA_B_POOLED`). `--no-pooled-noise` opts back
+into the independent LogNormal above as the sensitivity run.
+
 ### 5.3 Loadings $A_{b,k}$
 
-There are three loading priors. All share one derived scale vector $\tau_A$
-(length $K$).
+There are four loading priors. All expose one derived scale vector $\tau_A$
+(length $K$) for the downstream readers, though `pt1` fixes it at 1.
 
-**(a) `"normal"` — canonical + confirmatory.** Non-negative loadings, one
-learned shared scale:
+**(a) `"normal"` — exploration default + confirmatory.** Non-negative
+loadings, one learned shared scale (the flagship K=4 fit and the confirmatory
+Q-matrix fits use this):
 
 $$
 \tau_A^{\text{scalar}} \sim \mathrm{LogNormal}(\log 0.5,\;0.5),
@@ -240,10 +258,28 @@ $$
 | $A^{z}_{b,k}$ | non-negative (HalfNormal) auxiliary. |
 | $\text{mask}_{b,k}\in\{0,1\}$ | optional **Q-matrix / anchor** mask: $1$ if benchmark $b$ is allowed to load on axis $k$, else $0$. Absent anchors, all ones. |
 
-This is the prior used for the **1D canonical index** ($K=1$, mask all ones)
-and for the confirmatory Q-matrix fits.
+**(b) `"pt1"` — the canonical 1D prior.** `--preset canonical` fits this one.
+Non-negative loadings under a **product-to-one** constraint per axis: the log
+loadings of each axis are a zero-sum normal over benchmarks, so each column's
+geometric mean is exactly 1 (the sum-to-zero log-$\alpha$ gauge of Epoch's
+public ECI, generalized to $K$ axes):
 
-**(b) `"signed"` — exploration default.** iid signed cells × one shared scale:
+$$
+\sigma_A \sim \mathrm{LogNormal}(\log 0.5,\;0.5),
+\qquad
+\log A^{z}_{\cdot,k} \sim \mathrm{ZeroSumNormal}\ \text{(over benchmarks)},
+\qquad
+A_{b,k} = \exp\!\big(\sigma_A\, \log A^{z}_{b,k}\big).
+$$
+
+$\eta$ has $K$ exact multiplicative degeneracies ($A_{\cdot,k} \to c\,A_{\cdot,k}$,
+$\theta_{\cdot,k} \to \theta_{\cdot,k}/c$); the gauge breaks all $K$ hard, so
+there is **no free $\tau_A$** here ($\tau_{A,k} \equiv 1$ — a free scale would
+reinstate one ridge per axis). Costs: loadings are lognormal, so no benchmark
+can sit at exactly zero loading, and hard anchors are unavailable
+($\exp$ is never 0).
+
+**(c) `"signed"` — exploration alternative.** iid signed cells × one shared scale:
 
 $$
 \tau_A^{\text{scalar}} \sim \mathrm{LogNormal}(\log 0.5,\;0.5),
@@ -258,6 +294,17 @@ With signed cells and a single spherical scale, prior and likelihood are
 identified *after* sampling, one draw at a time. This is the only prior that can
 represent **contrast** axes (some benchmarks $+$, others $-$). Incompatible with
 the anchor mask (hard zeros would break the rotation symmetry).
+
+**(d) `"bifactor"`.** Axis 1 is a dense **general** column (the `"normal"`
+block on one column: HalfNormal cells × its own LogNormal scale); axes
+$2..K$ are **specifics** whose non-negative cells carry regularized-horseshoe
+local scales under one shared global scale. A specific cell is either squeezed
+to $\approx 0$ or escapes roughly unshrunk at a near-constant prior cost, so
+among likelihood-equivalent configurations the posterior prefers "common part
+in $g$, few large loadings per specific" — the bi-quartimin simplicity
+criterion moved into the prior. Axis identity is structural ($g$ is column 1),
+so nothing is rotated downstream; a specific the data does not need collapses
+to an empty column. Mutually exclusive with anchors; needs $K \ge 2$.
 
 ### 5.4 Abilities $\theta_{m,k}$
 
@@ -293,6 +340,20 @@ Because each increment $\delta_{e,k}\ge 0$, every child tier is **$\ge$ its
 parent on every axis** (hard monotone). Tiers on different branches share no
 path, so the prior says nothing about their relative strength.
 
+*`--human-merge` — the flagship's order.* The merged order
+(`config.HUMAN_ORDER_MERGED`) lets a tier carry **several parents** (the High
+School branch merges into the adult spine); its ability is a max over its
+root-to-tier paths, each path priced with one HalfNormal increment per edge:
+
+$$
+\theta_{\text{child},k} = \max_{p \in \text{parents}} \theta_{p,k} + \delta_{e,k}.
+$$
+
+The path-unrolled implementation is algebraically exact
+($\max(a,b)+\delta = \max(a+\delta,\,b+\delta)$), so a merged tier dominates
+**every** parent on every axis while adding paths, not parameters. The gaps
+stay free, and unrelated branches stay incomparable, as in the tree order.
+
 *Lineage — soft release chains.* For a vendor's release chain (founder →
 successors), improvement is the *mean* step but a node may regress:
 
@@ -322,6 +383,23 @@ $$
 | $s_k$ | per-step **regression tolerance**: a step can be negative (`PRIOR_LINEAGE_DELTA=1.0`). |
 | $\tau_o$ | tight scale of the per-variant offset $o$ (`PRIOR_LINEAGE_OFFSET=0.25`). |
 | $g(m)$ | the variant group of model $m$. |
+
+*`--lineage-bm` — the flagship's chain prior.* With `--lineage-prior
+--lineage-bm` the chain is indexed by **time**: each step's mean and variance
+scale with the release gap $dt_e$ (in years),
+
+$$
+\Delta_{e,k} = \mu_k\, dt_e + s_k \sqrt{dt_e}\; z_{e,k},
+\qquad
+\mu_k \sim \mathrm{HalfNormal}(1.0),\quad
+s_k \sim \mathrm{HalfNormal}(2.0),
+$$
+
+a Brownian motion with drift observed at the release dates, under **one shared
+per-axis drift rate** (a per-vendor pooled rate was fitted 2026-07-27 and
+removed: roughly one release per year per vendor cannot pin a rate). Constants:
+`PRIOR_LINEAGE_DRIFT_BM = 1.0` (logits/year) and `PRIOR_LINEAGE_DELTA_BM = 2.0`
+(logits/$\sqrt{\text{year}}$). The mean-zero variant offsets are unchanged.
 
 ### 5.5 Rotation identification (signed family only)
 
