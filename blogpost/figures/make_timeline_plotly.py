@@ -67,9 +67,10 @@ LABEL_LOW = {
 # without touching it.
 LABEL_HIGH_BENCH = ["Remote Labor Index", "Humanity's Last Exam"]
 HIGH_COL_X = "2024-03-01"
-# The last slot sits below the High School Top Performer reference line
-# (~161), so the dashed line never runs through the label text.
-HIGH_COL_Y = [216, 205, 194, 183, 172, 157]
+# Two slots only (RLI, HLE): the model labels sit RIGHT of their own points
+# instead, where the top-right corner above the tier names is empty. The
+# second slot stays near HLE's own height so its leader stays short.
+HIGH_COL_Y = [216, 172]
 N_TOP_MODELS = 3
 _EFFORTS = {"unknown", "max", "xhigh", "high", "medium", "low", "minimal",
             "promax", "proxhigh", "prohigh", "promedium", "prolow"}
@@ -209,7 +210,16 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
 
     high = [(dif[dif["name"] == n].iloc[0], "#d63384")
             for n in LABEL_HIGH_BENCH if len(dif[dif["name"] == n])]
-    seen = set()
+    # Sorted by target height, then paired with the column top-down: leaders
+    # then fan out without crossing.
+    high.sort(key=lambda t: -float(t[0]["mean"]))
+    for (r, color), y in zip(high, HIGH_COL_Y):
+        _label(r, (HIGH_COL_X, y), color)
+
+    # Top models: label just RIGHT of each point, running into the empty
+    # top-right corner (the tier names start lower, at ~161). Slots are the
+    # points' own heights, nudged apart top-down so the texts never touch.
+    model_rows, seen = [], set()
     for _, r in ai.sort_values("mean", ascending=False).iterrows():
         base = _base_name(r["name"])
         if base in seen:
@@ -217,15 +227,17 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
         seen.add(base)
         r = r.copy()
         r["name"] = base
-        high.append((r, "#20a39e"))
+        model_rows.append(r)
         if len(seen) == N_TOP_MODELS:
             break
-    # Sorted by target height, then paired with the column top-down: leaders
-    # then fan out without crossing.
-    high.sort(key=lambda t: -float(t[0]["mean"]))
-    for (r, color), y in zip(high, HIGH_COL_Y):
-        _label(r, (HIGH_COL_X, y), color)
-    print(f"  labelled high: {[r['name'] for r, _ in high]}")
+    prev = np.inf
+    for r in model_rows:                        # already strongest-first
+        y = min(float(r["mean"]), prev - 6.0)   # ~one text height apart
+        prev = y
+        anchor_x = (r["release_date"] + pd.Timedelta(days=45)).strftime("%Y-%m-%d")
+        _label(r, (anchor_x, y), "#20a39e")
+    print(f"  labelled high: {[r['name'] for r, _ in high]} "
+          f"+ models right of their points: {[r['name'] for r in model_rows]}")
     if fig.layout.legend.grouptitlefont is not None:
         fig.layout.legend.grouptitlefont.size = 16
 
