@@ -56,17 +56,20 @@ ERRBAR_MODEL = 2.0    # model error-bar line width
 # the marker by default, which is unreadable inside the 2024-2026 cloud.
 # Low / left points, each label hand-placed in nearby empty canvas.
 LABEL_LOW = {
-    "GPQA Diamond": ("2023-04-01", 143),
+    "GPQA Diamond": ("2023-05-01", 140),
+    # Own anchor rather than the shared column: its column slot (y ~157 at
+    # 2024-03) sat right on the 2024 benchmark points it names.
+    "FrontierMath": ("2023-10-01", 165),
 }
 # High points (hard benchmarks and top models) share ONE column, ordered by the
 # value they point at, so no two leader lines cross. The column sits in the
 # still-sparse 2023 band: close to the 2024-2026 cloud the leaders point into,
 # without touching it.
-LABEL_HIGH_BENCH = ["Remote Labor Index", "Humanity's Last Exam", "FrontierMath"]
-HIGH_COL_X = "2023-02-01"
-# The last slot sits below the Top Performer reference line (~168), so the
-# dashed line never runs through the label text.
-HIGH_COL_Y = [214, 204, 194, 184, 174, 161]
+LABEL_HIGH_BENCH = ["Remote Labor Index", "Humanity's Last Exam"]
+HIGH_COL_X = "2024-03-01"
+# The last slot sits below the High School Top Performer reference line
+# (~161), so the dashed line never runs through the label text.
+HIGH_COL_Y = [216, 205, 194, 183, 172, 157]
 N_TOP_MODELS = 3
 _EFFORTS = {"unknown", "max", "xhigh", "high", "medium", "low", "minimal",
             "promax", "proxhigh", "prohigh", "promedium", "prolow"}
