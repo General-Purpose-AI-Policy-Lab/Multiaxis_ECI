@@ -40,9 +40,9 @@ Outputs:
 
 Run:
   python 3_diagnostics/diagnose_chains.py \
-      --trace results/mirt_loglog/trace_mirt_k2_loglog.nc --name k2_loglog --fig
+      --trace results/mirt/trace_mirt_k2.nc --name k2_demo --fig
   python 3_diagnostics/diagnose_chains.py \
-      --trace results/mirt_loglog/trace_mirt_k2_loglog.nc --write-modes
+      --trace results/mirt/trace_mirt_k2.nc --write-modes
 """
 from __future__ import annotations
 

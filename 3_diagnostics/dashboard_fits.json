@@ -1,7 +1,7 @@
 [
   {
-    "name": "demo_k2_floors",
-    "label": "K=2 demo \u00b7 positive loadings \u00b7 3PL floors \u00b7 4x400 (red-team walkthrough)",
+    "name": "demo_k2",
+    "label": "K=2 demo \u00b7 positive loadings \u00b7 3PL floors (default) \u00b7 4x400 (red-team walkthrough)",
     "type": "exploratory",
     "spec": {
       "K": 2,
@@ -25,7 +25,7 @@
       "known_se": false,
       "pooled_noise": true
     },
-    "trace_path": "results/mirt_floors/trace_mirt_k2_floors.nc",
+    "trace_path": "results/mirt/trace_mirt_k2.nc",
     "short": "K=2 demo",
     "forecast": true
   }

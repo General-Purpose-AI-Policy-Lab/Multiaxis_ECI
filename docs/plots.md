@@ -35,7 +35,7 @@ the flag set, the data scope and the destination folder from it.
 
 ```bash
 python 3_diagnostics/3_plot_mirt.py --forecast --trace \
-  results/mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise/trace_mirt_k3_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise.nc
+  results/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
 Folder sweep. Renders every MIRT trace under a directory, one child process
@@ -44,7 +44,7 @@ nothing.
 
 ```bash
 python 3_diagnostics/3_plot_mirt.py --folder results/ --dry-run
-python 3_diagnostics/3_plot_mirt.py --folder results/mirt_dropFrontierMathv1AlgoTune_floors_poolednoise
+python 3_diagnostics/3_plot_mirt.py --folder results/mirt_humanmerge_lineageprior_lineagebm
 ```
 
 Dashboard. `--force-all` ignores the render cache, which is the only way to be
@@ -134,7 +134,7 @@ model's axis ability from a figure when its posterior SD >= 0.4. It never
 touches the fit and never touches a diagnostic: convergence, PPC, PIT, GoF
 and LOO always describe the whole fit. The same holds for a mode-restricted
 dashboard card, which is an addition to the whole-fit figures, not a
-replacement. The 0.4 cap corresponds to a 94% interval width of about 1.5.
+replacement. The 0.4 cap corresponds to a 95% interval width of about 1.57.
 
 **SOTA models are exempt from that drop.** Models in `config.SOTA_MODELS`
 stay on every timeline even when sparse and wide, because a frontier release

@@ -1,6 +1,6 @@
 """Ordered-human-prior vs independent-θ humans — head-to-head, confirmed Q-matrix.
 
-Pairs each ordered-human-prior skill fit (results/mirt_humanprior/) with its
+Pairs each ordered-human-prior skill fit (results/Old/mirt_humanprior/) with its
 independent-θ counterpart (results/mirt/) on the same data. Because both fits pin
 the axes with the same Q-matrix, the axes ARE comparable across fits (unlike the
 exploratory fits), so the per-axis tier comparison is meaningful.
@@ -50,15 +50,15 @@ from multiaxis_eci.persistence import save_df  # noqa: E402
 from multiaxis_eci.viz import save_fig  # noqa: E402
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt  # noqa: E402
 
-OUT = ROOT / "results" / "mirt_humanprior" / "comparison"
+OUT = ROOT / "results" / "Old" / "mirt_humanprior" / "comparison"
 MONO_EPS = 1e-3
 PAIRS = [
     {"K": 3, "label": "K=3 skills",
-     "independent": ROOT / "results" / "mirt" / "trace_mirt_k3_noard_aqmatrix3.nc",
-     "ordered": ROOT / "results" / "mirt_humanprior" / "trace_mirt_k3_noard_aqmatrix3_humanprior.nc"},
+     "independent": ROOT / "results" / "Old" / "mirt" / "trace_mirt_k3_noard_aqmatrix3.nc",
+     "ordered": ROOT / "results" / "Old" / "mirt_humanprior" / "trace_mirt_k3_noard_aqmatrix3_humanprior.nc"},
     {"K": 4, "label": "K=4 skills + multimodal",
-     "independent": ROOT / "results" / "mirt" / "trace_mirt_k4_noard_aqmatrix4.nc",
-     "ordered": ROOT / "results" / "mirt_humanprior" / "trace_mirt_k4_noard_aqmatrix4_humanprior.nc"},
+     "independent": ROOT / "results" / "Old" / "mirt" / "trace_mirt_k4_noard_aqmatrix4.nc",
+     "ordered": ROOT / "results" / "Old" / "mirt_humanprior" / "trace_mirt_k4_noard_aqmatrix4_humanprior.nc"},
 ]
 
 
@@ -283,7 +283,7 @@ def main():
 
     (OUT / "README.md").write_text(
         "# Ordered vs independent human baselines (confirmed Q-matrix)\n\n"
-        "Each ordered-human-prior skill fit (`results/mirt_humanprior/`) paired with "
+        "Each ordered-human-prior skill fit (`results/Old/mirt_humanprior/`) paired with "
         "its independent-θ counterpart (`results/mirt/`) on the same data. The "
         "Q-matrix pins the axes, so axes are comparable across the two fits.\n\n"
         "## Summary\n\n" + tab.to_string(index=False) + "\n\n"

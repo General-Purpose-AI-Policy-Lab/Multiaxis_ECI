@@ -59,7 +59,7 @@ semantic name would be invented.
 Run:
   python 3_diagnostics/theta_bimodality.py
   python 3_diagnostics/theta_bimodality.py \
-      --trace results/mirt_loglog/trace_mirt_k2_loglog.nc
+      --trace results/mirt/trace_mirt_k2.nc
 """
 from __future__ import annotations
 
@@ -92,9 +92,9 @@ _dc = _load_script("3_diagnostics/diagnose_chains.py")
 _load_matching_data, modes_path = _dc._load_matching_data, _dc.modes_path
 from multiaxis_eci.lineage import build_lineage_structure  # noqa: E402
 
-DEFAULT_TRACE = (ROOT / "results"
-                 / "mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise"
-                 / "trace_mirt_k4_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise.nc")
+from multiaxis_eci.analysis import FLAGSHIP_TRACE  # noqa: E402
+
+DEFAULT_TRACE = FLAGSHIP_TRACE
 
 # a chain-mean gap this many within-chain sds wide separates two lumps
 GAP_SDS = 3.0

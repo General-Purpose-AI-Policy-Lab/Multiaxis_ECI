@@ -287,34 +287,30 @@ class FitSpec:
 
 # ── the flagship fit ────────────────────────────────────────────────────────
 # K=4, positive loadings, merged human order + Brownian lineage prior, 3PL
-# floors, pooled noise, the exploration scope. THE forecasting base.
+# floors, pooled noise, the exploration scope. THE forecasting base — the fit
+# the LW post reports (10 chains x 12,000 draws on the 2026-08 snapshot:
+# 4,923 obs / 829 test-takers / 96 benchmarks, R² 0.9643).
 # FrontierMath v1 and AlgoTune are out of this scope through the retirement
 # list, so no drop flag names them and the tag no longer carries `_drop`.
 # `loading_prior` and `floors` are named explicitly although both now hold the
 # default: the flagship is a statement of one fit, and a later default change
-# must not silently redefine it. The trace on disk predates the token removals
-# and lives in
-# `mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise`,
-# which a consumer reaches by an explicit path, not by this spec's `trace_path`.
+# must not silently redefine it. The superseded 2026-07 fit (old tag grammar,
+# 10x20,000 on the previous snapshot) is archived under `results/Old/`.
 FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
                    lineage_prior=True, lineage_bm=True, floors=True)
-# Where that trace actually sits. The folder and filename were written under the
-# earlier tag grammar (`_dropFrontierMathv1AlgoTune` + `_poolednoise`), which
-# `FLAGSHIP.trace_path` no longer derives, so the path is stated once here and
-# every consumer reads it from this constant. Its results folder,
-# `FLAGSHIP_TRACE.parent`, holds the fit's CSVs and caches too.
-FLAGSHIP_TRACE = (RESULTS_DIR
-                  / ("mirt_humanmerge_lineageprior_lineagebm"
-                     "_dropFrontierMathv1AlgoTune_floors_poolednoise")
-                  / ("trace_mirt_k4_humanmerge_lineageprior_lineagebm"
-                     "_dropFrontierMathv1AlgoTune_floors_poolednoise.nc"))
-# Chains 6 and 9 sit in the second solution: they lift the whole human block on
-# the legacy-QA axis by about 2.3 logits while the machine rows move by 0.25.
-# Reading the majority means the reported fit is one solution, not an average of
-# two, so the majority is the DEFAULT and a caller must opt out to re-admit them.
-FLAGSHIP_MAJORITY_CHAINS = [0, 1, 2, 3, 4, 5, 7, 8]
-# Every flagship summary is a median or an interval, which 20,000 draws pin as
-# well as 200,000.
+# The trace lives exactly where the spec derives it (current tag grammar);
+# the constant stays because every consumer reads the path from here and a
+# future grammar change must not silently retarget them.
+FLAGSHIP_TRACE = FLAGSHIP.trace_path
+# All 10 chains share one logp basin and one axis system (mode JSON: matched
+# corr 0.818), but they split 6/4 on where the human tiers and 18 older/small
+# models sit on the Agentic axis. Chains 0, 1, 3 and 8 are the minority group.
+# Reading the majority means the reported fit is one placement, not an average
+# of two, so the majority is the DEFAULT and a caller must opt out to re-admit
+# the minority.
+FLAGSHIP_MAJORITY_CHAINS = [2, 4, 5, 6, 7, 9]
+# Every flagship summary is a median or an interval, which the thinned draws
+# pin as well as the full 120,000.
 FLAGSHIP_THIN = 10
 
 

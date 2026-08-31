@@ -1,0 +1,2 @@
+fit,trace,n_chains,divergences,logp_spread_nats,dspread_max,eta_rhat_all,D_rhat_all,island_chains,eta_rhat_majority,verdict,recommended_drop_chains
+k2_demo,results/mirt/trace_mirt_k2.nc,4,0,98.25,1.215,1.5344,1.4613,1,1.2249,ISLANDS,

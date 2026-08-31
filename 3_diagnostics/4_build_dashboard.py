@@ -77,22 +77,19 @@ CMP_DIR = ROOT / "results" / "comparisons"
 #    "type": "exploratory",
 #    "forecast": True},
 FITS = [
-    {"name": "k4_drop2_humanmerge_flagship",
+    {"name": "k4_humanmerge_flagship",
      "spec": FLAGSHIP,
-     # Fitted before FrontierMath v1 and AlgoTune moved to the retirement list,
-     # so its folder still carries the `_drop` and `_poolednoise` tokens the
-     # current grammar drops. The data scope is the same either way (5,004 obs /
-     # 835 takers / 98 benchmarks), so the spec still scores this trace.
      "trace_path": FLAGSHIP_TRACE,
-     "label": "K=4 · exploration −2 benchmarks · positive loadings · "
+     "label": "K=4 · full exploration scope (4,923 obs / 829 takers / 96 "
+              "benchmarks, 2026-08 snapshot) · positive loadings · "
               "raw rank-tracked axes (no rotation) · "
               "human-merge+lineage(BM) priors · 3PL floors · pooled noise · "
-              "10×20000, tune 7000 · single solution (10/10 chains one basin, "
-              "matched corr 0.843), 78/200,000 divergences, D r-hat 1.168 max; "
-              "the merged HS→adult edges bind (P(DE>HSQ) 0.64-0.80 under the "
-              "tree order → 1.00) at identical GoF (R² 0.9645 vs 0.9647) — "
-              "THE forecasting base",
-     "short": "K=4 −2bench · pooled · merge · flagship",
+              "10×12,000 · one logp basin and one axis system (10/10 chains, "
+              "matched corr 0.818), 37/120,000 divergences; the chains split "
+              "6/4 on the human tiers and 18 older models on the Agentic axis "
+              "(majority = chains 2,4,5,6,7,9) · R² 0.9643 — "
+              "THE forecasting base (the LW post's fit)",
+     "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
      "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True},
 ]

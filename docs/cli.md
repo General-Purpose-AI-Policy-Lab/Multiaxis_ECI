@@ -111,7 +111,7 @@ published snapshot date in the source, not the wall clock.
 
 ```bash
 python 3_diagnostics/3_plot_mirt.py --trace \
-  results/mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise/trace_mirt_k3_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise.nc
+  results/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
 Figures land in the fit's own `plots/mirt_k{K}{tag}/`, one HTML and one PNG
@@ -152,10 +152,11 @@ python 3_diagnostics/theta_bimodality.py --trace TRACE
 `diagnose_chains.py` asks whether the chains found one solution or several. It
 prints a row per chain, giving that chain's log-probability gap to the best
 chain, how well its loading columns match the pooled mean, and which basin it
-sits in, then a verdict. On the small K=2 demo trace it reports `chains=4
-divergences=0`, a 14.1-nat logp spread, `eta r-hat: all=1.271`, and
-`VERDICT: ISLANDS | recommended drop_chains = none`. A verdict row is appended
-to `results/comparisons/chain_verdicts.csv`.
+sits in, then a verdict. On the small K=2 demo trace
+(`results/mirt/trace_mirt_k2.nc`) it reports `chains=4 divergences=0`, a
+98.2-nat logp spread with one island chain, `eta r-hat: all=1.534
+majority=1.225`, and `VERDICT: ISLANDS | recommended drop_chains = none`. A
+verdict row is appended to `results/comparisons/chain_verdicts.csv`.
 
 Three refinements: `--fig` also renders the per-chain diagnostic figure,
 `--match-thresh X` overrides the loading-match threshold behind the basin
@@ -166,15 +167,17 @@ assignment, and `--out-csv PATH` redirects the verdict row.
 superseded trace still splits. The dashboard only reads that file; when it is
 present a multimodal fit gets one extra loading and timeline figure set per
 mode, labelled with its chains and Δlogp. On the demo trace it writes
-`1 mode(s)`. Mode restriction is plot-side only: convergence, PPC, PIT and GoF
-on the card always describe the whole fit.
+`2 mode(s)` (the majority chains 0/2/3 and the island chain 1). Mode
+restriction is plot-side only: convergence, PPC, PIT and GoF on the card
+always describe the whole fit.
 
 `theta_bimodality.py` answers which test-takers the split actually moves. It
 reports per-axis how many abilities are bimodal across chains, before and after
 axis alignment, and writes `results/<fit>/theta_bimodality.csv` plus a
 `bimodality.html` viewer. On the demo trace it reports
-`split takers: raw 1/829 -> aligned 0/829`, so alignment absorbs the one
-apparent split. It defaults to the flagship K=4 fit when `--trace` is omitted.
+`split takers: raw 210/829 -> aligned 1/829`, so axis alignment absorbs almost
+all of the apparent splits. It defaults to the flagship K=4 fit when `--trace`
+is omitted.
 
 ## Build the dashboard
 
@@ -188,7 +191,7 @@ selector, per-fit figures rendered lazily, and a cross-fit comparison view
 comes from cache. Open `index.html` in a browser; no server needed.
 
 The tracked `index.html` cannot be rebuilt from a fresh clone: it renders from
-the `.nc` traces, which are gitignored (the K=4 trace alone is 38 GB) and must
+the `.nc` traces, which are gitignored (the K=4 trace alone runs to tens of GB) and must
 be re-fitted first. Treat the committed dashboard as a published artifact of the
 snapshot it was built from, not as something the repo regenerates on demand.
 `--png` / `--pdf` also dump stills to `plots/dashboard/`.

@@ -1,0 +1,36 @@
+{
+ "trace": "trace_mirt_k2.nc",
+ "n_chains": 4,
+ "K": 2,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.6) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -2.7,
+  -98.2,
+  0.0,
+  -4.1
+ ],
+ "modes": [
+  {
+   "chains": [
+    0,
+    2,
+    3
+   ],
+   "mean_logp": 5020.428099672173,
+   "min_matched_corr": 0.979,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    1
+   ],
+   "mean_logp": 4924.433658842564,
+   "min_matched_corr": 1.0,
+   "label": "B",
+   "delta_logp": -96.0,
+   "matched_corr_to_best": 0.76
+  }
+ ]
+}

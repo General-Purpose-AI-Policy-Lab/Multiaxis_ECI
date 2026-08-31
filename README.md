@@ -1,16 +1,17 @@
 # Multi-Axis ECI
 
-Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines* (GPAI Policy Lab, August 2026). Its link goes here once it is published.
-
-It follows [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1), which is a separate piece of work with its own code in [`Multi-axis-Rosetta`](https://github.com/General-Purpose-AI-Policy-Lab/Multi-axis-Rosetta). Nothing here reproduces that post.
+Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines* (GPAI Policy Lab, August 2026). It follows [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1), see [`Multi-axis-Rosetta`](https://github.com/General-Purpose-AI-Policy-Lab/Multi-axis-Rosetta).
 
 The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many benchmark scores into one number per model, following the [Rosetta Stone paper](https://arxiv.org/abs/2512.00193). The previous post put human baseline tiers on that same scale, which exposed a problem. Humans score near-perfectly on abstract-reasoning benchmarks like ARC-AGI or VPCT and near chance on GPQA-type benchmarks, while many models show the opposite pattern. No single ordering produces both.
 
 This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT**, an item-response model with a Beta likelihood. Every ability comes with its uncertainty, and the nine human tiers are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index. Four axes come out of the fit, named after the benchmarks whose loadings are most collinear with them:
+1. **Fluid Intelligence** (ARC-AGI-2, ARC-AGI, VPCT)
+2. **Scientific Knowledge and Reasoning** (WMDP Chemistry and Biology, the GPQA subsets, FrontierMath)
+3. **Agentic** (GBAEval, Remote Labor Index, SWE-Bench Pro)
+4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
-<img src="results/mirt_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune_floors_poolednoise/axis_share_heatmap.png" width="560" alt="Benchmark axis share, top 20 per axis">
 
-**Fluid Intelligence** (ARC-AGI-2, ARC-AGI, VPCT), **Scientific Knowledge and Reasoning** (WMDP Chemistry and Biology, the GPQA subsets, FrontierMath), **Agentic** (GBAEval, Remote Labor Index, SWE-Bench Pro) and **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
+<img src="results/mirt_humanmerge_lineageprior_lineagebm/axis_share_heatmap.png" width="560" alt="Benchmark axis share, top 20 per axis">
 
 Scope: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions.
 
@@ -85,9 +86,7 @@ Four things are on by default with no flag over them: non-negative loadings, the
 
 Whether the chains agree on those axes is a different question, with its own number. Each chain's mean loading columns are matched to the pooled mean over every permutation and sign (all 24 of them at K=4), and the median correlation is reported per axis. Nothing is relabelled by this; the number says which axis the chains disagree about, which the identified r-hat cannot. Convergence is judged on identified quantities only (`eta`, `D`, `sigma_b`), because raw per-axis r-hat on `A` and `theta` is permutation-inflated.
 
-**An ability is trustworthy only where it was measured.** A test-taker's ability on an axis rests on benchmarks that load on that axis. Models from 2021-2023 took only easy benchmarks, so their hard-axis ability is extrapolated, not measured, and can land high with a wide interval. Figures drop those rows through `mirt_informed_mask` (posterior SD < 0.4); the fit and the diagnostics keep every row.
-
-**The tracked `results/canonical/` summaries match the current data snapshot** (their scope, 4,184 / 781 / 88, re-derives exactly from the tracked processed table). After any data refresh, re-fit before quoting a canonical number; `3_diagnostics/1_country_frontier.py` refuses a stale trace on its own. The tracked `index.html` cannot be rebuilt from a fresh clone: it renders from the `.nc` traces, which are gitignored (the K=4 trace alone is 38 GB). Treat the committed dashboard as a published artifact of the snapshot it was built from.
+**An ability is trustworthy only where it was measured.** A test-taker's ability on an axis rests on benchmarks that load on that axis. Models from 2021-2023 took only easy benchmarks, so their hard-axis ability is extrapolated, and can land high with a wide interval. Figures drop those rows through `mirt_informed_mask` (posterior SD < 0.4); the fit and the diagnostics keep every row.
 
 ## Limitations
 
@@ -101,7 +100,7 @@ On the **Legacy QA** axis specifically, the human lead is a comparison against a
 
 `multiaxis_eci/data.py` reads `1_data/processed/benchmarks_merged.csv`, produced by the in-repo notebook `1_data/1_pipeline/pipeline.ipynb` (Restart Kernel → Run All; see [1_data/1_pipeline/README.md](1_data/1_pipeline/README.md)).
 
-That notebook is being superseded by [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline), a standalone repository covering the same feeds with a UUID-keyed schema and a determinism check. The migration is not done: this repo still fits the in-repo notebook's output, and the two schemas are not interchangeable yet.
+That notebook will soon be superseded by [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline), as a standalone repository.
 
 ## Resources
 
