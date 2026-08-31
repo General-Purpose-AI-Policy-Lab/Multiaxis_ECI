@@ -1,11 +1,11 @@
 """Crossover dates per axis, three stacked panels, in the post's Plotly style.
 
 Per human tier: the median crossing date (dot), a THICK 50% bar and a THIN 80%
-bar, green when the median crossing is behind us, red when ahead, dotted today
-line. Crossings are solved per draw (t* = (θ_h − intercept)/slope) by
-`analysis.mirt_crossover_df`, so both interval widths come from the same
-per-draw distribution and both are HDIs, the summary the whole forecast
-pipeline uses.
+bar, each bar split at the today line — the share already behind us is green,
+the share still ahead is red. Crossings are solved per draw
+(t* = (θ_h − intercept)/slope) by `analysis.mirt_crossover_df`, so both
+interval widths come from the same per-draw distribution and both are HDIs,
+the summary the whole forecast pipeline uses.
 
 The slope/intercept draws come from `make_trend_plotly.forecast` — the
 forecast cache pickle BESIDE the trace (records basis, FORECAST_KW, per-axis
@@ -14,9 +14,10 @@ reused. The human theta draws need the trace itself (all chains, flagship
 thinning, axis identity checked), so the assembled table is cached as
 `lw_crossover_50_80.csv` beside the trace and later runs read the CSV only.
 
-An 80% whisker that runs past the x-limit (a slope posterior with a small
-positive fraction has a heavy right tail) is clipped at the limit and marked
-with an open right-arrow instead of stretching the shared window.
+The window is fixed at 2015-2035 so every variant of the figure is
+comparable. Whatever runs past it (a whisker's tail, or a median outside the
+window) is clipped at the edge and marked with a small dot plus the true date
+in small type.
 
 Usage:
     python blogpost/figures/make_crossover_plotly.py [--trace FILE] [--tag ""]
@@ -183,15 +184,14 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
         cx = cx[~dropped]
     today = pd.Timestamp.today().normalize()
 
-    # One shared window over all three panels (the panels have to be
-    # comparable). Sized so every median and 50% bar sits comfortably; an 80%
-    # tail may extend it, but only up to 40% beyond the 50% span — a heavier
-    # tail is clipped and arrow-marked rather than stretching the window.
-    lo = min(cx["hdi80_low"].min(), today)
-    hi50 = max(cx["crossover_hdi_high"].max(), today)
-    hi = min(cx["hdi80_high"].max(), hi50 + 0.4 * (hi50 - lo))
-    pad = pd.Timedelta(days=int(0.03 * (hi - lo).days))
-    x0, x1 = lo - pad, hi + pad
+    # Fixed 2015-2035 window, shared by every variant of the figure so they
+    # are all directly comparable. Whatever runs past it is clipped at the
+    # edge and marked with a small dot plus the true date in small type. The
+    # pad is canvas only (room for the edge dots and their labels); the ticks
+    # stay on the years.
+    x0d, x1d = pd.Timestamp("2015-01-01"), pd.Timestamp("2035-01-01")
+    pad = pd.Timedelta(days=160)
+    x0, x1 = x0d - pad, x1d + pad
 
     titles = [TITLES[a] + (f'  <span style="font-size:{FONT_NOTE}px">'
                            f'{BACKCAST[a]}</span>' if a in BACKCAST else "")
@@ -205,33 +205,41 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
         tiers = rows["tier"].tolist()
         print(f"  {TITLES[name]}")
 
-        for col in (PAST, FUTURE):
-            grp = rows[(rows["crossover_date_median"] <= today) == (col == PAST)]
-            if grp.empty:
-                continue
-            # Whiskers as segment batches: thin 80% first, thick 50% on top,
-            # median dot last. An 80% upper bound past the window is drawn to
-            # the edge and finished with an open right-arrow.
-            bars = (("hdi80_low", "hdi80_high", BAR80_W),
-                    ("crossover_hdi_low", "crossover_hdi_high", BAR50_W))
-            for lo_c, hi_c, w in (bars[1:] if len(probs) == 1 else bars):
-                seg_x, seg_y = [], []
-                for _, r in grp.iterrows():
-                    end = min(r[hi_c], x1)
-                    if r[hi_c] > x1:
-                        clipped.append((name, r["tier"], lo_c == "hdi80_low",
-                                        r[hi_c]))
-                        fig.add_trace(go.Scatter(
-                            x=[end.isoformat()], y=[r["tier"]], mode="markers",
-                            marker=dict(color=col, symbol="arrow-right-open",
-                                        size=22, line=dict(width=3)),
-                            showlegend=False, hoverinfo="skip"), row=i, col=1)
-                    seg_x += [r[lo_c].isoformat(), end.isoformat(), None]
-                    seg_y += [r["tier"], r["tier"], None]
-                fig.add_trace(go.Scatter(x=seg_x, y=seg_y, mode="lines",
-                                         line=dict(color=col, width=w),
+        # Every bar is split at the today line: its past share is green, its
+        # future share red — the color reads per segment, not per row. Batches:
+        # thin 80% first, thick 50% on top, median dot last.
+        bars = (("hdi80_low", "hdi80_high", BAR80_W),
+                ("crossover_hdi_low", "crossover_hdi_high", BAR50_W))
+        segs = {(w, c): ([], []) for _, _, w in bars for c in (PAST, FUTURE)}
+        for lo_c, hi_c, w in (bars[1:] if len(probs) == 1 else bars):
+            for _, r in rows.iterrows():
+                start, end = max(r[lo_c], x0d), min(r[hi_c], x1d)
+                if start > end:                      # bar entirely off-window
+                    continue
+                pieces = []
+                if start < today:
+                    pieces.append((start, min(end, today), PAST))
+                if end > today:
+                    pieces.append((max(start, today), end, FUTURE))
+                for s, e, c in pieces:
+                    sx, sy = segs[(w, c)]
+                    sx += [s.isoformat(), e.isoformat(), None]
+                    sy += [r["tier"], r["tier"], None]
+        for (w, c), (sx, sy) in segs.items():
+            if sx:
+                fig.add_trace(go.Scatter(x=sx, y=sy, mode="lines",
+                                         line=dict(color=c, width=w),
                                          opacity=0.85, showlegend=False,
                                          hoverinfo="skip"), row=i, col=1)
+
+        # Median dots, colored by their own side of today; a median outside
+        # the window is left to the edge markers below.
+        m_in = rows[(rows["crossover_date_median"] >= x0d)
+                    & (rows["crossover_date_median"] <= x1d)]
+        for col, grp in ((PAST, m_in[m_in["crossover_date_median"] <= today]),
+                         (FUTURE, m_in[m_in["crossover_date_median"] > today])):
+            if grp.empty:
+                continue
             fig.add_trace(go.Scatter(
                 x=grp["crossover_date_median"].dt.strftime("%Y-%m-%d"),
                 y=grp["tier"], mode="markers",
@@ -239,13 +247,38 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                 hovertemplate="%{y}<br>median %{x|%Y-%m-%d}<extra></extra>"),
                 row=i, col=1)
 
+        # Off-window overflow: one small dot at the edge per (row, side), with
+        # the true date in small type above it — the median's date when the
+        # median itself is out, otherwise the 80% endpoint's.
         for _, r in rows.iterrows():
-            side = "green" if r["crossover_date_median"] <= today else "red"
+            m = r["crossover_date_median"]
+            for side, edge, lo_c, hi_c in (("left", x0d, "hdi80_low", None),
+                                           ("right", x1d, None, "hdi80_high")):
+                if side == "left":
+                    over = r[lo_c] < edge or m < edge
+                    true_date = m if m < edge else r[lo_c]
+                    tpos = "top right"
+                else:
+                    over = r[hi_c] > edge or m > edge
+                    true_date = m if m > edge else r[hi_c]
+                    tpos = "top left"
+                if not over:
+                    continue
+                col = PAST if edge <= today else FUTURE
+                clipped.append((name, r["tier"], side, true_date,
+                                (m < x0d) or (m > x1d)))
+                fig.add_trace(go.Scatter(
+                    x=[edge.isoformat()], y=[r["tier"]], mode="markers+text",
+                    marker=dict(color=col, size=9),
+                    text=[f"{true_date.year}"], textposition=tpos,
+                    textfont=dict(size=19, color=col),
+                    showlegend=False, hoverinfo="skip"), row=i, col=1)
+
+        for _, r in rows.iterrows():
             print(f"    {r['tier']}: median {r['crossover_date_median'].date()}, "
                   f"50% [{r['crossover_hdi_low'].date()}, "
                   f"{r['crossover_hdi_high'].date()}], "
-                  f"80% [{r['hdi80_low'].date()}, {r['hdi80_high'].date()}] "
-                  f"({side})")
+                  f"80% [{r['hdi80_low'].date()}, {r['hdi80_high'].date()}]")
 
         fig.add_vline(x=today.strftime("%Y-%m-%d"), row=i, col=1,
                       line=dict(color=TODAY_COLOR, width=2.5, dash="dot"))
@@ -263,10 +296,10 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
         fig.add_trace(go.Scatter(x=[None], y=[None], name=name,
                                  legendrank=rank, **kw), row=1, col=1)
 
-    proxy(1, "crossing already behind us", mode="markers",
-          marker=dict(color=PAST, size=MARKER))
-    proxy(2, "crossing still ahead", mode="markers",
-          marker=dict(color=FUTURE, size=MARKER))
+    proxy(1, "already behind us", mode="lines",
+          line=dict(color=PAST, width=BAR50_W))
+    proxy(2, "still ahead", mode="lines",
+          line=dict(color=FUTURE, width=BAR50_W))
     proxy(3, "median", mode="markers", marker=dict(color="#888", size=MARKER))
     if len(probs) == 1:
         proxy(4, f"{probs[0]:.0%} interval", mode="lines",
@@ -279,9 +312,8 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
     proxy(6, "today", mode="lines",
           line=dict(color=TODAY_COLOR, width=2.5, dash="dot"))
     if clipped:
-        proxy(7, "80% interval continues past the axis", mode="markers",
-              marker=dict(color="#888", symbol="arrow-right-open", size=22,
-                          line=dict(width=3)))
+        proxy(7, "continues past the window (true date shown)", mode="markers",
+              marker=dict(color="#888", size=9))
 
     fig.update_xaxes(title=dict(text="Crossing date", font=dict(size=FONT_TICK)),
                      row=len(AXES), col=1)
@@ -301,12 +333,11 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.write_html(out.with_suffix(".html"))
     save_print(fig, out)
-    print(f"  shared x window {x0.date()} .. {x1.date()} "
-          f"({(x1 - x0).days / 365.25:.1f} yr)")
-    for name, tier, is80, true_hi in clipped:
-        print(f"  clipped: {name} / {tier} "
-              f"{'80%' if is80 else '50%'} upper bound {true_hi.date()} "
-              f"drawn as an arrow at the x-limit")
+    print(f"  fixed x window {x0d.date()} .. {x1d.date()}")
+    for name, tier, side, true_date, median_out in clipped:
+        what = "median" if median_out else "80% endpoint"
+        print(f"  clipped {side}: {name} / {tier} — {what} {true_date.date()} "
+              f"marked as a small dot at the edge")
     print(f"  wrote {out.with_suffix('.png')} and {out.with_suffix('.html')}")
 
 
