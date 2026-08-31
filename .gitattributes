@@ -1,0 +1,33 @@
+# Normalize every text file to LF in the repository, whatever platform it was
+# committed from. Without this a CSV committed from a CRLF machine reads as a
+# whole-file diff for everyone else, and the working tree is dirty on clone.
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.csv   text eol=lf
+*.json  text eol=lf
+*.ipynb text eol=lf
+*.html  text eol=lf
+*.sh    text eol=lf
+*.toml  text eol=lf
+
+# Never diffed, never munged.
+*.png   binary
+*.pdf   binary
+*.npz   binary
+*.npy   binary
+*.nc    binary
+
+# Generated figures. Plotly inlines its whole bundle, so index.html alone is
+# 11 MB of minified JavaScript and each country figure is 4.7 MB. Left
+# unmarked, GitHub reports this as an HTML repository (30 MB of HTML against
+# 1 MB of Python) and renders those files in every diff. They stay tracked and
+# viewable; they just stop counting as hand-written source.
+index.html             linguist-generated=true
+deliverables/**/*.html linguist-generated=true
+results/**/*.html      linguist-generated=true
+
+# Records of past investigations, not the library.
+notebooks/**           linguist-documentation=true
