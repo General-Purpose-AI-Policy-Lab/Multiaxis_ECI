@@ -2396,7 +2396,10 @@ class TestLayoutPaths:
                 and p.resolve() != cls._SELF]
 
     def test_no_prerename_path_literals(self):
-        stale = _re.compile(r'/ *"(data|diagnostics)"|"(diagnostics|eci)/')
+        # `[/"]` after the name: catches both the exact segment (`/ "data"`)
+        # and a longer literal (`/ "data/processed/..."`), which the
+        # closing-quote-only form let through (found live in the post scripts).
+        stale = _re.compile(r'/ *"(data|diagnostics)[/"]|"(diagnostics|eci)/')
         hits = [f"{p.relative_to(PROJECT_ROOT)}:{i}"
                 for p in self._files({".py"})
                 for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)

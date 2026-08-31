@@ -101,7 +101,7 @@ def main(results: Path, tag: str) -> None:
     # the tier list from the fit's own human table so the split is not guessed.
     human_names = set(pd.read_csv(results / "human_groups.csv")["name"])
 
-    raw = pd.read_csv(REPO / "data/processed/benchmarks_merged.csv").dropna(
+    raw = pd.read_csv(REPO / "1_data/processed/benchmarks_merged.csv").dropna(
         subset=["release_date"])
     model_dates = raw.groupby("model_version")["release_date"].min()
     curated = {m: d for m, d in config.RELEASE_DATES.items()

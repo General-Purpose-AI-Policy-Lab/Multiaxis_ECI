@@ -101,7 +101,7 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     hg = pd.read_csv(results / "human_groups.csv")
     human_names = set(hg["name"])
 
-    raw = pd.read_csv(REPO / "data/processed/benchmarks_merged.csv").dropna(
+    raw = pd.read_csv(REPO / "1_data/processed/benchmarks_merged.csv").dropna(
         subset=["release_date"])
     dates = raw.groupby("model_version")["release_date"].min()
     dates = pd.concat([dates, pd.Series({m: d for m, d in config.RELEASE_DATES.items()
