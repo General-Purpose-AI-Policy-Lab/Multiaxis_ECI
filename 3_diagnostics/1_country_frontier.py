@@ -236,7 +236,7 @@ def build_figure(theta0, mini, transform, model_dates, country_map, records, for
         xaxis=dict(title="Release date", type="date",
                   range=[pd.to_datetime(model_dates.min()).strftime("%Y-%m-%d"),
                          pd.Timestamp(horizon).strftime("%Y-%m-%d")]),
-        yaxis=dict(title="ECI (anchored)", range=[ylo - pad, yhi + pad]),
+        yaxis=dict(title="ECI-H (anchored)", range=[ylo - pad, yhi + pad]),
         legend=dict(orientation="v", yanchor="top", y=0.99, xanchor="left", x=1.01),
         margin=dict(l=70, r=220, t=70, b=55), height=560, width=1050)
     return fig
@@ -398,7 +398,7 @@ def main():
     fit_label = f"records since {pd.Timestamp(args.fit_start):%b %Y}"
     fig = build_figure(theta0, mini, transform, model_dates, country_map,
                        records, forecasts, args.horizon,
-                       title=f"US vs China frontier (ECI) — {scope_label}",
+                       title=f"US vs China frontier (ECI-H) — {scope_label}",
                        fit_label=fit_label,
                        y_range=(tuple(float(v) for v in args.y_range.split(","))
                                 if args.y_range else None))

@@ -132,7 +132,7 @@ Here $\theta_{m}\in\mathbb{R}$ is the model's single overall capability and
 $A_b>0$ is the benchmark's discrimination. This is the standard **2PL** item
 model with a Beta response. (The retired standalone 1D model wrote the same
 mean as $\alpha_b(C_m - D_b)$; that is an affine reparametrization of
-$A_b\theta_m - D_b$, absorbed by the ECI anchoring in Section 6.)
+$A_b\theta_m - D_b$, absorbed by the ECI-H anchoring in Section 6.)
 
 ### 4.2 KD (K-axis compensatory MIRT)
 
@@ -426,14 +426,17 @@ $$
 
 ---
 
-## 6. From ability to the ECI scale
+## 6. From ability to the ECI-H scale
+
+The human-anchored index is written **ECI-H** to keep it distinct from
+Epoch's published ECI; the two share the anchor convention below.
 
 The reported index is an **affine** transform of the overall capability
 (axis 1 of a $K$-axis fit, or $\theta$ of a 1D fit), applied **per posterior
 draw**:
 
 $$
-\mathrm{ECI}_m = a + b\,\theta_{m,1}.
+\mathrm{ECI\text{-}H}_m = a + b\,\theta_{m,1}.
 $$
 
 $a$ and $b$ are fixed by two anchor models:
@@ -447,9 +450,9 @@ $$
 i.e.
 
 $$
-\mathrm{ECI}_{\text{Claude 3.5 Sonnet (2024-10-22)}} = 130,
+\mathrm{ECI\text{-}H}_{\text{Claude 3.5 Sonnet (2024-10-22)}} = 130,
 \qquad
-\mathrm{ECI}_{\text{GPT-5 (2025-08-07, medium)}} = 150.
+\mathrm{ECI\text{-}H}_{\text{GPT-5 (2025-08-07, medium)}} = 150.
 $$
 
 The choice of anchors is arbitrary (it matches the public Epoch dashboard for

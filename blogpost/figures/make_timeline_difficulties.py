@@ -192,9 +192,9 @@ def main(results: Path, tag: str) -> None:
                                     lw=0.9, alpha=0.6, shrinkA=2, shrinkB=3))
         label_top -= 9
 
-    ax.set_ylabel("ECI")
+    ax.set_ylabel("ECI-H")
     ax.set_xlabel("Release date")
-    ax.set_title("ECI timeline with benchmark difficulties (1D)", fontsize=15)
+    ax.set_title("AI capability, human capability and benchmark difficulty (1D, ECI-H)", fontsize=15)
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     ax.legend(loc="lower right", frameon=False, fontsize=12)

@@ -4,7 +4,7 @@ Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilitie
 
 The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many benchmark scores into one number per model, following the [Rosetta Stone paper](https://arxiv.org/abs/2512.00193). The previous post put human baseline tiers on that same scale, which exposed a problem. Humans score near-perfectly on abstract-reasoning benchmarks like ARC-AGI or VPCT and near chance on GPQA-type benchmarks, while many models show the opposite pattern. No single ordering produces both.
 
-This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT**, an item-response model with a Beta likelihood. Every ability comes with its uncertainty, and the nine human tiers are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index. Four axes come out of the fit, named after the benchmarks whose loadings are most collinear with them:
+This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT**, an item-response model with a Beta likelihood. Every ability comes with its uncertainty, and the nine human tiers are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index, which we call **ECI-H** (ECI with Human baselines) to keep it distinct from Epoch's published ECI. Four axes come out of the fit, named after the benchmarks whose loadings are most collinear with them:
 1. **Fluid Intelligence** (ARC-AGI-2, ARC-AGI, VPCT)
 2. **Scientific Knowledge and Reasoning** (WMDP Chemistry and Biology, the GPQA subsets, FrontierMath)
 3. **Agentic** (GBAEval, Remote Labor Index, SWE-Bench Pro)
@@ -36,13 +36,13 @@ Main project fit with K=4.
 python 2_fit.py --K 4 --human-merge --lineage-prior --lineage-bm
 ```
 
-The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI deliverables to `results/canonical/`:
+The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `results/canonical/`:
 
 ```bash
 python 2_fit.py --preset canonical
 ```
 
-ECI is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2024-10-22) = 130 and GPT-5 (2025-08-07, medium) = 150, matching Epoch's dashboard. Every other flag, where a fit's output lands, and the plot / diagnose / dashboard commands: [docs/cli.md](docs/cli.md).
+ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2024-10-22) = 130 and GPT-5 (2025-08-07, medium) = 150, matching the scale of Epoch's dashboard. Every other flag, where a fit's output lands, and the plot / diagnose / dashboard commands: [docs/cli.md](docs/cli.md).
 
 ```
 .

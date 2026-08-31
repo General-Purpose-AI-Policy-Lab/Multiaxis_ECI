@@ -1,4 +1,5 @@
-"""ECI-scale statistics: capability draws, the affine anchor transform,
+"""ECI-H-scale statistics: capability draws, the affine anchor transform,
+(ECI-H is the human-anchored index; code and CSV columns keep the short ECI_* names.)
 and the SOTA / all-models / timeline / human / forest summary tables."""
 from __future__ import annotations
 

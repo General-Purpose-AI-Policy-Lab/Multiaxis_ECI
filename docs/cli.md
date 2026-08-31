@@ -67,9 +67,9 @@ unmarked to both.
 
 | flag | effect |
 |---|---|
-| `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI deliverables to `results/canonical/` |
+| `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI-H deliverables to `results/canonical/` |
 | `--skip-sampling` | `[canon]` reuse `results/canonical/trace.nc`. Must match the current data shape |
-| `--raw-c` | `[canon]` report raw C instead of anchored ECI |
+| `--raw-c` | `[canon]` report raw C instead of anchored ECI-H |
 | `--skip-baseline` / `--refit-baseline` | `[expl]` skip or force the K=1 baseline fit |
 | `--plots` | `[expl]` render the fit's figures in-process |
 

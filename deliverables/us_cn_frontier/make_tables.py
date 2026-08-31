@@ -95,7 +95,7 @@ def main():
             "Δ open−all", "Δ closed−all"]
     fig = make_subplots(rows=2, cols=1,
                         specs=[[{"type": "table"}], [{"type": "table"}]],
-                        subplot_titles=("Frontier slopes (ECI/yr) — median [95% HDI]",
+                        subplot_titles=("Frontier slopes (ECI-H/yr) — median [95% HDI]",
                                         "Gap and lag — median [95% HDI]"),
                         row_heights=[0.55, 0.45], vertical_spacing=0.16)
     fig.add_trace(go.Table(header=dict(values=cols, **HDR),

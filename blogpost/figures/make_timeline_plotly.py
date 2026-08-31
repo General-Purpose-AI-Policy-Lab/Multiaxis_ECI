@@ -168,14 +168,14 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     # English text and post-scale type: the figure is shared flat, so it has to
     # be readable without zooming.
     fig.update_layout(
-        title=dict(text="AI capability and benchmark difficulty on the ECI scale",
+        title=dict(text="AI capability, human capability and benchmark difficulty on the ECI-H scale",
                    x=0.5, font=dict(size=FONT_TITLE)),
         xaxis=dict(title=dict(text="Release date", font=dict(size=FONT_AXIS)),
                    tickfont=dict(size=FONT_TICK),
                    dtick="M12", tickformat="%Y", tickangle=0,
                    range=[(x_left - pd.Timedelta(days=90)).strftime("%Y-%m-%d"),
                           (x_right + pd.Timedelta(days=75)).strftime("%Y-%m-%d")]),
-        yaxis=dict(title=dict(text="ECI", font=dict(size=FONT_AXIS)),
+        yaxis=dict(title=dict(text="ECI-H", font=dict(size=FONT_AXIS)),
                    tickfont=dict(size=FONT_TICK), range=[30, 220]),
         legend=dict(font=dict(size=15)),
         height=1250, width=1900, margin=dict(l=130, r=430, t=120, b=110),

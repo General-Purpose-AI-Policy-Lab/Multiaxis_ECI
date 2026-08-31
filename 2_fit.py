@@ -3,8 +3,8 @@
 Two modes:
 
   python 2_fit.py --preset canonical
-      The headline ECI pipeline: K=1, "pt1" loading prior, curated
-      benchmark exclusions, humans as test-takers. Produces the anchored ECI
+      The headline ECI-H pipeline: K=1, "pt1" loading prior, curated
+      benchmark exclusions, humans as test-takers. Produces the anchored ECI-H
       scale, SOTA table, forests, timeline, PPC/GoF and figures under
       results/canonical/ and plots/canonical/.
 
@@ -244,7 +244,7 @@ def run_canonical(args) -> None:
 
     if args.raw_c:
         config.RAW_C_MODE = True
-        print("── --raw-c mode: ECI = C (no affine anchor rescaling) ───────────")
+        print("── --raw-c mode: ECI-H = C (no affine anchor rescaling) ───────────")
     if args.include_all_benchmarks:
         print("── --include-all-benchmarks: curated exclusions NOT applied ─────")
 
@@ -337,8 +337,8 @@ def run_canonical(args) -> None:
     print(f"   min ess   = {float(np.nanmin(summary[['ess_bulk', 'ess_tail']].values)):.0f}")
     print(f"   divergences = {n_div}")
 
-    # ── SOTA + ECI ──────────────────────────────────────────────────────────
-    print("\n── SOTA + ECI ───────────────────────────────────────────────────")
+    # ── SOTA + ECI-H ──────────────────────────────────────────────────────────
+    print("\n── SOTA + ECI-H ───────────────────────────────────────────────────")
     if args.eci_data_only:
         raw_df = (pd.read_csv(DATA_DIR / "raw" / "eci_data.csv")
                     .rename(columns={"model": "model_version"}))
@@ -390,8 +390,8 @@ def run_canonical(args) -> None:
         (config.ANCHOR_HIGH[1], f"{config.ANCHOR_HIGH[0]} = {config.ANCHOR_HIGH[1]:.0f}"),
     ]
     save_fig(sota_forest_fig(sota, x_col="ECI",
-                             title="SOTA ECI (anchored: Claude 3.5 Sonnet = 130, GPT-5 = 150)",
-                             xaxis_title="ECI (affine-anchored)",
+                             title="SOTA ECI-H (anchored: Claude 3.5 Sonnet = 130, GPT-5 = 150)",
+                             xaxis_title="ECI-H (affine-anchored)",
                              anchors=anchors),
              "sota_eci", plots_dir)
     save_fig(sota_forest_fig(sota, x_col="C",
@@ -695,7 +695,7 @@ def run_exploration(args, parser) -> None:
 def main():
     parser = argparse.ArgumentParser(
         description="Fit the compensatory Beta-MIRT: --preset canonical for the "
-                    "headline ECI pipeline (K=1), or the K-axis exploration flags.")
+                    "headline ECI-H pipeline (K=1), or the K-axis exploration flags.")
     parser.add_argument("--preset", choices=["canonical"],
                         help="'canonical': K=1, pt1 prior, curated exclusions, "
                              "humans in, full ECI deliverables → results/canonical/")
