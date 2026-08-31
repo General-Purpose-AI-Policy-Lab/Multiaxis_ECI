@@ -90,7 +90,9 @@ def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
 def crossover_dotwhisker_fig(crossover_df, *, axis_name: str,
                              human_labels: dict | None = None) -> go.Figure:
     """When the frontier is projected to reach each human tier: tier on Y,
-    crossover date + 94% CI on X, coloured passed (vert) vs future (rouge).
+    crossover date + interval on X (at the hdi_prob the crossover frame was
+    built with; the dashboard renders 50% and titles it so), coloured passed
+    (vert) vs future (rouge).
 
     `human_labels` defaults to HUMAN_LEVEL_LABELS_FR; pass {} for raw names."""
     labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels

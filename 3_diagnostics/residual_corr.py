@@ -6,7 +6,7 @@ For each benchmark pair (b1, b2):
   residual         = observed - implied
 
 Reads the canonical K=1 trace (results/canonical/trace.nc, from
-`fit.py --preset canonical`). If 1D is enough, residuals are tiny and
+`2_fit.py --preset canonical`). If 1D is enough, residuals are tiny and
 unstructured. Clustered structure (e.g. all-math residuals coordinated
 positive, math-vs-agentic negative) is the signature of a second latent factor.
 """

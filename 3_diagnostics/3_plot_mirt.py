@@ -1,4 +1,4 @@
-"""Plot a SINGLE MIRT fit in detail — run AFTER a fit.py / fits/* fit.
+"""Plot a SINGLE MIRT fit in detail — run AFTER a 2_fit.py / fits/* fit.
 
 Single-fit deep-dive. Rotation/identity handling (`analysis.prepare_fit`) and
 every figure builder (`viz/`) are the dashboard's
@@ -155,7 +155,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             r = float(np.corrcoef(a1, tb)[0, 1])
             figs["factor1_vs_1d"] = factor_vs_1d_fig(tb, a1, mod, r)
 
-            # fit.py fits the K=1 baseline with the same likelihood options.
+            # 2_fit.py fits the K=1 baseline with the same likelihood options.
             pred_1d = posterior_predictive_mirt(idata_1d, data, floor_c=floor_c,
                                                 n_eff=n_eff).mean(axis=0)
             resid_kd = data.scores - gof.y_pred_mean
@@ -164,7 +164,8 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             figs["pred_k_vs_k1"] = pred_scatter_fig(
                 pred_1d, gof.y_pred_mean, np.abs(resid_1d) - np.abs(resid_kd), hover)
 
-            var_y = pd.Series(data.scores).groupby(data.bench_idx).var()
+            # ddof=0 so var*n is exactly the total sum of squares (R² denominator).
+            var_y = pd.Series(data.scores).groupby(data.bench_idx).var(ddof=0)
             n_per = pd.Series(np.ones_like(data.scores)).groupby(data.bench_idx).sum()
             r2_1d = 1 - pd.Series(resid_1d ** 2).groupby(data.bench_idx).sum() / (var_y * n_per)
             r2_kd = 1 - pd.Series(resid_kd ** 2).groupby(data.bench_idx).sum() / (var_y * n_per)
@@ -187,7 +188,7 @@ def folder_decision(name: str, size_bytes: int, thin: int | None = None):
     """(skip reason or None, thin) for one candidate trace under `--folder`.
 
     Two filenames are not fits of their own: `trace.nc` is the canonical index,
-    and a bare `trace_mirt_k1.nc` is the helper baseline fit.py fits beside a
+    and a bare `trace_mirt_k1.nc` is the helper baseline 2_fit.py fits beside a
     K-axis fit, which `plot_fit` already reads from the K-axis trace's own
     folder. Thin keeps one draw per 2 GB of file, the ratio
     that fits the 38 GB flagship inside 26 GB of RAM. An explicit `thin` wins.

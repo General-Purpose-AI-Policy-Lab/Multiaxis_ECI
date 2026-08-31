@@ -22,6 +22,11 @@ Plus one shared figure (in comparison/):
      for both K. Shows the prior is convergence- and prediction-neutral.
 
 Run:  python 3_diagnostics/compare_human_prior.py
+
+HISTORICAL: the trace pairs in `PAIRS` were fitted under the retired
+`noard_aqmatrix` grammar, which no current 2_fit.py flag set can regenerate.
+The script skips gracefully when the traces are absent (any fresh clone), and
+is kept as the record of how the human-prior confirmation was run.
 """
 from __future__ import annotations
 

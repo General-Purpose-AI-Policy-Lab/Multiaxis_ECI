@@ -8,7 +8,7 @@ unit conversion (percentages → proportions, 0-10 → 0-1). It does NOT mean
 chance-corrected: a 4-choice multiple-choice benchmark still has scores
 clustered around 0.25. Per-benchmark chance floors are NOT carried in this
 schema — their reviewed ground truth lives in
-`1_data/curated/benchmark_lower_bounds.csv`, read directly by the `--floors`
+`1_data/curated/benchmark_lower_bounds.csv`, read directly by the default-on fixed-c-floors
 3PL fit (`load_benchmark_floors`).
 
 Model & benchmark integer indices are derived in-memory by sorting unique
@@ -46,11 +46,10 @@ RAW_DIR       = DATA_DIR / "raw"
 CURATED_DIR   = DATA_DIR / "curated"
 PROCESSED_DIR = DATA_DIR / "processed"
 
-# Re-run 1_data/1_pipeline/pipeline.ipynb to refresh this file.
+# Re-run 1_data/1_pipeline/pipeline.ipynb to refresh this file. The canonical
+# alias map (variant → canonical) lives in 1_data/1_pipeline/canonical/ and is
+# applied by that notebook at data-prep time; nothing here reads it.
 PROCESSED_FILE = PROCESSED_DIR / "benchmarks_merged.csv"
-# Shared canonical alias map (variant → canonical); applied by the pipeline
-# notebook at data-prep time.
-ALIASES_FILE = DATA_DIR / "pipeline" / "canonical" / "model_aliases.csv"
 
 
 def _subset_obs(data: "ECIData", keep: np.ndarray) -> "ECIData":
@@ -125,11 +124,15 @@ def drop_model_benchmark_cells(data: "ECIData", model_name, bench_names) -> "ECI
 
 def _curated_name_list(filename: str) -> set[str]:
     """One benchmark name per line, '#' comments and blanks skipped. An absent
-    file is an empty list, so a curated list is optional."""
+    file is an empty list, so a curated list is optional — and so is a file
+    holding only comments (pandas raises EmptyDataError there)."""
     path = CURATED_DIR / filename
     if not path.exists():
         return set()
-    names = (pd.read_csv(path, comment="#", header=None)[0].str.strip())
+    try:
+        names = (pd.read_csv(path, comment="#", header=None)[0].str.strip())
+    except pd.errors.EmptyDataError:
+        return set()
     return set(names[names != ""].tolist())
 
 
@@ -229,11 +232,23 @@ def clip_scores_to_floors(data: "ECIData", floors: np.ndarray) -> "ECIData":
         new_scores[i] = r.clipped_score
 
     stale = set(row_by_key) - matched
+    # A clip row whose BENCHMARK is absent from this fit's scope (retired /
+    # excluded / dropped), or whose MODEL has no observation left in it
+    # (--no-sg runs drop_model_observations before this), is a scope
+    # restriction, not data drift — the clips file is generated over the full
+    # scope and legitimately carries those rows. Warn only when both sides are
+    # in scope and the observation is still gone: that is the data having
+    # changed under a reviewed clip.
+    in_scope_benchmarks = set(bench_of.values())
+    models_with_obs = {model_of[m] for m in set(data.model_idx.tolist())}
+    stale = {k for k in stale
+             if k[0] in in_scope_benchmarks and k[1] in models_with_obs}
     if stale:
         warnings.warn(
             f"benchmark_score_clips.csv: {len(stale)} row(s) match no current "
-            f"observation (e.g. {sorted(stale)[:3]}) — refresh with "
-            f"3_diagnostics/audit_lower_bounds.py --write-clips.", UserWarning)
+            f"observation on an in-scope benchmark (e.g. {sorted(stale)[:3]}) — "
+            f"refresh with 3_diagnostics/audit_lower_bounds.py --write-clips.",
+            UserWarning)
 
     below = new_scores < floors[data.bench_idx] - 1e-9
     if below.any():
@@ -263,7 +278,7 @@ HUMAN_GROUPS_DROP: set[str] = set()
 # the lineage's variant collapse for those rows.
 _EFFORT_SUFFIX_RE = re.compile(
     r"_(?:low|medium|high|minimal|max|xhigh|none|unknown|web-?app|"
-    r"\d+K|reasoning-(?:low|medium|high))$"
+    r"\d+[kK]|reasoning-(?:low|medium|high))$"
 )
 
 
@@ -314,7 +329,13 @@ def _known_release_date_by_model() -> pd.Series:
     """Best-known release date per model, from the FULL processed file plus the
     config.RELEASE_DATES fallback. Used by the era filters, which must see a
     model's date even when its dated rows sit on benchmarks the current fit
-    excludes."""
+    excludes.
+
+    Ties are broken by MAX over a model's dated rows; analysis/stats.py's
+    `_release_dates` (the SOTA envelope) takes the MIN instead. The two agree
+    whenever a model's rows carry one date — the near-universal case — but a
+    badly-dated duplicate row in a data refresh would make the era filter and
+    the SOTA envelope disagree silently; keep row dates consistent per model."""
     from multiaxis_eci.config import RELEASE_DATES
     full = pd.read_csv(PROCESSED_FILE)
     dates = pd.to_datetime(full["release_date"], errors="coerce")
@@ -375,8 +396,9 @@ def _load_human_baselines_as_models() -> pd.DataFrame:
     naturally estimates each group's capability with full posterior + HDI —
     replaces the ad-hoc post-hoc median-of-implied-C aggregation.
 
-    Boundary scores (exactly 0 or 1) are dropped to avoid Beta-likelihood
-    pathologies — same convention as the current human_baseline_levels filter.
+    Boundary scores (exactly 0 or 1) are clamped into the open interval
+    (ECI_EPS, 1 - ECI_EPS) and kept — the same treatment AI boundary rows get
+    from the model builders (see the clamp note below).
     """
     src = CURATED_DIR / "human_baselines.csv"
     if not src.exists():
@@ -481,7 +503,7 @@ class ECIData:
     is_human: np.ndarray          # (n_models,) bool — True for fitted human-group rows
     # Benchmark category per benchmark index (same order as blookup). Surfaced
     # for downstream metadata only — e.g. labelling MIRT factor loadings by
-    # category (fit.py). The model never reads it. Defaults to
+    # category (2_fit.py). The model never reads it. Defaults to
     # None so existing constructors (tests, replace()) don't have to supply it.
     bench_category: np.ndarray | None = None
     # (n_obs,) float — effective test length implied by the reported harness
@@ -583,6 +605,10 @@ def load_eci_data(drop_low_obs_models: bool = False,
         df["category"]     = "ECI-only"
         df = df[["model_version", "score", "release_date", "organization",
                   "benchmark", "stderr", "source", "category"]]
+        # Retired benchmarks leave this diagnostic scope too — the module
+        # contract says "dropped for every fit". Today's eci_data.csv carries
+        # none of them; the guard is here so a refresh cannot re-admit one.
+        df = df[~df["benchmark"].isin(load_retired_benchmarks())].reset_index(drop=True)
     else:
         if not PROCESSED_FILE.exists():
             raise FileNotFoundError(
@@ -713,19 +739,21 @@ def load_eci_data(drop_low_obs_models: bool = False,
                 warnings.warn(
                     f"human_baselines.csv: {len(orphans)} benchmark(s) have no "
                     f"model-side data and are dropped from the fit: {sorted(orphans)}. "
-                    "Reconcile the human benchmark name with the data or ingest it.")
+                    "Either the benchmark was dropped for this fit, or the human "
+                    "benchmark name needs reconciling with the data / ingesting.")
             groups_before = set(humans["model_version"].unique())
             humans = humans[humans["benchmark"].isin(fitted_benchmarks)]
-            # A tier whose every baseline sits on excluded benchmarks vanishes
-            # from the fit — that is a substantive scope change (one fewer human
-            # reference level), not routine row filtering, so warn loudly.
+            # A tier whose every baseline sits on excluded benchmarks leaves
+            # the fit automatically — expected under the canonical scope (the
+            # Committee of Skilled Generalists' only baseline, PIQA, is on the
+            # exclusion list), so announce it like the other scope drops rather
+            # than warning. Add a baseline on a non-excluded benchmark to keep
+            # a tier in the canonical fit.
             lost_tiers = groups_before - set(humans["model_version"].unique())
             if lost_tiers:
-                warnings.warn(
-                    f"human_baselines.csv: {len(lost_tiers)} human tier(s) lost "
-                    f"ALL their benchmarks to the curated exclusions and leave "
-                    f"the fit: {sorted(lost_tiers)}. Add a baseline on a "
-                    f"non-excluded benchmark to keep the tier.")
+                print(f"   human tiers: {len(lost_tiers)} tier(s) have no "
+                      f"baseline left in this scope and leave the fit: "
+                      f"{sorted(lost_tiers)}")
             human_groups = set(humans["model_version"].unique())
             df = pd.concat([df, humans], ignore_index=True)
 

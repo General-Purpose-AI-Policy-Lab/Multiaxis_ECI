@@ -8,6 +8,21 @@ import xarray as xr
 
 from multiaxis_eci.data import ECIData
 
+def convergence(idata) -> dict:
+    """Global max r-hat / min ESS / divergences (nan-safe for masked entries).
+
+    The one copy every fit driver imports — it drifted when each driver
+    carried its own (2_fit.py's lacked the nan-safety, so pt1's constant
+    tau_A printed NaN as the max r-hat)."""
+    rh = az.rhat(idata)
+    ess = az.ess(idata)
+    max_rhat = float(np.nanmax([np.nanmax(v.values) for v in rh.data_vars.values()]))
+    min_ess = float(np.nanmin([np.nanmin(v.values) for v in ess.data_vars.values()]))
+    div = int(idata.sample_stats["diverging"].sum()) if "diverging" in idata.sample_stats else -1
+    n_draws = int(idata.posterior.sizes["chain"] * idata.posterior.sizes["draw"])
+    return {"max_rhat": max_rhat, "min_ess": min_ess, "divergences": div, "n_draws": n_draws}
+
+
 def _rhat_subset_idx(data: ECIData, n_obs_sample: int, seed: int):
     """Random (bench_idx, model_idx) subset for a prediction-level r-hat. Shared
     by the compensatory and non-comp reporters so both sample the same way."""

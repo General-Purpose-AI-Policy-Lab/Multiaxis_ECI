@@ -5,5 +5,5 @@
 - fit_interaction: compensatory + interaction fits
 
 The compensatory fits (canonical K=1 preset and K-axis exploration) run
-through the root fit.py CLI.
+through the root 2_fit.py CLI.
 """

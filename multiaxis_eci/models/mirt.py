@@ -465,9 +465,11 @@ def build_mirt_model(data: ECIData, K: int,
     psi[node] + variant offset, where psi follows founder + cumulative SOFT
     (Normal, can regress) increments along the chain. Disjoint from human_order.
     lineage_bm=True scales each increment by the release gap dt (in years) —
-    Normal(rate*dt, s^2*dt), a Brownian motion with drift observed at the
-    release dates — and gives each chain its own rate, pooled toward a per-axis
-    population rate. The mean-zero effort-variant offsets are unaffected.
+    Normal(drift*dt, s^2*dt), a Brownian motion with drift observed at the
+    release dates — under ONE shared per-axis drift rate (a per-vendor pooled
+    rate was fitted 2026-07-27 and removed: roughly one release per year per
+    vendor cannot pin a rate; see _lineage_block). The mean-zero effort-variant
+    offsets are unaffected.
 
     Both are priors on theta only, and both compose with any loading_prior. The
     human roots and chain founders join the unstructured models inside one

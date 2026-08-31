@@ -30,7 +30,7 @@ import pymc as pm
 
 from multiaxis_eci import config  # attribute access so --eci-data-only / --raw-c overrides propagate
 from multiaxis_eci.analysis import (
-    FitSpec, all_models_stats_df, factor_corr_df,
+    FitSpec, all_models_stats_df, convergence, factor_corr_df,
     factor_scores_df, forest_stats_df, forest_stats_from_draws, human_stats_df,
     loadings_table, mirt_identified_rhat, prepare_fit, sota_stats_df,
     spec_json, tau_spectrum_df, timeline_stats_df, trace_loading_prior,
@@ -77,24 +77,13 @@ class _Heartbeat:
                   flush=True)
 
 
-def convergence(idata) -> dict:
-    """Max r-hat, min bulk-ESS, and divergence count across the trace."""
-    rh = az.rhat(idata)
-    ess = az.ess(idata)
-    max_rhat = float(max(float(v.max()) for v in rh.data_vars.values()))
-    min_ess = float(min(float(v.min()) for v in ess.data_vars.values()))
-    div = int(idata.sample_stats["diverging"].sum()) if "diverging" in idata.sample_stats else -1
-    n_draws = int(idata.posterior.sizes["chain"] * idata.posterior.sizes["draw"])
-    return {"max_rhat": max_rhat, "min_ess": min_ess, "divergences": div, "n_draws": n_draws}
-
-
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
                 loading_prior="signed", floor_c=None,
                 ceiling_noise=False, known_se=False,
                 pooled_noise=False, shared_base_zsn=True, time_t=None,
                 theta_t_cells=False, theta_pos=False, link="linear",
-                checkpoint_path=None, stream_path=None):
+                checkpoint_path=None, stream_path=None, spec_attrs=None):
     """Build + sample one compensatory MIRT; print identified convergence."""
     tag = f"{loading_prior} loadings"
     if human_order:
@@ -171,8 +160,12 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         print(f"  starting {sampler} sampler at t=0 (no live heartbeat with this backend)",
               flush=True)
     if stream_path is not None:
-        print(f"  streaming draws to {stream_path} (read mid-run with "
-              f"persistence.load_live_draws)", flush=True)
+        if sampler == "nutpie":
+            print(f"  streaming draws to {stream_path} (read mid-run with "
+                  f"persistence.load_live_draws)", flush=True)
+        else:
+            print(f"  WARNING: --stream-draws is nutpie-only; nothing is "
+                  f"streamed with sampler={sampler}", flush=True)
     with model:
         idata = pm.sample(**sample_kw, **extra)
         # nutpie's zarr store writes the warmup draws whatever save_warmup says,
@@ -181,6 +174,15 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         for group in ("warmup_posterior", "warmup_sample_stats"):
             if group in idata.groups():
                 delattr(idata, group)
+        if spec_attrs:
+            # The full attr set is stamped HERE, before the checkpoint save, so
+            # a recovered checkpoint is exactly as self-describing as a finished
+            # trace: FitSpec.from_trace needs mirt_spec (an attr-less trace
+            # falls back to the folder tokens, which read floors as OFF), and
+            # prepare_fit gates the signed per-draw alignment on
+            # mirt_loading_prior — a checkpoint missing it would be read as a
+            # normal-prior fit and summarized in arbitrary orientations.
+            idata.posterior.attrs.update(spec_attrs)
         if checkpoint_path is not None:
             # Crash insurance: bank the raw draws BEFORE the memory-heavy
             # log-likelihood pass. nutpie holds every draw in RAM, so a kill in
@@ -499,6 +501,46 @@ def run_exploration(args, parser) -> None:
               f"years around the mean, {len(time_t) - dated} undated rows at 0",
               flush=True)
 
+    # The whole flag set travels with the trace: mirt_spec lets any later
+    # reader recover the fit's tag, folders and data scope without a filename
+    # convention, and mirt_loading_prior/mirt_link gate prepare_fit's
+    # rotation/sign handling without caller flags. Built BEFORE sampling and
+    # stamped by sample_mirt ahead of the crash checkpoint, so a recovered
+    # checkpoint carries the same identity as a finished trace.
+    attrs = {"mirt_spec": spec_json(spec),
+             "mirt_loading_prior": args.loading_prior,
+             "mirt_link": args.link}
+    if human_order:
+        attrs["mirt_human_order"] = json.dumps(human_order)
+    if lineage:
+        attrs["mirt_lineage_chains"] = json.dumps(lineage.chain_names)
+        attrs["mirt_lineage_bm"] = json.dumps(bool(args.lineage_bm))
+    if time_t is not None:
+        attrs["mirt_time_prior"] = json.dumps(True)
+    if args.drop_benchmarks:
+        attrs["mirt_drop_benchmarks"] = json.dumps(args.drop_benchmarks)
+    if args.cyber:
+        attrs["mirt_cyber"] = json.dumps(True)
+    if args.simpleqa_original:
+        attrs["mirt_simpleqa_original"] = json.dumps(True)
+    if args.loading_prior == "bifactor":
+        # Axis identity is structural here (axis1 IS the general column), so
+        # name the axes on the trace and let every plot label them.
+        attrs["mirt_axis_names"] = json.dumps(
+            ["g"] + [f"specific{k}" for k in range(1, args.K)])
+    if args.private_bases:
+        attrs["mirt_shared_base_zsn"] = json.dumps(False)
+    if args.theta_t:
+        attrs["mirt_theta_t_cells"] = json.dumps(True)
+    if args.theta_pos:
+        attrs["mirt_theta_pos"] = json.dumps(True)
+    if floor_c is not None:
+        attrs["mirt_floor_c"] = json.dumps(floor_c.tolist())
+    if args.known_se:
+        attrs["mirt_known_se"] = json.dumps(True)
+    if args.pooled_noise:
+        attrs["mirt_pooled_noise"] = json.dumps(True)
+
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
     idata_k, conv_k = sample_mirt(data, spec.K, sample_kw,
                                   human_order=human_order, lineage=lineage,
@@ -513,44 +555,8 @@ def run_exploration(args, parser) -> None:
                                   link=spec.link,
                                   checkpoint_path=spec.trace_path,
                                   stream_path=(results_dir / "live_draws.zarr"
-                                               if args.stream_draws else None))
-    # The whole flag set travels with the trace, so any later reader recovers
-    # the fit's tag, folders and data scope without a filename convention.
-    idata_k.posterior.attrs["mirt_spec"] = spec_json(spec)
-    # Loading prior travels with the trace so prepare_fit can gate
-    # rotation/sign handling without caller flags.
-    idata_k.posterior.attrs["mirt_loading_prior"] = args.loading_prior
-    idata_k.posterior.attrs["mirt_link"] = args.link
-    if human_order:
-        idata_k.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
-    if lineage:
-        idata_k.posterior.attrs["mirt_lineage_chains"] = json.dumps(lineage.chain_names)
-        idata_k.posterior.attrs["mirt_lineage_bm"] = json.dumps(bool(args.lineage_bm))
-    if time_t is not None:
-        idata_k.posterior.attrs["mirt_time_prior"] = json.dumps(True)
-    if args.drop_benchmarks:
-        idata_k.posterior.attrs["mirt_drop_benchmarks"] = json.dumps(args.drop_benchmarks)
-    if args.cyber:
-        idata_k.posterior.attrs["mirt_cyber"] = json.dumps(True)
-    if args.simpleqa_original:
-        idata_k.posterior.attrs["mirt_simpleqa_original"] = json.dumps(True)
-    if args.loading_prior == "bifactor":
-        # Axis identity is structural here (axis1 IS the general column), so
-        # name the axes on the trace and let every plot label them.
-        idata_k.posterior.attrs["mirt_axis_names"] = json.dumps(
-            ["g"] + [f"specific{k}" for k in range(1, args.K)])
-    if args.private_bases:
-        idata_k.posterior.attrs["mirt_shared_base_zsn"] = json.dumps(False)
-    if args.theta_t:
-        idata_k.posterior.attrs["mirt_theta_t_cells"] = json.dumps(True)
-    if args.theta_pos:
-        idata_k.posterior.attrs["mirt_theta_pos"] = json.dumps(True)
-    if floor_c is not None:
-        idata_k.posterior.attrs["mirt_floor_c"] = json.dumps(floor_c.tolist())
-    if args.known_se:
-        idata_k.posterior.attrs["mirt_known_se"] = json.dumps(True)
-    if args.pooled_noise:
-        idata_k.posterior.attrs["mirt_pooled_noise"] = json.dumps(True)
+                                               if args.stream_draws else None),
+                                  spec_attrs=attrs)
     save_trace(idata_k, spec.trace_path)
 
     # ── Factors: the same identity decision every figure gets ─────────────
@@ -584,7 +590,10 @@ def run_exploration(args, parser) -> None:
     corr = factor_corr_df(view.Phi)
     save_df(corr.reset_index().rename(columns={"index": "axis"}),
             results_dir / "mirt_factor_corr.csv")
-    print("\n── factor correlation Phi (off-diag = axis-ability overlap) ──")
+    phi_label = ("promax factor correlation Phi (oblique — NOT the raw "
+                 "ability correlation)" if view.phi_is_promax
+                 else "factor correlation Phi (off-diag = axis-ability overlap)")
+    print(f"\n── {phi_label} ──")
     print(corr.to_string(float_format=lambda x: f"{x:.3f}"))
 
     loadings = loadings_table(view.A, bench_names, data.bench_category)
@@ -631,6 +640,7 @@ def run_exploration(args, parser) -> None:
 
     if not args.skip_baseline:
         baseline_path = spec.baseline_trace_path
+        cached = False
         if baseline_path.exists() and not args.refit_baseline:
             # The K=1 MIRT is data-shape-locked: it indexes the same (model,
             # benchmark) coords as the K-axis fit, so a cached trace is safe to
@@ -641,9 +651,10 @@ def run_exploration(args, parser) -> None:
             post = idata_1d.posterior
             # draw > 0 because an interrupted baseline is saved as an
             # aborted 0-draw trace, and the dims of an empty trace still match.
-            if post.sizes.get("draw", 0) > 0 and \
-               post.sizes.get("model") == data.n_models and \
-               post.sizes.get("bench") == data.n_benchmarks:
+            cached = (post.sizes.get("draw", 0) > 0
+                      and post.sizes.get("model") == data.n_models
+                      and post.sizes.get("bench") == data.n_benchmarks)
+            if cached:
                 print(f"\nReusing cached K=1 baseline → {baseline_path}", flush=True)
                 gof_path = results_dir / "mirt_gof_k1.json"
                 if gof_path.exists():
@@ -654,17 +665,17 @@ def run_exploration(args, parser) -> None:
                 print(f"\nCached K=1 dims (model={post.sizes.get('model')}, "
                       f"bench={post.sizes.get('bench')}) don't match current data "
                       f"({data.n_models}, {data.n_benchmarks}) — refitting.", flush=True)
-                idata_1d, _ = sample_mirt(data, 1, sample_kw, loading_prior="normal",
-                                          floor_c=floor_c,
-                                          ceiling_noise=args.ceiling_noise,
-                                          known_se=args.known_se)
-                save_trace(idata_1d, baseline_path)
-                gof_report(idata_1d, "1D (K=1)", "k1")
-        else:
-            idata_1d, _ = sample_mirt(data, 1, sample_kw, loading_prior="normal",
-                                      floor_c=floor_c,
-                                      ceiling_noise=args.ceiling_noise,
-                                      known_se=args.known_se)
+        if not cached:
+            # The baseline is self-describing too: without the spec attr,
+            # from_trace reads the folder tokens and gets floors wrong.
+            idata_1d, _ = sample_mirt(
+                data, 1, sample_kw, loading_prior="normal",
+                floor_c=floor_c,
+                ceiling_noise=args.ceiling_noise,
+                known_se=args.known_se,
+                spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
+                            "mirt_loading_prior": "normal",
+                            "mirt_link": "linear"})
             save_trace(idata_1d, baseline_path)
             gof_report(idata_1d, "1D (K=1)", "k1")
 
@@ -697,10 +708,13 @@ def main():
     parser.add_argument("--chains", type=int, default=None,
                         help="override number of chains and cores")
     parser.add_argument("--seed", type=int, default=None,
-                        help="override config.SAMPLE_KW random_seed (42). Nutpie is "
-                             "deterministic given seed+data+model, so a multi-run "
-                             "recipe MUST vary this or the runs are duplicates")
-    parser.add_argument("--target-accept", type=float, default=0.95)
+                        help="[exploration] override config.SAMPLE_KW random_seed "
+                             "(42). Nutpie is deterministic given seed+data+model, "
+                             "so a multi-run recipe MUST vary this or the runs are "
+                             "duplicates. --preset canonical keeps config.SAMPLE_KW")
+    parser.add_argument("--target-accept", type=float, default=0.95,
+                        help="[exploration] NUTS target acceptance (default 0.95). "
+                             "--preset canonical keeps config.SAMPLE_KW")
     parser.add_argument("--sampler", default="nutpie",
                         choices=["pymc", "nutpie", "numpyro"],
                         help="NUTS backend (default nutpie: Rust, ~2-3x faster on CPU)")
@@ -770,9 +784,10 @@ def main():
     parser.add_argument("--lineage-bm", action="store_true",
                         help="[exploration] with --lineage-prior: index the chain by "
                              "TIME — each step's mean and variance scale with the "
-                             "release gap in years (Brownian motion with drift), and "
-                             "each vendor chain gets its own rate, pooled toward a "
-                             "per-axis population rate.")
+                             "release gap in years (Brownian motion with drift), "
+                             "under one shared per-axis drift rate. (A per-vendor "
+                             "pooled rate was fitted 2026-07-27 and removed: one "
+                             "release per year per vendor cannot pin a rate.)")
     parser.add_argument("--time-prior", action="store_true",
                         help="[exploration] add a learned per-axis linear trend in "
                              "release year to the theta prior MEAN, so thinly-"
@@ -784,13 +799,13 @@ def main():
     parser.add_argument("--theta-t", action="store_true",
                         help="[exploration] cell-wise leptokurtic theta: give each "
                              "(model, axis) cell of the exchangeable block a "
-                             "Student-t(4) marginal via a per-cell scale mixture "
-                             "instead of a Gaussian one. The Gaussian block is "
-                             "spherical and leaves the rotation orbit exactly flat; "
-                             "independent heavy-tailed columns are the ICA "
-                             "identification channel, so the likelihood can prefer "
-                             "one orientation. Costs one extra latent per cell, and "
-                             "widens the abilities of thinly-measured models")
+                             "Student-t(4) marginal (direct closed-form density, "
+                             "no extra latents) instead of a Gaussian one. The "
+                             "Gaussian block is spherical and leaves the rotation "
+                             "orbit exactly flat; independent heavy-tailed columns "
+                             "are the ICA identification channel, so the likelihood "
+                             "can prefer one orientation. Widens the abilities of "
+                             "thinly-measured models")
     parser.add_argument("--theta-pos", action="store_true",
                         help="[exploration] positive likelihood-side ability, the "
                              "semi-compensatory convention: eta reads "
@@ -808,7 +823,7 @@ def main():
     parser.add_argument("--cyber", action="store_true",
                         help="[exploration] append the unsaturated benchmarks of "
                              "Epoch's separate cyber ECI (1_data/curated/cyber_benchmarks.csv; "
-                             "regenerate with `python -m diagnostics.fetch_cyber_eci`). "
+                             "regenerate with `python 3_diagnostics/fetch_cyber_eci.py`). "
                              "Adds frontier coverage the pipeline feeds do not carry")
     parser.add_argument("--simpleqa-original", action="store_true",
                         help="[exploration] append the original OpenAI SimpleQA "
@@ -859,7 +874,7 @@ def main():
                         help="[exploration] re-fit the K=1 baseline even if cached")
     parser.add_argument("--plots", action="store_true",
                         help="[exploration] render figures in-process via "
-                             "diagnostics.plot_mirt.plot_fit")
+                             "3_diagnostics/3_plot_mirt.py")
     args = parser.parse_args()
 
     if args.preset == "canonical":

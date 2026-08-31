@@ -13,7 +13,7 @@ published plots, a weaker provenance than the ZIP feeds. The file records no
 fetch date, so staleness against a refreshed processed table is not detectable
 from the file alone.
 
-Usage:  python -m diagnostics.fetch_cyber_eci [--out PATH] [--dry-run]
+Usage:  python 3_diagnostics/fetch_cyber_eci.py [--out PATH] [--dry-run]
 """
 from __future__ import annotations
 

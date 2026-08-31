@@ -269,12 +269,32 @@ def total_logp(model) -> float:
     return float(model.compile_logp()(model.initial_point()))
 
 
+def perturbed_logp(model, eps: float = 0.1) -> float:
+    """Total logp at (initial point + eps) on every transformed coordinate.
+
+    The default initial point zeroes theta, so a configuration whose only
+    difference routes through A·theta — the anchor mask, the Brownian lineage
+    deltas — collapses onto its twin there and its golden locks nothing. One
+    deterministic step away from the origin makes those terms visible while
+    staying exact for a golden."""
+    ip = {k: v + eps for k, v in model.initial_point().items()}
+    return float(model.compile_logp()(ip))
+
+
 class TestGoldenLogp:
     """Initial-point total logp per configuration, pinned on the current data.
 
     The initial point is deterministic (transformed-space zeros), so these
     values are exact up to floating-point noise. rtol=1e-6 ≈ 0.06 on the
     ~6e4 magnitudes here — tight enough to catch any real math change.
+
+    Two exceptions evaluate at the PERTURBED point instead (initial + 0.1 on
+    every transformed coordinate, `perturbed_logp`): `anchored` and
+    `signed_bm_full_options`. At the origin theta = 0 (and signed A = 0), so
+    the anchor mask and the Brownian dt-scaling never reached the logp and
+    those two goldens equalled their twins exactly — zero detection power,
+    found in the 2026-08-31 pre-publication review. A data refresh re-pins
+    them like the rest, at their perturbed point.
 
     Pinned on the 2026-07-30 data state (4,567 obs / 762 models / 99 benchmarks
     on the full set). A legitimate data refresh moves every value here:
@@ -341,13 +361,18 @@ class TestGoldenLogp:
             total_logp(model), -164610.744003, rtol=self.RTOL)
 
     def test_mirt_k3_signed_bm_full_options(self, data):
+        # Pinned at the PERTURBED point (2026-08-31): at the default initial
+        # point signed A = 0 hides the Brownian drift*dt deltas and this golden
+        # equalled its iid-lineage twin exactly (-76750.248574 both), locking
+        # nothing. At +0.1 the BM re-indexing reaches eta and the two separate
+        # by ~550 nats: the iid twin evaluates to -62459.872215 here.
         bench = data.blookup["benchmark"].tolist()
         model = build_mirt_model(
             data, K=3, loading_prior="signed", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True,
             plt_founders=[bench[5], bench[10], bench[20]])
         np.testing.assert_allclose(
-            total_logp(model), -76750.248574, rtol=self.RTOL)
+            perturbed_logp(model), -61909.945334, rtol=self.RTOL)
 
     def test_mirt_k3_normal_time_prior(self, data):
         # Config lock only: at the initial point time_beta = 0, so the trend
@@ -468,12 +493,17 @@ class TestGoldenLogp:
             total_logp(model), -184060.334716, rtol=self.RTOL)
 
     def test_mirt_k3_anchored(self, data):
+        # Pinned at the PERTURBED point (2026-08-31): at the default initial
+        # point theta = 0 hides the anchor mask entirely and this golden
+        # equalled its no-anchor twin exactly (-76217.967914 both), locking
+        # nothing. At +0.1 the mask reaches eta and the two separate: the
+        # no-anchor twin evaluates to -63730.620890 here.
         bench = data.blookup["benchmark"].tolist()
         model = build_mirt_model(
             data, K=3, loading_prior="normal",
             anchors={bench[5]: 0, bench[10]: 1, bench[20]: 2})
         np.testing.assert_allclose(
-            total_logp(model), -76217.967914, rtol=self.RTOL)
+            perturbed_logp(model), -63727.987073, rtol=self.RTOL)
 
     def test_nc_k3_full(self, data_all):
         from multiaxis_eci.fits.fit_nc import build_qmatrix
@@ -549,6 +579,7 @@ class TestSparseBuilder:
             off = [k for k in range(3) if k != ax]
             assert np.all(g_draws[:, bi, off] == 0.0), f"{bname} off-axis gate leaked"
 
+    @pytest.mark.slow
     def test_tiny_sample_runs(self, data):
         bench = data.blookup["benchmark"].tolist()
         with build_mirt_sparse_model(
@@ -833,6 +864,7 @@ class TestStreamedDraws:
     a killed run keeps its finished prefix. Toy model — the mechanism is the
     sampler's, not the MIRT's."""
 
+    @pytest.mark.slow
     def test_partial_store_reads_back_and_saves(self, tmp_path):
         from nutpie import zarr_store
 
@@ -849,7 +881,7 @@ class TestStreamedDraws:
                     "save_warmup": False,
                     "zarr_store": zarr_store.LocalStore(str(store), mkdir=True)})
         # The store IGNORES save_warmup and hands the warmup back too — the RAM
-        # that OOM-killed two finished runs, so fit.py drops it and so does the
+        # that OOM-killed two finished runs, so 2_fit.py drops it and so does the
         # reader.
         assert "warmup_posterior" in idata.groups()
         np.testing.assert_allclose(load_live_draws(store).posterior.x.values,
@@ -934,6 +966,7 @@ class TestInteractionBuilder:
         fi = bench.index(founders[1])
         assert np.all(gamma[:, fi, 1:] == 0.0)
 
+    @pytest.mark.slow
     def test_tiny_sample_runs(self, data):
         bench = data.blookup["benchmark"].tolist()
         with build_mirt_interaction_model(

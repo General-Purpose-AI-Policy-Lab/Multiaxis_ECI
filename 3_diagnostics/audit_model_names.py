@@ -362,7 +362,12 @@ def check_sibling_dominance(min_shared=2):
         for w in CUTDOWN_WORDS:
             if w not in tokens(child):
                 continue
-            parent_norm = cn.replace(w, "")
+            # Remove the tier word at token boundaries only: a bare
+            # cn.replace(w, "") also eats the "mini" inside "gemini" (or the
+            # "air" inside "airline"), so the parent never matches and the
+            # whole family silently escapes check 7.
+            parent_norm = norm(re.sub(rf"(?<![a-z0-9]){w}(?![a-z0-9])", "",
+                                      str(child).lower()))
             for parent in bases:
                 if parent == child or norm(parent) != parent_norm:
                     continue

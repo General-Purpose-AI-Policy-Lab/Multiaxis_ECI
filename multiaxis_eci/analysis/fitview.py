@@ -23,9 +23,13 @@ class FitView:
     the rotation/identity decision.
 
     Always present: `theta` (S, M, K) abilities; `Phi` (K, K) axis correlation to
-    DISPLAY; `Phi_raw` (K, K) the raw ability correlation (for a signed fit, the
-    per-draw alignment's promax factor correlation); `names`, `K`, and the family
-    flags. Family-specific fields are None when they don't apply:
+    DISPLAY (for a signed fit, the per-draw alignment's promax factor
+    correlation — an oblique quantity, and figures must label it as such);
+    `Phi_raw` (K, K) the plain correlation of the (aligned) ability point
+    estimates; `names`, `K`, and the family flags. `rotated` records whether a
+    post-hoc rotation was applied ON TOP of the trace — always False now (the
+    per-draw alignment owns the signed family's identification).
+    Family-specific fields are None when they don't apply:
       * `A`   — (S, B, K) loadings. None for non-comp (slope fixed = 1).
       * `tau` — (S, K) per-axis scale (tau_A). None for non-comp.
 
@@ -44,6 +48,12 @@ class FitView:
     rotated: bool
     A: np.ndarray | None = None
     tau: np.ndarray | None = None
+    # True exactly when `Phi` is the signed alignment's promax factor
+    # correlation (an oblique quantity) rather than a plain ability
+    # correlation. Set at the one place the substitution happens, so figure
+    # and table builders read this instead of re-deriving the predicate from
+    # the loading prior (and getting it subtly different, per site).
+    phi_is_promax: bool = False
 
     def require_A(self) -> np.ndarray:
         if self.A is None:
@@ -91,16 +101,19 @@ def prepare_fit(idata, data: ECIData) -> FitView:
         A, theta = signed_res.A, signed_res.theta
     names = trace_axis_names(idata, K)
     Phi_raw = np.corrcoef(theta.mean(0).T) if K > 1 else np.array([[1.0]])
-    if signed_res is not None and signed_res.Phi is not None:
-        Phi_raw = signed_res.Phi        # promax factor correlation
     # No post-hoc rotation, ever. Anchors, the per-draw signed alignment and
     # K == 1 each identify the axes outright; the bifactor prior's dense-g /
     # sparse-specifics asymmetry fixes the orientation (rotating would mix g
     # back into the specifics); and for a non-negative loading prior the
     # positivity constraint itself pins the rotation. So the raw rank-tracked
-    # axes ARE the frame, and Phi is the raw ability correlation (or, for a
-    # signed fit, the alignment's own promax factor correlation).
-    Phi, rotated = Phi_raw, False
+    # axes ARE the frame, and Phi is the raw ability correlation — except for
+    # a signed fit, where the DISPLAY Phi is the alignment's own promax factor
+    # correlation (oblique) while Phi_raw keeps the plain ability correlation,
+    # so a figure can show both instead of conflating them (the K=2
+    # "0.71 promax vs 0.05 raw" trap).
+    Phi, rotated, phi_is_promax = Phi_raw, False, False
+    if signed_res is not None and signed_res.Phi is not None:
+        Phi, phi_is_promax = signed_res.Phi, True
     return FitView(theta=theta, Phi=Phi, Phi_raw=Phi_raw, names=names, K=K,
                    is_nc=False, anchored=anchored, rotated=rotated,
-                   A=A, tau=tau)
+                   A=A, tau=tau, phi_is_promax=phi_is_promax)

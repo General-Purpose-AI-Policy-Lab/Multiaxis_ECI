@@ -30,7 +30,7 @@ def build_gof_figures(scores, y_pred_mean, yrep, pit, hover, bench_of_obs,
                       residual_mask=None, include_ecdf: bool = False,
                       model_of_obs=None, eta_of_obs=None,
                       floor=None, ceiling=None) -> dict:
-    """Shared goodness-of-fit figure set — the core figures fit.py, `plot_mirt`
+    """Shared goodness-of-fit figure set — the core figures 2_fit.py, `plot_mirt`
     and the dashboard all read from here.
 
     `bench_of_obs` is the benchmark name for each observation; `residual_mask`
@@ -299,8 +299,11 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     figs.update(load_figs)          # held back above — legacy page position
 
     if K >= 2:
+        # A signed fit's display Phi is the promax factor correlation, an
+        # oblique quantity: title it as such and annotate the raw ability
+        # correlation, instead of presenting promax under "(ability)".
         figs["factor_correlations"] = factor_corr_fig(
-            view.Phi, names, rotated=view.rotated, Phi_raw=view.Phi_raw)
+            view.Phi, names, rotated=view.phi_is_promax, Phi_raw=view.Phi_raw)
 
     if view.is_nc:
         Q = idata.constant_data["Q"].values
@@ -395,6 +398,10 @@ def build_comparison(results: list):
         figs["cmp_pareto_k"] = cmp_pareto_k_fig(loo_results)
         df = gof_table.merge(loo_table[["name", "loo_elpd"]], left_on="fit",
                              right_on="name", how="left")
+        # Same modal-obs restriction as the ΔELPD figure above: the trust
+        # chart's first panel is `loo_elpd - max`, an ELPD-sum comparison,
+        # invalid across fits trained on different observation counts.
+        df = df[df["name"].isin({r["name"] for r in loo_cmp})]
         # min/median ESS on the identified eta, plotted against the kept-draw
         # count: cards keep different numbers of draws, so the draw ceiling is
         # what makes an absolute ESS readable.

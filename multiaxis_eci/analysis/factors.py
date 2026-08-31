@@ -12,7 +12,7 @@ from multiaxis_eci.analysis.rotation import canonicalize_factors
 def trace_anchors(trace) -> dict:
     """Anchor map stored on a MIRT trace, or {} if the fit was unanchored.
 
-    fit.py writes the anchor dict (benchmark -> axis index) to
+    2_fit.py writes the anchor dict (benchmark -> axis index) to
     `trace.posterior.attrs["mirt_anchors"]` as JSON at save time (Option C:
     the metadata travels with the trace, so post-processing knows whether the
     axes are pre-identified without the caller having to remember a flag)."""

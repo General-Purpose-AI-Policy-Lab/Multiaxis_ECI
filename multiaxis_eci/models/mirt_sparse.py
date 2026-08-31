@@ -87,7 +87,7 @@ def build_mirt_sparse_model(data: ECIData, anchors: dict, K: int = 3,
         Fitted dataset (scores, model_idx, bench_idx, lookups).
     anchors : dict[str, int]
         Pure-anchor identity block, benchmark name -> axis index; must pin each
-        axis 0..K-1 exactly once (e.g. {"ARC-AGI-2": 0, "GSM8K": 1,
+        axis 0..K-1 exactly once (e.g. {"ARC-AGI-2": 0, "MMLU": 1,
         "OS World (Screenshot)": 2}).
     K : int
         Number of skill axes (default 3).

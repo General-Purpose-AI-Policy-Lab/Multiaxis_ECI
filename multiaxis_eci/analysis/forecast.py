@@ -222,7 +222,7 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
         if not data.is_human[i]:
             continue
         th = theta_draws[:, i, k]                          # (S,)
-        h_mean, h_lo, h_hi = post_stats(th, hdi_prob=0.5)
+        h_mean, h_lo, h_hi = post_stats(th, hdi_prob=hdi_prob)
         p_now = float((f_now > th).mean())
         pos = fc.slope > 0
         frac_pos = float(pos.mean())

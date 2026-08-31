@@ -160,14 +160,15 @@ class TestData:
             assert b not in present, f"excluded benchmark {b} still in dataset"
         assert {"ARC-AGI", "HellaSwag"}.issubset(data.excluded_benchmarks)
 
-    def test_exclusion_total_losses_are_not_silent(self):
+    def test_exclusion_total_losses_are_not_silent(self, capsys):
         """A model — or worse, a human tier — whose every observation sits on
-        excluded benchmarks leaves the canonical fit entirely. That loss must
-        be announced: a warning for lost human tiers, a printed line for lost
-        models. On current data the Committee of Skilled Generalists (only
-        baseline: the excluded PIQA) is the live example."""
-        with pytest.warns(UserWarning, match="human tier"):
-            d = load_eci_data()
+        excluded benchmarks leaves the canonical fit entirely. The tier drop
+        is automatic and expected under the canonical scope, but it must be
+        announced (a printed scope line, like the model drops). On current
+        data the Committee of Skilled Generalists (only baseline: the
+        excluded PIQA) is the live example."""
+        d = load_eci_data()
+        assert "human tiers:" in capsys.readouterr().out
         d_all = load_eci_data(include_all_benchmarks=True)
         # The full-scope fit keeps every model the canonical scope loses.
         assert d_all.n_models > d.n_models
@@ -659,7 +660,8 @@ class TestPPC:
 
 
 class TestFloors:
-    # Floors/clips are exploration-only (opt-in --floors), which fits the full
+    # Floors/clips are exploration-side (on by default there; --no-floors opts
+    # out), and exploration fits the full
     # benchmark set. Exercise them on data_all (include_all_benchmarks=True) so
     # the test mirrors that scope: on the canonical scope the curated-excluded
     # benchmarks (OpenBookQA/VPCT/SimpleBench) drop out and their clip rows read
@@ -1122,6 +1124,7 @@ class TestMIRT:
             build_mirt_model(data, K=3, loading_prior="signed",
                              plt_founders=[bl[0], bl[1], "NotARealBenchmark"])
 
+    @pytest.mark.slow
     def test_signed_tiny_sample_runs(self, data):
         """The signed model compiles and NUTS runs (finite logp everywhere)."""
         with build_mirt_model(data, K=2, loading_prior="signed"):
@@ -1168,6 +1171,25 @@ class TestMIRT:
         A2, th2, tau2 = canonicalize_factors(A, th, tau)
         assert np.allclose(tau2, np.tile([0.9, 0.5, 0.2], (S, 1)))
         assert np.allclose(_eta(A2, th2), _eta(A, th))    # relabel preserves fit
+
+    def test_rank_track_sorts_each_draw_independently(self):
+        """The sort key VARIES across draws here, so a regression from the
+        per-draw argsort to one global permutation (which the constant-key
+        fixtures above cannot distinguish) fails this test. This is the
+        identification path the flagship (normal-prior, rank-tracked) fit
+        rides, so it gets its own lock."""
+        rng = np.random.default_rng(7)
+        S, B, M, K = 6, 4, 5, 3
+        A = np.abs(rng.normal(size=(S, B, K)))
+        th = rng.normal(size=(S, M, K))
+        tau = np.abs(rng.normal(size=(S, K))) + 0.1        # distinct order per draw
+        A2, th2, tau2 = canonicalize_factors(A, th, tau)
+        assert np.allclose(_eta(A2, th2), _eta(A, th))
+        for s in range(S):                                 # each draw on its own
+            order = np.argsort(-tau[s])
+            assert np.array_equal(tau2[s], tau[s][order])
+            assert np.array_equal(A2[s], A[s][:, order])
+            assert np.array_equal(th2[s], th[s][:, order])
 
     def test_rank_track_false_is_identity(self):
         rng = np.random.default_rng(0)
@@ -2124,9 +2146,9 @@ class TestFitSpec:
                 / "trace_mirt_k3_lineagehard_floors.nc")
 
     def test_attrless_baseline_takes_folder_data_scope(self):
-        # fit.py's K=1 baseline carries no attrs and no tag in its filename. It
+        # 2_fit.py's K=1 baseline used to carry no attrs and no tag in its filename. It
         # keeps the folder's DATA scope and gets the model-side flags from
-        # fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
+        # 2_fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
         # and the pooled noise not).
         idata = self._idata(K=1)
         p = (PROJECT_ROOT / "results"
@@ -2136,20 +2158,24 @@ class TestFitSpec:
         assert spec.K == 1
         assert (spec.cyber, spec.floors, spec.known_se) == (True, True, True)
         assert not (spec.human_prior or spec.lineage_prior or spec.pooled_noise)
-        assert spec.tag == "_cyber_knownse"          # floors emits no token
+        # floors ON emits no token; the baseline is fit pooled_noise=False
+        # (2_fit.py's baseline rule), which the tag now names. Harmless for
+        # folders: a baseline lives untagged in its K-fit's folder.
+        assert spec.tag == "_cyber_knownse_unpooled"
 
     # `tag` writes the tokens and `_parse_tag` reads them from a second list, so
     # every flag has to survive the round trip or a folder tag silently loads the
     # wrong data scope. One case per boolean flag set AWAY from its default, and
     # one per loading prior; the dependent flag brings its prerequisite with it.
-    # pooled_noise and floors are excluded: both default on and the tag carries
-    # no token for either, so the folder cannot express them. Their legacy tokens
-    # are covered by test_legacy_poolednoise_token_still_parses and
+    # floors and pooled_noise default ON with no token; their opt-outs emit
+    # `_nofloors` / `_unpooled` so a sensitivity run cannot overwrite the default
+    # config's folder. Their legacy ON tokens are covered by
+    # test_legacy_poolednoise_token_still_parses and
     # test_legacy_floors_token_still_parses.
     @pytest.mark.parametrize("kwargs", [
         pytest.param({f.name: not f.default}, id=f.name)
         for f in dataclasses.fields(analysis.FitSpec)
-        if isinstance(f.default, bool) and f.name not in ("pooled_noise", "floors")
+        if isinstance(f.default, bool)
     ] + [
         pytest.param({"loading_prior": p}, id=f"prior_{p}")
         for p in ("normal", "signed", "signedhs", "pt1", "bifactor")
@@ -2160,10 +2186,11 @@ class TestFitSpec:
         for f in list(kwargs):
             kwargs.update(prereq.get(f, {}))
         spec = analysis.FitSpec(K=2, **kwargs)
-        # `tag` never emits `_floors`, so a parsed spec always reads floors OFF
-        # (the legacy meaning of an absent token). Every other flag must survive.
-        assert analysis.FitSpec(K=2, **_parse_tag(spec.tag)) == dataclasses.replace(
-            spec, floors=False)
+        # floors ON emits no token and an absent token parses as OFF (the legacy
+        # meaning, kept for three attr-less traces on disk); floors OFF emits
+        # `_nofloors` and round-trips exactly. Every other flag must survive.
+        expected = spec if not spec.floors else dataclasses.replace(spec, floors=False)
+        assert analysis.FitSpec(K=2, **_parse_tag(spec.tag)) == expected
 
     def test_legacy_floors_token_still_parses(self):
         # `tag` stopped emitting `_floors` once floors became the default, but
@@ -2195,6 +2222,32 @@ class TestFitSpec:
         from multiaxis_eci.analysis.fitspec import _parse_tag
         assert _parse_tag("_floors_poolednoise") == {
             "loading_prior": "normal", "floors": True, "pooled_noise": True}
+
+    def test_legacy_unpooled_trace_in_tokenless_folder_resolves(self):
+        # A --no-pooled-noise fit from before the `_unpooled` token: its attrs
+        # say pooled_noise=False but its folder carries nothing. The recovered
+        # spec's own tag now emits `_unpooled`, so the round-trip guard must
+        # compare pooled_noise loosely (same treatment as floors) or every such
+        # legacy trace becomes unreadable.
+        legacy = analysis.FitSpec(K=3, human_prior=True, floors=True,
+                                  pooled_noise=False)
+        idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(legacy)})
+        p = (PROJECT_ROOT / "results" / "mirt_humanprior_floors"
+             / "trace_mirt_k3_humanprior_floors.nc")
+        assert analysis.FitSpec.from_trace(idata, p) == legacy
+
+    def test_optout_flags_get_their_own_folder(self):
+        # --no-floors / --no-pooled-noise are sensitivity runs; without their own
+        # tokens they would silently overwrite the default config's trace and
+        # CSVs (same results_dir), and reuse its cached K=1 baseline.
+        from multiaxis_eci.analysis.fitspec import _parse_tag
+        base = analysis.FitSpec(K=2)
+        nofl = dataclasses.replace(base, floors=False)
+        unpl = dataclasses.replace(base, pooled_noise=False)
+        assert nofl.tag == "_nofloors" and unpl.tag == "_unpooled"
+        assert len({base.results_dir, nofl.results_dir, unpl.results_dir}) == 3
+        assert _parse_tag("_nofloors")["floors"] is False
+        assert _parse_tag("_unpooled")["pooled_noise"] is False
 
     def test_legacy_flagship_trace_name_resolves(self):
         # The on-disk flagship trace predates both the retirement list and the
@@ -2318,9 +2371,29 @@ class TestLayoutPaths:
 
     @classmethod
     def _files(cls, suffixes):
-        return [p for p in PROJECT_ROOT.rglob("*")
+        # git-visible files only, when git is available: tracked plus
+        # untracked-but-not-ignored (--others --exclude-standard), so a new
+        # file is scanned BEFORE it is staged, while a maintainer's gitignored
+        # local dirs (lw_post/, memo/, evals/*/out/) cannot raise false alarms
+        # a fresh cloner can never reproduce. Falls back to the rglob sweep
+        # when the tree is not a git checkout (a tarball download) — including
+        # when git succeeds but sees nothing, which happens when the tarball
+        # sits inside some ENCLOSING repo (a dotfiles repo over $HOME): exit 0,
+        # zero rows, and the locks would pass vacuously.
+        import subprocess
+        try:
+            listed = subprocess.run(
+                ["git", "ls-files", "-z", "--cached", "--others",
+                 "--exclude-standard"], cwd=PROJECT_ROOT, capture_output=True,
+                check=True, text=True).stdout.split("\0")
+            paths = [PROJECT_ROOT / t for t in listed if t]
+        except (OSError, subprocess.CalledProcessError):
+            paths = []
+        if not paths:
+            paths = [p for p in PROJECT_ROOT.rglob("*")
+                     if not cls._SKIP_PARTS & set(p.parts)]
+        return [p for p in paths
                 if p.is_file() and p.suffix in suffixes
-                and not cls._SKIP_PARTS & set(p.parts)
                 and p.resolve() != cls._SELF]
 
     def test_no_prerename_path_literals(self):

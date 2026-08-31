@@ -93,6 +93,8 @@ def main():
     flagships = []
     for chain, g in lm.groupby("chain"):
         latest = g[g["date"] == g["date"].max()]
+        if latest.empty:                        # every in-data node undated
+            continue                            # (NaT max matches nothing)
         if latest["date"].iloc[0] < cutoff:     # skip dead chains
             continue
         best = max(latest["raw_string"], key=lambda s: c_of[s])   # top variant

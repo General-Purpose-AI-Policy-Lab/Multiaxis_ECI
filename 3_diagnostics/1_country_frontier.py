@@ -1,7 +1,7 @@
 """US vs China frontier on a K=1 canonical trace: per-country record-setters,
 per-draw OLS trends, gap/lag/crossovers in ECI. See CALC 1-3 in main().
 
-Country map: 1_data/curated/model_country.csv. Scope flags mirror fit.py's
+Country map: 1_data/curated/model_country.csv. Scope flags mirror 2_fit.py's
 --open-only / --closed-only. Both selection variants (informed-only and
 SOTA-admitted) land in the CSV; figures show informed-only.
 
@@ -49,7 +49,7 @@ class _MiniData:
 
 
 def load_scope(scope: str):
-    """Rebuild the data for scope 'all'/'open'/'closed' (drop lists from fit.py)."""
+    """Rebuild the data for scope 'all'/'open'/'closed' (drop lists from 2_fit.py)."""
     drop = (None if scope == "all"
             else open_only_drop_list(include_all_benchmarks=False,
                                      keep_open=(scope == "open")))

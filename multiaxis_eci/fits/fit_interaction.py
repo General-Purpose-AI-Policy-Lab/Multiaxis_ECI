@@ -6,7 +6,7 @@ axis): ARC-AGI-2 -> reasoning, MMLU -> knowledge, OS World (Screenshot) -> agent
 --loading-prior normal switches to non-negative HalfNormal loadings with no
 founders (non-negativity pins the frame). --floors applies the fixed-c 3PL link
 (chance floors from 1_data/curated/benchmark_lower_bounds.csv, scores clipped up to
-the floor), as in fit.py --floors. Each benchmark gets a per-pair interaction
+the floor), as 2_fit.py does under its default-on floors. Each benchmark gets a per-pair interaction
 coefficient gamma (DeMars a_3), non-negative and acting on softplus abilities:
 gamma > 0 means the item rewards having BOTH abilities ("needs both" /
 conjunctive), gamma = 0 is compensatory.
@@ -42,7 +42,7 @@ import pymc as pm
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from multiaxis_eci.analysis import factor_scores_df, mirt_identified_rhat_interaction  # noqa: E402
+from multiaxis_eci.analysis import convergence, factor_scores_df, mirt_identified_rhat_interaction  # noqa: E402
 from multiaxis_eci.config import HUMAN_ORDER, SAMPLE_KW, SG_MODEL_NAME  # noqa: E402
 from multiaxis_eci.data import (  # noqa: E402
     clip_scores_to_floors, drop_model_benchmark_cells, drop_model_observations,
@@ -60,15 +60,6 @@ AXES = ["Reasoning", "Knowledge", "Agentic"]
 PLT_FOUNDERS = ["ARC-AGI-2", "MMLU", "OS World (Screenshot)"]   # one per axis, in order
 
 
-def convergence(idata):
-    """Global max r-hat / min ESS / divergences (nan-safe for masked entries)."""
-    rh = az.rhat(idata)
-    ess = az.ess(idata)
-    max_rhat = float(np.nanmax([np.nanmax(v.values) for v in rh.data_vars.values()]))
-    min_ess = float(np.nanmin([np.nanmin(v.values) for v in ess.data_vars.values()]))
-    div = int(idata.sample_stats["diverging"].sum()) if "diverging" in idata.sample_stats else -1
-    n_draws = int(idata.posterior.sizes["chain"] * idata.posterior.sizes["draw"])
-    return {"max_rhat": max_rhat, "min_ess": min_ess, "divergences": div, "n_draws": n_draws}
 
 
 def prior_median(interaction_scale):

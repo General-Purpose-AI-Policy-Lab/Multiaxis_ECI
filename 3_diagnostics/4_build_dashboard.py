@@ -439,7 +439,11 @@ def render_fit(fit, data, raw, bench, mod):
     else:
         axis_repro = crosschain_axis_reproducibility(idata)
     free_load = int((np.abs(np.median(view.A, axis=0)) > 1e-9).sum()) if view.A is not None else 0
-    max_phi = (round(float(np.abs(view.Phi_raw[np.triu_indices(view.K, 1)]).max()), 3)
+    # view.Phi, not Phi_raw: the DISPLAY correlation (promax for signed fits),
+    # matching what every already-cached card recorded — Phi_raw is now the
+    # plain aligned-ability correlation and would flip a signed card's number
+    # (the 0.71-promax vs 0.05-raw gap) between cached and fresh renders.
+    max_phi = (round(float(np.abs(view.Phi[np.triu_indices(view.K, 1)]).max()), 3)
                if view.K > 1 else "—")
     loo, min_ess, tau = _loo_min_ess_tau(idata)
     if lp == "signed" and view.A is not None and view.K > 1:
@@ -500,11 +504,15 @@ def _validate_fits(fits=None):
     """Refuse a malformed registry before any trace is opened.
 
     A render costs minutes per card and `index.html` is written only at the end,
-    so a missing key found mid-loop discards the whole build. A card with
-    neither a trace nor a cache can never appear, and an unknown `type` reaches
-    the CSVs but not the HTML: both are errors here, not silent skips.
+    so a missing key found mid-loop discards the whole build. An unknown `type`
+    reaches the CSVs but not the HTML: an error here, not a silent skip.
+
+    A card with neither a trace nor a cache is a WARNING, not an error: the
+    render loop skips such cards loudly, a fresh clone has no traces at all
+    (they are gitignored; the tracked `index.html` is the published artifact),
+    and the no-card-rendered case still exits non-zero at the end of the build.
     """
-    problems, seen = [], set()
+    problems, unrenderable, seen = [], [], set()
     for i, fit in enumerate(fits if fits is not None else all_fits()):
         # Index within the registry the entry came from, so the message points
         # at the right list.
@@ -524,10 +532,15 @@ def _validate_fits(fits=None):
         seen.add(name)
         if "spec" in fit and "name" in fit:
             if not _trace_path(fit).exists() and not (CACHE_DIR / f"{name}.pkl").exists():
-                problems.append(f"{where}: no trace at {_trace_path(fit)} and no "
-                                f"cached card — check the spec's flags")
+                unrenderable.append(f"{where}: no trace at {_trace_path(fit)} "
+                                    f"and no cached card")
     if problems:
         sys.exit("registry errors:\n  " + "\n  ".join(problems))
+    if unrenderable:
+        print("registry warning — these cards will be skipped (no trace, no "
+              "render cache; expected on a fresh clone, where the tracked "
+              "index.html is the published artifact):\n  "
+              + "\n  ".join(unrenderable), flush=True)
 
 
 def _list_fits(fits=None):
@@ -697,7 +710,7 @@ def main():
                 continue
         else:
             print(f"rendering {fit['label']} ({fit['type']}) …", flush=True)
-            # Floors are already clipped: the spec's load_data mirrors fit.py.
+            # Floors are already clipped: the spec's load_data mirrors 2_fit.py.
             figures, r = render_fit(fit, data, raw, bench, mod)
             _cache_save(fit["name"], figures, r, fp)
         # Comparison charts key on r["fit"]/r["name"]: use the SHORT label there
@@ -739,16 +752,23 @@ def main():
                 "chains": f"{e['chains_kept']}/{e['chains_total']}",
                 "draws": e["chains_kept"] * e["draws_per_chain"],
                 "R2": r["R2"], "RMSE": r["RMSE"],
-                "elpd_loo": round(r["loo_elpd"], 1),
-                "loo_se": round(r["loo_se"], 1),
+                # LOO columns exist only when the trace carries a
+                # log_likelihood group (a crash-checkpoint or --add'ed legacy
+                # trace does not); None renders as a blank cell instead of a
+                # KeyError killing the build after every render.
+                "elpd_loo": (round(r["loo_elpd"], 1)
+                             if r.get("loo_elpd") is not None else None),
+                "loo_se": (round(r["loo_se"], 1)
+                           if r.get("loo_se") is not None else None),
                 "eta_rhat": r["eta_rhat"],
                 "ess_min": int(round(e["eta_ess_min"])),
                 "ess_med": int(round(e["eta_ess_med"])),
                 "divergences": r["divergences"],
                 # LOO reliability travels with the ELPD it qualifies: share of
                 # observations whose importance weights failed the k<0.7 check.
-                "khat_gt_0.7": round(
-                    (r["pareto_k_bad"] + r["pareto_k_very_bad"]) / r["n_obs"], 3),
+                "khat_gt_0.7": (round(
+                    (r["pareto_k_bad"] + r["pareto_k_very_bad"]) / r["n_obs"], 3)
+                    if r.get("n_obs") else None),
             })
 
     # Every registry entry skipped: a stale registry or a missing results tree,

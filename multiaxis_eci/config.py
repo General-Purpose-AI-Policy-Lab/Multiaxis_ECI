@@ -345,5 +345,5 @@ DENSITY_SEED  = 1
 
 # ── Raw-C mode ─────────────────────────────────────────────────────────────
 # When True, ECI = C (identity affine — no anchor rescaling). Set via the
-# --raw-c CLI flag in fit.py. Default False keeps the affine anchor transform.
+# --raw-c CLI flag in 2_fit.py. Default False keeps the affine anchor transform.
 RAW_C_MODE = False

@@ -1,6 +1,6 @@
 """Fit the NON-COMPENSATORY (conjunctive) Beta-MIRT and write its artefacts.
 
-Companion to the root fit.py (compensatory). Same data, same Beta
+Companion to the root 2_fit.py (compensatory). Same data, same Beta
 likelihood — the link is the conjunctive product (see models/mirt_nc.py). The
 axes are pinned by a category-seeded Q-MATRIX (organic per-category
 multi-loading), so there is NO rotation and NO permutation to undo: theta is
@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from multiaxis_eci.analysis import (  # noqa: E402
-    factor_scores_df, mirt_identified_rhat_nc, nc_difficulty_draws,
+    convergence, factor_scores_df, mirt_identified_rhat_nc, nc_difficulty_draws,
 )
 from multiaxis_eci.config import SAMPLE_KW  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
@@ -142,15 +142,6 @@ def build_qmatrix(data, K: int, variant: str = "full"):
     return Q, axes
 
 
-def convergence(idata) -> dict:
-    """Global max r-hat / min ESS / divergences (nan-safe for masked entries)."""
-    rh = az.rhat(idata)
-    ess = az.ess(idata)
-    max_rhat = float(np.nanmax([np.nanmax(v.values) for v in rh.data_vars.values()]))
-    min_ess  = float(np.nanmin([np.nanmin(v.values) for v in ess.data_vars.values()]))
-    div = int(idata.sample_stats["diverging"].sum()) if "diverging" in idata.sample_stats else -1
-    n_draws = int(idata.posterior.sizes["chain"] * idata.posterior.sizes["draw"])
-    return {"max_rhat": max_rhat, "min_ess": min_ess, "divergences": div, "n_draws": n_draws}
 
 
 def difficulty_table(trace, data, axes) -> pd.DataFrame:

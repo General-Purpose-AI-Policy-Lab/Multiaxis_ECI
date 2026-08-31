@@ -48,7 +48,8 @@ observed scores up to the floor so below-chance rows read as uninformative-low.
 `gamma_pooling` controls how many gammas are estimated:
 
 - "benchmark" (default): one gamma per (benchmark, axis-pair) — all pairs for
-  non-founders, the within-triangle pairs for founders — under a tight Normal prior.
+  non-founders, the within-triangle pairs for founders — under a tight
+  HalfNormal prior (non-negative by construction, which `p_above_prior` relies on).
   The richest form, but with a sparse response matrix most cells stay prior-dominated.
 - "pooled": ONE shared gamma per axis-pair (K*(K-1)/2 numbers), informed by every
   observation. Answers the identifiable stage-1 question — do benchmarks need both
@@ -119,7 +120,7 @@ def build_mirt_interaction_model(data: ECIData, plt_founders, K: int = 3,
         HalfNormal cells, no founders (see module docstring).
     floor_c : optional (n_benchmarks,) array
         Fixed per-benchmark chance floors -> fixed-c 3PL link. Pair with
-        data.clip_scores_to_floors in the driver, as in fit.py --floors.
+        data.clip_scores_to_floors in the driver, as 2_fit.py does under its default-on floors.
 
     Trace variables: `A` (loadings), `D` (difficulty), `gamma` (interaction,
     bench x pair — always present), `theta` (reported ability), `theta_pos`

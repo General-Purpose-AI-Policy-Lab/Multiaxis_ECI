@@ -1,14 +1,14 @@
 """Fit the sparse-gate non-compensatory Beta-MIRT and write its artefacts.
 
 Driver for models/mirt_sparse.py. Three pure anchors form an identity block
-(ARC-AGI-2 -> reasoning, GSM8K -> knowledge, OS World (Screenshot) -> agentic); a
+(ARC-AGI-2 -> reasoning, MMLU -> knowledge, OS World (Screenshot) -> agentic); a
 regularized ("Finnish") horseshoe estimates every other benchmark's per-axis
 gates. Discrimination is fixed a=1. --human-prior / --lineage-prior add the theta
 ordering priors.
 
 What it does:
   1. Load full-benchmark data (include_all_benchmarks=True), humans included.
-  2. Build the sparse-gate model with category-seeded gate initial values.
+  2. Build the sparse-gate model (anchored identity block + horseshoe gates).
   3. --prior-check: sample the prior predictive, report the score distribution, stop.
   4. Otherwise fit (nutpie), judge convergence on identified quantities
      (analysis.mirt_identified_rhat_sparse), run the PPC + GoF, and write factor
@@ -33,7 +33,7 @@ import pymc as pm
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from multiaxis_eci.analysis import factor_scores_df, mirt_identified_rhat_sparse  # noqa: E402
+from multiaxis_eci.analysis import convergence, factor_scores_df, mirt_identified_rhat_sparse  # noqa: E402
 from multiaxis_eci.config import HUMAN_ORDER, RH_TAU_SCALE, SAMPLE_KW, SG_MODEL_NAME  # noqa: E402
 from multiaxis_eci.data import (  # noqa: E402
     drop_model_benchmark_cells, drop_model_observations, load_eci_data)
@@ -54,15 +54,6 @@ ANCHORS = {"ARC-AGI-2": 0, "MMLU": 1, "OS World (Screenshot)": 2}
 GATE_SURVIVE = 0.2   # posterior-median gate above this counts as an active axis
 
 
-def convergence(idata):
-    """Global max r-hat / min ESS / divergences (nan-safe for masked entries)."""
-    rh = az.rhat(idata)
-    ess = az.ess(idata)
-    max_rhat = float(np.nanmax([np.nanmax(v.values) for v in rh.data_vars.values()]))
-    min_ess = float(np.nanmin([np.nanmin(v.values) for v in ess.data_vars.values()]))
-    div = int(idata.sample_stats["diverging"].sum()) if "diverging" in idata.sample_stats else -1
-    n_draws = int(idata.posterior.sizes["chain"] * idata.posterior.sizes["draw"])
-    return {"max_rhat": max_rhat, "min_ess": min_ess, "divergences": div, "n_draws": n_draws}
 
 
 def gate_table(idata, data, K):

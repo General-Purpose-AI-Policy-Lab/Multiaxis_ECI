@@ -6,7 +6,7 @@ module is the single owner of all four, so a folder name, a trace name and a
 plotted data set cannot drift apart.
 
 `from_trace` recovers the spec of an already-fitted trace. Three sources, in
-order: the `mirt_spec` JSON attr, which fit.py writes, the individual `mirt_*`
+order: the `mirt_spec` JSON attr, which 2_fit.py writes, the individual `mirt_*`
 attrs, and the tokens of the results-folder name for the flags no attr carries
 (`--apply-exclusions`, `--no-sg`, `--ceiling-noise`). A flag a tag cannot carry
 losslessly is REFUSED, not guessed: `_dropFrontierMathv1AlgoTune` cannot be
@@ -37,7 +37,7 @@ _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
 class FitSpec:
     """The flag set of one compensatory MIRT fit.
 
-    Field names match fit.py's CLI flags. Hashable, so a caller can memoize a
+    Field names match 2_fit.py's CLI flags. Hashable, so a caller can memoize a
     loaded data scope on the spec itself.
     """
     K: int
@@ -59,14 +59,15 @@ class FitSpec:
     # Fixed-c 3PL floors are the basic likelihood, not an option: a below-chance
     # score reads as uninformative-low ability instead of a point demand. The
     # floors come from file and add no parameters, so there is nothing to tune.
-    # The tag carries no token for it, the same as `pooled_noise`.
+    # The default (ON) carries no token; the opt-out emits `_nofloors`, so a
+    # sensitivity run gets its own folder instead of overwriting the default's.
     floors: bool = True
     ceiling_noise: bool = False
     known_se: bool = False
     # Hierarchical sigma_b is the basic noise model, not an option: thin
     # benchmarks shrink to the shared median instead of keeping a free scale
-    # the panel cannot pin. The tag carries no token for it, so a fit that
-    # turns it off is identified by its `mirt_spec` attr, not by its folder.
+    # the panel cannot pin. The default (ON) carries no token; the opt-out
+    # emits `_unpooled` for the same folder-separation reason as `floors`.
     pooled_noise: bool = True
 
     def __post_init__(self):
@@ -102,8 +103,10 @@ class FitSpec:
             tag += "_drop" + "".join(re.sub(r"\W", "", b)
                                      for b in self.drop_benchmarks)
         if self.private_bases: tag += "_privbase"
+        if not self.floors: tag += "_nofloors"
         if self.ceiling_noise: tag += "_ceilnoise"
         if self.known_se: tag += "_knownse"
+        if not self.pooled_noise: tag += "_unpooled"
         return tag
 
     @property
@@ -123,9 +126,10 @@ class FitSpec:
 
     @property
     def baseline_trace_path(self) -> Path:
-        """The K=1 baseline fit.py fits beside a K-axis fit. It carries no tag in
-        its filename and no attrs at all, so its spec is reconstructed from the
-        folder plus fit.py's baseline rule (see `_baseline_spec`)."""
+        """The K=1 baseline 2_fit.py fits beside a K-axis fit. It carries no tag
+        in its filename; current saves stamp its spec as the `mirt_spec` attr,
+        and an old attr-less baseline is reconstructed from the folder plus
+        2_fit.py's baseline rule (see `_baseline_spec`)."""
         return self.results_dir / "trace_mirt_k1.nc"
 
     @property
@@ -134,10 +138,17 @@ class FitSpec:
         return (HUMAN_ORDER_MERGED if self.human_merge
                 else HUMAN_ORDER if self.human_prior else None)
 
+    def baseline_spec(self) -> "FitSpec":
+        """The spec of the K=1 baseline 2_fit.py fits beside this fit: same data
+        scope, every model-side flag off (see `_BASELINE_OFF`). 2_fit.py stamps
+        this as the baseline trace's `mirt_spec` attr so the trace stays
+        self-describing — its folder tokens describe the K-axis fit, not it."""
+        return _baseline_spec(self)
+
     # ── construction ────────────────────────────────────────────────────────
     @classmethod
     def from_args(cls, args, parser=None) -> "FitSpec":
-        """Spec from fit.py's parsed exploration flags. `parser` turns a flag
+        """Spec from 2_fit.py's parsed exploration flags. `parser` turns a flag
         conflict into an argparse error instead of a traceback."""
         try:
             return cls(
@@ -189,6 +200,14 @@ class FitSpec:
             spec = FitSpec(**d)
         else:
             attr = _attr_flags(post)
+            if not any(k.startswith("mirt_") for k in post.attrs):
+                import warnings
+                warnings.warn(
+                    f"{trace_path.name}: trace carries no mirt_* attrs; spec "
+                    "recovered from the folder tokens alone. Under that legacy "
+                    "grammar an absent floors token reads floors OFF — wrong for "
+                    "a crash checkpoint or an old baseline of a floors-ON fit. "
+                    "Verify the recovered spec before trusting derived numbers.")
             tag = _folder_tag(trace_path)
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
                                    **attr})
@@ -202,7 +221,7 @@ class FitSpec:
     def load_data(self, idata=None):
         """The fit's data scope: `(data, floor_c, n_eff)`.
 
-        Same loads, drops, clips and prints fit.py runs before sampling, so a
+        Same loads, drops, clips and prints 2_fit.py runs before sampling, so a
         plot or a GoF number is scored on exactly the observations the trace saw.
         Pass `idata` to have the trace's own `model` / `bench` dims checked
         against it — a trace from an older data generation cannot be indexed
@@ -233,8 +252,9 @@ class FitSpec:
             floor_c = load_benchmark_floors(data)
             n_before = int((data.scores < floor_c[data.bench_idx]).sum())
             data = clip_scores_to_floors(data, floor_c)
-            print(f"  --floors: fixed-c 3PL; clipped {n_before} below-floor scores up "
-                  f"to their benchmark chance floor", flush=True)
+            print(f"  floors (default; --no-floors opts out): fixed-c 3PL; "
+                  f"clipped {n_before} below-floor scores up to their benchmark "
+                  f"chance floor", flush=True)
         if self.known_se:
             measured = np.isfinite(data.n_eff)
             print(f"  --known-se: {int(measured.sum())} of {data.n_obs} cells "
@@ -369,7 +389,7 @@ def _folder_tag(trace_path: Path) -> str:
 
 
 def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
-    """The flags a results-folder tag encodes, consumed in the order fit.py
+    """The flags a results-folder tag encodes, consumed in the order 2_fit.py
     writes them. Raises on a token this parser does not know, and on the two
     lossy `_drop` token when no attr supplied its value."""
     rest, out = tag, {}
@@ -413,27 +433,33 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["drop_benchmarks"] = tuple(drop_benchmarks)
     if take("_privbase"):
         out["private_bases"] = True
-    # `tag` no longer emits `_floors`, but folders written while it did must
-    # still parse, and there an ABSENT token means floors OFF: three attrless
-    # traces sit in such folders (mirt_humanprior, mirt_loglog) and were fit
-    # without floors, so falling through to the now-True default would score
-    # them against clipped data. The token is parsed because live traces carry
-    # it; a token zero traces carry (`_ceilings`) raises as unrecognized instead.
-    out["floors"] = take("_floors")
+    # Floors, three grammars. Current: ON is the untagged default, OFF emits
+    # `_nofloors`. Legacy: ON emitted `_floors`. Legacy-attrless: three traces
+    # (mirt_humanprior, mirt_loglog) sit in token-less folders and were fit
+    # WITHOUT floors, so an absent token still reads floors OFF here — a trace
+    # fit floors-ON under the current grammar carries the state in its
+    # `mirt_floor_c` / `mirt_spec` attrs, which override this. A token zero
+    # traces carry (`_ceilings`) raises as unrecognized instead.
+    if take("_nofloors"):
+        out["floors"] = False
+    else:
+        out["floors"] = take("_floors")
     for tok, fl in (("_ceilnoise", "ceiling_noise"), ("_knownse", "known_se")):
         if take(tok):
             out[fl] = True
-    # `tag` no longer emits this token; folders written while it did must still
-    # parse, and they name the value the default already holds.
+    # Legacy token: ON used to be tagged `_poolednoise`; it names the value the
+    # default already holds. The current grammar tags only the opt-out.
     if take("_poolednoise"):
         out["pooled_noise"] = True
+    if take("_unpooled"):
+        out["pooled_noise"] = False
     if rest:
         raise ValueError(f"unrecognized tag token {rest!r} in folder tag {tag!r} "
                          "— refusing to guess the fit's data scope")
     return out
 
 
-# The model-side flags fit.py does NOT forward to the K=1 baseline (fit.py's
+# The model-side flags 2_fit.py does NOT forward to the K=1 baseline (2_fit.py's
 # baseline call passes floors / ceiling_noise / known_se only). Every
 # other model-side flag is off there whatever the folder tag says; the data-scope
 # flags are the folder's.
@@ -466,10 +492,15 @@ def _check_round_trip(spec: FitSpec, trace_path: Path) -> None:
                          f"against a recovered spec of K={spec.K}")
     want = FitSpec(K=spec.K, **_parse_tag(spec.tag, spec.drop_benchmarks))
     got = FitSpec(K=spec.K, **_parse_tag(folder_tag, spec.drop_benchmarks))
-    # `floors` is no longer a folder-identity flag: a legacy folder carries
-    # `_floors` and the spec's own tag cannot emit it, so the two sides disagree
-    # on that field by construction. Every other flag is still compared.
-    if replace(got, floors=want.floors) != want:
+    # `floors` and `pooled_noise` are compared loosely: their tag grammar
+    # changed twice (ON used to emit `_floors`/`_poolednoise`; today ON is the
+    # untagged default and OFF emits `_nofloors`/`_unpooled`), so a legacy
+    # folder can disagree with the recovered spec's own tag on those two fields
+    # by construction — e.g. a --no-pooled-noise fit from before the `_unpooled`
+    # token, whose attrs say False while its folder carries nothing. New fits
+    # still round-trip exactly (both sides emit the same opt-out token). Every
+    # other flag is compared strictly.
+    if replace(got, floors=want.floors, pooled_noise=want.pooled_noise) != want:
         raise ValueError(f"spec round-trip failed: folder tag {folder_tag!r} names "
                          f"a different flag set than the recovered spec, whose own "
                          f"tag is {spec.tag!r}")

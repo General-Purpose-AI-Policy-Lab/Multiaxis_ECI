@@ -23,6 +23,9 @@ from multiaxis_eci.viz.core import save_fig  # noqa: E402
 US_COLOR, CN_COLOR = "#1A9641", "#D7191C"   # green US / red CN; the darkened
                                             # shades keep the pair separable
                                             # for deuteranopes
+# Pinned to the published figure's data snapshot, NOT the wall clock (a re-run
+# months later should reproduce the figure, not move the "today" line). Note
+# 1_country_frontier.py's p_passed_now uses the actual current date instead.
 TODAY = pd.Timestamp("2026-08-27")
 
 # Panel layout: rows = country, cols = scope.

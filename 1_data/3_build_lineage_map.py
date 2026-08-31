@@ -5,7 +5,7 @@ nemo∈Nemotron). Cross-checks node obs-counts against the validated plan number
 import pandas as pd, re
 from pathlib import Path
 
-# Anchor I/O to the repo root (parent of 3_diagnostics/) so the script works from
+# Anchor I/O to the repo root (parent of 1_data/) so the script works from
 # any working directory, not just the repo root.
 ROOT = Path(__file__).resolve().parent.parent
 df = pd.read_csv(ROOT / '1_data/processed/benchmarks_merged.csv')
