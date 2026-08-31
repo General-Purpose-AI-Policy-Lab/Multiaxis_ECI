@@ -1651,6 +1651,28 @@ class TestMIRT:
             mirt_frontier_forecast(theta, 0, d, raw, sd_cap=None,
                                    drop_low_obs=False, fit_names=["nope"])
 
+        # weights="precision": an early record measured WIDE keeps its place in
+        # the fit but loses its leverage. Blow up m0's posterior SD (25x the
+        # others) and bias its median high: the unweighted OLS lets that single
+        # point produce negative-slope draws and drag the median slope well
+        # under the truth, the precision-weighted fit stays on it. With equal
+        # SDs the two estimators must agree draw for draw (WLS reduces to OLS).
+        theta_w = theta.copy()
+        theta_w[:, 0, 0] = 1.8 + rng.normal(0, 2.0, S)
+        ols = mirt_frontier_forecast(theta_w, 0, d, raw, sd_cap=None,
+                                     drop_low_obs=False,
+                                     fit_names=[f"m{i}" for i in range(6)])
+        wls = mirt_frontier_forecast(theta_w, 0, d, raw, sd_cap=None,
+                                     drop_low_obs=False, weights="precision",
+                                     fit_names=[f"m{i}" for i in range(6)])
+        assert (wls.slope > 0).mean() > 0.99 > (ols.slope > 0).mean()
+        assert abs(float(np.median(wls.slope)) - 1.0) \
+            < abs(float(np.median(ols.slope)) - 1.0)
+        same = mirt_frontier_forecast(theta, 0, d, raw, sd_cap=None,
+                                      drop_low_obs=False, weights="precision",
+                                      fit_names=["m0", "m2", "m4"])
+        np.testing.assert_allclose(same.slope, fr.slope, rtol=0.2)
+
 
 # ─────────────────── MIRT non-compensatory (conjunctive) ────────────────────
 @pytest.fixture(scope="session")

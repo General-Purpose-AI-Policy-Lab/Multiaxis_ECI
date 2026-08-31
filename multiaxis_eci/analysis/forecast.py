@@ -62,6 +62,7 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
                            sota_exempt: bool = True,
                            fit_basis: str = "frontier",
                            fit_names: list[str] | None = None,
+                           weights: str | None = None,
                            hdi_prob: float = 0.5) -> ForecastResult:
     """Extrapolate axis-k's capability trend linearly in time.
 
@@ -90,6 +91,12 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
     and `fit_basis` reads "frozen". Use it when the same set must be compared
     across subsets of the posterior, which the SD mask would otherwise re-pick
     for each one.
+
+    `weights="precision"` turns the per-draw OLS into a WLS with FIXED weights
+    1/SD²(θ_m,k) (posterior SD on this axis): an early record measured wide
+    keeps its place in the fit but loses the leverage that lets it flip the
+    slope draw by draw — the pathology behind negative-slope draws and
+    decade-long crossover tails. None (default) keeps the unweighted OLS.
     """
     if fit_basis not in ("frontier", "records", "informed"):
         raise ValueError(f"fit_basis must be 'frontier', 'records' or 'informed', "
@@ -164,9 +171,20 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
 
     x = _to_year(dates[front])                             # (F,)
     y = theta_draws[:, idx[front], k]                      # (S, F)
-    xc = x - x.mean()
-    slope = (y * xc).sum(1) / (xc**2).sum()                # (S,)
-    intercept = y.mean(1) - slope * x.mean()               # (S,)
+    if weights is None:
+        w = np.ones_like(x)
+    elif weights == "precision":
+        # Fixed per-model weights (not per draw): the estimator stays linear
+        # in y, so the per-draw slope distribution still propagates the
+        # posterior; the weights only re-apportion leverage within the fit set.
+        sd = y.std(axis=0)
+        w = 1.0 / np.maximum(sd, 1e-3) ** 2
+    else:
+        raise ValueError(f"weights must be None or 'precision', got {weights!r}")
+    xw = (w * x).sum() / w.sum()
+    xc = x - xw
+    slope = (y * (w * xc)).sum(1) / (w * xc**2).sum()      # (S,)
+    intercept = (y * w).sum(1) / w.sum() - slope * xw      # (S,)
 
     last_obs = pd.to_datetime(dates.max())
     horizon = (pd.Timestamp(horizon_date) if horizon_date is not None
