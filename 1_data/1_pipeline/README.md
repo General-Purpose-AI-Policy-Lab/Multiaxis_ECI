@@ -26,10 +26,9 @@ This notebook is the current refresh path for
    - Row counts at each stage
    - Top-10 score changes vs the current dataset (sanity check)
    - **Any unrecognized upstream files** (= new benchmarks in the feed; map them
-     in `FILE_SPEC` or skip them with a reason in `FILE_SKIP`). This section was
-     added 2026-07-27: the list had previously existed only in the notebook cell
-     output, so seven benchmarks sat unmapped for at least one refresh cycle
-     while the report looked clean.
+     in `FILE_SPEC` or skip them with a reason in `FILE_SKIP`). `FILE_SPEC` is
+     an allowlist, so an unmapped file is silently absent from the fit and the
+     report otherwise looks clean.
    - Any benchmarks missing metadata (= you need to edit `canonical/benchmark_metadata.csv`)
    - Any new models since the last review (= you may want to edit `canonical/model_aliases.csv`)
 3. Section 10 swaps the outputs into `1_data/processed/` and `1_data/curated/`
@@ -381,7 +380,7 @@ y = (x + 230) / (x + 230 + 63230)  =  sigma( log(x + 230) - log 63230 )
 step as $5,000 to $10,000, and a linear rescale would call the second one fifty
 times larger. Log-dollars is the coordinate on which those steps are comparable.
 The Beta-MIRT link is already a logistic on a latent linear predictor, so the map
-that makes that predictor equal log-dollars is simply its inverse. One logit of
+that makes that predictor equal log-dollars is its inverse. One logit of
 ability then means a factor of e = 2.72 in the year-end balance.
 
 **Why the origin is -$230.** A logarithm goes vertical at its origin, so the

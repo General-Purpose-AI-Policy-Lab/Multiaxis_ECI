@@ -1,0 +1,25 @@
+{
+  "k4_reference_reproduction": {
+    "elpd_loo": 7711.1546421051025,
+    "elpd_se": 76.34393772091939,
+    "p_loo": 2141.5960388183594,
+    "frac_k_ge_0p7": 0.22482014388489208,
+    "frac_k_ge_1": 0.010591526778577139,
+    "loo_draws": 200000,
+    "reff": 0.393
+  },
+  "k3_full_priors": {
+    "elpd_loo": 7447.79735994339,
+    "elpd_se": 77.3668157893681,
+    "p_loo": 1829.438856124878,
+    "frac_k_ge_0p7": 0.16207034372502,
+    "frac_k_ge_1": 0.013389288569144684,
+    "loo_draws": 36000,
+    "reff": 0.401
+  },
+  "paired_delta_k3_vs_ref": {
+    "paired_rows_clean": 3771,
+    "paired_delta_vs_ref": -191.07367515563965,
+    "paired_delta_se": 14.269107391194915
+  }
+}

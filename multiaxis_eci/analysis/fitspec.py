@@ -291,32 +291,31 @@ class FitSpec:
 # the LW post reports (10 chains x 12,000 draws on the 2026-08 snapshot:
 # 4,923 obs / 829 test-takers / 96 benchmarks, R² 0.9643).
 # FrontierMath v1 and AlgoTune are out of this scope through the retirement
-# list, so no drop flag names them and the tag no longer carries `_drop`.
-# `loading_prior` and `floors` are named explicitly although both now hold the
+# list, so no drop flag names them and the tag carries no `_drop`.
+# `loading_prior` and `floors` are named explicitly although both hold the
 # default: the flagship is a statement of one fit, and a later default change
 # must not silently redefine it. The superseded 2026-07 fit (old tag grammar,
 # 10x20,000 on the previous snapshot) is archived under `results/Old/`.
 FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
                    lineage_prior=True, lineage_bm=True, floors=True)
-# The trace lives exactly where the spec derives it (current tag grammar);
-# the constant stays because every consumer reads the path from here and a
-# future grammar change must not silently retarget them.
+# The one path every consumer reads, so the figures, the dashboard card and the
+# post cannot name different traces. `FLAGSHIP_TRACE.parent` is the fit's
+# results folder and holds its CSVs and caches. 10 chains x 12,000 draws over
+# 829 test-takers and 96 benchmarks, which is the current exploration scope.
 FLAGSHIP_TRACE = FLAGSHIP.trace_path
-# All 10 chains share one logp basin and one axis system (mode JSON: matched
-# corr 0.818), but they split 6/4 on where the human tiers and 18 older/small
-# models sit on the Agentic axis. Chains 0, 1, 3 and 8 are the minority group.
-# Reading the majority means the reported fit is one placement, not an average
-# of two, so the majority is the DEFAULT and a caller must opt out to re-admit
-# the minority.
-FLAGSHIP_MAJORITY_CHAINS = [2, 4, 5, 6, 7, 9]
+# One posterior mode over all ten chains (`mirt_modes_<trace-stem>.json`), so
+# every chain is read. The chains do split 6/4 on where the human tiers and 18
+# older/small models sit on the Agentic axis (the post's appendix), but that is
+# a placement split inside one mode, not a second basin. A multimodal flagship
+# would name its majority here and `open_flagship` would default to it.
+FLAGSHIP_CHAINS = None
 # Every flagship summary is a median or an interval, which the thinned draws
 # pin as well as the full 120,000.
 FLAGSHIP_THIN = 10
 
 
-def open_flagship(keep=None, thin: int = FLAGSHIP_THIN,
-                  chains=FLAGSHIP_MAJORITY_CHAINS):
-    """The flagship posterior, majority chains, thinned. `chains=None` for all."""
+def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
+    """The flagship posterior, thinned. `chains=None` reads every chain."""
     return FLAGSHIP.open_posterior(keep=keep, thin=thin, chains=chains,
                                    path=FLAGSHIP_TRACE)
 

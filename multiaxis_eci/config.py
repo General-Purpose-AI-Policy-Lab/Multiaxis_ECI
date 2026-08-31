@@ -11,26 +11,21 @@ RESULTS_DIR  = PROJECT_ROOT / "results"
 PLOTS_DIR    = PROJECT_ROOT / "plots"
 
 # ── Zero-score diagnostic threshold ───────────────────────────────────────
-# Historical: when the model used a left-censored Beta-CDF branch for the
-# exact-zero observations, this was the censoring threshold c such that the
-# likelihood for those rows was log F_Beta(c | ...). The CDF branch was
-# removed for sampler stability (see multiaxis_eci/models/mirt.py), but the threshold is still
-# used by ppc.py to report `zero_pred_below_threshold` — the posterior
-# probability that the zero-score rows would replicate at or below 0.5%.
+# The level `ppc.py` scores `zero_pred_below_threshold` against: the posterior
+# probability that the exact-zero rows replicate at or below 0.5%. Diagnostic
+# only — it enters no likelihood.
 ZERO_DIAG_THRESHOLD = 5e-3
 
 # ── Epsilon bound ────────────────────────────────────────────────────────
-# Beta likelihood has open support on (0, 1). The model clips boundary scores
-# onto [ECI_EPS, 1 - ECI_EPS] (see multiaxis_eci/models/mirt.py); this same epsilon is used by
-# data.py's --drop-zero-scores diagnostic to identify rows on or outside
-# (ECI_EPS, 1 - ECI_EPS).
+# Beta likelihood has open support on (0, 1). `models/mirt.py` clips boundary
+# scores onto [ECI_EPS, 1 - ECI_EPS]; the same epsilon lets 2_fit.py's
+# --drop-zero-scores identify rows on or outside (ECI_EPS, 1 - ECI_EPS).
 ECI_EPS = 1e-3
 
 # ── Low-observation flag ─────────────────────────────────────────────────
 # Models with fewer than this many benchmark observations are flagged as
 # data-poor: their posterior C is dominated by prior + a few extreme points
-# and shouldn't appear in the headline timeline / forest. Plotted separately
-# in plots/low_obs_models_*.html.
+# and shouldn't appear in the headline timeline / forest.
 LOW_OBS_THRESHOLD = 4
 
 # ── Priors (LogNormal mu, sigma on the log scale) ─────────────────────────

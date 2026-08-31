@@ -17,12 +17,14 @@ fit CLI: [../README.md](../README.md).
 | `plots/canonical/` | `2_fit.py --preset canonical` | no |
 | `plots/dashboard/` | `3_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `3_diagnostics/4_build_dashboard.py` | **yes** |
-| `lw_post/figures/` | `lw_post/figures/make_all.py`, a local-only folder not in this repository | no |
+| `lw_post/figures/` | `lw_post/figures/make_all.py` | **yes**, except `*.html` |
 
-`plots/` is gitignored entirely: figures are regenerable from the traces, and
-one dashboard build writes hundreds of them. `index.html` is the tracked
+`plots/` is gitignored entirely: figures there are regenerable from the traces,
+and one dashboard build writes hundreds of them. `index.html` is the tracked
 artifact and the thing you serve. It is self-contained, so a browser opens it
-with no server.
+with no server. `lw_post/figures/` is tracked because the post is a deliverable
+rather than a render, but its interactive Plotly twins are not: ~4.7 MB each of
+inlined JS, rebuilt by `make_all.py`.
 
 One fit writes one HTML and one PNG per figure into its own
 `plots/mirt_k{K}{tag}/`. K is in that folder name, so a K=3 and a K=4 run of
@@ -57,12 +59,13 @@ python 3_diagnostics/4_build_dashboard.py --force-all
 ```
 
 LessWrong post figures. Every one reads the flagship through
-`analysis.FLAGSHIP` / `open_flagship`, so the fit identity, the majority-chain
-policy and the forecast settings are the repo's. `--cached` never opens the
-trace: it reuses the forecast cache pickle and fails if it is missing.
+`analysis.FLAGSHIP` / `FLAGSHIP_TRACE` / `open_flagship`, so the fit identity,
+the chain policy and the forecast settings are the repo's and no script names a
+trace of its own. `--cached` never opens the trace: it reuses the forecast cache
+pickle and fails if it is missing.
 
 ```bash
-python lw_post/figures/make_all.py all --cached   # local-only, not shipped here
+python lw_post/figures/make_all.py all --cached
 ```
 
 ## Figure catalogue
@@ -179,9 +182,8 @@ shows.
   the memory between fits and one out-of-memory kill costs one fit rather
   than the sweep.
 - `analysis.open_flagship()` is the flagship reader every downstream script
-  uses. It defaults to `FLAGSHIP_MAJORITY_CHAINS` (0-5, 7, 8) and
-  `FLAGSHIP_THIN` (10). Chains 6 and 9 sit in the second solution: they lift
-  the whole human block on the legacy-QA axis by about 2.3 logits while the
-  machine rows move by 0.25. The majority is the default so the reported fit
-  is one solution rather than an average of two, and a caller has to pass
-  `chains=None` on purpose to re-admit them.
+  uses, and `analysis.FLAGSHIP_TRACE` is the one path any of them names. It
+  defaults to `FLAGSHIP_CHAINS` and `FLAGSHIP_THIN` (10). The flagship has one
+  posterior mode over all ten chains, so `FLAGSHIP_CHAINS` is `None` and every
+  chain is read. A multimodal flagship would name its majority there instead,
+  and a caller would pass `chains=None` on purpose to re-admit the rest.

@@ -31,7 +31,7 @@ from multiaxis_eci.analysis.factors import (
 )
 from multiaxis_eci.analysis.fitspec import (
     FLAGSHIP,
-    FLAGSHIP_MAJORITY_CHAINS,
+    FLAGSHIP_CHAINS,
     FLAGSHIP_THIN,
     FLAGSHIP_TRACE,
     FitSpec,
@@ -101,6 +101,6 @@ __all__ = [
     "loadings_forest_df", "nc_difficulty_timeline_df",
     "ForecastResult", "mirt_frontier_forecast", "mirt_crossover_df",
     "FitView", "prepare_fit",
-    "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_MAJORITY_CHAINS",
+    "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS",
     "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship",
 ]

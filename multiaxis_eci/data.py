@@ -545,7 +545,7 @@ def load_eci_data(drop_low_obs_models: bool = False,
     `excluded_benchmarks.txt` list, which is filtered out here at fit time):
       • drop_low_obs_models (default False) — when True, models with
         <LOW_OBS_THRESHOLD obs are deleted (SOTA + anchors + humans protected).
-        Paused: every model is fit, sparse ones simply get wide posteriors.
+        Paused: every model is fit, sparse ones get wide posteriors.
       • collapse_effort_variants (default False) — when True, for each base
         model (e.g. `gpt-5-2025-08-07`) keep one effort variant. Paused:
         `_low` / `_medium` / `_high` are fit as distinct models.
@@ -731,8 +731,8 @@ def load_eci_data(drop_low_obs_models: bool = False,
             # from a true orphan (a human benchmark never present on the model side
             # — a name mismatch like "GPQA Extended *" vs the data's Diamond/Main,
             # or a benchmark not ingested like PubMedQA). Warn only for orphans so
-            # the drop is not silent (finding C2, 2026-07-06); the rows are kept in
-            # the curated file as reference and simply don't enter this fit.
+            # the drop is not silent; the rows stay in the curated file as
+            # reference and do not enter this fit.
             orphans = (set(humans["benchmark"]) - fitted_benchmarks
                        - load_excluded_benchmarks())
             if orphans:

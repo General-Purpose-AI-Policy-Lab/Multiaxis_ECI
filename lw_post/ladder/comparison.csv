@@ -1,0 +1,6 @@
+fit,key,chains_x_draws,divergences,eta_max_rhat,eta_frac_rhat_gt_1.01,D_max_rhat,sigma_b_max_rhat,eta_ess_min,eta_ess_med,ess_draws_used,n_loading_modes,human_theta_split,bayes_R2,rmse,elpd_loo,elpd_se,p_loo,frac_k_ge_0p7,frac_k_ge_1,loo_draws,paired_rows_clean,paired_delta_vs_ref,paired_delta_se
+K=1 baseline,K1_baseline,10x10000,0/100000,1.005,0.0,1.005,1.009,2085,9903,10000,1,n/a (K=1),0.9054,0.0764,6249.6,112.1,1200.4,0.064,0.007,100000.0,3773.0,-999.6,33.2
+K=4 bare (no priors),K4_bare,12x3000,778/36000,1.553,0.603,1.815,1.298,20,834,12000,2,10 vs 2,0.9641,0.0392,7583.9,75.9,2511.9,0.329,0.025,36000.0,3110.0,-107.2,18.3
+K=4 human order only,K4_humanonly,12x3000,80/36000,1.116,0.102,1.091,1.172,66,9964,12000,2,7 vs 5,0.9643,0.0391,7583.3,73.1,2344.6,0.292,0.019,36000.0,3242.0,-109.2,17.2
+K=4 both priors (reference),K4_both_ref,10x20000,78/200000,1.142,0.158,1.173,1.203,46,9493,10000,1,8 vs 2,0.9645,0.0413,7710.4,76.3,2142.4,0.231,0.01,200000.0,,,
+K=3 both priors,K3_full,12x3000,12/36000,1.351,0.427,1.361,1.353,27,6989,12000,2,10 vs 2,0.9553,0.0481,7447.8,77.4,1829.4,0.162,0.013,36000.0,3771.0,-191.1,14.3
