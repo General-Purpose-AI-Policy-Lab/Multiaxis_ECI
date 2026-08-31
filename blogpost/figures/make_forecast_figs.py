@@ -1,30 +1,26 @@
-"""The two forecast figures for the blog post.
+"""The two forecast figures for the blog post, in matplotlib.
 
-Same fit and same forecast code as the memo (`memo/make_memo_figs.py`): flagship
-K=4 fit, majority chains, raw display frame, records basis from Oct 2024,
-SD cap 0.4. Three axes only (axis 4, Legacy QA, is out of the post's forecast
-scope). Every interval on both figures is a 50% HDI.
+The flagship K=4 fit, records basis from Oct 2024, SD cap 0.4. Three axes only
+(axis 4, Legacy QA, is out of the post's forecast scope). Every interval drawn
+on either figure is a 50% HDI.
 
   forecast_trend_lw.png     frontier trend per axis, 1x3, window 2020-2030,
-                            50% band, recomputed from the trace at
-                            hdi_prob=0.5.
+                            50% band.
   forecast_crossover_lw.png crossover dates per axis, three stacked panels on
                             ONE shared time window, so the panels are
                             comparable. Median dot and a 50% whisker from the
-                            stored `forecast_crossover.csv` next to the trace.
-                            The 95% bounds are read from the local
-                            `crossover_hdi95.csv` cache and printed, not drawn.
-                            An interval straddling today reads as an undecided
-                            crossing. Axis 2's dates are shown with the
+                            flagship's stored crossover table; the 80% bounds
+                            in the same table are printed, not drawn. An
+                            interval straddling today reads as an undecided
+                            crossing. Axis 2's dates carry the
                             backward-extrapolation caveat on the panel.
 
   python blogpost/figures/make_forecast_figs.py
 
-The trend-object pickle beside the trace is always reused when it exists, so a
-layout edit never reloads the 38 GB trace.
-
-The forecast itself (`compute`, `hdi95`, the cache path) lives in `make_all.py`,
-which owns the flagship fit identity; this file is the matplotlib rendering only.
+The forecast itself (`compute`, the cache path) lives in `make_all.py`, which
+owns the flagship fit identity; the panel drawers and labels live in `figbase`.
+This file is the layout only. The trend-object pickle beside the trace is
+reused whenever it exists, so a layout edit never reloads the trace.
 """
 from __future__ import annotations
 
@@ -32,8 +28,6 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent.parent
-sys.path.insert(0, str(ROOT / "memo"))
 sys.path.insert(0, str(HERE))
 
 import matplotlib.dates as mdates  # noqa: E402
@@ -41,7 +35,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-import make_memo_figs as mmf  # noqa: E402
+import figbase  # noqa: E402
 from multiaxis_eci.analysis import FLAGSHIP_TRACE  # noqa: E402
 from multiaxis_eci.config import AXIS_TITLES as LW_TITLES  # noqa: E402
 from make_all import AXES, END, forecast_cache  # noqa: E402
@@ -61,14 +55,15 @@ BACKCAST_NOTE = {
 
 
 def trend_fig(per_axis: dict) -> Path:
-    """Memo's `_timeline_forecast_panel` content, 1x3, window capped at 2030."""
+    """`figbase.timeline_forecast_panel` per axis, 1x3, window capped at 2030."""
     today = pd.Timestamp.today().normalize()
     fig, axs = plt.subplots(len(AXES), 1, figsize=(11, 12.5))
     for ax, name in zip(np.atleast_1d(axs), AXES):
         d = per_axis[name]
         fc = d["fc"]
-        mmf._timeline_forecast_panel(ax, d["tl"], d["hs"], fc, LW_TITLES[name],
-                                     today, show_ylabel=True)
+        figbase.timeline_forecast_panel(ax, d["tl"], d["hs"], fc,
+                                        LW_TITLES[name], today,
+                                        show_ylabel=True)
         ax.set_xlim(TREND_START, END)
         ax.xaxis.set_major_locator(mdates.YearLocator(base=1))
         if name == AXES[-1]:
@@ -78,11 +73,11 @@ def trend_fig(per_axis: dict) -> Path:
               f"trend at 2030 = {fc.median[-1]:.2f} "
               f"[{fc.lo[-1]:.2f}, {fc.hi[-1]:.2f}] (50% HDI)")
     handles = [
-        plt.Line2D([], [], marker="o", color=mmf._AI_COLOR, ls="none", alpha=0.5,
-                   label="AI models (dated)"),
-        plt.Line2D([], [], color="#ff9500", ls="--",
+        plt.Line2D([], [], marker="o", color=figbase.AI_COLOR, ls="none",
+                   alpha=0.5, label="AI models (dated)"),
+        plt.Line2D([], [], color=figbase.TREND_COLOR, ls="--",
                    label="frontier trend (50% band)"),
-        plt.Line2D([], [], color=mmf._HUMAN_COLOR, ls="--", alpha=0.6,
+        plt.Line2D([], [], color=figbase.HUMAN_COLOR, ls="--", alpha=0.6,
                    label="human tiers"),
         plt.Line2D([], [], color="#444", ls=":", label="today"),
     ]
@@ -100,8 +95,8 @@ def trend_fig(per_axis: dict) -> Path:
 # The memo's scheme: green where the median crossing is behind us, red where it
 # is ahead. The color encodes the MEDIAN only — on the Agentic axis the draws
 # are far from unanimous, which the text gives as a probability.
-FUTURE_COLOR = mmf._FUTURE_COLOR
-PAST_COLOR = mmf._PASSED_COLOR
+FUTURE_COLOR = figbase.FUTURE_COLOR
+PAST_COLOR = figbase.PASSED_COLOR
 
 
 def _window(rows: pd.DataFrame, hard_max: pd.Timestamp | None):
@@ -237,9 +232,7 @@ def crossover_fig(cx: pd.DataFrame) -> Path:
 
 
 def main() -> None:
-    # Crossover figure: the flagship's stored 50%/80% table. `mmf` supplies the
-    # drawing helpers only — the fit is the flagship, same as every other figure
-    # in the post.
+    # Crossover figure: the flagship's stored 50%/80% table.
     cx = pd.read_csv(FLAGSHIP_TRACE.parent / "lw_crossover_50_80.csv")
     crossover_fig(cx)
 

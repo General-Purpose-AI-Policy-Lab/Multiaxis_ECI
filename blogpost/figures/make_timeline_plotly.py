@@ -41,7 +41,7 @@ X_MIN = "2022-01-01"
 # pace with the type.
 FONT_TITLE = 42       # figure title
 FONT_AXIS = 36        # axis titles
-FONT_TICK = 30        # tick labels
+FONT_TICK = 26        # tick labels
 FONT_CALLOUT = 28     # named-point leader labels
 FONT_TIER = 26        # right-margin human tier names
 MARKER_BENCH = 16     # benchmark points
@@ -56,15 +56,17 @@ ERRBAR_MODEL = 2.0    # model error-bar line width
 # the marker by default, which is unreadable inside the 2024-2026 cloud.
 # Low / left points, each label hand-placed in nearby empty canvas.
 LABEL_LOW = {
-    "GPQA Diamond": ("2022-04-01", 143),
+    "GPQA Diamond": ("2023-04-01", 143),
 }
 # High points (hard benchmarks and top models) share ONE column, ordered by the
-# value they point at, so no two leader lines cross.
+# value they point at, so no two leader lines cross. The column sits in the
+# still-sparse 2023 band: close to the 2024-2026 cloud the leaders point into,
+# without touching it.
 LABEL_HIGH_BENCH = ["Remote Labor Index", "Humanity's Last Exam", "FrontierMath"]
-HIGH_COL_X = "2022-02-01"
+HIGH_COL_X = "2023-02-01"
 # The last slot sits below the Top Performer reference line (~168), so the
 # dashed line never runs through the label text.
-HIGH_COL_Y = [216, 205, 194, 183, 173, 160]
+HIGH_COL_Y = [214, 204, 194, 184, 174, 161]
 N_TOP_MODELS = 3
 _EFFORTS = {"unknown", "max", "xhigh", "high", "medium", "low", "minimal",
             "promax", "proxhigh", "prohigh", "promedium", "prolow"}
@@ -172,7 +174,7 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
         yaxis=dict(title=dict(text="ECI", font=dict(size=FONT_AXIS)),
                    tickfont=dict(size=FONT_TICK), range=[30, 220]),
         legend=dict(font=dict(size=15)),
-        height=1000, width=1900, margin=dict(l=130, r=430, t=120, b=110),
+        height=1250, width=1900, margin=dict(l=130, r=430, t=120, b=110),
     )
     for tr in fig.data:
         if tr.name == "Difficulté des benchmarks":
