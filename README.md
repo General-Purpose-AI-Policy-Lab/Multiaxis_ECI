@@ -1,6 +1,6 @@
-# ECI Bayesian Recreation
+# Multi-Axis ECI
 
-Code and data behind the forthcoming post *A Four-Axis Bayesian Epoch Capabilities Index
+Code and data behind the forthcoming post *Multi-Axis Bayesian Epoch Capabilities Index
 with Human Baselines* (GPAI Policy Lab, August 2026), whose link goes here once it is
 published, and its predecessor [Mapping AI capabilities to human expertise on the Rosetta Stone scale](https://www.lesswrong.com/posts/cfbdyJGbHkY8rPesE/mapping-ai-capabilities-to-human-expertise-on-the-rosetta-1).
 
