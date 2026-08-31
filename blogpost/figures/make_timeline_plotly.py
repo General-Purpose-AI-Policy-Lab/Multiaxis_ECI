@@ -44,8 +44,8 @@ FONT_AXIS = 36        # axis titles
 FONT_TICK = 26        # tick labels
 FONT_CALLOUT = 28     # named-point leader labels
 FONT_TIER = 26        # right-margin human tier names
-MARKER_BENCH = 16     # benchmark points
-MARKER_MODEL = 13     # model points
+MARKER_BENCH = 13     # benchmark points
+MARKER_MODEL = 10     # model points
 ERRBAR_BENCH = 2.6    # benchmark error-bar line width
 ERRBAR_MODEL = 2.0    # model error-bar line width
 
@@ -216,9 +216,10 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     for (r, color), y in zip(high, HIGH_COL_Y):
         _label(r, (HIGH_COL_X, y), color)
 
-    # Top models: label just RIGHT of each point, running into the empty
-    # top-right corner (the tier names start lower, at ~161). Slots are the
-    # points' own heights, nudged apart top-down so the texts never touch.
+    # Top models: one column in the TOP-RIGHT corner, past the last point and
+    # above the tier names (which start at ~161), text running into the right
+    # margin. Strongest model takes the top slot, so the three leaders fan
+    # down-left to their points without crossing.
     model_rows, seen = [], set()
     for _, r in ai.sort_values("mean", ascending=False).iterrows():
         base = _base_name(r["name"])
@@ -230,14 +231,12 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
         model_rows.append(r)
         if len(seen) == N_TOP_MODELS:
             break
-    prev = np.inf
-    for r in model_rows:                        # already strongest-first
-        y = min(float(r["mean"]), prev - 6.0)   # ~one text height apart
-        prev = y
-        anchor_x = (r["release_date"] + pd.Timedelta(days=45)).strftime("%Y-%m-%d")
-        _label(r, (anchor_x, y), "#20a39e")
+    model_col_x = (x_right + pd.Timedelta(days=20)).strftime("%Y-%m-%d")
+    MODEL_COL_Y = [209, 198, 187]
+    for r, y in zip(model_rows, MODEL_COL_Y):   # already strongest-first
+        _label(r, (model_col_x, y), "#20a39e")
     print(f"  labelled high: {[r['name'] for r, _ in high]} "
-          f"+ models right of their points: {[r['name'] for r in model_rows]}")
+          f"+ models in the top-right column: {[r['name'] for r in model_rows]}")
     if fig.layout.legend.grouptitlefont is not None:
         fig.layout.legend.grouptitlefont.size = 16
 
