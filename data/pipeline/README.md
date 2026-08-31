@@ -7,6 +7,13 @@ public benchmark ZIP (CC-BY, refreshed ~weekly) and assembles a
 This notebook is the authoritative refresh path for
 `data/processed/benchmarks_merged.csv`.
 
+> **Related repository.** [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline)
+> covers the same upstream feeds (Epoch, Kaggle, RAND, Scale SEAL) with a
+> different, UUID-keyed schema. It does **not** feed this repository: `data.py`
+> consumes `data/processed/benchmarks_merged.csv`, produced by the notebook in
+> this directory. Read that repo's README before assuming the two are
+> interchangeable.
+
 ## Refresh workflow
 
 1. Open `pipeline.ipynb` from this directory and **Restart Kernel → Run All**.

@@ -150,7 +150,8 @@ def _trace_path(fit):
 # `results/<dir>/mirt_modes_<trace-stem>.json`; the dashboard only READS that
 # file, so a build never loads a multi-GB trace to re-detect. Mode views are
 # ADDITIONS: the whole-fit figures stay, and no diagnostic number is ever
-# mode-restricted (convergence, PPC and PIT describe the whole fit — CLAUDE.md).
+# mode-restricted (convergence, PPC and PIT describe the whole fit; see the
+# "Diagnose a fit" section of README.md).
 
 def _modes_path(fit):
     """Where this fit's mode split lives — same trace-stem rule as

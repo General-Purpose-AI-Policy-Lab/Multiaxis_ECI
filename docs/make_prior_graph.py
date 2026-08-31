@@ -5,6 +5,8 @@ floors, pooled per-benchmark noise, merged human order,
 Brownian-motion lineage steps over release gaps.
 """
 import numpy as np
+from pathlib import Path
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -124,7 +126,7 @@ def canvas(w, h, xlim, ylim):
     return fig, ax
 
 
-out = "/Users/yassineessifi/Desktop/ECI_Bayesian/docs/prior_graph.pdf"
+out = str(Path(__file__).resolve().parent / "prior_graph.pdf")
 
 with PdfPages(out) as pdf:
     # ================= Page 1 : overview =================

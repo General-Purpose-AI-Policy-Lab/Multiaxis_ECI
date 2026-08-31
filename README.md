@@ -15,13 +15,15 @@ merged by a tracked pipeline notebook.
 Model math, priors and identification: [docs/model_math.md](docs/model_math.md).
 Figures and how to read them: [docs/plots.md](docs/plots.md).
 Data pipeline: [data/pipeline/README.md](data/pipeline/README.md).
+Licensing of the upstream scores: [NOTICE.md](NOTICE.md).
 
 ## Setup
 
 Any Python >= 3.11 environment works.
 
 ```bash
-pip install pymc arviz pytensor nutpie numpy pandas scipy plotly kaleido
+pip install pymc arviz pytensor nutpie numpy pandas scipy plotly kaleido \
+            matplotlib requests pytest
 plotly_get_chrome -y   # once per env; figure export raises without it
 ```
 
@@ -89,7 +91,8 @@ quoting any canonical number.
 ## Flags
 
 `[canon]` applies to `--preset canonical` only, `[expl]` to exploration only,
-unmarked to both. The full surface is in `CLAUDE.md`.
+unmarked to both. Every flag `fit.py` accepts is listed below;
+`python fit.py --help` is the generated reference.
 
 **Sampling**
 
@@ -115,6 +118,9 @@ unmarked to both. The full surface is in `CLAUDE.md`.
 | `--lineage-prior` | `[expl]` soft vendor release-chain prior: each release's mean step over its predecessor is positive, but a node can regress |
 | `--lineage-bm` | `[expl]` with `--lineage-prior`: index the chain by time, so each step scales with the release gap in years |
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
+| `--time-prior` | `[expl]` add a learned per-axis linear trend in release year to the theta prior MEAN, so a thinly-evaluated model is shrunk toward its era's level rather than the whole population's. The slope is signed and centered at zero, so a flat population reduces to the plain prior |
+| `--theta-t` | `[expl]` cell-wise leptokurtic theta: each (model, axis) cell of the exchangeable block gets a Student-t(4) marginal via a per-cell scale mixture instead of a Gaussian one |
+| `--private-bases` | `[expl]` give each human root and chain founder a private Normal(0,1) base and let the ZeroSumNormal span only the unstructured rows. Same marginal scale; changes how much of the population the location pin carries |
 
 **Data scope**
 
@@ -125,6 +131,11 @@ unmarked to both. The full surface is in `CLAUDE.md`.
 | `--drop-benchmarks A,B` | `[expl]` drop the named benchmarks (comma-separated, exact names) for a sensitivity run |
 | `--cyber` | `[expl]` append the cyber ECI benchmarks |
 | `--open-only` | `[canon]` keep only benchmarks whose items are public; results go to `results/canonical_open/` |
+| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks NOT public+verified in `data/curated/benchmark_access.csv`; results go to `results/canonical_closed/` |
+| `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`data/curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
+| `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
+| `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
+| `--eci-data-only` | `[canon]` fit `data/raw/eci_data.csv`, the original reference ECI dataset, instead of the processed file |
 
 **Likelihood**
 
@@ -133,6 +144,7 @@ unmarked to both. The full surface is in `CLAUDE.md`.
 | `--no-floors` | `[expl]` drop the chance floors, which are on by default |
 | `--no-pooled-noise` | `[expl]` drop the hierarchical `sigma_b`, which is on by default, and give a thin benchmark a free scale |
 | `--ceiling-noise` | `[expl]` estimate a per-benchmark upper asymptote confined to a noise-sized gap, Beta(1,20). Grading noise, not walls |
+| `--known-se` | `[expl]` split the Beta noise: fixed per-cell instrument precision from the reported harness stderr (`n_eff = p(1-p)/se^2`), so `sigma_b` becomes excess-only. Cells without stderr are unchanged |
 
 **Run control and output**
 
@@ -236,6 +248,11 @@ Renders every registered fit into the tracked repo-root `index.html`: a fit
 selector, per-fit figures rendered lazily, and a cross-fit comparison view
 (GoF, LOO). Always pass `--force-all` when serving results so no stale card
 comes from cache. Open `index.html` in a browser; no server needed.
+
+The tracked `index.html` cannot be rebuilt from a fresh clone: it renders from
+the `.nc` traces, which are gitignored (the K=4 trace alone is 38 GB) and must
+be re-fitted first. Treat the committed dashboard as a published artifact of the
+snapshot it was built from, not as something the repo regenerates on demand.
 `--png` / `--pdf` also dump stills to `plots/dashboard/`.
 
 ### Manage the cards
@@ -285,6 +302,9 @@ analysis/         # FitSpec, ECI transform, rotations, convergence, forecasts
 diagnostics/      # dashboard build, per-fit plots, chain diagnosis, audits
 viz/              # Plotly figure builders
 data/             # pipeline notebook, processed table, curated files
+fits/             # drivers for the non-compensatory / sparse / interaction families
+evals/            # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
+deliverables/     # figure + table sets built for a specific write-up
 results/          # one folder per fit; canonical/ is the index
 plots/            # figure output (gitignored)
 tests/            # fast unit tests + golden logp locks

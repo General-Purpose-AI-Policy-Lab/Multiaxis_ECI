@@ -69,7 +69,7 @@ def load_matched(trace_path: Path, scope: str, allow_stale: bool):
         msg = (f"trace has {len(trace_names)} models, rebuilt data scope has "
                f"{len(data_names)} models — they don't match "
                "(results/canonical/trace.nc predates the current data "
-               "snapshot per CLAUDE.md; re-fit before quoting numbers)")
+               "snapshot; re-fit before quoting numbers)")
         if not allow_stale:
             raise AssertionError(msg + ". Pass --allow-stale for a quick look "
                                  "that joins by model-name intersection.")

@@ -14,14 +14,14 @@ PLOTS_DIR    = PROJECT_ROOT / "plots"
 # Historical: when the model used a left-censored Beta-CDF branch for the
 # exact-zero observations, this was the censoring threshold c such that the
 # likelihood for those rows was log F_Beta(c | ...). The CDF branch was
-# removed for sampler stability (see model.py), but the threshold is still
+# removed for sampler stability (see models/mirt.py), but the threshold is still
 # used by ppc.py to report `zero_pred_below_threshold` — the posterior
 # probability that the zero-score rows would replicate at or below 0.5%.
 ZERO_DIAG_THRESHOLD = 5e-3
 
 # ── Epsilon bound ────────────────────────────────────────────────────────
 # Beta likelihood has open support on (0, 1). The model clips boundary scores
-# onto [ECI_EPS, 1 - ECI_EPS] (see model.py); this same epsilon is used by
+# onto [ECI_EPS, 1 - ECI_EPS] (see models/mirt.py); this same epsilon is used by
 # data.py's --drop-zero-scores diagnostic to identify rows on or outside
 # (ECI_EPS, 1 - ECI_EPS).
 ECI_EPS = 1e-3

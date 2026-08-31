@@ -61,8 +61,8 @@ ORG_UNKNOWN_VALUES = {"other"}
 # happens to contain (e.g. "instructblip" before "vicuna", "llava-v1.6-
 # vicuna-13b" before both). Keys are matched case-insensitively.
 #
-# Sourced from CLAUDE.md's worked examples plus WebSearch for the genuinely
-# obscure ones (see build report / commit message for citations); a few
+# Sourced from the vendor-prefix worked examples plus WebSearch for the
+# genuinely obscure ones (see build report / commit message for citations); a few
 # (LinVT, ml-elephant) turned up no reliable affiliation and are left
 # unresolved on purpose rather than guessed.
 NAME_PREFIX = {
