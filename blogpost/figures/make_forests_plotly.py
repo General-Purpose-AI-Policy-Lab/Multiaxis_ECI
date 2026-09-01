@@ -5,12 +5,15 @@ mean at SD < 0.5, the pinned frontier releases, and every human tier — drawn b
 the dashboard's own `viz.forest_grid_fig`, so markers, whiskers and the legend
 are the definitions the fit's CSVs use. The type constants match
 `make_timeline_plotly.py` / `make_loadings_plotly.py`. Reads the flagship
-trace over ALL chains: the post's figures are whole-posterior, never
-mode-restricted. Axis identity is checked against `make_all.EXPECTED_TOPS`
-before any label is applied.
+trace over ALL chains by default — the post's headline figures are
+whole-posterior — with `--chains` for the mode-restricted appendix variants
+(the subset's axes are permuted back onto the fit-level display frame first,
+exactly as in `make_crossover_plotly`). Axis identity is checked against
+`make_all.EXPECTED_TOPS` before any label is applied.
 
 Usage:
     python blogpost/figures/make_forests_plotly.py [--trace FILE] [--tag _draft]
+                                                   [--chains 0,1,3,8]
 """
 from __future__ import annotations
 
@@ -52,11 +55,17 @@ ERRBAR_W = 2.6        # whisker line width (caps stay 0, the forest convention)
 WIDTH, HEIGHT = 2100, 2500
 
 
-def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE) -> None:
+def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
+         chains: list[int] | None = None) -> None:
     idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
-                                    thin=FLAGSHIP_THIN, chains=None, path=trace)
+                                    thin=FLAGSHIP_THIN, chains=chains, path=trace)
     data, *_ = FLAGSHIP.load_data(idata)
     view = prepare_fit(idata, data)
+    if chains is not None:
+        # A chain subset ranks the axes in its own order; put panel k back on
+        # the axis panel k carries everywhere else before any label is applied.
+        from make_crossover_plotly import _display_frame
+        view = _display_frame(view, data, trace)
     check_axis_identity(view, data)     # SystemExit before any mislabeled axis
 
     frames = forest_frames(view, data)  # n_top / sd_cap: make_all's defaults
@@ -103,5 +112,10 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--trace", type=Path, default=TRACE)
     p.add_argument("--tag", default="_draft")
+    p.add_argument("--chains", default=None,
+                   help="comma-separated chain subset (e.g. 0,1,3,8); "
+                        "default: all chains")
     args = p.parse_args()
-    main(args.trace, args.tag)
+    main(args.trace, args.tag,
+         chains=None if args.chains is None
+         else [int(c) for c in args.chains.split(",")])
