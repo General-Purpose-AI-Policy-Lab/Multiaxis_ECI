@@ -119,9 +119,10 @@ def crossovers(trace: Path, cached: bool = False,
     if cached:
         raise SystemExit(f"--cached but {cache} is missing — run without "
                          "--cached once to rebuild it from the trace.")
-    from analysis import mirt_crossover_df, mirt_frontier_forecast
-    from config import FORECAST_KW, FORECAST_NO_SOTA_AXES
-    from data import PROCESSED_FILE
+    from multiaxis_eci.analysis import mirt_crossover_df, mirt_frontier_forecast
+    from multiaxis_eci.config import (FORECAST_BACKCAST_FLOOR, FORECAST_KW,
+                                      FORECAST_NO_SOTA_AXES)
+    from multiaxis_eci.data import PROCESSED_FILE
     from make_all import END, check_axis_identity
     from make_trend_plotly import forecast
 
@@ -143,7 +144,8 @@ def crossovers(trace: Path, cached: bool = False,
                     view.theta, view.names.index(n), data, raw,
                     **dict(FORECAST_KW, horizon_date=END,
                            sota_exempt=view.names.index(n)
-                           not in FORECAST_NO_SOTA_AXES))}
+                           not in FORECAST_NO_SOTA_AXES,
+                           backcast_floor=FORECAST_BACKCAST_FLOOR.get(n)))}
             for n in AXES}
 
     parts = []

@@ -104,15 +104,17 @@ def compute(view, data, raw) -> dict:
     The crossover figure reads only the ForecastResult (slope/intercept draws)
     out of this, through `make_trend_plotly.forecast`'s cache.
     """
-    from analysis import (mirt_frontier_forecast, mirt_human_axis_stats,
+    from multiaxis_eci.analysis import (mirt_frontier_forecast, mirt_human_axis_stats,
                           mirt_model_timeline_df)
+    from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
 
     out = {}
     for name in AXES:
         k = view.names.index(name)
         fc = mirt_frontier_forecast(view.theta, k, data, raw,
                                     **dict(FORECAST_KW, horizon_date=END,
-                                           sota_exempt=k not in FORECAST_NO_SOTA_AXES))
+                                           sota_exempt=k not in FORECAST_NO_SOTA_AXES,
+                                           backcast_floor=FORECAST_BACKCAST_FLOOR.get(name)))
         out[name] = {
             "fc": fc,
             "tl": mirt_model_timeline_df(view.theta, k, data, raw, sd_cap=0.4,
@@ -192,8 +194,8 @@ def forest_frames(view, data, n_top: int = 11, sd_cap: float = 0.5) -> list:
 
 def forests(out_dir: Path) -> Path:
     """Top models, frontier releases and human tiers, one panel per axis."""
-    from viz import forest_grid_fig
-    from viz.core import save_print
+    from multiaxis_eci.viz import forest_grid_fig
+    from multiaxis_eci.viz.core import save_print
 
     view, data, _raw = load_flagship()
     fig = forest_grid_fig(forest_frames(view, data),
@@ -203,9 +205,9 @@ def forests(out_dir: Path) -> Path:
 
 def loadings(out_dir: Path, top_n: int = 20) -> Path:
     """The benchmarks that define each axis, ranked by axis share."""
-    from analysis import loadings_table
-    from viz import loadings_grid_fig
-    from viz.core import save_print
+    from multiaxis_eci.analysis import loadings_table
+    from multiaxis_eci.viz import loadings_grid_fig
+    from multiaxis_eci.viz.core import save_print
 
     view, data, _raw = load_flagship()
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
@@ -231,8 +233,8 @@ def axis_timelines(out_dir: Path) -> Path:
     would give a tier a shade three of the four panels do not use. The tiers are
     on the forest figure, where each one is its own row.
     """
-    from viz import build_axis_figures, subplot_grid
-    from viz.core import save_print
+    from multiaxis_eci.viz import build_axis_figures, subplot_grid
+    from multiaxis_eci.viz.core import save_print
 
     view, data, raw = load_flagship()
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()

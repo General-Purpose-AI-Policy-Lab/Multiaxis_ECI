@@ -210,10 +210,21 @@ SOTA_MODELS: list[str] = _load_sota_models()
 FORECAST_NO_SOTA_AXES: set[int] = {3}
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
-# records only, fit from the reasoning-model cutoff, SD<0.4 cloud, 50% HDIs.
-# Each caller still supplies its own sota_exempt/back_start/horizon_date.
-FORECAST_KW = dict(fit_basis="records", fit_start="2024-10-01", sd_cap=0.4,
+# the per-draw running-max ENVELOPE over the SD<0.4 cloud (non-decreasing by
+# definition, so no draw can carry a negative trend — the record regression it
+# replaces left a third of the Agentic axis's draws with negative slopes),
+# extended forward at its recent rate; 50% HDIs. `fit_start` only matters to
+# the regression bases kept for sensitivity runs (records/frontier/informed).
+# Each caller still supplies its own sota_exempt/backcast_floor/horizon_date.
+FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=0.4,
                    hdi_prob=0.5)
+
+# Backcast floor per axis (envelope basis): a tier already passed at the
+# window start is backcast at the envelope's early rate, but never before
+# this date; axes absent here are CENSORED at their window start instead.
+# Only axis 2 backcasts — its benchmarks were measured long before the
+# informed window — and the floor matches the crossover figure's own window.
+FORECAST_BACKCAST_FLOOR = {"axis2": "2015-01-01"}
 
 # Display strings for the flagship's 4 axes, opt-in per fit (figure dict keys
 # stay axis{k} so cache/anchor ids don't churn when a caller passes these).

@@ -1691,6 +1691,46 @@ class TestMIRT:
         assert abs(float(np.median(ts_b.slope)) - 1.0) \
             < abs(float(np.median(ols_b.slope)) - 1.0) - 0.3
 
+        # fit_basis="envelope": the per-draw running max. Non-negative recent
+        # rate by construction, forward line anchored at the last record, and
+        # three crossing regimes: observed step date inside the window
+        # (Average Human at 1.0 is first reached by m2, 2024-01), forward
+        # projection above it (Top Performer at 3.5, one year past m5's 2.5),
+        # and window-start censoring / floored backcast below it.
+        env = mirt_frontier_forecast(theta, 0, d, raw, sd_cap=None,
+                                     drop_low_obs=False, fit_basis="envelope")
+        assert env.kind == "envelope" and (env.slope >= 0).all()
+        assert abs(float(np.median(env.slope)) - 1.0) < 0.2
+        cxe = mirt_crossover_df(env, theta, 0, d, axis_name="axis1",
+                                today="2026-01-01")
+        avg_e = cxe[cxe.tier == "Average Human"].iloc[0]
+        top_e = cxe[cxe.tier == "Top Performer"].iloc[0]
+        assert avg_e.status.startswith("passed")
+        assert (pd.Timestamp("2023-09-01") < pd.Timestamp(avg_e.crossover_date_median)
+                < pd.Timestamp("2024-06-01"))
+        assert (pd.Timestamp("2026-01-01") < pd.Timestamp(top_e.crossover_date_median)
+                < pd.Timestamp("2027-06-01"))
+        # A tier below the very first record: censored at the window start
+        # without a floor, backcast at the early rate (but never past the
+        # floor) with one.
+        theta_lo = theta.copy()
+        theta_lo[:, 6, 0] = -0.5 + rng.normal(0, 0.05, S)   # Average Human low
+        env0 = mirt_frontier_forecast(theta_lo, 0, d, raw, sd_cap=None,
+                                      drop_low_obs=False, fit_basis="envelope")
+        c0 = mirt_crossover_df(env0, theta_lo, 0, d, axis_name="axis1",
+                               today="2026-01-01")
+        c0 = c0[c0.tier == "Average Human"].iloc[0]
+        assert abs((pd.Timestamp(c0.crossover_date_median)
+                    - pd.Timestamp("2023-01-01")).days) < 40   # censored at start
+        envf = mirt_frontier_forecast(theta_lo, 0, d, raw, sd_cap=None,
+                                      drop_low_obs=False, fit_basis="envelope",
+                                      backcast_floor="2022-06-01")
+        cf = mirt_crossover_df(envf, theta_lo, 0, d, axis_name="axis1",
+                               today="2026-01-01")
+        cf = cf[cf.tier == "Average Human"].iloc[0]
+        assert (pd.Timestamp("2022-05-25") <= pd.Timestamp(cf.crossover_date_median)
+                < pd.Timestamp("2023-01-01"))                  # backcast, floored
+
 
 # ─────────────────── MIRT non-compensatory (conjunctive) ────────────────────
 @pytest.fixture(scope="session")

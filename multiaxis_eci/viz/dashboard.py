@@ -199,10 +199,12 @@ def forecast_figures(view, data, raw, names, th_fc,
             # plotted point) purely for visual consistency; the fitted
             # slope only uses the Oct-2024-onward records.
             back = pd.to_datetime(tl["release_date"]).min()
+            from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
             fc = mirt_frontier_forecast(th_fc, k, data, raw,
                                         **dict(FORECAST_KW,
                                               sota_exempt=k not in FORECAST_NO_SOTA_AXES,
-                                              back_start=back))
+                                              back_start=back,
+                                              backcast_floor=FORECAST_BACKCAST_FLOOR.get(f"axis{k + 1}")))
         except ValueError:
             continue
         hstat = mirt_human_axis_stats(th_fc, k, data, hdi_prob=0.5)
