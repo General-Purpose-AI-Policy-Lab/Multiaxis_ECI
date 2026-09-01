@@ -65,7 +65,7 @@ FR = [
     ("Axis 2 — Scientific Knowledge and Reasoning",
      "Axe 2 — Connaissances et raisonnement scientifiques"),
     ("Axis 3 — Agentic", "Axe 3 — Agentique"),
-    ("Axis 4 — Legacy QA", "Axe 4 — QA historiques"),
+    ("Axis 4 — Legacy QA", "Axe 4 — Questions-Réponses (saturées)"),
     # Human tiers (committees and High School entries before their substrings)
     ("Committee of Average Humans", HUMAN_LEVEL_LABELS_FR["Committee of Average Humans"]),
     ("Committee of Skilled Generalists", HUMAN_LEVEL_LABELS_FR["Committee of Skilled Generalists"]),

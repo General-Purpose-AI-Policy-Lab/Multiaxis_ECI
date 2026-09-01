@@ -33,6 +33,39 @@ plt.rcParams.update({
 OUT_DIR = Path(__file__).resolve().parent
 DPI = 240
 
+# --lang fr: the finished figure's Text objects are passed through this table
+# (ordered, most specific first) and the render lands in fr/ instead. Math
+# strings pass through untouched; only these phrases translate.
+LANG = "en"
+FR = [
+    ("Committee of Average Humans", "Comité d'humains moyens"),
+    ("Committee of Skilled Generalists", "Comité de généralistes qualifiés"),
+    ("Committee of Domain Experts", "Comité d'experts du domaine"),
+    ("High School Top Performer", "Lycéen, meilleur performeur"),
+    ("High School Qualifier", "Lycéen qualifié"),
+    ("Average Human", "Humain moyen"),
+    ("Skilled Generalist", "Généraliste qualifié"),
+    ("Domain Expert", "Expert du domaine"),
+    ("Top Performer", "Meilleur performeur"),
+    ("dashed: second parent —", "tirets = second parent"),
+    ("one illustrative family", "une famille illustrative"),
+    ("expected gain grows with the gap", "le gain attendu croît avec l'écart"),
+    ("small offsets, unordered", "petits écarts, non ordonnés"),
+    ("Model 1.0\n(Jan 2025)", "Modèle 1.0\n(janv. 2025)"),
+    ("Model 1.5\n(Apr 2025)", "Modèle 1.5\n(avr. 2025)"),
+    ("Model 2.0\n(Dec 2025)", "Modèle 2.0\n(déc. 2025)"),
+    ("root", "racine"),
+]
+
+
+def _translate_fig(fig):
+    import matplotlib.text
+    for t in fig.findobj(matplotlib.text.Text):
+        s = t.get_text()
+        for en, fr in FR:
+            s = s.replace(en, fr)
+        t.set_text(s)
+
 
 def plate(ax, x0, y0, x1, y1, label="", fill=PLF, pos="br"):
     ax.add_patch(FancyBboxPatch((x0, y0), x1 - x0, y1 - y0,
@@ -82,7 +115,11 @@ def canvas(w, h, xlim, ylim):
 
 
 def save(fig, name):
-    out = OUT_DIR / name
+    out_dir = OUT_DIR / "fr" if LANG == "fr" else OUT_DIR
+    out_dir.mkdir(exist_ok=True)
+    if LANG == "fr":
+        _translate_fig(fig)
+    out = out_dir / name
     fig.savefig(out, dpi=DPI, bbox_inches="tight")
     plt.close(fig)
     print("wrote", out)
@@ -200,5 +237,9 @@ def make_model_family_example():
 
 
 if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser()
+    p.add_argument("--lang", choices=["en", "fr"], default="en")
+    LANG = p.parse_args().lang
     make_human_arrangement()
     make_model_family_example()

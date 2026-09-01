@@ -126,7 +126,85 @@ def canvas(w, h, xlim, ylim):
     return fig, ax
 
 
-out = str(Path(__file__).resolve().parent / "prior_graph.pdf")
+import argparse
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--lang", choices=["en", "fr"], default="en")
+_ap.add_argument("--png-dir", type=Path, default=None,
+                 help="also write one PNG per page into this directory")
+_args = _ap.parse_args()
+
+# --lang fr: the finished pages' Text objects pass through this table (ordered,
+# most specific first); math strings pass through untouched.
+_FR = [
+    ("Committee of Average Humans", "Comité d'humains moyens"),
+    ("Committee of Skilled Generalists", "Comité de généralistes qualifiés"),
+    ("Committee of Domain Experts", "Comité d'experts du domaine"),
+    ("High School Top Performer", "Lycéen, meilleur performeur"),
+    ("High School Qualifier", "Lycéen qualifié"),
+    ("Average Human", "Humain moyen"),
+    ("Skilled Generalist", "Généraliste qualifié"),
+    ("Domain Expert", "Expert du domaine"),
+    ("Top Performer", "Meilleur performeur"),
+    ("Overview", "Vue d'ensemble"),
+    ("Test-taker structure", "Structure des sujets"),
+    ("human tiers · model families · effort variants",
+     "niveaux humains · familles de modèles · variantes d'effort"),
+    ("Benchmark structure", "Structure des benchmarks"),
+    ("loading scales · difficulty · noise",
+     "échelles de loadings · difficulté · bruit"),
+    ("Beta-MIRT likelihood", "Vraisemblance Beta-MIRT"),
+    ("Beta-MIRT model", "Modèle Beta-MIRT"),
+    ("Human prior", "A priori humain"),
+    ("Model-family prior · time-based steps",
+     "A priori de famille · pas temporels"),
+    ("Fixed: floors", "Planchers fixés"),
+    ("The single per-axis ZeroSumNormal every base level is sliced from.",
+     "L'unique ZeroSumNormal par axe dont chaque niveau de base est extrait."),
+    ("abilities", "capacités"),
+    ("families  c", "familles  c"),
+    ("founder", "fondateur"),
+    ("models  m = 1…M", "modèles  m = 1…M"),
+    ("non-root tiers  t", "niveaux non racines  t"),
+    ("root tiers  r", "niveaux racines  r"),
+    ("releases  j ≥ 2", "versions  j ≥ 2"),
+    ("observed", "observé"),
+    ("deterministic", "déterministe"),
+    ("fixed constant", "constante fixée"),
+    ("chance floor, read from file", "plancher de hasard, lu depuis un fichier"),
+    ("tier increments  t", "incréments de niveau  t"),
+    ("variant groups  g", "groupes de variantes  g"),
+    ("dashed: second parent —", "tirets = second parent"),
+    ("root", "racine"),
+]
+
+
+def _translate_fig(fig):
+    import matplotlib.text
+    for t in fig.findobj(matplotlib.text.Text):
+        v = t.get_text()
+        for en, fr in _FR:
+            v = v.replace(en, fr)
+        t.set_text(v)
+
+
+_page = 0
+
+
+def _save(pdf, fig):
+    global _page
+    _page += 1
+    if _args.lang == "fr":
+        _translate_fig(fig)
+    pdf.savefig(fig, bbox_inches="tight")
+    if _args.png_dir is not None:
+        _args.png_dir.mkdir(parents=True, exist_ok=True)
+        png = _args.png_dir / f"prior_graph-{_page}.png"
+        fig.savefig(png, dpi=240, bbox_inches="tight")
+        print("wrote", png)
+
+
+_suffix = "_fr" if _args.lang == "fr" else ""
+out = str(Path(__file__).resolve().parent / f"prior_graph{_suffix}.pdf")
 
 with PdfPages(out) as pdf:
     # ================= Page 1 : overview =================
@@ -167,7 +245,7 @@ with PdfPages(out) as pdf:
     edge(ax, (7.5, 2.83), (7.22, 2.83), rA=0.0, rB=0.0, color=FLR)
     edge(ax, (5.25, 2.2), (5.25, 1.0), rA=0.0, rB=0.4)
 
-    pdf.savefig(fig, bbox_inches="tight")
+    _save(pdf, fig)
     plt.close(fig)
 
     # ================= Page 2 : the model =================
@@ -253,7 +331,7 @@ with PdfPages(out) as pdf:
     ax.add_patch(Rectangle((lx + 5.1 - 0.09, ly - 0.09), 0.18, 0.18, facecolor=FLR))
     ax.text(lx + 5.36, ly, "fixed constant", fontsize=9.4, va="center")
 
-    pdf.savefig(fig, bbox_inches="tight")
+    _save(pdf, fig)
     plt.close(fig)
 
     # ================= Page 3 : human prior =================
@@ -332,7 +410,7 @@ with PdfPages(out) as pdf:
         ax.text(rx, 0.92, "root", ha="center", va="center", fontsize=9,
                 color=MUT)
 
-    pdf.savefig(fig, bbox_inches="tight")
+    _save(pdf, fig)
     plt.close(fig)
 
     # ============ Page 4 : model-family prior, Brownian steps ============
@@ -428,7 +506,7 @@ with PdfPages(out) as pdf:
                      (7.25, r"$\Delta t_3=1.20$ yr")]:
         ax.text(xm, 1.32, dlab, ha="center", va="top", fontsize=9, color=MUT)
 
-    pdf.savefig(fig, bbox_inches="tight")
+    _save(pdf, fig)
     plt.close(fig)
 
 print("wrote", out)
