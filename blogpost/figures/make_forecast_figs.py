@@ -1,11 +1,11 @@
 """The two forecast figures for the blog post, in matplotlib.
 
-The flagship K=4 fit, records basis from Oct 2024, SD cap 0.4. Three axes only
+The flagship K=4 fit, record-envelope basis, SD cap 0.4. Three axes only
 (axis 4, Legacy QA, is out of the post's forecast scope). Every interval drawn
-on either figure is a 50% HDI.
+on either figure is an 80% HDI (FORECAST_KW).
 
   forecast_trend_lw.png     frontier trend per axis, 1x3, window 2020-2030,
-                            50% band.
+                            80% band.
   forecast_crossover_lw.png crossover dates per axis, three stacked panels on
                             ONE shared time window, so the panels are
                             comparable. Median dot and a 50% whisker from the
@@ -47,11 +47,11 @@ TREND_START = pd.Timestamp("2020-01-01")
 # they are a safety clip, not an active bound.
 PANEL_HARD_MAX = {"axis1": pd.Timestamp("2031-07-01"),
                   "axis3": pd.Timestamp("2040-01-01")}
-# Panels whose dates are extrapolated backwards out of the fit window.
-BACKCAST_NOTE = {
-    "axis2": "dates are the post-2024 record trend extrapolated backwards, "
-             "not observed crossings",
-}
+# Every axis backcasts (FORECAST_BACKCAST_FLOOR): dates before the first
+# measured model are the early record trend extrapolated backwards.
+_NOTE = ("pre-data dates are the early record trend extrapolated backwards, "
+         "not observed crossings")
+BACKCAST_NOTE = {"axis1": _NOTE, "axis2": _NOTE, "axis3": _NOTE}
 
 
 def trend_fig(per_axis: dict) -> Path:
@@ -71,7 +71,7 @@ def trend_fig(per_axis: dict) -> Path:
         print(f"  {name}: slope median {np.median(fc.slope):+.3f}/yr, "
               f"P(slope>0)={float((fc.slope > 0).mean()):.3f}, "
               f"trend at 2030 = {fc.median[-1]:.2f} "
-              f"[{fc.lo[-1]:.2f}, {fc.hi[-1]:.2f}] (50% HDI)")
+              f"[{fc.lo[-1]:.2f}, {fc.hi[-1]:.2f}] (80% HDI)")
     handles = [
         plt.Line2D([], [], marker="o", color=figbase.AI_COLOR, ls="none",
                    alpha=0.5, label="AI models (dated)"),

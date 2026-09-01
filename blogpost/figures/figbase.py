@@ -79,11 +79,11 @@ def timeline_forecast_panel(ax, tl: pd.DataFrame, hstat: pd.DataFrame, fc,
         ax.axhline(r["mean"], color=HUMAN_COLOR, ls="--", lw=0.7, alpha=0.45,
                    zorder=0)
 
-    # Trend: median line + 50% band.
+    # Trend: median line + the forecast band (hdi_prob from FORECAST_KW).
     gx = pd.to_datetime(fc.grid_dates)
     ax.fill_between(gx, fc.lo, fc.hi, color=TREND_COLOR, alpha=0.15, zorder=2)
     ax.plot(gx, fc.median, color=TREND_COLOR, ls="--", lw=2.2, zorder=3,
-            label="frontier trend (50% band)")
+            label="frontier trend (80% band)")
 
     ax.axvline(today, color="#444", ls=":", lw=1, zorder=2)
     ax.set_title(title, fontsize=10)

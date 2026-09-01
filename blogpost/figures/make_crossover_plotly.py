@@ -2,22 +2,24 @@
 
 Per human tier: the median crossing date (dot), a THICK 50% bar and a THIN 80%
 bar, each bar split at the today line — the share already behind us is green,
-the share still ahead is red. Crossings are solved per draw
-(t* = (θ_h − intercept)/slope) by `analysis.mirt_crossover_df`, so both
-interval widths come from the same per-draw distribution and both are HDIs,
-the summary the whole forecast pipeline uses.
+the share still ahead is red. Crossings are solved per draw by
+`analysis.mirt_crossover_df` on the record ENVELOPE (observed step date inside
+the window, early-rate backcast clamped at the floor below it, forward line
+above it), so both interval widths come from the same per-draw distribution
+and both are HDIs, the summary the whole forecast pipeline uses.
 
-The slope/intercept draws come from `make_trend_plotly.forecast` — the
-forecast cache pickle BESIDE the trace (records basis, FORECAST_KW, per-axis
-SOTA exemption), keyed by folder so another fit's forecast can never be
-reused. The human theta draws need the trace itself (all chains, flagship
-thinning, axis identity checked), so the assembled table is cached as
-`lw_crossover_50_80.csv` beside the trace and later runs read the CSV only.
+The envelope draws come from `make_trend_plotly.forecast` — the forecast
+cache pickle BESIDE the trace (FORECAST_KW: envelope basis, per-axis SOTA
+exemption and backcast floor), keyed by folder so another fit's forecast can
+never be reused. The human theta draws need the trace itself (all chains,
+flagship thinning, axis identity checked), so the assembled table is cached
+as `lw_crossover_50_80.csv` beside the trace and later runs read the CSV only.
 
 The window is fixed at 2015-2030 so every variant of the figure is
 comparable. Whatever runs past it (a whisker's tail, or a median outside the
 window) is clipped at the edge and marked with a small dot plus the true date
-in small type.
+in small type — "<2015" when the value sits on the backcast floor, where the
+true date is censored rather than known.
 
 Usage:
     python blogpost/figures/make_crossover_plotly.py [--trace FILE] [--tag ""]
@@ -254,28 +256,37 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
 
         # Off-window overflow: one small dot at the edge per (row, side), with
         # the true date in small type above it — the median's date when the
-        # median itself is out, otherwise the 80% endpoint's.
+        # median itself is out, otherwise the 80% endpoint's. The left edge is
+        # ALSO the backcast floor, so an endpoint sitting exactly on it is a
+        # censored value ("crossed at or before the floor", true date unknown):
+        # it gets the dot too, labeled "<{year}" instead of a year.
         for _, r in rows.iterrows():
             m = r["crossover_date_median"]
             for side, edge, lo_c, hi_c in (("left", x0d, "hdi80_low", None),
                                            ("right", x1d, None, "hdi80_high")):
                 if side == "left":
-                    over = r[lo_c] < edge or m < edge
-                    true_date = m if m < edge else r[lo_c]
+                    # One day of slack: a floored value roundtrips through the
+                    # float-year encoding with microseconds of noise, so exact
+                    # equality with the floor never holds.
+                    tol = edge + pd.Timedelta(days=1)
+                    over = r[lo_c] <= tol or m <= tol
+                    true_date = m if m <= tol else r[lo_c]
+                    label = (f"<{edge.year}" if true_date <= tol
+                             else f"{true_date.year}")
                     tpos = "top right"
                 else:
                     over = r[hi_c] > edge or m > edge
                     true_date = m if m > edge else r[hi_c]
+                    label = f"{true_date.year}"
                     tpos = "top left"
                 if not over:
                     continue
                 col = PAST if edge <= today else FUTURE
-                clipped.append((name, r["tier"], side, true_date,
-                                (m < x0d) or (m > x1d)))
+                clipped.append((name, r["tier"], side, label, true_date is m))
                 fig.add_trace(go.Scatter(
                     x=[edge.isoformat()], y=[r["tier"]], mode="markers+text",
                     marker=dict(color=col, size=9),
-                    text=[f"{true_date.year}"], textposition=tpos,
+                    text=[label], textposition=tpos,
                     textfont=dict(size=19, color=col),
                     showlegend=False, hoverinfo="skip"), row=i, col=1)
 
@@ -317,7 +328,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
     proxy(6, "today", mode="lines",
           line=dict(color=TODAY_COLOR, width=2.5, dash="dot"))
     if clipped:
-        proxy(7, "continues past the window (true date shown)", mode="markers",
+        proxy(7, "continues past the window (date shown)", mode="markers",
               marker=dict(color="#888", size=9))
 
     fig.update_xaxes(title=dict(text="Crossing date", font=dict(size=FONT_TICK)),
@@ -339,9 +350,9 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
     save_html(fig, out)
     save_print(fig, out)
     print(f"  fixed x window {x0d.date()} .. {x1d.date()}")
-    for name, tier, side, true_date, median_out in clipped:
+    for name, tier, side, label, median_out in clipped:
         what = "median" if median_out else "80% endpoint"
-        print(f"  clipped {side}: {name} / {tier} — {what} {true_date.date()} "
+        print(f"  clipped {side}: {name} / {tier} — {what} {label} "
               f"marked as a small dot at the edge")
     print(f"  wrote {out.with_suffix('.png')} and html/{out.stem}.html")
 

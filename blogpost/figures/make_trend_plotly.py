@@ -7,7 +7,7 @@ trend, human tiers in Blues with their names in the right margin, no legend.
 
 Reads the flagship trace over ALL chains: the post's figures are
 whole-posterior, never mode-restricted. The forecast itself is
-`make_all.compute` (FORECAST_KW, records basis, per-axis SOTA exemption), and
+`make_all.compute` (FORECAST_KW, envelope basis, per-axis SOTA exemption), and
 its result is cached in `lw_forecast_cache_80.pkl` BESIDE the trace it came
 from — keyed by folder, so pointing --trace elsewhere can never reuse another
 fit's forecast. Axis identity is checked against `make_all.EXPECTED_TOPS`

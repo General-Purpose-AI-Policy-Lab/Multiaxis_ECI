@@ -143,10 +143,14 @@ def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str,
 
     `human_labels` defaults to HUMAN_LEVEL_LABELS_FR; pass {} for raw names."""
     labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
-    from multiaxis_eci.analysis.forecast import _to_year
+    from multiaxis_eci.analysis.forecast import _to_year, frontier_paths
 
     xg = _to_year(fc.grid_dates)
-    f = fc.intercept[:, None] + fc.slope[:, None] * xg[None, :]     # (S, G)
+    # Through frontier_paths, NOT intercept + slope * t: an envelope result's
+    # line is only valid beyond the last record — evaluated backward it would
+    # extrapolate the recent rate over the observed window and misprice every
+    # historical exceedance probability.
+    f = frontier_paths(fc, xg)                                      # (S, G)
     gx = pd.to_datetime(fc.grid_dates).strftime("%Y-%m-%d")
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
 

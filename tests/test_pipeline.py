@@ -443,9 +443,12 @@ class TestScopeFlags:
 class TestAnalysis:
     def test_post_stats_ordering(self):
         s = np.linspace(0.0, 1.0, 1000)
-        mean, lo, hi = post_stats(s, hdi_prob=0.94)
+        mean, lo, hi = post_stats(s)          # default hdi_prob: 95%
         assert lo <= mean <= hi
         assert 0.4 < mean < 0.6  # ~0.5 for uniform[0,1]
+        # The default interval is the 95% HDI — for uniform[0,1] any 95% HDI
+        # spans 0.95, so the edges sit within 5% of the support ends.
+        assert lo < 0.05 and hi > 0.95
 
     def test_flat_C_shape(self, synth_trace, data):
         C_flat = flat_C(synth_trace)
@@ -463,6 +466,38 @@ class TestAnalysis:
         eci_high = t.apply(C_flat[:, high_idx])
         np.testing.assert_allclose(eci_low,  ANCHOR_LOW[1],  rtol=0, atol=1e-9)
         np.testing.assert_allclose(eci_high, ANCHOR_HIGH[1], rtol=0, atol=1e-9)
+
+    def test_eci_anchor_literals(self):
+        # A silent anchor swap rescales every published ECI-H number while the
+        # pin test above (which reads the same constants) keeps passing.
+        assert ANCHOR_LOW == ("claude-3-5-sonnet-20241022", 130.0)
+        assert ANCHOR_HIGH == ("gpt-5-2025-08-07_medium", 150.0)
+
+    def test_forecast_config_wiring(self):
+        # The figure pipeline feeds FORECAST_KW / FORECAST_BACKCAST_FLOOR into
+        # mirt_frontier_forecast through dict-merges and .get(name): a typo'd
+        # key degrades silently (kwarg TypeError only inside a 13 GB trace
+        # run; a missing floor key = censoring instead of backcast).
+        import inspect
+        from multiaxis_eci.config import (AXIS_TITLES, FORECAST_BACKCAST_FLOOR,
+                                          FORECAST_KW)
+        from multiaxis_eci.analysis import mirt_frontier_forecast
+        params = set(inspect.signature(mirt_frontier_forecast).parameters)
+        assert set(FORECAST_KW) <= params
+        assert FORECAST_KW["fit_basis"] == "envelope"      # flagship identity
+        assert FORECAST_KW["hdi_prob"] == 0.8              # the figures' mass
+        assert set(FORECAST_BACKCAST_FLOOR) == {"axis1", "axis2", "axis3"}
+        assert set(FORECAST_BACKCAST_FLOOR) <= set(AXIS_TITLES)
+        for v in FORECAST_BACKCAST_FLOOR.values():
+            # One shared floor, equal to the crossover figure's window start.
+            assert pd.Timestamp(v) == pd.Timestamp("2015-01-01")
+
+    def test_save_html_lands_in_html_subdir(self, tmp_path):
+        import plotly.graph_objects as go
+        from multiaxis_eci.viz.core import save_html
+        out = save_html(go.Figure(), tmp_path / "some_figure")
+        assert out == tmp_path / "html" / "some_figure.html"
+        assert out.exists()
 
     def test_sota_stats_df_columns_and_dates(self, synth_trace, data, raw_df):
         df = sota_stats_df(synth_trace, data, raw_df)
@@ -1748,6 +1783,80 @@ class TestMIRT:
         assert (pd.Timestamp("2022-06-01") <= pd.Timestamp(cd.crossover_date_median)
                 < pd.Timestamp("2023-01-01"))                  # backcast, not pinned
 
+        # Frozen set + envelope: the running max over exactly those models —
+        # not a silent downgrade to the frozen OLS (kind stays "envelope").
+        env_fr = mirt_frontier_forecast(theta, 0, d, raw, sd_cap=None,
+                                        drop_low_obs=False, fit_basis="envelope",
+                                        fit_names=[f"m{i}" for i in range(6)])
+        assert env_fr.kind == "envelope" and env_fr.fit_basis == "envelope"
+        assert abs(float(np.median(env_fr.slope)) - 1.0) < 0.2
+
+        # A duplicated LAST date more than rate_window past its predecessor
+        # must not collapse the recent-rate denominator to zero.
+        raw_dup2 = raw.copy()
+        raw_dup2.loc[4, "release_date"] = pd.Timestamp("2025-07-01")  # m4 joins m5
+        env_l = mirt_frontier_forecast(theta, 0, d, raw_dup2, sd_cap=None,
+                                       drop_low_obs=False, fit_basis="envelope",
+                                       fit_names=["m0", "m1", "m4", "m5"])
+        assert np.isfinite(env_l.slope).all()
+        with pytest.raises(ValueError):                        # one shared date only
+            mirt_frontier_forecast(theta, 0, d, raw_dup2, sd_cap=None,
+                                   drop_low_obs=False, fit_basis="envelope",
+                                   fit_names=["m4", "m5"])
+
+        # frontier_paths: observed record steps inside the window, the forward
+        # line beyond it — what the dashboard exceedance curves must consume.
+        from multiaxis_eci.analysis.forecast import _to_year, frontier_paths
+        xg = np.asarray(_to_year(pd.DatetimeIndex(["2024-02-01", "2027-01-01"])),
+                        dtype=float)
+        fp = frontier_paths(env, xg)
+        assert abs(float(np.median(fp[:, 0])) - 1.0) < 0.1     # record then: m2
+        assert float(np.median(fp[:, 1])) > 3.0                # forward line
+
+        # p_passed_now decisiveness split, and a RETROSPECTIVE today inside
+        # the window: the record level of that date (m2 ~= the tier, so p is
+        # near a coin flip), not the forward line evaluated backwards (~1.5,
+        # which would call it decisively passed).
+        assert avg_e.status == "passed_ci" and avg_e.p_passed_now > 0.975
+        cxr = mirt_crossover_df(env, theta, 0, d, axis_name="axis1",
+                                today="2024-03-01")
+        p_retro = cxr[cxr.tier == "Average Human"].iloc[0].p_passed_now
+        assert 0.2 < p_retro < 0.8
+
+        # History shorter than rate_window: both rate windows are clamped into
+        # range instead of indexing one past the last candidate.
+        env_s = mirt_frontier_forecast(theta, 0, d, raw, sd_cap=None,
+                                       drop_low_obs=False, fit_basis="envelope",
+                                       fit_names=["m4", "m5"])
+        assert np.isfinite(env_s.slope).all() and np.isfinite(env_s.slope_early).all()
+
+        # A flat early envelope (first model above everything in the early
+        # window) has slope_early == 0: the backcast is undefined and pins at
+        # the floor exactly, rather than dividing by zero.
+        theta_hi0 = theta.copy()
+        theta_hi0[:, 0, 0] += 5.0                            # m0 dominates early
+        theta_hi0[:, 6, 0] = 3.0 + rng.normal(0, 0.02, S)    # tier below m0
+        env_h = mirt_frontier_forecast(theta_hi0, 0, d, raw, sd_cap=None,
+                                       drop_low_obs=False, fit_basis="envelope",
+                                       backcast_floor="2022-06-01")
+        ch = mirt_crossover_df(env_h, theta_hi0, 0, d, axis_name="axis1",
+                               today="2026-01-01")
+        ch = ch[ch.tier == "Average Human"].iloc[0]
+        assert abs((pd.Timestamp(ch.crossover_date_median)
+                    - pd.Timestamp("2022-06-01")).days) <= 2
+
+        # The dashboard exceedance curves consume frontier_paths verbatim and
+        # are nondecreasing for an envelope (records never fall).
+        from multiaxis_eci.viz.forecast import exceedance_prob_fig
+        figx = exceedance_prob_fig(env, theta, 0, d, axis_name="axis1",
+                                   human_labels={})
+        tr = next(t for t in figx.data if t.name == "Average Human")
+        xg_full = np.asarray(_to_year(pd.DatetimeIndex(env.grid_dates)), float)
+        p_manual = (frontier_paths(env, xg_full)
+                    > theta[:, 6, 0][:, None]).mean(0)
+        np.testing.assert_allclose(np.asarray(tr.y, float), p_manual, atol=1e-12)
+        assert (np.diff(np.asarray(tr.y, float)) >= -1e-12).all()
+
 
 # ─────────────────── MIRT non-compensatory (conjunctive) ────────────────────
 @pytest.fixture(scope="session")
@@ -2469,8 +2578,8 @@ class TestLayoutPaths:
     def _files(cls, suffixes):
         # git-visible files only, when git is available: tracked plus
         # untracked-but-not-ignored (--others --exclude-standard), so a new
-        # file is scanned BEFORE it is staged, while a maintainer's gitignored
-        # local dirs (blogpost/, memo/, evals/*/out/) cannot raise false alarms
+        # file is scanned BEFORE it is staged, while gitignored local
+        # artifacts (blogpost/figures/html/, memo/, evals/*/out/) cannot raise false alarms
         # a fresh cloner can never reproduce. Falls back to the rglob sweep
         # when the tree is not a git checkout (a tarball download) — including
         # when git succeeds but sees nothing, which happens when the tarball

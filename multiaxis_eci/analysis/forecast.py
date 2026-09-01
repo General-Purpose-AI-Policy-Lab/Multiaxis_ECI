@@ -172,7 +172,13 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         idx = np.array([pos[m] for m in fit_names])
         dates = pd.to_datetime(pd.Series([model_dates[m] for m in fit_names]).values)
         front = frontier = np.ones(len(idx), dtype=bool)
-        fit_basis = "frozen"
+        # The envelope basis still applies to a frozen set (the running max
+        # over exactly these models) — only the regression bases collapse to
+        # one frozen OLS. Overwriting unconditionally would silently swap the
+        # estimator under consumers that refit chain subsets on fc.fit_names
+        # (3_diagnostics/theta_bimodality.py).
+        if fit_basis != "envelope":
+            fit_basis = "frozen"
     else:
         informed = (mirt_informed_mask(theta_draws, sd_cap)[:, k] if sd_cap is not None
                     else np.ones(data.n_models, dtype=bool))
@@ -237,8 +243,17 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         # Several releases can share day one; the envelope AT the start date is
         # the day's running max (last same-day index), not the first candidate.
         j0 = int(np.searchsorted(env_x, env_x[0], side="right")) - 1
-        i0 = min(np.searchsorted(env_x, env_x[-1] - rate_window), len(env_x) - 2)
-        i1 = max(np.searchsorted(env_x, env_x[0] + rate_window), j0 + 1)
+        # ... and the LAST date can be shared too: cap the recent-rate anchor
+        # strictly before it, or the slope's denominator collapses to zero.
+        jN = int(np.searchsorted(env_x, env_x[-1], side="left"))
+        if jN == 0:
+            raise ValueError(f"axis {k}: every envelope candidate shares one "
+                             "release date — no rate to measure")
+        i0 = min(np.searchsorted(env_x, env_x[-1] - rate_window), jN - 1)
+        # Clamped into range: an axis whose whole history is shorter than
+        # `rate_window` would otherwise index one past the last candidate.
+        i1 = min(max(np.searchsorted(env_x, env_x[0] + rate_window), j0 + 1),
+                 len(env_x) - 1)
         slope = (env_E[:, -1] - env_E[:, i0]) / (env_x[-1] - env_x[i0])
         slope_early = (env_E[:, i1] - env_E[:, j0]) / (env_x[i1] - env_x[0])
         # Forward extension as a line anchored at the last record, so every
@@ -285,15 +300,8 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
                   else pd.to_datetime(dates[front].min()))
     grid = pd.date_range(grid_start, horizon, freq="MS")
     xg = _to_year(grid)                                    # (G,)
-    if fit_basis == "envelope":
-        # Observed record steps inside the window, forward line beyond it.
-        pos = np.clip(np.searchsorted(env_x, xg, side="right") - 1, 0, len(env_x) - 1)
-        f = env_E[:, pos]
-        beyond = xg > env_x[-1]
-        f[:, beyond] = (env_E[:, -1][:, None]
-                        + slope[:, None] * (xg[beyond] - env_x[-1])[None, :])
-    else:
-        f = intercept[:, None] + slope[:, None] * xg[None, :]  # (S, G)
+    f = _frontier_paths(fit_basis == "envelope", env_x, env_E,
+                        slope, intercept, xg)
     # hdi_prob HDI per grid point (narrowest interval holding the mass), the same
     # summary the human reference bands use — more intuitive than equal-tailed
     # quantiles and consistent across the figure.
@@ -313,6 +321,32 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
     )
 
 
+def _frontier_paths(envelope: bool, env_x, env_E, slope, intercept,
+                    xg: np.ndarray) -> np.ndarray:
+    """Per-draw frontier value at each grid year in `xg` — (S, G).
+
+    Envelope: the observed record steps inside the window, the forward line
+    beyond it. Linear: the fitted line everywhere. Every consumer that walks a
+    frontier over a grid (the forecast band, the dashboard exceedance curves)
+    must go through this — evaluating `intercept + slope * t` backward over an
+    envelope's window extrapolates the recent rate into the past and is wrong.
+    """
+    if not envelope:
+        return intercept[:, None] + slope[:, None] * xg[None, :]
+    pos = np.clip(np.searchsorted(env_x, xg, side="right") - 1, 0, len(env_x) - 1)
+    f = env_E[:, pos].copy()
+    beyond = xg > env_x[-1]
+    f[:, beyond] = (env_E[:, -1][:, None]
+                    + slope[:, None] * (xg[beyond] - env_x[-1])[None, :])
+    return f
+
+
+def frontier_paths(fc: ForecastResult, xg: np.ndarray) -> np.ndarray:
+    """`_frontier_paths` read off a finished ForecastResult (grid in years)."""
+    return _frontier_paths(getattr(fc, "kind", "linear") == "envelope",
+                           fc.env_x, fc.env_E, fc.slope, fc.intercept, xg)
+
+
 def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
                       data: ECIData, *, axis_name: str = "",
                       today: str | pd.Timestamp | None = None,
@@ -330,7 +364,10 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
     """
     today = pd.Timestamp(today) if today is not None else pd.Timestamp.today().normalize()
     t_now = _to_year(today)
-    f_now = fc.intercept + fc.slope * t_now                # (S,)
+    # Through frontier_paths so a retrospective `today` inside an envelope's
+    # observed window reads the record level of THAT date, not the forward
+    # line extrapolated backward.
+    f_now = frontier_paths(fc, np.atleast_1d(np.asarray(t_now, dtype=float)))[:, 0]
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
 
     rows = []

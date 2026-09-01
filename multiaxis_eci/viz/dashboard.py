@@ -194,10 +194,11 @@ def forecast_figures(view, data, raw, names, th_fc,
             # are mostly the lineage prior (successor + positive drift),
             # so the slope is part evidence and part prior. That is the
             # accepted cost of a line that tracks the visible frontier
-            # instead of stopping at the last well-measured record. The
-            # line is drawn back over the cloud (back_start = earliest
-            # plotted point) purely for visual consistency; the fitted
-            # slope only uses the Oct-2024-onward records.
+            # instead of stopping at the last well-measured record.
+            # back_start only matters to the regression bases; the
+            # envelope (FORECAST_KW's default) ignores it and draws the
+            # observed record steps from its own window start, with the
+            # forward rate measured over the last rate_window years.
             back = pd.to_datetime(tl["release_date"]).min()
             from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
             fc = mirt_frontier_forecast(th_fc, k, data, raw,
