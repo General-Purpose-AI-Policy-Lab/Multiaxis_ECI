@@ -52,6 +52,31 @@ class ForecastResult:
     fit_basis: str = "frontier"
 
 
+def _weighted_median_rows(v: np.ndarray, w: np.ndarray) -> np.ndarray:
+    """Row-wise weighted median of `v` (S, P) under shared weights `w` (P,):
+    the smallest value whose cumulative weight reaches half the total."""
+    order = np.argsort(v, axis=1)
+    cw = np.cumsum(w[order], axis=1)
+    pick = (cw >= 0.5 * w.sum()).argmax(axis=1)
+    return np.take_along_axis(np.take_along_axis(v, order, 1),
+                              pick[:, None], 1)[:, 0]
+
+
+def _theilsen_slopes(x: np.ndarray, y: np.ndarray,
+                     w: np.ndarray | None) -> np.ndarray:
+    """Per-draw Theil-Sen slope: the (weighted) median over all pairwise
+    slopes (y_j - y_i)/(x_j - x_i). `x` (F,), `y` (S, F); pair weights are
+    w_i * w_j. Ties in release date are excluded (dx = 0)."""
+    i, j = np.triu_indices(len(x), 1)
+    dx = x[j] - x[i]
+    keep = np.abs(dx) > 1e-9
+    i, j, dx = i[keep], j[keep], dx[keep]
+    sp = (y[:, j] - y[:, i]) / dx                          # (S, P)
+    if w is None:
+        return np.median(sp, axis=1)
+    return _weighted_median_rows(sp, w[i] * w[j])
+
+
 def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
                            raw_df: pd.DataFrame, *,
                            horizon_date: str | pd.Timestamp | None = None,
@@ -63,6 +88,7 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
                            fit_basis: str = "frontier",
                            fit_names: list[str] | None = None,
                            weights: str | None = None,
+                           estimator: str = "ols",
                            hdi_prob: float = 0.5) -> ForecastResult:
     """Extrapolate axis-k's capability trend linearly in time.
 
@@ -97,6 +123,13 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
     keeps its place in the fit but loses the leverage that lets it flip the
     slope draw by draw — the pathology behind negative-slope draws and
     decade-long crossover tails. None (default) keeps the unweighted OLS.
+
+    `estimator="theilsen"` replaces the per-draw least-squares line with the
+    per-draw Theil-Sen line: the slope is the median of all pairwise slopes
+    (weighted median with pair weights w_i*w_j under `weights="precision"`),
+    the intercept the (weighted) median of y - slope*x. A single aberrant
+    point changes at most half the pairs, so it cannot flip the slope's sign
+    the way it moves a mean-based fit. Composes with `weights`.
     """
     if fit_basis not in ("frontier", "records", "informed"):
         raise ValueError(f"fit_basis must be 'frontier', 'records' or 'informed', "
@@ -181,10 +214,19 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         w = 1.0 / np.maximum(sd, 1e-3) ** 2
     else:
         raise ValueError(f"weights must be None or 'precision', got {weights!r}")
-    xw = (w * x).sum() / w.sum()
-    xc = x - xw
-    slope = (y * (w * xc)).sum(1) / (w * xc**2).sum()      # (S,)
-    intercept = (y * w).sum(1) / w.sum() - slope * xw      # (S,)
+    if estimator == "ols":
+        xw = (w * x).sum() / w.sum()
+        xc = x - xw
+        slope = (y * (w * xc)).sum(1) / (w * xc**2).sum()  # (S,)
+        intercept = (y * w).sum(1) / w.sum() - slope * xw  # (S,)
+    elif estimator == "theilsen":
+        slope = _theilsen_slopes(x, y, None if weights is None else w)
+        resid = y - slope[:, None] * x[None, :]            # (S, F)
+        intercept = (np.median(resid, axis=1) if weights is None
+                     else _weighted_median_rows(resid, w))
+    else:
+        raise ValueError(f"estimator must be 'ols' or 'theilsen', "
+                         f"got {estimator!r}")
 
     last_obs = pd.to_datetime(dates.max())
     horizon = (pd.Timestamp(horizon_date) if horizon_date is not None

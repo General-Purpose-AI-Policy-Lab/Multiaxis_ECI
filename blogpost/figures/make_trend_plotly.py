@@ -78,6 +78,13 @@ def forecast(trace: Path, cached: bool = False) -> dict:
     """
     cache = trace.parent / "lw_forecast_cache_50.pkl"
     if cache.exists():
+        # A cache written before the package rename pickled the result as
+        # `analysis.forecast.ForecastResult`; alias the old module path so
+        # those caches keep loading on the multiaxis_eci layout.
+        import multiaxis_eci.analysis as _a
+        import multiaxis_eci.analysis.forecast as _af
+        sys.modules.setdefault("analysis", _a)
+        sys.modules.setdefault("analysis.forecast", _af)
         print(f"  reused {cache}")
         return pickle.loads(cache.read_bytes())
     if cached:

@@ -1673,6 +1673,24 @@ class TestMIRT:
                                       fit_names=["m0", "m2", "m4"])
         np.testing.assert_allclose(same.slope, fr.slope, rtol=0.2)
 
+        # estimator="theilsen": recovers the clean slope like OLS, and a single
+        # aberrant POINT VALUE (not just noisy: biased in every draw) moves the
+        # pairwise-median slope far less than the mean-based OLS.
+        ts = mirt_frontier_forecast(theta, 0, d, raw, sd_cap=None,
+                                    drop_low_obs=False, estimator="theilsen",
+                                    fit_names=[f"m{i}" for i in range(6)])
+        assert abs(float(np.median(ts.slope)) - 1.0) < 0.15
+        theta_b = theta.copy()
+        theta_b[:, 0, 0] += 3.0                      # m0 biased high, every draw
+        ols_b = mirt_frontier_forecast(theta_b, 0, d, raw, sd_cap=None,
+                                       drop_low_obs=False,
+                                       fit_names=[f"m{i}" for i in range(6)])
+        ts_b = mirt_frontier_forecast(theta_b, 0, d, raw, sd_cap=None,
+                                      drop_low_obs=False, estimator="theilsen",
+                                      fit_names=[f"m{i}" for i in range(6)])
+        assert abs(float(np.median(ts_b.slope)) - 1.0) \
+            < abs(float(np.median(ols_b.slope)) - 1.0) - 0.3
+
 
 # ─────────────────── MIRT non-compensatory (conjunctive) ────────────────────
 @pytest.fixture(scope="session")
