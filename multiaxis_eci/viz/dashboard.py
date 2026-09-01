@@ -83,7 +83,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
                        axis_titles: dict | None = None,
                        human_labels: dict | None = None) -> dict:
     """Ability-timeline + loading figures for one posterior: per axis, the
-    measured timeline (SD<0.4, low-obs dropped), its all-models companion, and
+    measured timeline (SD<0.33, low-obs dropped), its all-models companion, and
     the loading forest, plus the all-axis loading heatmap.
 
     `build_fit_figures` and a MODE-RESTRICTED view (the same fit sliced to one
@@ -181,7 +181,8 @@ def forecast_figures(view, data, raw, names, th_fc,
         # honest wide CI. All intervals on this figure set are 50% HDIs:
         # the whiskers, the human bands, the forecast band and the
         # crossover dates.
-        tl = mirt_model_timeline_df(th_fc, k, data, raw, sd_cap=0.4,
+        tl = mirt_model_timeline_df(th_fc, k, data, raw,
+                                    sd_cap=FORECAST_KW["sd_cap"],
                                     hdi_prob=0.5)
         if tl.empty:
             continue

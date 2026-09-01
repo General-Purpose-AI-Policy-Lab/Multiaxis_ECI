@@ -117,7 +117,8 @@ def compute(view, data, raw) -> dict:
                                            backcast_floor=FORECAST_BACKCAST_FLOOR.get(name)))
         out[name] = {
             "fc": fc,
-            "tl": mirt_model_timeline_df(view.theta, k, data, raw, sd_cap=0.4,
+            "tl": mirt_model_timeline_df(view.theta, k, data, raw,
+                                         sd_cap=FORECAST_KW["sd_cap"],
                                          hdi_prob=HDI),
             "hs": mirt_human_axis_stats(view.theta, k, data, hdi_prob=HDI),
         }

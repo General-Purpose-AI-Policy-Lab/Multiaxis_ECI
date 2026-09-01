@@ -486,6 +486,7 @@ class TestAnalysis:
         assert set(FORECAST_KW) <= params
         assert FORECAST_KW["fit_basis"] == "envelope"      # flagship identity
         assert FORECAST_KW["hdi_prob"] == 0.8              # the figures' mass
+        assert FORECAST_KW["sd_cap"] == 0.33               # the measured cloud
         # Raw backcast dates on every axis: no clamp configured. Any entry
         # must at least name a real axis and parse as a date.
         assert set(FORECAST_BACKCAST_FLOOR) <= set(AXIS_TITLES)

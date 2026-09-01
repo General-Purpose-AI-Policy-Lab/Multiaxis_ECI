@@ -9,7 +9,7 @@ from multiaxis_eci.analysis.convergence import nc_difficulty_draws
 from multiaxis_eci.analysis.stats import _release_dates, forest_stats_from_draws, post_stats
 from multiaxis_eci.data import ECIData
 
-def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = 0.4) -> np.ndarray:
+def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = 0.33) -> np.ndarray:
     """(M, K) bool: True where a model's per-axis posterior SD < sd_cap.
 
     Filters out models whose ability is extrapolated rather than measured
@@ -28,7 +28,7 @@ def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = 0.4) -> np.ndarr
 
 def mirt_model_timeline_df(theta_canon: np.ndarray, k: int,
                            data: ECIData, raw_df: pd.DataFrame,
-                           sd_cap: float | None = 0.4,
+                           sd_cap: float | None = 0.33,
                            drop_low_obs: bool = True,
                            hdi_prob: float = 0.5) -> pd.DataFrame:
     """Model-ability timeline for axis k (kind='model'); humans excluded

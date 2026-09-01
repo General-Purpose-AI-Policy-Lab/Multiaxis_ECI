@@ -210,13 +210,13 @@ SOTA_MODELS: list[str] = _load_sota_models()
 FORECAST_NO_SOTA_AXES: set[int] = {3}
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
-# the per-draw running-max ENVELOPE over the SD<0.4 cloud (non-decreasing by
+# the per-draw running-max ENVELOPE over the SD<0.33 cloud (non-decreasing by
 # definition, so no draw can carry a negative trend — the record regression it
 # replaces left a third of the Agentic axis's draws with negative slopes),
 # extended forward at its recent rate; 80% HDIs. `fit_start` only matters to
 # the regression bases kept for sensitivity runs (records/frontier/informed).
 # Each caller still supplies its own sota_exempt/backcast_floor/horizon_date.
-FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=0.4,
+FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=0.33,
                    hdi_prob=0.8)
 
 # Optional backcast clamp per axis (envelope basis): a tier already passed at
