@@ -486,11 +486,12 @@ class TestAnalysis:
         assert set(FORECAST_KW) <= params
         assert FORECAST_KW["fit_basis"] == "envelope"      # flagship identity
         assert FORECAST_KW["hdi_prob"] == 0.8              # the figures' mass
-        assert set(FORECAST_BACKCAST_FLOOR) == {"axis1", "axis2", "axis3"}
+        # Raw backcast dates on every axis: no clamp configured. Any entry
+        # must at least name a real axis and parse as a date.
         assert set(FORECAST_BACKCAST_FLOOR) <= set(AXIS_TITLES)
         for v in FORECAST_BACKCAST_FLOOR.values():
-            # One shared floor, equal to the crossover figure's window start.
-            assert pd.Timestamp(v) == pd.Timestamp("2015-01-01")
+            pd.Timestamp(v)
+        assert FORECAST_BACKCAST_FLOOR == {}               # flagship identity
 
     def test_save_html_lands_in_html_subdir(self, tmp_path):
         import plotly.graph_objects as go
@@ -1745,9 +1746,9 @@ class TestMIRT:
                 < pd.Timestamp("2024-06-01"))
         assert (pd.Timestamp("2026-01-01") < pd.Timestamp(top_e.crossover_date_median)
                 < pd.Timestamp("2027-06-01"))
-        # A tier below the very first record: censored at the window start
-        # without a floor, backcast at the early rate (but never past the
-        # floor) with one.
+        # A tier below the very first record: backcast at the early rate. The
+        # tier sits 0.5 under the day-one record and the early rate is ~1/yr,
+        # so the raw extrapolated crossing is ~mid-2022 — reported as-is.
         theta_lo = theta.copy()
         theta_lo[:, 6, 0] = -0.5 + rng.normal(0, 0.05, S)   # Average Human low
         env0 = mirt_frontier_forecast(theta_lo, 0, d, raw, sd_cap=None,
@@ -1755,16 +1756,17 @@ class TestMIRT:
         c0 = mirt_crossover_df(env0, theta_lo, 0, d, axis_name="axis1",
                                today="2026-01-01")
         c0 = c0[c0.tier == "Average Human"].iloc[0]
-        assert abs((pd.Timestamp(c0.crossover_date_median)
-                    - pd.Timestamp("2023-01-01")).days) < 40   # censored at start
+        assert (pd.Timestamp("2022-03-01") <= pd.Timestamp(c0.crossover_date_median)
+                < pd.Timestamp("2022-10-01"))                  # raw backcast
+        # An explicit floor clamps that raw date when it lands before it.
         envf = mirt_frontier_forecast(theta_lo, 0, d, raw, sd_cap=None,
                                       drop_low_obs=False, fit_basis="envelope",
-                                      backcast_floor="2022-06-01")
+                                      backcast_floor="2022-10-01")
         cf = mirt_crossover_df(envf, theta_lo, 0, d, axis_name="axis1",
                                today="2026-01-01")
         cf = cf[cf.tier == "Average Human"].iloc[0]
-        assert (pd.Timestamp("2022-05-25") <= pd.Timestamp(cf.crossover_date_median)
-                < pd.Timestamp("2023-01-01"))                  # backcast, floored
+        assert abs((pd.Timestamp(cf.crossover_date_median)
+                    - pd.Timestamp("2022-10-01")).days) <= 2   # clamped at floor
 
         # Several releases can share day one (the flagship data has four on
         # 2024-05-13). A tier first beaten by the SECOND same-day candidate is
@@ -1831,19 +1833,18 @@ class TestMIRT:
         assert np.isfinite(env_s.slope).all() and np.isfinite(env_s.slope_early).all()
 
         # A flat early envelope (first model above everything in the early
-        # window) has slope_early == 0: the backcast is undefined and pins at
-        # the floor exactly, rather than dividing by zero.
+        # window) has slope_early == 0: no rate to extrapolate, so the backcast
+        # pins at the window start rather than dividing by zero.
         theta_hi0 = theta.copy()
         theta_hi0[:, 0, 0] += 5.0                            # m0 dominates early
         theta_hi0[:, 6, 0] = 3.0 + rng.normal(0, 0.02, S)    # tier below m0
         env_h = mirt_frontier_forecast(theta_hi0, 0, d, raw, sd_cap=None,
-                                       drop_low_obs=False, fit_basis="envelope",
-                                       backcast_floor="2022-06-01")
+                                       drop_low_obs=False, fit_basis="envelope")
         ch = mirt_crossover_df(env_h, theta_hi0, 0, d, axis_name="axis1",
                                today="2026-01-01")
         ch = ch[ch.tier == "Average Human"].iloc[0]
         assert abs((pd.Timestamp(ch.crossover_date_median)
-                    - pd.Timestamp("2022-06-01")).days) <= 2
+                    - pd.Timestamp("2023-01-01")).days) <= 2
 
         # The dashboard exceedance curves consume frontier_paths verbatim and
         # are nondecreasing for an envelope (records never fall).

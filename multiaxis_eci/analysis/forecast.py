@@ -54,8 +54,8 @@ class ForecastResult:
     # `env_x` (F,) are the candidate years sorted ascending, `env_E` (S, F) the
     # cumulative max of theta over them, `slope_early` (S,) the envelope's
     # growth rate over its FIRST `rate_window` years (used to backcast), and
-    # `backcast_floor` the earliest year a backcast crossing may name (None =
-    # no backcast: a tier already passed at window start is censored there).
+    # `backcast_floor` an OPTIONAL clamp: the earliest year a backcast crossing
+    # may name (None = raw, the extrapolated date is reported as-is).
     # `slope`/`intercept` hold the FORWARD extension (recent rate anchored at
     # the last record), so every linear consumer works unchanged for t >= end.
     kind: str = "linear"
@@ -131,9 +131,9 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         inside the window are the observed record-step dates; ahead of it the
         envelope extends linearly at its growth rate over the last
         `rate_window` years; behind it (a tier already passed at window
-        start) it backcasts at the rate over its FIRST `rate_window` years,
-        clamped at `backcast_floor` — or is censored at the window start when
-        no floor is given. The `weights`/`estimator` knobs do not apply.
+        start) it backcasts at the rate over its FIRST `rate_window` years —
+        raw dates by default, clamped at `backcast_floor` when one is given.
+        The `weights`/`estimator` knobs do not apply.
     Either way the OLS is per-draw, so ability uncertainty propagates into the
     slope/intercept, hence into the forecast band and every crossover date.
 
@@ -382,8 +382,8 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
         if getattr(fc, "kind", "linear") == "envelope":
             # Three regimes per draw: crossed INSIDE the window (the observed
             # record-step date), already above at the window START (backcast at
-            # the early rate, clamped at the floor — censored at the window
-            # start when no floor is given), or still AHEAD (forward line).
+            # the early rate — raw dates, clamped only when a floor is given),
+            # or still AHEAD (forward line).
             E, xs = fc.env_E, fc.env_x
             reached = E >= th[:, None]
             ever = reached.any(axis=1)
@@ -399,11 +399,13 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
             j0 = int(np.searchsorted(xs, xs[0], side="right")) - 1
             with np.errstate(divide="ignore", invalid="ignore"):
                 fwd = np.where(pos, xs[-1] + (th - E[:, -1]) / fc.slope, np.nan)
+                # A flat early envelope carries no rate to extrapolate: those
+                # draws pin at the window start (the latest date the crossing
+                # can have happened) rather than divide by zero.
                 back = np.where(fc.slope_early > 1e-9,
-                                xs[0] - (E[:, j0] - th) / fc.slope_early, np.nan)
-            back = (np.full_like(back, xs[0]) if fc.backcast_floor is None
-                    else np.maximum(np.nan_to_num(back, nan=fc.backcast_floor),
-                                    fc.backcast_floor))
+                                xs[0] - (E[:, j0] - th) / fc.slope_early, xs[0])
+            if fc.backcast_floor is not None:
+                back = np.maximum(back, fc.backcast_floor)
             cross = np.where(inside, xs[first],
                              np.where(at_start, back, fwd))   # (S,) NaN = never
             star = cross[np.isfinite(cross)]

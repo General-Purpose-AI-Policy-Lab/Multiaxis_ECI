@@ -4,22 +4,20 @@ Per human tier: the median crossing date (dot), a THICK 50% bar and a THIN 80%
 bar, each bar split at the today line — the share already behind us is green,
 the share still ahead is red. Crossings are solved per draw by
 `analysis.mirt_crossover_df` on the record ENVELOPE (observed step date inside
-the window, early-rate backcast clamped at the floor below it, forward line
-above it), so both interval widths come from the same per-draw distribution
-and both are HDIs, the summary the whole forecast pipeline uses.
+the window, raw early-rate backcast below it, forward line above it), so both
+interval widths come from the same per-draw distribution and both are HDIs,
+the summary the whole forecast pipeline uses.
 
 The envelope draws come from `make_trend_plotly.forecast` — the forecast
 cache pickle BESIDE the trace (FORECAST_KW: envelope basis, per-axis SOTA
-exemption and backcast floor), keyed by folder so another fit's forecast can
-never be reused. The human theta draws need the trace itself (all chains,
+exemption), keyed by folder so another fit's forecast can never be reused. The human theta draws need the trace itself (all chains,
 flagship thinning, axis identity checked), so the assembled table is cached
 as `lw_crossover_50_80.csv` beside the trace and later runs read the CSV only.
 
 The window is fixed at 2015-2030 so every variant of the figure is
 comparable. Whatever runs past it (a whisker's tail, or a median outside the
 window) is clipped at the edge and marked with a small dot plus the true date
-in small type — "<2015" when the value sits on the backcast floor, where the
-true date is censored rather than known.
+in small type.
 
 Usage:
     python blogpost/figures/make_crossover_plotly.py [--trace FILE] [--tag ""]
@@ -53,9 +51,8 @@ TITLE = None
 # forecast figure — its benchmarks carry no recent measurements, so a trend
 # there is not meaningful. TITLES has 4 keys; only 3 are looked up here.
 AXES = ["axis1", "axis2", "axis3"]
-# Every panel backcasts (FORECAST_BACKCAST_FLOOR covers all three axes):
-# dates before an axis's first measured model are backward extrapolations
-# of its early record trend, floored at the figure's window start.
+# Every panel backcasts: dates before an axis's first measured model are
+# raw backward extrapolations of its early record trend.
 _NOTE = "(pre-data dates: backward extrapolation of the early record trend)"
 BACKCAST = {"axis1": _NOTE, "axis2": _NOTE, "axis3": _NOTE}
 
@@ -256,29 +253,22 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
 
         # Off-window overflow: one small dot at the edge per (row, side), with
         # the true date in small type above it — the median's date when the
-        # median itself is out, otherwise the 80% endpoint's. The left edge is
-        # ALSO the backcast floor, so an endpoint sitting exactly on it is a
-        # censored value ("crossed at or before the floor", true date unknown):
-        # it gets the dot too, labeled "<{year}" instead of a year.
+        # median itself is out, otherwise the 80% endpoint's. Backcast dates
+        # are RAW (no floor), so the year shown at the left edge is the actual
+        # extrapolated crossing year.
         for _, r in rows.iterrows():
             m = r["crossover_date_median"]
             for side, edge, lo_c, hi_c in (("left", x0d, "hdi80_low", None),
                                            ("right", x1d, None, "hdi80_high")):
                 if side == "left":
-                    # One day of slack: a floored value roundtrips through the
-                    # float-year encoding with microseconds of noise, so exact
-                    # equality with the floor never holds.
-                    tol = edge + pd.Timedelta(days=1)
-                    over = r[lo_c] <= tol or m <= tol
-                    true_date = m if m <= tol else r[lo_c]
-                    label = (f"<{edge.year}" if true_date <= tol
-                             else f"{true_date.year}")
+                    over = r[lo_c] < edge or m < edge
+                    true_date = m if m < edge else r[lo_c]
                     tpos = "top right"
                 else:
                     over = r[hi_c] > edge or m > edge
                     true_date = m if m > edge else r[hi_c]
-                    label = f"{true_date.year}"
                     tpos = "top left"
+                label = f"{true_date.year}"
                 if not over:
                     continue
                 col = PAST if edge <= today else FUTURE
