@@ -234,10 +234,13 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
     if fit_basis == "envelope":
         srt = np.argsort(x, kind="stable")                 # frozen sets may be unsorted
         env_x, env_E = x[srt], np.maximum.accumulate(y[:, srt], axis=1)
+        # Several releases can share day one; the envelope AT the start date is
+        # the day's running max (last same-day index), not the first candidate.
+        j0 = int(np.searchsorted(env_x, env_x[0], side="right")) - 1
         i0 = min(np.searchsorted(env_x, env_x[-1] - rate_window), len(env_x) - 2)
-        i1 = max(np.searchsorted(env_x, env_x[0] + rate_window), 1)
+        i1 = max(np.searchsorted(env_x, env_x[0] + rate_window), j0 + 1)
         slope = (env_E[:, -1] - env_E[:, i0]) / (env_x[-1] - env_x[i0])
-        slope_early = (env_E[:, i1] - env_E[:, 0]) / (env_x[i1] - env_x[0])
+        slope_early = (env_E[:, i1] - env_E[:, j0]) / (env_x[i1] - env_x[0])
         # Forward extension as a line anchored at the last record, so every
         # linear consumer (f_now, future crossings) works unchanged for t >= end.
         intercept = env_E[:, -1] - slope * env_x[-1]
@@ -348,12 +351,19 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
             reached = E >= th[:, None]
             ever = reached.any(axis=1)
             first = np.argmax(reached, axis=1)
-            at_start = ever & (first == 0)
-            inside = ever & (first > 0)
+            # Same DATE as the window start counts as "already above": several
+            # releases can share day one (xs[0] == xs[1] == ...), and a tier
+            # first beaten by the second same-day candidate is no more an
+            # observed crossing than one beaten by the first.
+            at_start = ever & (xs[first] == xs[0])
+            inside = ever & (xs[first] > xs[0])
+            # The envelope at the start DATE is the day-one running max (last
+            # same-day index), the value the backcast extrapolates down from.
+            j0 = int(np.searchsorted(xs, xs[0], side="right")) - 1
             with np.errstate(divide="ignore", invalid="ignore"):
                 fwd = np.where(pos, xs[-1] + (th - E[:, -1]) / fc.slope, np.nan)
                 back = np.where(fc.slope_early > 1e-9,
-                                xs[0] - (E[:, 0] - th) / fc.slope_early, np.nan)
+                                xs[0] - (E[:, j0] - th) / fc.slope_early, np.nan)
             back = (np.full_like(back, xs[0]) if fc.backcast_floor is None
                     else np.maximum(np.nan_to_num(back, nan=fc.backcast_floor),
                                     fc.backcast_floor))

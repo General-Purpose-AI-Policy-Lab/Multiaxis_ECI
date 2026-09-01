@@ -1731,6 +1731,23 @@ class TestMIRT:
         assert (pd.Timestamp("2022-05-25") <= pd.Timestamp(cf.crossover_date_median)
                 < pd.Timestamp("2023-01-01"))                  # backcast, floored
 
+        # Several releases can share day one (the flagship data has four on
+        # 2024-05-13). A tier first beaten by the SECOND same-day candidate is
+        # "already above at the window start" exactly like one beaten by the
+        # first — it must backcast, not pin an observed crossing on that date.
+        raw_dup = raw.copy()
+        raw_dup.loc[1, "release_date"] = pd.Timestamp("2023-01-01")   # m1 joins m0
+        theta_dup = theta.copy()
+        theta_dup[:, 6, 0] = 0.25 + rng.normal(0, 0.02, S)  # between m0 and m1
+        envd = mirt_frontier_forecast(theta_dup, 0, d, raw_dup, sd_cap=None,
+                                      drop_low_obs=False, fit_basis="envelope",
+                                      backcast_floor="2022-06-01")
+        cd = mirt_crossover_df(envd, theta_dup, 0, d, axis_name="axis1",
+                               today="2026-01-01")
+        cd = cd[cd.tier == "Average Human"].iloc[0]
+        assert (pd.Timestamp("2022-06-01") <= pd.Timestamp(cd.crossover_date_median)
+                < pd.Timestamp("2023-01-01"))                  # backcast, not pinned
+
 
 # ─────────────────── MIRT non-compensatory (conjunctive) ────────────────────
 @pytest.fixture(scope="session")

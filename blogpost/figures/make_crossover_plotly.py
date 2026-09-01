@@ -14,7 +14,7 @@ reused. The human theta draws need the trace itself (all chains, flagship
 thinning, axis identity checked), so the assembled table is cached as
 `lw_crossover_50_80.csv` beside the trace and later runs read the CSV only.
 
-The window is fixed at 2015-2035 so every variant of the figure is
+The window is fixed at 2015-2030 so every variant of the figure is
 comparable. Whatever runs past it (a whisker's tail, or a median outside the
 window) is clipped at the edge and marked with a small dot plus the true date
 in small type.
@@ -189,12 +189,12 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
         cx = cx[~dropped]
     today = pd.Timestamp.today().normalize()
 
-    # Fixed 2015-2035 window, shared by every variant of the figure so they
+    # Fixed 2015-2030 window, shared by every variant of the figure so they
     # are all directly comparable. Whatever runs past it is clipped at the
     # edge and marked with a small dot plus the true date in small type. The
     # pad is canvas only (room for the edge dots and their labels); the ticks
     # stay on the years.
-    x0d, x1d = pd.Timestamp("2015-01-01"), pd.Timestamp("2035-01-01")
+    x0d, x1d = pd.Timestamp("2015-01-01"), pd.Timestamp("2030-01-01")
     pad = pd.Timedelta(days=160)
     x0, x1 = x0d - pad, x1d + pad
 
