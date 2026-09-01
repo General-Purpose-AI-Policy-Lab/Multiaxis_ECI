@@ -1,14 +1,14 @@
 """Frontier-trend forecast, three stacked axes, in the post's Plotly style.
 
 Same content as the matplotlib panel in `make_forecast_figs.trend_fig` (dated
-models, frontier trend with its 50% band, human tiers, today line), drawn with
+models, frontier trend with its 80% band, human tiers, today line), drawn with
 the palette and type sizes of `make_timeline_plotly.py`: teal models, orange
 trend, human tiers in Blues with their names in the right margin, no legend.
 
 Reads the flagship trace over ALL chains: the post's figures are
 whole-posterior, never mode-restricted. The forecast itself is
 `make_all.compute` (FORECAST_KW, records basis, per-axis SOTA exemption), and
-its result is cached in `lw_forecast_cache_50.pkl` BESIDE the trace it came
+its result is cached in `lw_forecast_cache_80.pkl` BESIDE the trace it came
 from — keyed by folder, so pointing --trace elsewhere can never reuse another
 fit's forecast. Axis identity is checked against `make_all.EXPECTED_TOPS`
 before the cache is written, so a reused cache is a checked one.
@@ -76,7 +76,7 @@ def forecast(trace: Path, cached: bool = False) -> dict:
     the axis-identity check (SystemExit before any mislabeled axis), and hands
     the view to `make_all.compute`, which owns the forecast settings.
     """
-    cache = trace.parent / "lw_forecast_cache_50.pkl"
+    cache = trace.parent / "lw_forecast_cache_80.pkl"
     if cache.exists():
         # A cache written before the package rename pickled the result as
         # `analysis.forecast.ForecastResult`; alias the old module path so
@@ -151,7 +151,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
         fc, tl, hs = d["fc"], d["tl"], d["hs"]
         gx = pd.to_datetime(fc.grid_dates)
 
-        # 50% band: lower edge, then upper edge filled down to it.
+        # 80% band: lower edge, then upper edge filled down to it.
         fig.add_trace(go.Scatter(x=gx, y=fc.lo, mode="lines", showlegend=False,
                                  line=dict(width=0), hoverinfo="skip"),
                       row=i, col=1)
@@ -160,7 +160,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                                  line=dict(width=0), hoverinfo="skip"),
                       row=i, col=1)
 
-        # Dated models with their 50% intervals.
+        # Dated models with their 80% intervals.
         fig.add_trace(go.Scatter(
             x=pd.to_datetime(tl["release_date"]), y=tl["mean"], mode="markers",
             marker=dict(color=AI, size=MARKER, opacity=0.55,
@@ -200,7 +200,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                          showticklabels=True, row=i, col=1)
         print(f"  {name}: slope median {np.median(fc.slope):+.3f}/yr, "
               f"trend at 2030 {fc.median[-1]:.2f} "
-              f"[{fc.lo[-1]:.2f}, {fc.hi[-1]:.2f}] (50% HDI), "
+              f"[{fc.lo[-1]:.2f}, {fc.hi[-1]:.2f}] (80% HDI), "
               f"{len(tl)} dated models, earliest "
               f"{pd.to_datetime(tl['release_date']).min().date()}, y {ylim[0]:.2f}"
               f"..{ylim[1]:.2f}")

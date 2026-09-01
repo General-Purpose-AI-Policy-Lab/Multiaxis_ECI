@@ -20,7 +20,7 @@ The three per-axis figures have a matplotlib twin in `make_results_figs.py`,
 drawn by `figbase`; the Plotly ones here write `*_lw_plotly.png`, so the two
 sets can be compared side by side.
 
-The forecast cache is `results/mirt.../lw_forecast_cache_50.pkl`, next to the
+The forecast cache is `results/mirt.../lw_forecast_cache_80.pkl`, next to the
 trace it was computed from, not in the temp dir: it is derived from one specific
 fit and it takes a 14 GB trace read to rebuild.
 """
@@ -48,11 +48,11 @@ from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from figbase import FOREST_FRONTIER, pretty  # noqa: E402
 
 AXES = ["axis1", "axis2", "axis3"]      # Legacy QA is out of the forecast scope
-HDI = 0.5                               # every interval on both forecast figures
+HDI = 0.8                               # every interval on both forecast figures
 END = pd.Timestamp("2030-01-01")        # right edge of the trend figure
 # The cache sits in the trace's own folder, which the tag grammar does not
 # derive, so it is read off `FLAGSHIP_TRACE` and never off `results_dir`.
-CACHE = FLAGSHIP_TRACE.parent / "lw_forecast_cache_50.pkl"
+CACHE = FLAGSHIP_TRACE.parent / "lw_forecast_cache_80.pkl"
 
 # Defining benchmarks per axis. The prose titles in AXIS_TITLES are keyed
 # `axis1..4` by position, so they are valid only while the axes keep these

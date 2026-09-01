@@ -213,11 +213,11 @@ FORECAST_NO_SOTA_AXES: set[int] = {3}
 # the per-draw running-max ENVELOPE over the SD<0.4 cloud (non-decreasing by
 # definition, so no draw can carry a negative trend — the record regression it
 # replaces left a third of the Agentic axis's draws with negative slopes),
-# extended forward at its recent rate; 50% HDIs. `fit_start` only matters to
+# extended forward at its recent rate; 80% HDIs. `fit_start` only matters to
 # the regression bases kept for sensitivity runs (records/frontier/informed).
 # Each caller still supplies its own sota_exempt/backcast_floor/horizon_date.
 FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=0.4,
-                   hdi_prob=0.5)
+                   hdi_prob=0.8)
 
 # Backcast floor per axis (envelope basis): a tier already passed at the
 # window start is backcast at the envelope's early rate, but never before
