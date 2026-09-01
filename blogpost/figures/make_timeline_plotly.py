@@ -26,7 +26,7 @@ sys.path.insert(0, str(REPO))
 import multiaxis_eci.config as config  # noqa: E402
 import multiaxis_eci.viz.core as vc  # noqa: E402
 from multiaxis_eci.analysis.stats import eci_affine  # noqa: E402
-from multiaxis_eci.viz.core import save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 DATES_CSV = HERE / "benchmark_release_dates.csv"
@@ -247,7 +247,7 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
 
     out = out_dir / f"eci_1d_timeline_plotly{tag}"
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     try:
         save_print(fig, out)
         print(f"  wrote {out.with_suffix('.png')}")

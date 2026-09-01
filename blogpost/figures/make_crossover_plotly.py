@@ -40,7 +40,7 @@ sys.path.insert(0, str(HERE))
 from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
                       FLAGSHIP_TRACE as TRACE, prepare_fit)
 from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
-from multiaxis_eci.viz.core import FUTURE_COLOR as FUTURE, PASSED_COLOR as PAST, save_print  # noqa: E402
+from multiaxis_eci.viz.core import FUTURE_COLOR as FUTURE, PASSED_COLOR as PAST, save_html, save_print  # noqa: E402
 
 
 # None drops the in-figure title: the post's caption carries the
@@ -51,8 +51,11 @@ TITLE = None
 # forecast figure — its benchmarks carry no recent measurements, so a trend
 # there is not meaningful. TITLES has 4 keys; only 3 are looked up here.
 AXES = ["axis1", "axis2", "axis3"]
-# Panels whose dates are extrapolated backwards out of the trend's fit window.
-BACKCAST = {"axis2": "(backward extrapolation of the post-2024 record trend)"}
+# Every panel backcasts (FORECAST_BACKCAST_FLOOR covers all three axes):
+# dates before an axis's first measured model are backward extrapolations
+# of its early record trend, floored at the figure's window start.
+_NOTE = "(pre-data dates: backward extrapolation of the early record trend)"
+BACKCAST = {"axis1": _NOTE, "axis2": _NOTE, "axis3": _NOTE}
 
 TODAY_COLOR = "#444"
 
@@ -333,14 +336,14 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                           margin_t=190)
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     save_print(fig, out)
     print(f"  fixed x window {x0d.date()} .. {x1d.date()}")
     for name, tier, side, true_date, median_out in clipped:
         what = "median" if median_out else "80% endpoint"
         print(f"  clipped {side}: {name} / {tier} — {what} {true_date.date()} "
               f"marked as a small dot at the edge")
-    print(f"  wrote {out.with_suffix('.png')} and {out.with_suffix('.html')}")
+    print(f"  wrote {out.with_suffix('.png')} and html/{out.stem}.html")
 
 
 if __name__ == "__main__":

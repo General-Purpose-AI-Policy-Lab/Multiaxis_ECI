@@ -221,10 +221,13 @@ FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=0.4,
 
 # Backcast floor per axis (envelope basis): a tier already passed at the
 # window start is backcast at the envelope's early rate, but never before
-# this date; axes absent here are CENSORED at their window start instead.
-# Only axis 2 backcasts — its benchmarks were measured long before the
-# informed window — and the floor matches the crossover figure's own window.
-FORECAST_BACKCAST_FLOOR = {"axis2": "2015-01-01"}
+# this date; an axis absent here would be CENSORED at its window start
+# instead (its interval edges would pile up on the first record's date).
+# Every forecast axis backcasts, with the floor at the crossover figure's
+# own window start.
+FORECAST_BACKCAST_FLOOR = {"axis1": "2015-01-01",
+                           "axis2": "2015-01-01",
+                           "axis3": "2015-01-01"}
 
 # Display strings for the flagship's 4 axes, opt-in per fit (figure dict keys
 # stay axis{k} so cache/anchor ids don't churn when a caller passes these).

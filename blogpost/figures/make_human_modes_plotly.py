@@ -44,7 +44,7 @@ from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
 from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
 from make_all import two_column_layout  # noqa: E402
 from theta_bimodality import PERM_STRIDE, axis_permutations, residual_groups  # noqa: E402
-from multiaxis_eci.viz.core import save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 
 # None drops the in-figure title: the post's caption carries the
@@ -175,14 +175,14 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE) -> None:
         ann.font = dict(size=FONT_AXIS)
 
     out = out_dir / f"human_modes_plotly{tag}"
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     save_print(fig, out)
     gap = th[minority].mean(axis=(0, 1)) - th[majority].mean(axis=(0, 1))
     for k in range(K):
         j = int(np.abs(gap[:, k]).argmax())
         print(f"  {titles[k]}: signed tier mean {gap[:, k].mean():+.2f}, "
               f"largest {gap[j, k]:+.2f} on {tiers[j]}")
-    print(f"  wrote {out.with_suffix('.png')} and {out.with_suffix('.html')}")
+    print(f"  wrote {out.with_suffix('.png')} and html/{out.stem}.html")
 
 
 if __name__ == "__main__":

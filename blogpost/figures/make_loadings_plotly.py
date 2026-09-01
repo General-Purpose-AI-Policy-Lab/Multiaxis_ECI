@@ -29,7 +29,7 @@ from multiaxis_eci.analysis import loadings_table  # noqa: E402
 from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
 from make_all import check_axis_identity, two_column_layout  # noqa: E402
 from multiaxis_eci.viz import loadings_grid_fig  # noqa: E402
-from multiaxis_eci.viz.core import save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 TOP_N = 20
 
@@ -105,7 +105,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE) -> None
                                showarrow=False, font=dict(size=FONT_TICK))
 
     out = out_dir / f"loadings_axes_plotly{tag}"
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     save_print(fig, out)
     print(f"  wrote {out.with_suffix('.png')}")
     for axis in dict.fromkeys(ldf["axis"]):

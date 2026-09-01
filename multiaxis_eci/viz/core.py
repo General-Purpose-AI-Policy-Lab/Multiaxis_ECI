@@ -72,6 +72,19 @@ def save_print(fig: go.Figure, path, *, width: int | None = None,
     return png
 
 
+def save_html(fig: go.Figure, path) -> Path:
+    """Write the interactive HTML twin of a `save_print` export.
+
+    It lands in an `html/` folder BESIDE `path`, not next to the PNG/PDF: the
+    figure directory stays a flat list of the print files the post embeds.
+    """
+    path = Path(path)
+    out = path.parent / "html" / f"{path.stem}.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    fig.write_html(out)
+    return out
+
+
 def subplot_grid(figs, titles=None, ncols: int = 2, vertical_spacing: float = 0.09,
                  horizontal_spacing: float = 0.09, **layout) -> go.Figure:
     """Lay finished figures out as the panels of one grid.

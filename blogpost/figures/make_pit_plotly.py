@@ -37,7 +37,7 @@ sys.path.insert(0, str(REPO))
 from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
                       FLAGSHIP_TRACE as TRACE)
 from multiaxis_eci.ppc import boundary_mask, pit_values, posterior_predictive_mirt  # noqa: E402
-from multiaxis_eci.viz.core import AI_COLOR, save_print  # noqa: E402
+from multiaxis_eci.viz.core import AI_COLOR, save_html, save_print  # noqa: E402
 
 
 # None drops the in-figure title: the post's caption carries the
@@ -110,9 +110,9 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                                      font=dict(size=FONT_TITLE)), margin_t=190)
 
     out = out_dir / f"pit_plotly{tag}"
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     save_print(fig, out)
-    print(f"  wrote {out.with_suffix('.png')} and {out.with_suffix('.html')}")
+    print(f"  wrote {out.with_suffix('.png')} and html/{out.stem}.html")
 
 
 if __name__ == "__main__":

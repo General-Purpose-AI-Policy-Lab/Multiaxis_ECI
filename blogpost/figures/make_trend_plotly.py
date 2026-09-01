@@ -37,7 +37,7 @@ from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
                       FLAGSHIP_TRACE as TRACE, prepare_fit)
 from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
-from multiaxis_eci.viz.core import save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 
 # None drops the in-figure title: the post's caption carries the
@@ -218,9 +218,9 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                           margin_t=170)
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     save_print(fig, out)
-    print(f"  wrote {out.with_suffix('.png')} and {out.with_suffix('.html')}")
+    print(f"  wrote {out.with_suffix('.png')} and html/{out.stem}.html")
 
 
 if __name__ == "__main__":

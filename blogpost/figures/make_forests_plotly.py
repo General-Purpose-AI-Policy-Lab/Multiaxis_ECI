@@ -29,7 +29,7 @@ from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
 from make_all import (check_axis_identity, forest_frames,  # noqa: E402
                       two_column_layout)
 from multiaxis_eci.viz import forest_grid_fig  # noqa: E402
-from multiaxis_eci.viz.core import save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 
 # None drops the in-figure title: the post's caption carries the
@@ -87,7 +87,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE) -> None
                       error_x=dict(thickness=ERRBAR_W))
 
     out = out_dir / f"forests_axes_plotly{tag}"
-    fig.write_html(out.with_suffix(".html"))
+    save_html(fig, out)
     save_print(fig, out)
     print(f"  wrote {out.with_suffix('.png')}")
     for name, df in zip(view.names, frames):

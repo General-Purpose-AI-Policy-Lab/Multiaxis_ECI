@@ -115,7 +115,7 @@ family, and human tiers being in the fit.
 
 | key | what it shows |
 |---|---|
-| `forecast_{k}_{axis}` | the measured timeline with the fitted frontier trend, its 50% band, and a dashed marker at each human tier's projected crossover date |
+| `forecast_{k}_{axis}` | the measured timeline with the per-draw record envelope extended at its recent rate, its 80% band, and a dashed marker at each human tier's projected crossover date |
 | `forecast_{k}_{axis}_when` | the crossover dates alone: tier on the y-axis, projected date and interval on the x-axis, coloured passed against future. The readable version of the dashed markers |
 | `forecast_{k}_{axis}_prob` | P(frontier > tier) over the forecast grid, one S-curve per tier, with reference lines at 0.5 and 0.975. Read a date off it rather than a point estimate |
 
