@@ -69,13 +69,30 @@ TIER_GAP = 0.066      # min label spacing, fraction of the row's y span
 WIDTH, HEIGHT = 2200, 2500
 
 
-def forecast(trace: Path, cached: bool = False) -> dict:
+def forecast(trace: Path, cached: bool = False,
+             chains: list[int] | None = None) -> dict:
     """Per axis {"fc", "tl", "hs"}, from the pickle beside `trace` or rebuilt.
 
     A rebuild opens the trace over all chains at the flagship thinning, runs
     the axis-identity check (SystemExit before any mislabeled axis), and hands
     the view to `make_all.compute`, which owns the forecast settings.
+
+    A chain SUBSET (`chains`) is never cached — the pickle beside the trace is
+    the whole fit's — and its axes are permuted back onto the fit-level
+    display frame first, exactly as in `make_crossover_plotly`.
     """
+    if chains is not None:
+        from make_all import check_axis_identity, compute
+        from make_crossover_plotly import _display_frame
+
+        idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
+                                        thin=FLAGSHIP_THIN, chains=chains,
+                                        path=trace)
+        data, *_ = FLAGSHIP.load_data(idata)
+        view = prepare_fit(idata, data)
+        view = _display_frame(view, data, trace)
+        check_axis_identity(view, data)
+        return compute(view, data, pd.read_csv(PROCESSED_FILE))
     cache = trace.parent / "lw_forecast_cache_80.pkl"
     if cache.exists():
         # A cache written before the package rename pickled the result as
@@ -137,9 +154,9 @@ def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, 
 
 
 def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
-         cached: bool = False) -> None:
+         cached: bool = False, chains: list[int] | None = None) -> None:
     out = out_dir / f"forecast_trend_plotly{tag}"
-    per_axis = forecast(trace, cached=cached)
+    per_axis = forecast(trace, cached=cached, chains=chains)
     today = pd.Timestamp.today().normalize().strftime("%Y-%m-%d")
 
     fig = make_subplots(rows=len(AXES), cols=1, shared_xaxes=True,
@@ -229,5 +246,10 @@ if __name__ == "__main__":
     p.add_argument("--tag", default="")
     p.add_argument("--cached", action="store_true",
                    help="never open the trace; fail if the cache is missing")
+    p.add_argument("--chains", default=None,
+                   help="comma-separated chain subset (e.g. 0,1,3,8); "
+                        "default: all chains, through the cache")
     args = p.parse_args()
-    main(args.trace, args.tag, cached=args.cached)
+    main(args.trace, args.tag, cached=args.cached,
+         chains=None if args.chains is None
+         else [int(c) for c in args.chains.split(",")])
