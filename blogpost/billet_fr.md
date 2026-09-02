@@ -27,7 +27,7 @@ Points méthodologiques :
 
 ## Le point de départ, un indice unidimensionnel
 
-Nous partons de la [version bayésienne de l'ECI proposée par Alexander Barry](https://abstatisticalconsulting.substack.com/p/kicking-the-tires-of-the-epoch-capabilities-741), que nous avons reconstruite en Python avec PyMC. Dans ce cadre bayésien, au lieu de chercher une seule valeur optimale pour chaque paramètre, nous échantillonnons toute une distribution de valeurs plausibles. Chaque capacité estimée vient ainsi avec son incertitude.
+Nous partons de la [version bayésienne de l'ECI proposée par Alexander Barry](https://abstatisticalconsulting.substack.com/p/kicking-the-tires-of-the-epoch-capabilities-741), que nous avons reconstruite en Python avec PyMC. Dans ce cadre bayésien, au lieu d'obtenir une seule valeur pour chaque paramètre, des distributions de valeurs plausibles sont échantillonnées, ce qui permet d'estimer l'incertitude autour de chaque capacité estimée.
 
 Nous intégrons aussi les neuf niveaux humains de référence (*baselines*) comme des sujets évalués aux côtés des modèles, de l'Humain Moyen jusqu'aux Comités d'Experts du Domaine, en passant par deux niveaux lycéens. Les références et la table de benchmarks ont été mises à jour et étendues depuis le billet précédent (les tables complètes, avec leurs sources, sont en annexe). Pour ce modèle unidimensionnel uniquement, nous avons exclu les benchmarks faciles pour les humains comme ARC-AGI ou VPCT, comme dans le billet précédent (la liste est en annexe).
 
@@ -91,7 +91,7 @@ L'hypothèse principale de ces projections est que la tendance prolongée au ryt
 
 ### Le modèle
 
-Chaque sujet *m* possède quatre capacités qui forment son profil de compétence. Chaque benchmark *b* pondère ces compétences à travers quatre pondérations positives (*loadings*), une par axe, qui mesurent à quel point chaque compétence compte pour ce benchmark. Les pondérations règlent aussi la finesse avec laquelle un benchmark sépare les sujets passant les tests, ce que la littérature psychométrique appelle la discrimination. Un benchmark fortement pondéré distingue bien les modèles faibles des modèles forts, un benchmark aux pondérations faibles ne réagit guère à la compétence. La difficulté est la barre que la somme pondérée des compétences doit franchir pour dépasser le score médian, et une courbe en S transforme le résultat en un score entre 0 et 1. Il faut enfin tenir compte de la possibilité de répondre au hasard, ce que nous faisons en fixant à l'avance le plancher de chance de chaque benchmark et en faisant démarrer la courbe à ce plancher plutôt qu'à 0, de sorte qu'un QCM à quatre options a un score plancher de 0,25 et non de 0.
+Chaque sujet *m* possède quatre capacités qui forment son profil de compétence. Chaque benchmark *b* pondère ces compétences via quatre pondérations positives (*loadings*), une par axe, qui représentent à quel point chaque compétence compte pour ce benchmark. Les pondérations règlent aussi dans quelle mesure un benchmark est capable de séparer les sujets passant les tests, ce que la littérature psychométrique appelle la discrimination. Un benchmark fortement pondéré distingue bien les modèles faibles des modèles forts, alors qu'un benchmark aux pondérations faibles sépare moins bien différents niveaux de compétence. La difficulté *D* est la barre que la somme pondérée des compétences doit franchir pour dépasser le score médian sur un benchmark donné. À la fin une courbe sigmoïde transforme le résultat en un score entre 0 et 1. Enfin, nous intégrons la possibilité de bonnes réponses au hasard en fixant à l'avance le plancher de chance de chaque benchmark, de sorte qu'un QCM à quatre options a un score plancher de 0,25 et non de 0.
 
 Le score attendu du sujet *m* sur le benchmark *b* s'écrit ainsi
 
@@ -155,7 +155,20 @@ Au-delà de la collecte de données supplémentaires, quelques directions valent
 
 ### Annexe B. Les ajustements précédents
 
-Cette annexe consigne les ajustements précédents et l'effet de chaque hypothèse sur le modèle. Pour le modèle unidimensionnel, nous utilisons tous les benchmarks afin de le comparer à l'ajustement final. *(Tableau identique à la version anglaise du billet.)*
+Cette annexe consigne les ajustements précédents et l'effet de chaque hypothèse sur le modèle. Pour le modèle unidimensionnel, nous utilisons tous les benchmarks afin de le comparer à l'ajustement final.
+
+| Ajustement | Runs × tirages | Divergences | Modes a posteriori (systèmes d'axes) | elpd (LOO) ± es | Δ vs final (a) |
+|---|---|---|---|---|---|
+| Indice 1D | 10 × 10 000 | 0 | 1 | 6 249,6 ± 112,1 | −999,6 ± 33,2 |
+| 4 axes, sans a priori | 12 × 3 000 | 778 | 2 | 7 583,9 ± 75,9 | −107,2 ± 18,3 |
+| 4 axes, ordre humain seul | 12 × 3 000 | 80 | 2 | 7 583,3 ± 73,1 | −109,2 ± 17,2 |
+| 4 axes, les deux a priori (final) | 10 × 12 000 | 37 (b) | 1 (c) | 7 710,4 ± 76,3 | 0 |
+| 3 axes, les deux a priori | 12 × 3 000 | 12 | 2 (d) | 7 447,8 ± 77,4 | −191,1 ± 14,3 |
+
+(a) Les écarts LOO appariés n'utilisent que les lignes dont le Pareto-k est inférieur à 0,7 dans les deux ajustements.
+(b) Ces divergences sont mineures et ne concernent qu'un paramètre associé au benchmark GSM8K.
+(c) Les deux groupes d'exécutions du modèle final partagent un même système d'axes et ne diffèrent que sur les niveaux humains et 18 modèles anciens ou peu évalués de l'axe Agentique (Annexe C), contrairement aux autres ajustements, qui ne s'accordent pas sur les axes.
+(d) À trois axes, avec toutes les hypothèses, dix exécutions se séparent contre deux, en échangeant deux des axes entre les solutions.
 
 ### Annexe C. Le mode minoritaire
 
