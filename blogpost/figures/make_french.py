@@ -126,22 +126,36 @@ def _walk(node):
     return node
 
 
-def translate(fig: go.Figure) -> go.Figure:
-    """A COPY of `fig` with every string field passed through the FR table."""
-    return go.Figure(_walk(fig.to_plotly_json()))
+def translate(fig: go.Figure, extra: list[tuple[str, str]] | None = None) -> go.Figure:
+    """A COPY of `fig` with every string field passed through the FR table,
+    then through `extra` (figure-specific replacements applied after it)."""
+    out = go.Figure(_walk(fig.to_plotly_json()))
+    if extra:
+        def _fix(node):
+            if isinstance(node, str):
+                for a, b in extra:
+                    node = node.replace(a, b)
+            return node
+        out = go.Figure(_map_strings(out.to_plotly_json(), _fix))
+    return out
 
 
-def _fr_save_print(fig, path, **kw):
-    return save_print(translate(fig), path, **kw)
+def _map_strings(node, fn):
+    if isinstance(node, str):
+        return fn(node)
+    if isinstance(node, dict):
+        return {k: _map_strings(v, fn) for k, v in node.items()}
+    if isinstance(node, (list, tuple)):
+        return [_map_strings(v, fn) for v in node]
+    return node
 
 
-def _fr_save_html(fig, path):
-    return save_html(translate(fig), path)
-
-
-def _patched(module):
-    module.save_print = _fr_save_print
-    module.save_html = _fr_save_html
+def _patched(module, extra: list[tuple[str, str]] | None = None):
+    """Route the module's savers through the FR translation; `extra` adds
+    figure-specific replacements (e.g. the loadings grid drops " (saturées)"
+    from the axis-4 title so it clears the colorbar)."""
+    module.save_print = lambda fig, path, **kw: save_print(translate(fig, extra), path, **kw)
+    module.save_html = lambda fig, path: save_html(translate(fig, extra), path)
     return module
 
 
@@ -183,7 +197,8 @@ def main(cached_only: bool = False, only: set[str] | None = None) -> None:
         _patched(make_forests_plotly).main(tag="_draft", out_dir=FR_DIR)
     if want("loadings", needs_trace=True):
         import make_loadings_plotly
-        _patched(make_loadings_plotly).main(tag="_draft", out_dir=FR_DIR)
+        _patched(make_loadings_plotly,
+                 extra=[(" (saturées)", "")]).main(tag="_draft", out_dir=FR_DIR)
     if want("human_modes", needs_trace=True):
         import make_human_modes_plotly
         _patched(make_human_modes_plotly).main(out_dir=FR_DIR)

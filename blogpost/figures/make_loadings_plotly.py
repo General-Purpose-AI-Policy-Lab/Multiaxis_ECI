@@ -42,7 +42,10 @@ TITLE = None
 # flat, so type must read without zooming. 20 rows per panel at this tick size
 # need the taller canvas; save_print's scale=2 doubles the pixel dimensions.
 FONT_TITLE = 42       # figure title
-FONT_AXIS = 36        # panel titles, axis titles, colorbar title
+FONT_AXIS = 36        # colorbar title
+FONT_PANEL = 34       # panel titles: a notch under FONT_AXIS so the long
+                      # French axis-2 title clears the canvas edge
+PANEL_YSHIFT = 10     # px of air between a panel title and its top row
 FONT_TICK = 30        # tick labels (benchmark name + share)
 ERRBAR_W = 2.0        # whisker line width
 ERRBAR_CAP = 5        # whisker cap width
@@ -76,14 +79,17 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE) -> None
                       margin=dict(l=80, r=240, t=170, b=110),
                       coloraxis_colorbar=dict(title_font_size=FONT_AXIS,
                                               tickfont_size=FONT_TICK, x=1.04))
-    fig.update_annotations(font_size=FONT_AXIS)          # panel titles
+    fig.update_annotations(font_size=FONT_PANEL, yshift=PANEL_YSHIFT)  # panel titles
     # The gutter also clears the LEFT panel's share-number column: the right
     # column's longest tick label must end short of the left panel's edge.
     two_column_layout(fig, [(0.0, 0.30), (0.70, 0.96)], AXIS_TITLES)
     fig.update_yaxes(tickfont_size=FONT_TICK)
     # The x caption repeats on all four panels and sits beside the colorbar,
-    # so it stays at tick size rather than axis-title size.
-    fig.update_xaxes(tickfont_size=FONT_TICK, title_font_size=FONT_TICK)
+    # so it stays at tick size and drops the interval note the builder writes:
+    # the post's caption carries "median, 95% interval", and the long French
+    # form ran into the colorbar.
+    fig.update_xaxes(tickfont_size=FONT_TICK, title_font_size=FONT_TICK,
+                     title_text="loading")
     fig.update_traces(selector=dict(type="bar"),
                       error_x=dict(thickness=ERRBAR_W, width=ERRBAR_CAP))
 
