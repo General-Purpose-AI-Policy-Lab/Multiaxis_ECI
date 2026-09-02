@@ -17,7 +17,7 @@ produces today, clipped to `[ECI_EPS, 1-ECI_EPS]`. `np.array_equal` on all
 Judged on identified quantities only (`eta` over a fixed 400-observation
 subset, seed 0, plus `D`, `sigma_b`, `tau_CD`) — the `mirt_identified_rhat`
 convention. Raw r-hat on `A` / `theta` / `tau_A` is permutation-inflated and is
-not reported. Mode verdicts come from `diagnostics/diagnose_chains.py
+not reported. Mode verdicts come from `3_diagnostics/diagnose_chains.py
 --write-modes`, which wrote `mirt_modes_<trace-stem>.json` next to each of the
 four traces that lacked one (K=1, step 1, step 2, K=3); the flagship K=4
 already had one.

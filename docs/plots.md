@@ -91,7 +91,7 @@ Computed on the **whole** fit, never on a plot-side subset.
 
 | key | what it shows |
 |---|---|
-| `timeline_{k}_{axis}` | the **measured** timeline for axis k: ability against release date, 50% intervals, models at posterior SD >= 0.4 and low-observation models dropped, human tiers as horizontal bands. The headline per-axis figure |
+| `timeline_{k}_{axis}` | the **measured** timeline for axis k: ability against release date, 50% intervals, models at posterior SD >= 0.33 and low-observation models dropped, human tiers as horizontal bands. The headline per-axis figure |
 | `timeline_{k}_{axis}_all` | the all-models companion: every dated model including the sparse pre-2023 ones, drawn with their prior-wide intervals. Use it to see who the measured view drops and why |
 | `timeline_difficulty` | benchmark difficulty D against benchmark release date, 50% intervals. The mirror of the ability timeline on the same latent scale |
 | `axes_timeline_compare` | every axis's running frontier (cumulative best ability) on one panel. Answers which axis is moving fastest. Single-fit CLI only, K >= 2 |
@@ -151,11 +151,12 @@ mean sits above every plotted point, and a ridge-split ability is bimodal and
 its mean lands in the empty valley between the two lumps.
 
 **The forecast rule lives in one place.** `config.FORECAST_KW` is
-`fit_basis="records"`, `fit_start="2024-10-01"` (the reasoning-model cutoff),
-`sd_cap=0.4`, `hdi_prob=0.5`. The dashboard card, the memo and the blog post all
-read it, so the three cannot drift apart on the basis, the cap or the interval
-width. The cloud and the trend fit share the one cap, which is what makes
-every fitted record also a plotted point.
+`fit_basis="envelope"`, `fit_start="2024-10-01"` (the reasoning-model cutoff,
+used only by the regression bases kept for sensitivity runs), `sd_cap=0.33`,
+`hdi_prob=0.8`. The dashboard card and the blog post figures both read it, so
+the two cannot drift apart on the basis, the cap or the interval width. The
+cloud and the trend fit share the one cap, which is what makes every fitted
+record also a plotted point.
 
 `config.FORECAST_NO_SOTA_AXES` takes the SOTA exemption back on a stale axis.
 Axis 4 is in that set: its defining benchmarks (OpenBookQA 0.89 axis share,

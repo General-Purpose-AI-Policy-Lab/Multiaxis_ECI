@@ -1,6 +1,6 @@
 """Every test-taker the flagship fit splits on, majority chains against the rest.
 
-`diagnostics/theta_bimodality.py` flags a taker as split when the gap in its
+`3_diagnostics/theta_bimodality.py` flags a taker as split when the gap in its
 sorted per-chain theta means is wider than 3 within-chain sds with at least two
 chains each side. Nearly all of the flags land on one axis, the agentic one, and
 this figure draws that axis only.
