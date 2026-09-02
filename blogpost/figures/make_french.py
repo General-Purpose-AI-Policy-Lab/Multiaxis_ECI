@@ -63,7 +63,7 @@ FR = [
     ("Axis 1 — Fluid Intelligence", "Axe 1 : Intelligence fluide"),
     ("Axis 2 — Scientific Knowledge and Reasoning",
      "Axe 2 : Connaissances et raisonnement scientifiques"),
-    ("Axis 3 — Agentic", "Axe 3 : Agentique"),
+    ("Axis 3 — Agentic Capabilities", "Axe 3 : Capacités agentiques"),
     ("Axis 4 — Legacy QA", "Axe 4 : Questions-Réponses (saturées)"),
     # Human tiers, in the post's capitalized style (the dashboard's
     # HUMAN_LEVEL_LABELS_FR keeps its own lowercase labels)

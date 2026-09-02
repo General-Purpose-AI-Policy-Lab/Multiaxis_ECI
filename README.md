@@ -7,7 +7,7 @@ The **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) compresses many b
 This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT**, an item-response model with a Beta likelihood. Every ability comes with its uncertainty, and the nine human tiers are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index, which we call **ECI-H** (ECI with Human baselines) to keep it distinct from Epoch's published ECI. Four axes come out of the fit, named after the benchmarks whose loadings are most collinear with them:
 1. **Fluid Intelligence** (ARC-AGI-2, ARC-AGI, VPCT)
 2. **Scientific Knowledge and Reasoning** (WMDP Chemistry and Biology, the GPQA subsets, FrontierMath)
-3. **Agentic** (GBAEval, Remote Labor Index, SWE-Bench Pro)
+3. **Agentic Capabilities** (GBAEval, Remote Labor Index, SWE-Bench Pro)
 4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
 

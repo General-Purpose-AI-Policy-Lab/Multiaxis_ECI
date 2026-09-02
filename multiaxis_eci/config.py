@@ -230,7 +230,7 @@ FORECAST_BACKCAST_FLOOR: dict[str, str] = {}
 # stay axis{k} so cache/anchor ids don't churn when a caller passes these).
 AXIS_TITLES = {"axis1": "Axis 1 — Fluid Intelligence",
               "axis2": "Axis 2 — Scientific Knowledge and Reasoning",
-              "axis3": "Axis 3 — Agentic",
+              "axis3": "Axis 3 — Agentic Capabilities",
               "axis4": "Axis 4 — Legacy QA"}
 
 RELEASE_DATES: dict[str, str] = {

@@ -16,7 +16,7 @@ Nous avons étendu l'Epoch Capabilities Index à quatre axes de compétence, dan
 
 **Résultats principaux :**
 
-- Les quatre axes qui émergent du modèle sont **Intelligence fluide**, **Connaissances et raisonnement scientifiques**, **Agentique** et **Questions-Réponses (saturées)**.
+- Les quatre axes qui émergent du modèle sont **Intelligence fluide**, **Connaissances et raisonnement scientifiques**, **Capacités agentiques** et **Questions-Réponses (saturées)**.
 - Les modèles ont désormais dépassé tous les niveaux humains sur l'axe Connaissances et raisonnement scientifiques, ce qui en dit sans doute plus sur l'étendue du rappel de connaissances que sur la capacité à faire de la science.
 - Sur les capacités agentiques, la frontière atteint le niveau du Généraliste Qualifié en ce moment même (été 2026).
 - Sur l'Intelligence fluide, les modèles ont probablement dépassé l'Humain Moyen, mais les experts humains gardent l'avantage. Si la tendance reste linéaire, elle croisera les niveaux les plus élevés en 2027 et 2028.
@@ -56,7 +56,7 @@ Nous nommons chaque axe d'après les benchmarks dont les vecteurs de pondératio
 
 - **Axe 1 : Intelligence fluide**, défini par ARC-AGI-2, ARC-AGI et VPCT, des benchmarks de puzzles abstraits.
 - **Axe 2 : Connaissances et raisonnement scientifiques**, défini par WMDP Chimie et Biologie, les sous-ensembles scientifiques de GPQA et FrontierMath.
-- **Axe 3 : Agentique**, défini par GBAEval, le Remote Labor Index et SWE-Bench Pro, des benchmarks où le modèle mène des tâches longues plutôt que de répondre à des questions.
+- **Axe 3 : Capacités agentiques**, défini par GBAEval, le Remote Labor Index et SWE-Bench Pro, des benchmarks où le modèle mène des tâches longues plutôt que de répondre à des questions.
 - **Axe 4 : Questions-Réponses (saturées)**, composé pour l'essentiel d'anciens benchmarks de questions-réponses largement saturés, OpenBookQA, ARC (AI2), BoolQ et similaires.
 
 ![Figure 2](figures/fr/loadings_axes_plotly_draft.pdf)
@@ -75,7 +75,7 @@ Pour ces prévisions, seuls les modèles dont la capacité sur l'axe est bien es
 
 **Sur l'axe Intelligence fluide, la frontière a probablement dépassé l'Humain Moyen et se situe au niveau du Généraliste Qualifié, mais reste sous les références expertes.** Elle est en passe d'atteindre l'Expert du Domaine d'ici le printemps 2027 et de dépasser le Meilleur Performeur vers mi-2028.
 
-**Sur l'axe Agentique, les modèles ont déjà dépassé une partie des niveaux inférieurs, et la frontière atteint la référence du Généraliste Qualifié** (nous écrivons ces lignes fin août 2026). Elle devrait dépasser le Comité d'Experts du Domaine vers mi-2027.
+**Sur l'axe Capacités agentiques, les modèles ont déjà dépassé une partie des niveaux inférieurs, et la frontière atteint la référence du Généraliste Qualifié** (nous écrivons ces lignes fin août 2026). Elle devrait dépasser le Comité d'Experts du Domaine vers mi-2027.
 
 **Sur l'axe Connaissances et raisonnement scientifiques, les modèles ont déjà dépassé tous les niveaux humains**, avec des niveaux de certitude de 85 % à 95 %. Les données brutes confirment par exemple que sur WMDP Chimie, la référence Expert du Domaine est à 0,433 contre 0,809 pour le meilleur modèle. Sur WMDP Biologie, l'écart est de 0,605 contre 0,875, et sur GPQA Diamond de 0,812 contre 0,946. La référence Généraliste Qualifié se place sous le niveau du hasard sur GPQA Diamond, à 0,22, et même le doctorant du domaine n'obtient que 0,43 sur WMDP Chimie. De fait, chaque modèle sur cet axe se place au-dessus des références humaines depuis 2023. En pratique, ces résultats en disent toutefois davantage sur ce que ces benchmarks récompensent, c'est-à-dire l'étendue des connaissances à travers toute une discipline, que sur la capacité actuelle des modèles d'IA à faire de la recherche scientifique à un niveau expert.
 
@@ -85,7 +85,7 @@ Pour ces prévisions, seuls les modèles dont la capacité sur l'axe est bien es
 ![Figure 5](figures/fr/forecast_crossover_plotly_majority.pdf)
 *Figure 5 - Dates auxquelles la tendance extrapolée atteint chaque niveau humain (médiane, intervalles à 50 % et 80 %, chaînes majoritaires). « Aujourd'hui » correspond au 1er septembre 2026.*
 
-L'hypothèse principale de ces projections est que la tendance prolongée au rythme récent conserve sa pente. Cette hypothèse apparaît raisonnable dans notre fenêtre d'observation, où la frontière ne montre aucun signe de décélération et semble même accélérer sur l'axe Agentique avec les dernières sorties. Ces dates doivent être lues avec l'incertitude que le modèle leur attache. Sur l'intervalle d'incertitude à 95 %, les fenêtres de croisement s'étirent de plusieurs années supplémentaires. Le meilleur moyen de resserrer ces estimations serait d'obtenir de meilleures références humaines, en particulier sur l'axe Agentique où les niveaux humains reposent sur une poignée de mesures.
+L'hypothèse principale de ces projections est que la tendance prolongée au rythme récent conserve sa pente. Cette hypothèse apparaît raisonnable dans notre fenêtre d'observation, où la frontière ne montre aucun signe de décélération et semble même accélérer sur l'axe Capacités agentiques avec les dernières sorties. Ces dates doivent être lues avec l'incertitude que le modèle leur attache. Sur l'intervalle d'incertitude à 95 %, les fenêtres de croisement s'étirent de plusieurs années supplémentaires. Le meilleur moyen de resserrer ces estimations serait d'obtenir de meilleures références humaines, en particulier sur l'axe Capacités agentiques où les niveaux humains reposent sur une poignée de mesures.
 
 ## Méthodologie
 
@@ -167,27 +167,27 @@ Cette annexe consigne les ajustements précédents et l'effet de chaque hypothè
 
 (a) Les écarts LOO appariés n'utilisent que les lignes dont le Pareto-k est inférieur à 0,7 dans les deux ajustements.
 (b) Ces divergences sont mineures et ne concernent qu'un paramètre associé au benchmark GSM8K.
-(c) Les deux groupes d'exécutions du modèle final partagent un même système d'axes et ne diffèrent que sur les niveaux humains et 18 modèles anciens ou peu évalués de l'axe Agentique (Annexe C), contrairement aux autres ajustements, qui ne s'accordent pas sur les axes.
+(c) Les deux groupes d'exécutions du modèle final partagent un même système d'axes et ne diffèrent que sur les niveaux humains et 18 modèles anciens ou peu évalués de l'axe Capacités agentiques (Annexe C), contrairement aux autres ajustements, qui ne s'accordent pas sur les axes.
 (d) À trois axes, avec toutes les hypothèses, dix exécutions se séparent contre deux, en échangeant deux des axes entre les solutions.
 
 ### Annexe C. Le mode minoritaire
 
 Quatre des dix chaînes d'échantillonnage placent les niveaux humains différemment. Cette annexe consigne ce qui bouge et comment les prévisions changent.
 
-L'écart entre le mode minoritaire et le mode majoritaire, moyenné sur les neuf niveaux, s'établit à +0,71 sur l'Intelligence fluide, −0,04 sur les Connaissances et le raisonnement scientifiques, −2,71 sur l'Agentique et +1,58 sur les Questions-Réponses (saturées). Les deux groupes partagent un même système d'axes et décrivent les scores aussi bien l'un que l'autre.
+L'écart entre le mode minoritaire et le mode majoritaire, moyenné sur les neuf niveaux, s'établit à +0,71 sur l'Intelligence fluide, −0,04 sur les Connaissances et le raisonnement scientifiques, −2,71 sur les Capacités agentiques et +1,58 sur les Questions-Réponses (saturées). Les deux groupes partagent un même système d'axes et décrivent les scores aussi bien l'un que l'autre.
 
 ![Figure 12](figures/fr/human_modes_plotly.pdf)
 *Figure 12 - Les niveaux humains, les six chaînes majoritaires (bleu) face aux quatre autres (orange).*
 
 ![Figure 13](figures/fr/split_takers_agentic_plotly.pdf)
-*Figure 13 - Les 18 modèles que les deux groupes échantillonnés placent différemment, tous sur l'axe Agentique.*
+*Figure 13 - Les 18 modèles que les deux groupes échantillonnés placent différemment, tous sur l'axe Capacités agentiques.*
 
 Voici les projections pour les chaînes minoritaires.
 
 ![Figure 14](figures/fr/forecast_crossover_plotly_minority.pdf)
 *Figure 14 - Dates auxquelles la tendance extrapolée atteint chaque niveau humain pour les chaînes minoritaires (médiane, intervalles à 50 % et 80 %). « Aujourd'hui » correspond au 1er septembre 2026.*
 
-Dans ces prévisions minoritaires, sur l'axe Agentique, tous les niveaux humains seront bientôt dépassés. Sur l'Intelligence fluide, les modèles de frontière restent au contraire sous l'Humain Moyen, contrairement à ce que prédisent les chaînes majoritaires.
+Dans ces prévisions minoritaires, sur l'axe Capacités agentiques, tous les niveaux humains seront bientôt dépassés. Sur l'Intelligence fluide, les modèles de frontière restent au contraire sous l'Humain Moyen, contrairement à ce que prédisent les chaînes majoritaires.
 
 ### Annexe D. Les intervalles à 95 %
 
