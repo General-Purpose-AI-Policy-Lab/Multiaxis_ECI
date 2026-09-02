@@ -11,7 +11,9 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
 
-<img src="results/mirt_humanmerge_lineageprior_lineagebm/axis_share_heatmap.png" width="560" alt="Benchmark axis share, top 20 per axis">
+<img src="blogpost/figures/loadings_axes_plotly_draft.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
+
+<img src="blogpost/figures/forecast_trend_plotly_majority.png" width="560" alt="Frontier trend per axis (majority chains): record envelope extended at its recent rate, with human tiers">
 
 Scope: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions.
 
