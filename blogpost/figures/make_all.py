@@ -158,9 +158,32 @@ def two_column_layout(fig, col_dom, titles, k: int = 4) -> None:
 
 # ── per-axis result figures ─────────────────────────────────────────────────
 
-def forest_frames(view, data, n_top: int = 11, sd_cap: float = 0.5) -> list:
-    """Per axis, the forest rows: top models by mean ability at posterior
-    SD < `sd_cap`, the pinned frontier releases, and every human tier.
+def forest_candidates(view, data, k: int, sd_cap: float = FORECAST_KW["sd_cap"],
+                      drop_low_obs: bool = True, sota_exempt: bool = True) -> np.ndarray:
+    """(M,) bool: the machines a forest panel may rank on axis k.
+
+    The same gate as the trend figure's point cloud (`mirt_model_timeline_df`
+    / `mirt_frontier_forecast` with FORECAST_KW): a model needs a measured
+    ability on THIS axis (posterior SD < `sd_cap`) and enough observations
+    (not `is_low_obs`), unless it is a SOTA model, which is exempt from both.
+    One rule for the forest and the forecast, so the two figures cannot show
+    different frontiers.
+    """
+    is_h = np.asarray(data.is_human, dtype=bool)
+    sd = view.theta[:, :, k].std(0)
+    ok = ~is_h & (sd < sd_cap)
+    if drop_low_obs:
+        ok &= ~np.asarray(data.is_low_obs, dtype=bool)
+    if sota_exempt:
+        ok |= ~is_h & np.asarray(data.is_sota, dtype=bool)
+    return ok
+
+
+def forest_frames(view, data, n_top: int = 11, **gate) -> list:
+    """Per axis, the forest rows: the top `n_top` models by mean ability among
+    `forest_candidates` (the trend figure's filter: SD < FORECAST_KW["sd_cap"]
+    and not low-obs, or SOTA), the pinned frontier releases, and every human
+    tier. `gate` forwards sd_cap / drop_low_obs / sota_exempt.
 
     Ascending by mean, so the strongest row lands at the top of the panel.
     """
@@ -169,9 +192,10 @@ def forest_frames(view, data, n_top: int = 11, sd_cap: float = 0.5) -> list:
     frames = []
     for k in range(view.K):
         th = view.theta[:, :, k]                        # (S, M)
-        mean, sd = th.mean(0), th.std(0)
+        mean = th.mean(0)
         lo, hi = np.percentile(th, [2.5, 97.5], axis=0)
-        top = [i for i in np.argsort(-mean) if not is_h[i] and sd[i] < sd_cap][:n_top]
+        ok = forest_candidates(view, data, k, **gate)
+        top = [i for i in np.argsort(-mean) if ok[i]][:n_top]
         rows = ([(i, "model") for i in top]
                 + [(i, "frontier") for i in range(len(names))
                    if names[i] in FOREST_FRONTIER and not is_h[i] and i not in top]

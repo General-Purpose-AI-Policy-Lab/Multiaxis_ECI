@@ -24,12 +24,13 @@ import figbase  # noqa: E402
 from figbase import AI_COLOR, AXIS_TITLES, HUMAN_COLOR  # noqa: E402
 # The fit comes from `make_all`, which axis-checks it, so this file and the
 # Plotly set cannot read a different posterior or accept a different labelling.
-from make_all import load_flagship  # noqa: E402
+from make_all import forest_candidates, load_flagship  # noqa: E402
 
 
-def forests_axes_2x2(view, data, out: Path, n_top: int = 11,
-                     sd_cap: float = 0.5) -> Path:
+def forests_axes_2x2(view, data, out: Path, n_top: int = 11) -> Path:
     """Top models, pinned frontier releases and human tiers, one panel per axis.
+
+    Rows gated by `make_all.forest_candidates`, the trend figure's filter.
 
     2 rows x 2 cols with a single figure-level legend, rather than the memo's
     1xK strip: the post is always K=4 and a 2x2 reads at page width.
@@ -38,11 +39,11 @@ def forests_axes_2x2(view, data, out: Path, n_top: int = 11,
     fig, axes = plt.subplots(2, 2, figsize=(13, 13.6))
     for k, ax in enumerate(axes.flat):
         th = view.theta[:, :, k]                  # (S, M)
-        mean, sd = th.mean(0), th.std(0)
+        mean = th.mean(0)
         lo, hi = np.percentile(th, [2.5, 97.5], axis=0)
         is_h = np.asarray(data.is_human, dtype=bool)
-        top = [i for i in np.argsort(-mean)
-               if not is_h[i] and sd[i] < sd_cap][:n_top]
+        ok = forest_candidates(view, data, k)
+        top = [i for i in np.argsort(-mean) if ok[i]][:n_top]
         frontier = [i for i in range(len(names))
                     if names[i] in figbase.FOREST_FRONTIER
                     and not is_h[i] and i not in top]

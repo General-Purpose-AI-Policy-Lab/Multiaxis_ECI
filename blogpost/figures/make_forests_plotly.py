@@ -1,7 +1,8 @@
 """K=4 forest figure: top models and human tiers per axis, at the post's scale.
 
 Same rows as `make_all.forests()` — `forest_frames`'s top models by posterior
-mean at SD < 0.5, the pinned frontier releases, and every human tier — drawn by
+mean under the trend figure's gate (SD < FORECAST_KW["sd_cap"] and not
+low-obs, or SOTA), the pinned frontier releases, and every human tier — drawn by
 the dashboard's own `viz.forest_grid_fig`, so markers, whiskers and the legend
 are the definitions the fit's CSVs use. The type constants match
 `make_timeline_plotly.py` / `make_loadings_plotly.py`. Reads the flagship
@@ -68,7 +69,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
         view = _display_frame(view, data, trace)
     check_axis_identity(view, data)     # SystemExit before any mislabeled axis
 
-    frames = forest_frames(view, data)  # n_top / sd_cap: make_all's defaults
+    frames = forest_frames(view, data)  # n_top / gate: make_all's defaults
     # The post draws frontier releases as ordinary model rows: one marker class
     # for machines, no "shown even when wide" legend entry. The rows themselves
     # stay — only the kind (marker symbol + legend label) collapses.
