@@ -100,7 +100,7 @@ DEFAULT_TRACE = FLAGSHIP_TRACE
 GAP_SDS = 3.0
 # min chains on each side of the gap — 1 chain apart is an outlier, not a lump
 MIN_SIDE = 2
-# posterior SD below which an ability counts as data-informed (timelines' default)
+# posterior SD below which an ability counts as data-informed
 SD_CAP = 0.4
 # draw stride for the figure histograms: 600 draws per chain resolve two lumps,
 # and the page ships binned COUNTS, so the stride costs smoothness, not weight
