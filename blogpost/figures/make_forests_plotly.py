@@ -14,6 +14,9 @@ fit-level display frame first, exactly as in `make_crossover_plotly`. Axis
 identity is checked against `make_all.EXPECTED_TOPS` before any label is
 applied.
 
+The chain subset names the output: `forests_axes_plotly_draft_majority`,
+`_minority`, `_c<chains>`, or no suffix for the whole posterior.
+
 Usage:
     python blogpost/figures/make_forests_plotly.py [--trace FILE] [--tag _draft]
                                                    [--chains 0,1,3,8 | all]
@@ -46,6 +49,19 @@ TITLE = None
 # The majority mode of the flagship fit (6 of 10 chains), the same subset the
 # trend and crossover figures draw; the minority appendix variant is 0,1,3,8.
 MAJORITY_CHAINS = [2, 4, 5, 6, 7, 9]
+MINORITY_CHAINS = [0, 1, 3, 8]
+
+
+def chain_suffix(chains: list[int] | None) -> str:
+    """File-name suffix naming the chain subset a render came from, so the
+    majority render is never mistaken for the whole-posterior one."""
+    if chains is None:
+        return ""
+    if sorted(chains) == MAJORITY_CHAINS:
+        return "_majority"
+    if sorted(chains) == MINORITY_CHAINS:
+        return "_minority"
+    return "_c" + "".join(str(c) for c in sorted(chains))
 
 # Post-scale sizing, shared with the timeline and loadings figures: the figure
 # is shared flat, so type must read without zooming. ~20 rows per panel at this
@@ -102,7 +118,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
     fig.update_traces(selector=dict(type="scatter"), marker_size=MARKER,
                       error_x=dict(thickness=ERRBAR_W))
 
-    out = out_dir / f"forests_axes_plotly{tag}"
+    out = out_dir / f"forests_axes_plotly{tag}{chain_suffix(chains)}"
     save_html(fig, out)
     save_print(fig, out)
     print(f"  wrote {out.with_suffix('.png')}")
