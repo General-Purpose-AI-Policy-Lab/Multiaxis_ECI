@@ -30,8 +30,8 @@ unmarked to both.
 | `--K N` | `[expl]` latent dimension. Default 4 |
 | `--loading-prior {normal,signed,pt1,bifactor}` | `[expl]` default `normal`, non-negative. `signed` allows a contrast axis and is rotation-invariant; `pt1` is `normal` under product-to-one loadings per axis (Epoch's identification); `bifactor` is a dense general column plus horseshoe specifics, `--K >= 2` |
 | `--link {linear,loglog}` | `[expl]` `linear` is the 2PL; `loglog` is a disjunctive best-axis family |
-| `--human-prior` | `[expl]` order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order |
-| `--human-merge` | `[expl]` instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents |
+| `--human-prior` | order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order. Also accepted by `--preset canonical`, which then writes to `results/canonical_humanprior/` |
+| `--human-merge` | instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents. Also accepted by `--preset canonical` (`results/canonical_humanmerge/`) |
 | `--lineage-prior` | `[expl]` soft vendor release-chain prior: each release's mean step over its predecessor is positive, but a node can regress |
 | `--lineage-bm` | `[expl]` with `--lineage-prior`: index the chain by time, so each step scales with the release gap in years |
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |

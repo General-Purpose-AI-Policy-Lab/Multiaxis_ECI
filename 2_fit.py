@@ -231,6 +231,14 @@ def run_canonical(args) -> None:
 
     scope_tag = "canonical_open" if args.open_only else \
         ("canonical_closed" if args.closed_only else "canonical")
+    # The ordered-human prior is a MODEL choice on top of the scope, so it gets
+    # its own folder suffix: results/canonical stays the plain index.
+    human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
+                   else config.HUMAN_ORDER if args.human_prior else None)
+    if args.human_merge:
+        scope_tag += "_humanmerge"
+    elif args.human_prior:
+        scope_tag += "_humanprior"
     results_dir = config.RESULTS_DIR / scope_tag
     plots_dir = config.PLOTS_DIR / scope_tag
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -247,6 +255,9 @@ def run_canonical(args) -> None:
         print("── --raw-c mode: ECI-H = C (no affine anchor rescaling) ───────────")
     if args.include_all_benchmarks:
         print("── --include-all-benchmarks: curated exclusions NOT applied ─────")
+    if human_order:
+        which = "HUMAN_ORDER_MERGED" if args.human_merge else "HUMAN_ORDER"
+        print(f"── ordered-human prior: config.{which} on the K=1 ability ────────")
 
     # --eci-data-only fits the reference eci_data.csv, whose "pretty names"
     # don't match the config's versioned anchors — remap on the config module
@@ -324,8 +335,11 @@ def run_canonical(args) -> None:
         # pt1 is the canonical loading prior: product-1 identification (Epoch's
         # sum-to-zero log-alpha gauge), fewer divergences than `normal` on this
         # scope at unchanged abilities (rank corr 0.9988).
-        trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1")
+        trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
+                               human_order=human_order)
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
+        if human_order:
+            trace.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
         save_trace(trace, trace_path)
         print(f"   saved trace → {trace_path}")
 
@@ -761,7 +775,8 @@ def main():
                         help="IRF link: linear 2PL (default) or the log-logistic "
                              "mu = 1/(1+(theta.A)^-alpha)")
     parser.add_argument("--human-prior", action="store_true",
-                        help="[exploration] order human tiers by config.HUMAN_ORDER")
+                        help="order human tiers by config.HUMAN_ORDER (exploration, "
+                             "or --preset canonical → results/canonical_humanprior/)")
     parser.add_argument("--stream-draws", action="store_true",
                         help="[exploration] write every draw to "
                              "results/<fit>/live_draws.zarr as it is sampled, so a "
@@ -770,7 +785,8 @@ def main():
                              "the warmup draws in disk (nutpie's store ignores "
                              "save_warmup)")
     parser.add_argument("--human-merge", action="store_true",
-                        help="[exploration] instead use config.HUMAN_ORDER_MERGED: "
+                        help="instead use config.HUMAN_ORDER_MERGED (exploration, or "
+                             "--preset canonical → results/canonical_humanmerge/): "
                              "the same tiers with the High School branch merged "
                              "into the adult spine (Domain Expert beats both a "
                              "Skilled Generalist and a High School Qualifier, Top "
