@@ -65,9 +65,9 @@ Nous nommons chaque axe d'après les benchmarks dont les vecteurs de pondératio
 Voici comment les meilleurs modèles se comparent aux humains sur chaque axe.
 
 ![Figure 3](figures/fr/forests_axes_plotly_draft.pdf)
-*Figure 3 - Meilleurs modèles et les neuf niveaux humains sur chaque axe (médiane, intervalle à 95 %). Les modèles affichés sont ceux retenus pour les projections : capacité bien estimée sur l'axe (écart-type a posteriori inférieur à 0,33) ou modèle de frontière.*
+*Figure 3 - Meilleurs modèles et les neuf niveaux humains sur chaque axe (médiane, intervalle à 95 %, chaînes majoritaires). Les modèles affichés sont ceux retenus pour les projections : capacité bien estimée sur l'axe (écart-type a posteriori inférieur à 0,33) ou modèle de frontière.*
 
-Les modèles de frontière dépassent tous les niveaux humains sur les Connaissances et le raisonnement scientifiques. Sur l'Intelligence fluide, c'est l'inverse. Chaque niveau humain se place au-dessus des meilleurs modèles, l'Humain Moyen de justesse. Sur les Questions-Réponses (saturées), les humains dominent également, mais il s'agit plutôt d'un artefact de données. Les huit benchmarks qui définissent cet axe le plus purement (part d'axe supérieure à un demi) n'ont plus été passés par des modèles depuis mi-2024, la plupart y plafonnant déjà autour de 0,9, et aucun modèle de frontière n'y a jamais été mesuré. L'avance humaine sur cet axe est donc une comparaison avec un bassin figé de modèles anciens, jamais confrontée à la frontière actuelle.
+Les modèles de frontière dépassent tous les niveaux humains sur les Connaissances et le raisonnement scientifiques. Sur l'Intelligence fluide, c'est l'inverse. Chaque niveau humain, à l'exception de l'Humain Moyen, se place au-dessus des meilleurs modèles. Sur les Questions-Réponses (saturées), les humains dominent également, mais il s'agit plutôt d'un artefact de données. Les huit benchmarks qui définissent cet axe le plus purement (part d'axe supérieure à un demi) n'ont plus été passés par des modèles depuis mi-2024, la plupart y plafonnant déjà autour de 0,9, et aucun modèle de frontière n'y a jamais été mesuré. L'avance humaine sur cet axe est donc une comparaison avec un bassin figé de modèles anciens, jamais confrontée à la frontière actuelle.
 
 ## Projections
 

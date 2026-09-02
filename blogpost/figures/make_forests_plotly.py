@@ -6,15 +6,17 @@ low-obs, or SOTA), the pinned frontier releases, and every human tier — drawn 
 the dashboard's own `viz.forest_grid_fig`, so markers, whiskers and the legend
 are the definitions the fit's CSVs use. The type constants match
 `make_timeline_plotly.py` / `make_loadings_plotly.py`. Reads the flagship
-trace over ALL chains by default — the post's headline figures are
-whole-posterior — with `--chains` for the mode-restricted appendix variants
-(the subset's axes are permuted back onto the fit-level display frame first,
-exactly as in `make_crossover_plotly`). Axis identity is checked against
-`make_all.EXPECTED_TOPS` before any label is applied.
+trace over the MAJORITY chains by default (`MAJORITY_CHAINS`, the mode the
+post's trend and crossover figures report), with `--chains` for another
+subset — `0,1,3,8` is the minority-mode appendix variant — or `--chains all`
+for the whole posterior. A chain subset's axes are permuted back onto the
+fit-level display frame first, exactly as in `make_crossover_plotly`. Axis
+identity is checked against `make_all.EXPECTED_TOPS` before any label is
+applied.
 
 Usage:
     python blogpost/figures/make_forests_plotly.py [--trace FILE] [--tag _draft]
-                                                   [--chains 0,1,3,8]
+                                                   [--chains 0,1,3,8 | all]
 """
 from __future__ import annotations
 
@@ -41,6 +43,10 @@ from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 # "Top models, frontier releases and human tiers per axis".
 TITLE = None
 
+# The majority mode of the flagship fit (6 of 10 chains), the same subset the
+# trend and crossover figures draw; the minority appendix variant is 0,1,3,8.
+MAJORITY_CHAINS = [2, 4, 5, 6, 7, 9]
+
 # Post-scale sizing, shared with the timeline and loadings figures: the figure
 # is shared flat, so type must read without zooming. ~20 rows per panel at this
 # tick size need the taller canvas; save_print's scale=2 doubles the pixels.
@@ -57,7 +63,7 @@ WIDTH, HEIGHT = 2100, 2500
 
 
 def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
-         chains: list[int] | None = None) -> None:
+         chains: list[int] | None = MAJORITY_CHAINS) -> None:
     idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
                                     thin=FLAGSHIP_THIN, chains=chains, path=trace)
     data, *_ = FLAGSHIP.load_data(idata)
@@ -113,10 +119,11 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--trace", type=Path, default=TRACE)
     p.add_argument("--tag", default="_draft")
-    p.add_argument("--chains", default=None,
-                   help="comma-separated chain subset (e.g. 0,1,3,8); "
-                        "default: all chains")
+    p.add_argument("--chains", default=",".join(map(str, MAJORITY_CHAINS)),
+                   help="comma-separated chain subset (e.g. 0,1,3,8), or "
+                        "'all' for the whole posterior; default: the "
+                        "majority chains")
     args = p.parse_args()
     main(args.trace, args.tag,
-         chains=None if args.chains is None
+         chains=None if args.chains == "all"
          else [int(c) for c in args.chains.split(",")])
