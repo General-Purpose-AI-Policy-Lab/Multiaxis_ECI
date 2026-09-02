@@ -8,7 +8,7 @@ Une difficulté persistait toutefois pour la raison suivante :
 - d'un côté, la plupart des humains obtiennent des scores quasi parfaits sur certains benchmarks de raisonnement abstrait comme ARC-AGI ou VPCT, mais des scores proches du hasard sur les benchmarks de connaissances scientifiques type GPQA,
 - de l'autre, les modèles d'IA de frontière montrent le profil exactement inverse sur ces mêmes benchmarks.
 
-Cette incohérence implique qu'il n'est pas possible de produire ces deux classements à la fois avec un indice unique. **Ce billet lève cette limite en passant à un modèle à quatre axes de compétence au lieu d'un seul**, dans un cadre bayésien permettant une meilleure estimation des incertitudes sur les prévisions qui en découlent.
+Cette incohérence implique qu'il n'est pas possible de produire ces deux classements à la fois avec un indice unique. **Ce billet lève cette limite en passant à un modèle à quatre axes de compétence au lieu d'un seul**, dans un cadre bayésien permettant une meilleure estimation des incertitudes sur les prévisions qui en découlent. Le code et les données sont disponibles sur [GitHub](https://github.com/General-Purpose-AI-Policy-Lab/Multiaxis_ECI).
 
 ## En bref
 
