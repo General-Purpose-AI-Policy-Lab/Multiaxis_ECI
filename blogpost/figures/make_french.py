@@ -35,8 +35,7 @@ REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(HERE))
 
-from multiaxis_eci.viz.core import (HUMAN_LEVEL_LABELS_FR,  # noqa: E402
-                                    save_html, save_print)
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 FR_DIR = HERE / "fr"
 
@@ -66,16 +65,17 @@ FR = [
      "Axe 2 — Connaissances et raisonnement scientifiques"),
     ("Axis 3 — Agentic", "Axe 3 — Agentique"),
     ("Axis 4 — Legacy QA", "Axe 4 — Questions-Réponses (saturées)"),
-    # Human tiers (committees and High School entries before their substrings)
-    ("Committee of Average Humans", HUMAN_LEVEL_LABELS_FR["Committee of Average Humans"]),
-    ("Committee of Skilled Generalists", HUMAN_LEVEL_LABELS_FR["Committee of Skilled Generalists"]),
-    ("Committee of Domain Experts", HUMAN_LEVEL_LABELS_FR["Committee of Domain Experts"]),
-    ("High School Top Performer", HUMAN_LEVEL_LABELS_FR["High School Top Performer"]),
-    ("High School Qualifier", HUMAN_LEVEL_LABELS_FR["High School Qualifier"]),
-    ("Average Human", HUMAN_LEVEL_LABELS_FR["Average Human"]),
-    ("Skilled Generalist", HUMAN_LEVEL_LABELS_FR["Skilled Generalist"]),
-    ("Domain Expert", HUMAN_LEVEL_LABELS_FR["Domain Expert"]),
-    ("Top Performer", HUMAN_LEVEL_LABELS_FR["Top Performer"]),
+    # Human tiers, in the post's capitalized style (the dashboard's
+    # HUMAN_LEVEL_LABELS_FR keeps its own lowercase labels)
+    ("Committee of Average Humans", "Comité d'Humains Moyens"),
+    ("Committee of Skilled Generalists", "Comité de Généralistes Qualifiés"),
+    ("Committee of Domain Experts", "Comité d'Experts du Domaine"),
+    ("High School Top Performer", "Lycéen Meilleur Performeur"),
+    ("High School Qualifier", "Lycéen Qualifié"),
+    ("Average Human", "Humain Moyen"),
+    ("Skilled Generalist", "Généraliste Qualifié"),
+    ("Domain Expert", "Expert du Domaine"),
+    ("Top Performer", "Meilleur Performeur"),
     # Crossover legend
     ("already behind us", "déjà derrière nous"),
     ("still ahead", "encore à venir"),
