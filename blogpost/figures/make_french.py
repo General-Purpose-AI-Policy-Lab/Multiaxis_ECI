@@ -60,11 +60,11 @@ FR = [
     ("Per-axis abilities over time", "Capacités par axe au fil du temps"),
     ("(measured models, 50% intervals)", "(modèles mesurés, intervalles à 50 %)"),
     # Axis titles
-    ("Axis 1 — Fluid Intelligence", "Axe 1 — Intelligence fluide"),
+    ("Axis 1 — Fluid Intelligence", "Axe 1 : Intelligence fluide"),
     ("Axis 2 — Scientific Knowledge and Reasoning",
-     "Axe 2 — Connaissances et raisonnement scientifiques"),
-    ("Axis 3 — Agentic", "Axe 3 — Agentique"),
-    ("Axis 4 — Legacy QA", "Axe 4 — Questions-Réponses (saturées)"),
+     "Axe 2 : Connaissances et raisonnement scientifiques"),
+    ("Axis 3 — Agentic", "Axe 3 : Agentique"),
+    ("Axis 4 — Legacy QA", "Axe 4 : Questions-Réponses (saturées)"),
     # Human tiers, in the post's capitalized style (the dashboard's
     # HUMAN_LEVEL_LABELS_FR keeps its own lowercase labels)
     ("Committee of Average Humans", "Comité d'Humains Moyens"),
