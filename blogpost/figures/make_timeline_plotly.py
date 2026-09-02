@@ -5,7 +5,9 @@ by the dashboard's own `viz.core.capability_timeline_fig`, so the post and the
 dashboard cannot drift apart. Differences from the dashboard call:
 
   * everything is mapped onto the anchored ECI scale, not raw theta
-  * intervals are 80%, tight enough to read at post scale
+  * intervals are 80%, tight enough to read at post scale; the human tiers
+    get theirs as a faint band around the dashed line (the dashboard draws
+    the line only)
   * labels are English and the type is scaled up for a shared figure
 
 Usage:
@@ -48,6 +50,13 @@ MARKER_BENCH = 13     # benchmark points
 MARKER_MODEL = 10     # model points
 ERRBAR_BENCH = 2.6    # benchmark error-bar line width
 ERRBAR_MODEL = 2.0    # model error-bar line width
+# Human tiers: the dashboard draws the dashed mean line only. The post adds the
+# tier's HDI_PROB interval as a faint band in the tier's own color, under every
+# point (layer below), so a prior-driven tier reads as uncertain. The alpha is
+# low because the one-observation tiers span 40+ ECI points and their bands
+# overlap the well-measured ones: at this value two stacked bands still stay
+# lighter than a single error bar.
+HUMAN_BAND_ALPHA = 0.06
 
 # Points to name on the canvas. The dashboard draws these as plain labels under
 # the marker, so only well-separated points are worth naming.
@@ -161,6 +170,14 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
         y = min(float(lvl), prev - gap)
         ys.append(y)
         prev = y
+    def _rgba(rgb_str: str, alpha: float) -> str:
+        inner = rgb_str[rgb_str.index("(") + 1: rgb_str.index(")")]
+        return f"rgba({inner},{alpha})"
+
+    for (_, r), col in zip(rows.iterrows(), tier_colors):
+        fig.add_hrect(y0=float(r["hdi_low"]), y1=float(r["hdi_high"]),
+                      fillcolor=_rgba(col, HUMAN_BAND_ALPHA), line_width=0,
+                      layer="below")
     for (_, r), y, col in zip(rows.iterrows(), ys, tier_colors):
         fig.add_annotation(
             x=1.005, y=y, xref="paper", yref="y",
@@ -170,7 +187,7 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     # English text and post-scale type: the figure is shared flat, so it has to
     # be readable without zooming.
     fig.update_layout(
-        title=dict(text="AI capability, human capability and benchmark difficulty on the ECI-H scale",
+        title=dict(text="AI capability, human baselines and benchmark difficulty on the ECI-H scale",
                    x=0.5, font=dict(size=FONT_TITLE)),
         xaxis=dict(title=dict(text="Release date", font=dict(size=FONT_AXIS)),
                    tickfont=dict(size=FONT_TICK),

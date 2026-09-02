@@ -46,8 +46,8 @@ FR_DIR = HERE / "fr"
 # alphabetic phrases, so date strings and numbers pass through untouched.
 FR = [
     # Figure titles and long captions
-    ("AI capability, human capability and benchmark difficulty on the ECI-H scale",
-     "Capacités des IA, niveaux humains et difficulté des benchmarks sur l'échelle ECI-H"),
+    ("AI capability, human baselines and benchmark difficulty on the ECI-H scale",
+     "Capacités des IA, références humaines et difficulté des benchmarks sur l'échelle ECI-H"),
     ("continues past the window (date shown)",
      "dépasse la fenêtre (date indiquée)"),
     ("ability on the agentic axis (median, 95% interval)",
