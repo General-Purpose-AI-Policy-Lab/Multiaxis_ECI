@@ -51,17 +51,15 @@ TITLE = None
 # forecast figure — its benchmarks carry no recent measurements, so a trend
 # there is not meaningful. TITLES has 4 keys; only 3 are looked up here.
 AXES = ["axis1", "axis2", "axis3"]
-# Every panel backcasts: dates before an axis's first measured model are
-# raw backward extrapolations of its early record trend.
-_NOTE = "(pre-data dates: backward extrapolation of the early record trend)"
-BACKCAST = {"axis1": _NOTE, "axis2": _NOTE, "axis3": _NOTE}
+# Every panel backcasts (dates before an axis's first measured model are raw
+# backward extrapolations of its early record trend); the post's caption
+# carries that caveat, the panel titles do not.
 
 TODAY_COLOR = "#444"
 
 # Post-scale sizing, shared with the trend / forests / loadings figures.
 FONT_TITLE = 42       # figure title (drawn only when TITLE is set)
 FONT_AXIS = 36        # panel titles
-FONT_NOTE = 26        # the backcast parenthetical inside a panel title
 FONT_TICK = 30        # tick labels (tier rows, years) and the x caption
 FONT_LEGEND = 30
 MARKER = 17           # median dot
@@ -197,9 +195,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
     pad = pd.Timedelta(days=160)
     x0, x1 = x0d - pad, x1d + pad
 
-    titles = [TITLES[a] + (f'  <span style="font-size:{FONT_NOTE}px">'
-                           f'{BACKCAST[a]}</span>' if a in BACKCAST else "")
-              for a in AXES]
+    titles = [TITLES[a] for a in AXES]
     fig = make_subplots(rows=len(AXES), cols=1, shared_xaxes=True,
                         vertical_spacing=0.075, subplot_titles=titles)
 

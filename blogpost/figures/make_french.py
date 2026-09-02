@@ -48,8 +48,6 @@ FR = [
     # Figure titles and long captions
     ("AI capability, human capability and benchmark difficulty on the ECI-H scale",
      "Capacités des IA, niveaux humains et difficulté des benchmarks sur l'échelle ECI-H"),
-    ("(pre-data dates: backward extrapolation of the early record trend)",
-     "(dates pré-données : extrapolation rétrograde)"),
     ("continues past the window (date shown)",
      "dépasse la fenêtre (date indiquée)"),
     ("ability on the agentic axis (median, 95% interval)",
