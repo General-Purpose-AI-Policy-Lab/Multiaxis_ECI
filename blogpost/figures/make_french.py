@@ -195,6 +195,11 @@ def main(cached_only: bool = False, only: set[str] | None = None) -> None:
     if want("forests", needs_trace=True):
         import make_forests_plotly
         _patched(make_forests_plotly).main(tag="_draft", out_dir=FR_DIR)
+    if want("forests_minority", needs_trace=True):
+        import make_forests_plotly
+        _patched(make_forests_plotly).main(
+            tag="_draft", out_dir=FR_DIR,
+            chains=make_forests_plotly.MINORITY_CHAINS)
     if want("loadings", needs_trace=True):
         import make_loadings_plotly
         _patched(make_loadings_plotly,
