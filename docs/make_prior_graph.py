@@ -203,6 +203,13 @@ def _save(pdf, fig):
         png = _args.png_dir / f"prior_graph-{_page}{lang}.png"
         fig.savefig(png, dpi=240, bbox_inches="tight")
         print("wrote", png)
+        if _args.lang == "fr":
+            # Vector twin for the French site's embeds, beside the Plotly
+            # figures' SVGs (blogpost/figures/fr/svg/).
+            svg = _args.png_dir / "svg" / f"prior_graph-{_page}{lang}.svg"
+            svg.parent.mkdir(exist_ok=True)
+            fig.savefig(svg, bbox_inches="tight")
+            print("wrote", svg)
 
 
 _suffix = "_fr" if _args.lang == "fr" else ""

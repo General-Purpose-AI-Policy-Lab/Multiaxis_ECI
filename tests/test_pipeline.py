@@ -501,6 +501,16 @@ class TestAnalysis:
         assert out == tmp_path / "html" / "some_figure.html"
         assert out.exists()
 
+    def test_save_svg_lands_in_svg_subdir_with_print_layout(self, tmp_path):
+        import plotly.graph_objects as go
+        from multiaxis_eci.viz.core import save_svg
+        fig = go.Figure(go.Scatter(x=[0, 1], y=[0, 1]))
+        out = save_svg(fig, tmp_path / "some_figure.png", width=300, height=200)
+        assert out == tmp_path / "svg" / "some_figure.svg"
+        text = out.read_text()
+        assert text.lstrip().startswith("<svg") and 'width="300"' in text
+        assert fig.layout.paper_bgcolor is None      # the caller's figure untouched
+
     def test_sota_stats_df_columns_and_dates(self, synth_trace, data, raw_df):
         df = sota_stats_df(synth_trace, data, raw_df)
         expected = {"model", "release_date", "C_mean", "C_hdi_low", "C_hdi_high",

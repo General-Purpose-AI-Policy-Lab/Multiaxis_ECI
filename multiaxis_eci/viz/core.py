@@ -41,17 +41,10 @@ _PRINT_LAYOUT = {"paper_bgcolor": "white",
                  "plot_bgcolor": "white"}
 
 
-def save_print(fig: go.Figure, path, *, width: int | None = None,
-               height: int | None = None, scale: int = 2,
-               pdf: bool = True) -> Path:
-    """Write `fig` as a print-quality PNG (and PDF) at `path` (suffix ignored).
-
-    The layout patch lands on a COPY: the caller's figure is never mutated, so
-    the same figure can also go to HTML unchanged. `scale=2` is the pixel
-    dimension every committed LW export was made at; changing it changes them.
-    """
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
+def _print_copy(fig: go.Figure, width: int | None = None,
+                height: int | None = None) -> go.Figure:
+    """A COPY of `fig` with the print defaults filled in (never the caller's
+    figure, so the same figure can also go to HTML unchanged)."""
     out = go.Figure(fig)
     for dotted, value in _PRINT_LAYOUT.items():
         obj = out.layout
@@ -63,6 +56,21 @@ def save_print(fig: go.Figure, path, *, width: int | None = None,
         out.layout.width = width
     if height:
         out.layout.height = height
+    return out
+
+
+def save_print(fig: go.Figure, path, *, width: int | None = None,
+               height: int | None = None, scale: int = 2,
+               pdf: bool = True) -> Path:
+    """Write `fig` as a print-quality PNG (and PDF) at `path` (suffix ignored).
+
+    The layout patch lands on a COPY: the caller's figure is never mutated, so
+    the same figure can also go to HTML unchanged. `scale=2` is the pixel
+    dimension every committed LW export was made at; changing it changes them.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out = _print_copy(fig, width, height)
 
     png = path.with_suffix(".png")
     out.write_image(png, scale=scale)
@@ -82,6 +90,22 @@ def save_html(fig: go.Figure, path) -> Path:
     out = path.parent / "html" / f"{path.stem}.html"
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.write_html(out)
+    return out
+
+
+def save_svg(fig: go.Figure, path, *, width: int | None = None,
+             height: int | None = None) -> Path:
+    """Write the vector SVG twin of a `save_print` export.
+
+    Same print layout as the PNG/PDF (same copy-and-patch, same width/height),
+    and like `save_html` it lands in a sibling folder, `svg/` beside `path`, so
+    the figure directory stays the flat list of files the post embeds. Vector:
+    `save_print`'s `scale` is a raster notion and does not apply.
+    """
+    path = Path(path)
+    out = path.parent / "svg" / f"{path.stem}.svg"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    _print_copy(fig, width, height).write_image(out)
     return out
 
 

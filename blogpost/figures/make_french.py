@@ -7,7 +7,9 @@ threading a language flag through eight scripts, this one re-runs their
 deep-walked and every string field (titles, axis captions, legend names,
 annotations, hovertemplates — and data-level category labels like the
 crossover tier rows) is passed through the EN→FR table below, then written
-under `fr/` (the HTML twins land in `fr/html/` through `save_html` as usual).
+under `fr/` (the HTML twins land in `fr/html/` through `save_html` as usual,
+and every print export also gets a vector SVG twin in `fr/svg/`, for the
+site's figure embeds).
 
 The matplotlib diagrams (human_arrangement_lw, model_family_example_lw, the
 prior graphs) draw their text at plot time and are NOT covered here.
@@ -16,10 +18,13 @@ Usage:
     python blogpost/figures/make_french.py [--cached] [--only NAME[,NAME...]]
 
 `--cached` skips every figure that would need to open the 13 GB trace
-(keeps: crossovers, the pooled trend, the 1D timeline). `--only` names a
-subset: timeline, trend, trend_majority, trend_minority, crossover,
-crossover_majority, crossover_minority, crossover_majority95,
-crossover_minority95, forests, loadings, human_modes, split_takers, pit.
+(keeps: crossovers, the pooled trend, the 1D timelines). `--only` names a
+subset: timeline, timeline_humanmerge, trend, trend_majority, trend_minority,
+crossover, crossover_majority, crossover_minority, crossover_majority95,
+crossover_minority95, forests, forests_minority, loadings, human_modes,
+split_takers, pit. `--post` is the subset the French post embeds (what
+`fr/` tracks): the two timelines, the majority trend, the four chain-mode
+crossovers, both forests, loadings, human_modes, split_takers, pit.
 """
 from __future__ import annotations
 
@@ -35,9 +40,16 @@ REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(HERE))
 
-from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print, save_svg  # noqa: E402
 
 FR_DIR = HERE / "fr"
+
+# The figures the French post embeds, i.e. the set `fr/` tracks (the pooled
+# trend/crossover and the minority trend are English-post appendix renders).
+POST = {"timeline", "timeline_humanmerge", "trend_majority",
+        "crossover_majority", "crossover_minority", "crossover_majority95",
+        "crossover_minority95", "forests", "forests_minority", "loadings",
+        "human_modes", "split_takers", "pit"}
 
 # Ordered substring pairs: longest / most specific FIRST — "High School Top
 # Performer" must translate before "Top Performer", full captions before the
@@ -153,8 +165,14 @@ def _map_strings(node, fn):
 def _patched(module, extra: list[tuple[str, str]] | None = None):
     """Route the module's savers through the FR translation; `extra` adds
     figure-specific replacements (e.g. the loadings grid drops " (obsolète)"
-    from the axis-4 title so it clears the colorbar)."""
-    module.save_print = lambda fig, path, **kw: save_print(translate(fig, extra), _fr_path(path), **kw)
+    from the axis-4 title so it clears the colorbar). Every print export also
+    writes its SVG twin (`fr/svg/<stem>_fr.svg`, same print layout)."""
+    def _print(fig, path, **kw):
+        fr, out = translate(fig, extra), _fr_path(path)
+        png = save_print(fr, out, **kw)
+        save_svg(fr, out, width=kw.get("width"), height=kw.get("height"))
+        return png
+    module.save_print = _print
     module.save_html = lambda fig, path: save_html(translate(fig, extra), _fr_path(path))
     return module
 
@@ -179,6 +197,11 @@ def main(cached_only: bool = False, only: set[str] | None = None) -> None:
         import make_timeline_plotly
         _patched(make_timeline_plotly).main(REPO / "results/canonical", "_draft",
                                             out_dir=FR_DIR)
+    if want("timeline_humanmerge"):
+        # The --human-merge variant of Figure 1 (results/canonical_humanmerge).
+        import make_timeline_plotly
+        _patched(make_timeline_plotly).main(REPO / "results/canonical_humanmerge",
+                                            "_humanmerge", out_dir=FR_DIR)
     if want("trend"):
         import make_trend_plotly
         _patched(make_trend_plotly).main(tag="", out_dir=FR_DIR, cached=True)
@@ -229,6 +252,10 @@ if __name__ == "__main__":
                    help="skip every figure that needs the trace")
     p.add_argument("--only", default=None,
                    help="comma-separated subset of figure names")
+    p.add_argument("--post", action="store_true",
+                   help="only the figures the French post embeds (the fr/ set)")
     args = p.parse_args()
-    main(cached_only=args.cached,
-         only=None if args.only is None else set(args.only.split(",")))
+    only = None if args.only is None else set(args.only.split(","))
+    if args.post:
+        only = POST if only is None else only & POST
+    main(cached_only=args.cached, only=only)

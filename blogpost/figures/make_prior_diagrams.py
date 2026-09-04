@@ -122,8 +122,14 @@ def save(fig, name):
         name = Path(name).stem + "_fr" + Path(name).suffix   # fr/<stem>_fr.png
     out = out_dir / name
     fig.savefig(out, dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
     print("wrote", out)
+    if LANG == "fr":
+        # Vector twin for the site's embeds, beside the Plotly SVGs (fr/svg/).
+        svg = out_dir / "svg" / (out.stem + ".svg")
+        svg.parent.mkdir(exist_ok=True)
+        fig.savefig(svg, bbox_inches="tight")
+        print("wrote", svg)
+    plt.close(fig)
 
 
 # ================= Figure 1: human tier arrangement =================
