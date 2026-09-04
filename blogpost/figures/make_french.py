@@ -62,7 +62,7 @@ FR = [
     ("Axis 2 — Scientific Knowledge and Reasoning",
      "Axe 2 : Connaissances et raisonnement scientifiques"),
     ("Axis 3 — Agentic Capabilities", "Axe 3 : Capacités agentiques"),
-    ("Axis 4 — Legacy QA", "Axe 4 : Questions-Réponses (saturées)"),
+    ("Axis 4 — Legacy QA", "Axe 4 : Questions-Réponses (obsolète)"),
     # Human tiers, in the post's capitalized style (the dashboard's
     # HUMAN_LEVEL_LABELS_FR keeps its own lowercase labels)
     ("Committee of Average Humans", "Comité d'Humains Moyens"),
@@ -152,7 +152,7 @@ def _map_strings(node, fn):
 
 def _patched(module, extra: list[tuple[str, str]] | None = None):
     """Route the module's savers through the FR translation; `extra` adds
-    figure-specific replacements (e.g. the loadings grid drops " (saturées)"
+    figure-specific replacements (e.g. the loadings grid drops " (obsolète)"
     from the axis-4 title so it clears the colorbar)."""
     module.save_print = lambda fig, path, **kw: save_print(translate(fig, extra), path, **kw)
     module.save_html = lambda fig, path: save_html(translate(fig, extra), path)
@@ -198,7 +198,7 @@ def main(cached_only: bool = False, only: set[str] | None = None) -> None:
     if want("loadings", needs_trace=True):
         import make_loadings_plotly
         _patched(make_loadings_plotly,
-                 extra=[(" (saturées)", "")]).main(tag="_draft", out_dir=FR_DIR)
+                 extra=[(" (obsolète)", "")]).main(tag="_draft", out_dir=FR_DIR)
     if want("human_modes", needs_trace=True):
         import make_human_modes_plotly
         _patched(make_human_modes_plotly).main(out_dir=FR_DIR)
