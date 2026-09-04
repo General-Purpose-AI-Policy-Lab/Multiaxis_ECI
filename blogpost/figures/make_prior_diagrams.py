@@ -119,6 +119,7 @@ def save(fig, name):
     out_dir.mkdir(exist_ok=True)
     if LANG == "fr":
         _translate_fig(fig)
+        name = Path(name).stem + "_fr" + Path(name).suffix   # fr/<stem>_fr.png
     out = out_dir / name
     fig.savefig(out, dpi=DPI, bbox_inches="tight")
     plt.close(fig)

@@ -198,7 +198,9 @@ def _save(pdf, fig):
     pdf.savefig(fig, bbox_inches="tight")
     if _args.png_dir is not None:
         _args.png_dir.mkdir(parents=True, exist_ok=True)
-        png = _args.png_dir / f"prior_graph-{_page}.png"
+        # A French export names its language, like every file in figures/fr/.
+        lang = "_fr" if _args.lang == "fr" else ""
+        png = _args.png_dir / f"prior_graph-{_page}{lang}.png"
         fig.savefig(png, dpi=240, bbox_inches="tight")
         print("wrote", png)
 

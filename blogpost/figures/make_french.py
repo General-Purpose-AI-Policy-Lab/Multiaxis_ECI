@@ -1,4 +1,4 @@
-"""French renders of the post's Plotly figures, in `figures/fr/`.
+"""French renders of the post's Plotly figures, in `figures/fr/`, named `<stem>_fr`.
 
 The blog post ships on the lab's (French) site first and is crossposted to
 LessWrong in English, so every figure exists in both languages. Rather than
@@ -154,9 +154,17 @@ def _patched(module, extra: list[tuple[str, str]] | None = None):
     """Route the module's savers through the FR translation; `extra` adds
     figure-specific replacements (e.g. the loadings grid drops " (obsolète)"
     from the axis-4 title so it clears the colorbar)."""
-    module.save_print = lambda fig, path, **kw: save_print(translate(fig, extra), path, **kw)
-    module.save_html = lambda fig, path: save_html(translate(fig, extra), path)
+    module.save_print = lambda fig, path, **kw: save_print(translate(fig, extra), _fr_path(path), **kw)
+    module.save_html = lambda fig, path: save_html(translate(fig, extra), _fr_path(path))
     return module
+
+
+def _fr_path(path) -> Path:
+    """`<stem>_fr<suffix>`: every French export carries the language in its
+    name, so a French file dropped next to its English twin cannot be mistaken
+    for it (the HTML twin in `fr/html/` gets the same stem)."""
+    path = Path(path)
+    return path.with_name(path.stem + "_fr" + path.suffix)
 
 
 def main(cached_only: bool = False, only: set[str] | None = None) -> None:
