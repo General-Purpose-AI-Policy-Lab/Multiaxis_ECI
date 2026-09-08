@@ -6,7 +6,7 @@ Layout
 * analysis helpers — anchor pinning, ECI affine, timeline split, human levels
 * model + sampler  — tiny NUTS run, verifies the full Beta IRT compiles + samples
 * PPC + plots      — every plot builder returns a valid go.Figure
-* CLI              — argparse contract for 2_fit.py
+* CLI              — argparse contract for 3_fit.py
 
 The analysis / plot tests run against a synthetic InferenceData built from a
 seeded RNG — no NUTS needed, so they finish in a fraction of a second. The
@@ -19,7 +19,6 @@ import dataclasses
 import json
 import subprocess
 import sys
-import warnings
 from pathlib import Path
 
 import arviz as az
@@ -30,42 +29,80 @@ import pymc as pm
 import pytensor
 import pytest
 
-from multiaxis_eci import analysis
 import multiaxis_eci.analysis.rotation as rotation
-from multiaxis_eci import viz
+from multiaxis_eci import analysis, viz
 from multiaxis_eci.analysis import (
-    align_factor_signs, align_rotations, alignment_report, all_models_stats_df,
-    apply_rotation, canonicalize_factors,
+    align_factor_signs,
+    align_rotations,
+    alignment_report,
+    all_models_stats_df,
+    apply_rotation,
+    canonicalize_factors,
     eci_transform,
-    flat_C, forest_stats_df, human_stats_df,
-    mirt_factors_from_trace, mirt_identified_rhat, mirt_identified_rhat_nc, prepare_fit,
-    mirt_informed_mask, nc_difficulty_draws, post_stats,
-    promax_rotate, sota_stats_df, timeline_stats_df, trace_anchors,
+    flat_C,
+    forest_stats_df,
+    human_stats_df,
+    mirt_factors_from_trace,
+    mirt_identified_rhat,
+    mirt_identified_rhat_nc,
+    mirt_informed_mask,
+    nc_difficulty_draws,
+    post_stats,
+    prepare_fit,
+    promax_rotate,
+    sota_stats_df,
+    timeline_stats_df,
+    trace_anchors,
     trace_loading_prior,
 )
 from multiaxis_eci.config import (
-    ANCHOR_HIGH, ANCHOR_LOW, DATA_DIR, ECI_EPS, HUMAN_ORDER,
-    PROJECT_ROOT, RELEASE_DATES, SOTA_MODELS, ZERO_DIAG_THRESHOLD,
+    ANCHOR_HIGH,
+    ANCHOR_LOW,
+    ECI_EPS,
+    HUMAN_ORDER,
+    PROJECT_ROOT,
+    SOTA_MODELS,
+    ZERO_DIAG_THRESHOLD,
 )
 from multiaxis_eci.data import (
-    ECIData, clip_scores_to_floors, drop_model_benchmark_cells,
-    drop_model_observations, drop_zero_scores, find_model_idx,
-    load_benchmark_floors, load_eci_data,
+    ECIData,
+    clip_scores_to_floors,
+    drop_model_benchmark_cells,
+    drop_model_observations,
+    drop_zero_scores,
+    find_model_idx,
+    load_benchmark_floors,
+    load_eci_data,
 )
 from multiaxis_eci.lineage import LINEAGE_MAP, build_lineage_structure
-from multiaxis_eci.models.qmatrix import QMATRIX_VARIANTS, axes_as_list
 from multiaxis_eci.models.mirt import build_mirt_model
 from multiaxis_eci.models.mirt_nc import _validate_qmatrix, build_mirt_nc_model
-from multiaxis_eci.persistence import save_pit, save_summary, save_trace
-from multiaxis_eci.viz import (
-    all_models_forest_fig, capability_timeline_fig, density_overlay_fig,
-    forest_fig, forest_grid_fig, hyperparams_fig, loadings_grid_fig,
-    pit_ecdf_fig, pit_hist_fig, pred_vs_obs_fig,
-    residuals_per_benchmark_fig, sota_forest_fig, subplot_grid,
-)
+from multiaxis_eci.models.qmatrix import QMATRIX_VARIANTS, axes_as_list
+from multiaxis_eci.persistence import save_pit
 from multiaxis_eci.ppc import (
-    _beta_draw, _flatten_over_chains, _thin_sel, boundary_mask, compute_gof,
-    pit_values, posterior_predictive_mirt, posterior_predictive_mirt_nc,
+    _beta_draw,
+    _flatten_over_chains,
+    _thin_sel,
+    boundary_mask,
+    compute_gof,
+    pit_values,
+    posterior_predictive_mirt,
+    posterior_predictive_mirt_nc,
+)
+from multiaxis_eci.viz import (
+    all_models_forest_fig,
+    capability_timeline_fig,
+    density_overlay_fig,
+    forest_fig,
+    forest_grid_fig,
+    hyperparams_fig,
+    loadings_grid_fig,
+    pit_ecdf_fig,
+    pit_hist_fig,
+    pred_vs_obs_fig,
+    residuals_per_benchmark_fig,
+    sota_forest_fig,
+    subplot_grid,
 )
 
 
@@ -79,21 +116,22 @@ def data() -> ECIData:
 def raw_df(data: ECIData) -> pd.DataFrame:
     """Mirror of what load_eci_data() actually keeps post-filtering.
 
-    Data prep (merge/dedup) is done by the preprocessing notebook and lives in
-    the complete `1_data/processed/benchmarks_merged.csv` (every benchmark). With
-    the canonical defaults (collapse_effort_variants=False,
-    drop_low_obs_models=False) the modeling-stage transforms that change the row
-    count are (1) the unconditional retirement drop, (2) the curated exclusion
-    filter applied at fit time and (3) the human-baseline merge, so this mirror
-    applies all three.
+    Data prep (merge/dedup, benchmark inclusion) is done by benchmark-data-pipeline
+    and lives in `0_input/all_scores_flat.csv`. With the canonical defaults
+    (collapse_effort_variants=False, drop_low_obs_models=False) the modeling-stage
+    transforms that change the row count are (1) the curated exclusion filter
+    applied at fit time and (2) the human-baseline merge, so this mirror applies
+    both.
     """
-    from multiaxis_eci.data import (PROCESSED_FILE, _load_human_baselines_as_models,
-                      load_excluded_benchmarks, load_retired_benchmarks)
+    from multiaxis_eci.data import (
+        SCORE_COLUMNS,
+        _load_human_baselines_as_models,
+        load_excluded_benchmarks,
+        read_scores,
+    )
 
-    df = pd.read_csv(PROCESSED_FILE)
-    # Mirror load_eci_data's two benchmark filters, retirement first.
-    df = df[~df["benchmark"].isin(load_retired_benchmarks()
-                                  | load_excluded_benchmarks())].reset_index(drop=True)
+    df = read_scores()[SCORE_COLUMNS]
+    df = df[~df["benchmark"].isin(load_excluded_benchmarks())].reset_index(drop=True)
     humans = _load_human_baselines_as_models()
     humans = humans[humans["benchmark"].isin(df["benchmark"].unique())]
     df = pd.concat([df, humans], ignore_index=True)
@@ -174,8 +212,8 @@ class TestData:
         assert d_all.n_models > d.n_models
         assert d_all.is_human.sum() >= d.is_human.sum()
 
-    def test_eci_data_merge_adds_mmlu_and_bbh(self, data):
-        """The pipeline (`1_data/1_pipeline/pipeline.ipynb`) contributes MMLU + BBH
+    def test_eci_data_merge_adds_mmlu(self, data):
+        """The pipeline (`benchmark-data-pipeline`) contributes MMLU
         with the SOTA models attached under their versioned IDs (not the
         eci_data.csv "pretty" names). Contract duplicated here so a future
         pipeline change that drops these benchmarks or those mappings is
@@ -195,7 +233,6 @@ class TestData:
         present_b = set(data.blookup["benchmark"].values)
         present_m = set(data.mlookup["model"].values)
         assert "MMLU" in present_b
-        assert "BIG-Bench Hard (BBH)" in present_b
         # Mapped SOTA models pick up the new evaluations under their versioned IDs
         for versioned in expected_mapped_ids:
             assert versioned in present_m, versioned
@@ -204,30 +241,25 @@ class TestData:
         assert "GPT-4 (Mar 2023)" not in present_m
 
     def test_processed_file_contract(self):
-        """Smoke test: the processed file exists, has the expected 9 columns,
-        and carries every benchmark (exclusions are applied at fit time by
-        load_eci_data, not during data generation)."""
-        from multiaxis_eci.data import PROCESSED_FILE, load_excluded_benchmarks
+        """Smoke test: the synced score view exists, carries the eight modeling
+        columns plus the pipeline's floor, and every curated-excluded benchmark
+        (exclusions are applied at fit time by load_eci_data, not in the pipeline)."""
+        from multiaxis_eci.data import PROCESSED_FILE, SCORE_COLUMNS, load_excluded_benchmarks
         assert PROCESSED_FILE.exists(), (
-            f"{PROCESSED_FILE} missing — run 1_data/1_pipeline/pipeline.ipynb and "
-            f"copy output/benchmarks_merged.csv into 1_data/processed/"
+            f"{PROCESSED_FILE} missing — run `python -m multiaxis_eci sync`"
         )
         df = pd.read_csv(PROCESSED_FILE)
-        assert set(df.columns) == {
-            "model_version", "score", "release_date", "organization",
-            "benchmark", "stderr", "source", "category",
-        }
+        assert set(SCORE_COLUMNS) | {"lower_bound", "ceiling"} <= set(df.columns)
         assert (df["category"] != "Tier 2 Excluded").all()
-        # The pipeline no longer pre-excludes — the curated "easy-for-humans"
-        # benchmarks must be present in the complete processed file. The fit-time
-        # drop is covered by test_excluded_benchmarks_dropped.
+        # The pipeline includes the curated "easy-for-humans" benchmarks — the
+        # fit-time drop is covered by test_excluded_benchmarks_dropped.
         present = set(df["benchmark"].unique())
         excluded = load_excluded_benchmarks()
         missing = excluded - present
         assert not missing, (
-            f"excluded benchmarks absent from the complete processed file: "
-            f"{sorted(missing)} — re-run the pipeline (exclusions now happen at "
-            f"fit time, so data generation must keep every benchmark)"
+            f"excluded benchmarks absent from the score view: {sorted(missing)} — "
+            f"they must stay included in benchmark-data-pipeline (exclusion happens "
+            f"at fit time here)"
         )
 
     def test_no_mojibake_in_model_names(self):
@@ -373,7 +405,7 @@ class TestEraFilter:
 
 
 class TestScopeFlags:
-    """--drop-benchmarks and --cyber, the two per-fit scope levers."""
+    """--drop-benchmarks, the per-fit scope lever."""
 
     def test_drop_benchmarks_removes_exactly_those_names(self, data_all):
         assert load_eci_data(include_all_benchmarks=True,
@@ -387,56 +419,17 @@ class TestScopeFlags:
         assert got.is_human.sum() <= data_all.is_human.sum()
 
     def test_drop_benchmarks_warns_on_unknown_name(self, data_all):
-        """A typo must be visible, not silently fit the full scope. It is a
-        warning rather than an error because a name already absent has to be a
-        no-op: the retirement list removes names a caller may still pass."""
+        """A typo must be visible, not silently fit the full scope."""
         with pytest.warns(UserWarning, match="not in the table"):
             got = load_eci_data(include_all_benchmarks=True,
                                 drop_benchmarks=["GBAEvaal"])
         assert got.n_obs == data_all.n_obs
 
-    def test_dropping_a_retired_benchmark_is_a_silent_no_op(self, data_all):
-        """The retirement list already removed them, so naming one changes
-        nothing and raises no warning."""
-        from multiaxis_eci.data import load_retired_benchmarks
-        retired = sorted(load_retired_benchmarks())
-        assert retired, "retired_benchmarks.txt is empty"
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", UserWarning)
-            got = load_eci_data(include_all_benchmarks=True,
-                                drop_benchmarks=retired)
-        assert (got.n_obs, got.n_models, got.n_benchmarks) == (
-            data_all.n_obs, data_all.n_models, data_all.n_benchmarks)
-        for b in retired:
-            assert b not in set(data_all.blookup["benchmark"])
-
-    def test_cyber_is_additive_and_never_shadows_a_pipeline_row(self, data_all):
-        """Cyber rows land only on models already fit, only on benchmarks the
-        pipeline does not supply, and leave every existing observation intact."""
-        from multiaxis_eci.data import CURATED_DIR
-
-        assert load_eci_data(include_all_benchmarks=True,
-                             fit_cyber=False).n_obs == data_all.n_obs, \
-            "cyber must be off by default"
-
-        if not (CURATED_DIR / "cyber_benchmarks.csv").exists():
-            pytest.skip("cyber_benchmarks.csv absent (run diagnostics.fetch_cyber_eci)")
-
-        got = load_eci_data(include_all_benchmarks=True, fit_cyber=True)
-        assert got.n_obs > data_all.n_obs
-        # No new test-takers: a cyber-only model carries no cross-benchmark info.
-        assert set(got.mlookup["model"]) == set(data_all.mlookup["model"])
-        # Purely additive on the benchmark side.
-        assert set(got.blookup["benchmark"]) > set(data_all.blookup["benchmark"])
-        # Every (model, benchmark) cell of the base scope survives exactly once.
-        # Both index arrays are 0-based positions into their lookup frame.
-        def cells(d):
-            mv = np.asarray(d.mlookup["model"])[d.model_idx]
-            bn = np.asarray(d.blookup["benchmark"])[d.bench_idx]
-            return pd.Series(list(zip(mv, bn))).value_counts()
-        base_cells, got_cells = cells(data_all), cells(got)
-        assert (base_cells == got_cells.reindex(base_cells.index)).all(), \
-            "a cyber row shadowed or duplicated a pipeline observation"
+    def test_cyber_benchmarks_are_in_scope_by_default(self, data_all):
+        """Epoch's cyber ECI benchmarks come through the pipeline's view since
+        September 2026 (the former --cyber flag); the Cyber category is fitted."""
+        assert "Cyber" in set(data_all.bench_category)
+        assert "Cybench" in set(data_all.blookup["benchmark"])
 
 
 # ───────────────────────── Analysis helpers ────────────────────────────────
@@ -479,9 +472,9 @@ class TestAnalysis:
         # key degrades silently (kwarg TypeError only inside a 13 GB trace
         # run; a missing floor key = censoring instead of backcast).
         import inspect
-        from multiaxis_eci.config import (AXIS_TITLES, FORECAST_BACKCAST_FLOOR,
-                                          FORECAST_KW)
+
         from multiaxis_eci.analysis import mirt_frontier_forecast
+        from multiaxis_eci.config import AXIS_TITLES, FORECAST_BACKCAST_FLOOR, FORECAST_KW
         params = set(inspect.signature(mirt_frontier_forecast).parameters)
         assert set(FORECAST_KW) <= params
         assert FORECAST_KW["fit_basis"] == "envelope"      # flagship identity
@@ -496,6 +489,7 @@ class TestAnalysis:
 
     def test_save_html_lands_in_html_subdir(self, tmp_path):
         import plotly.graph_objects as go
+
         from multiaxis_eci.viz.core import save_html
         out = save_html(go.Figure(), tmp_path / "some_figure")
         assert out == tmp_path / "html" / "some_figure.html"
@@ -503,6 +497,7 @@ class TestAnalysis:
 
     def test_save_svg_lands_in_svg_subdir_with_print_layout(self, tmp_path):
         import plotly.graph_objects as go
+
         from multiaxis_eci.viz.core import save_svg
         fig = go.Figure(go.Scatter(x=[0, 1], y=[0, 1]))
         out = save_svg(fig, tmp_path / "some_figure.png", width=300, height=200)
@@ -817,7 +812,7 @@ class TestCLI:
     def test_help_exits_clean(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "2_fit.py"), "--help"],
+            [py, str(PROJECT_ROOT / "3_fit.py"), "--help"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -830,7 +825,7 @@ class TestCLI:
     def test_unknown_arg_fails(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "2_fit.py"), "--bogus-flag"],
+            [py, str(PROJECT_ROOT / "3_fit.py"), "--bogus-flag"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -840,7 +835,7 @@ class TestCLI:
     def test_invalid_preset_fails(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "2_fit.py"), "--preset", "nonsense"],
+            [py, str(PROJECT_ROOT / "3_fit.py"), "--preset", "nonsense"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -1130,7 +1125,7 @@ class TestMIRT:
         rep = alignment_report(mirt_synth, data,
                                methods=("varimax", "matchalign"))
         assert set(rep["methods"]) == {"varimax", "matchalign"}
-        for m, entry in rep["methods"].items():
+        for _m, entry in rep["methods"].items():
             assert set(entry["sign_counts"]) == {"axis1", "axis2", "axis3"}
             assert np.isfinite(entry["aligned_max_rhat_A"])
             assert "sign_confident" in entry["loadings"].columns
@@ -1928,7 +1923,7 @@ class TestMIRTNonComp:
 
     def test_qmatrix3x_crossloads_coding_and_science(self):
         q3, q3x = QMATRIX_VARIANTS["qmatrix3"], QMATRIX_VARIANTS["qmatrix3x"]
-        crossed = {"Autonomous SWE", "Agentic Computer Use", "Biology", "Chemistry"}
+        crossed = {"Autonomous SWE", "Agentic Computer Use", "Cyber", "Biology", "Chemistry"}
         for cat in crossed:
             ax = axes_as_list(q3x[cat])
             assert len(ax) == 2 and 0 in ax              # gains reasoning (axis 0)
@@ -1940,8 +1935,11 @@ class TestMIRTNonComp:
         """qmatrix4 = qmatrix3 with Multimodal pulled out as a strict 4th axis.
         Kept OUT of QMATRIX_VARIANTS so the non-comp driver's 3-axis name mapping
         (OVERRIDE_MAPS) never sees a 4th index."""
-        from multiaxis_eci.models.qmatrix import (AXIS_LABELS_K4, QMATRIX4_CAT_TO_AXIS,
-                                  QMATRIX_VARIANTS)
+        from multiaxis_eci.models.qmatrix import (
+            AXIS_LABELS_K4,
+            QMATRIX4_CAT_TO_AXIS,
+            QMATRIX_VARIANTS,
+        )
         # strict simple structure: every category -> a single int axis
         assert all(isinstance(v, int) for v in QMATRIX4_CAT_TO_AXIS.values())
         assert set(QMATRIX4_CAT_TO_AXIS.values()) == {0, 1, 2, 3}
@@ -1954,9 +1952,12 @@ class TestMIRTNonComp:
     def test_qmatrix4x_crossloads(self):
         """qmatrix4x = qmatrix4 + qmatrix3x's cross-loads (coding & PhD-science
         also tap reasoning, axis 0); multimodal stays single (axis 3)."""
-        from multiaxis_eci.models.qmatrix import (QMATRIX4_CAT_TO_AXIS, QMATRIX4X_CAT_TO_AXIS,
-                                  QMATRIX_VARIANTS)
-        crossed = {"Autonomous SWE", "Agentic Computer Use", "Biology", "Chemistry"}
+        from multiaxis_eci.models.qmatrix import (
+            QMATRIX4_CAT_TO_AXIS,
+            QMATRIX4X_CAT_TO_AXIS,
+            QMATRIX_VARIANTS,
+        )
+        crossed = {"Autonomous SWE", "Agentic Computer Use", "Cyber", "Biology", "Chemistry"}
         for cat in crossed:
             ax = axes_as_list(QMATRIX4X_CAT_TO_AXIS[cat])
             assert len(ax) == 2 and 0 in ax            # gains reasoning (axis 0)
@@ -2364,9 +2365,9 @@ class TestFitSpec:
                 / "trace_mirt_k3_lineagehard_floors.nc")
 
     def test_attrless_baseline_takes_folder_data_scope(self):
-        # 2_fit.py's K=1 baseline used to carry no attrs and no tag in its filename. It
+        # 3_fit.py's K=1 baseline used to carry no attrs and no tag in its filename. It
         # keeps the folder's DATA scope and gets the model-side flags from
-        # 2_fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
+        # 3_fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
         # and the pooled noise not).
         idata = self._idata(K=1)
         p = (PROJECT_ROOT / "results"
@@ -2377,7 +2378,7 @@ class TestFitSpec:
         assert (spec.cyber, spec.floors, spec.known_se) == (True, True, True)
         assert not (spec.human_prior or spec.lineage_prior or spec.pooled_noise)
         # floors ON emits no token; the baseline is fit pooled_noise=False
-        # (2_fit.py's baseline rule), which the tag now names. Harmless for
+        # (3_fit.py's baseline rule), which the tag now names. Harmless for
         # folders: a baseline lives untagged in its K-fit's folder.
         assert spec.tag == "_cyber_knownse_unpooled"
 
@@ -2513,7 +2514,7 @@ class TestFitSpec:
 def _load_script(relpath):
     """Import a numbered script by path.
 
-    The reproduction-path scripts are prefixed (`3_diagnostics/3_plot_mirt.py`),
+    The reproduction-path scripts are prefixed (`4_diagnostics/3_plot_mirt.py`),
     and a module name cannot start with a digit, so `import` cannot reach them.
     Everything importable lives in `multiaxis_eci/`; these are entry points, loaded here
     the only way Python allows.
@@ -2529,7 +2530,7 @@ def _load_script(relpath):
 def test_plot_mirt_folder_decision():
     """`--folder` must refuse the two filenames that are not fits of their own,
     and thin one draw per 2 GB so the 38 GB flagship fits in 26 GB of RAM."""
-    folder_decision = _load_script("3_diagnostics/3_plot_mirt.py").folder_decision
+    folder_decision = _load_script("4_diagnostics/3_plot_mirt.py").folder_decision
     assert folder_decision("trace.nc", 1_694_555_488)[0] is not None
     assert folder_decision("trace_mirt_k1.nc", 141_356)[0] is not None
     assert folder_decision("trace_mirt_k2_loglog.nc", 20_333_520) == (None, 1)
@@ -2550,7 +2551,7 @@ def test_dashboard_json_registry_round_trip(tmp_path, monkeypatch):
     """
     import dataclasses as dc
     import json as _json
-    bd = _load_script("3_diagnostics/4_build_dashboard.py")
+    bd = _load_script("4_diagnostics/4_build_dashboard.py")
 
     spec = dc.replace(analysis.FLAGSHIP, drop_benchmarks=("FrontierMath v1",))
     reg = tmp_path / "dashboard_fits.json"
@@ -2573,7 +2574,7 @@ import re as _re
 
 class TestLayoutPaths:
     """The 2026-08 restructure renamed data/ -> 1_data/, diagnostics/ ->
-    3_diagnostics/, fit.py -> 2_fit.py and hoisted the library into
+    4_diagnostics/, fit.py -> 3_fit.py and hoisted the library into
     multiaxis_eci/. Paths built piecewise (`ROOT / "data" / "curated"`) survive
     a rename silently: they still evaluate to a Path, and only blow up when
     something reads them. These lock the layout so the next rename fails here
@@ -2627,7 +2628,7 @@ class TestLayoutPaths:
     def test_no_doubled_rename_artifacts(self):
         """A rename pass that replaces a long form and then a short one applies
         the second rule inside the first rule's output. It bit twice here:
-        `diagnostics/x.py` -> `3_diagnostics/3_x.py` -> `3_3_diagnostics/3_x.py`,
+        `diagnostics/x.py` -> `4_diagnostics/3_x.py` -> `3_4_diagnostics/3_x.py`,
         and `eci/data.py` -> `multiaxis_eci/data.py` ->
         `multiaxis_multiaxis_eci/data.py`. Both forms read as plausible until
         someone follows the path, so catch the shape rather than the instances:
@@ -2647,10 +2648,11 @@ class TestLayoutPaths:
         assert not hits, f"doubled rename artifacts: {hits}"
 
     def test_layout_entry_points_exist(self):
-        for rel in ["1_data", "1_data/1_pipeline/pipeline.ipynb", "1_data/curated",
-                    "1_data/processed/benchmarks_merged.csv", "2_fit.py",
-                    "3_diagnostics/4_build_dashboard.py", "3_diagnostics/dashboard_fits.json",
-                    "multiaxis_eci/config.py", "multiaxis_eci/scripts.py",
+        for rel in ["0_input/all_scores_flat.csv", "0_input/provenance.json",
+                    "1_curated/excluded_benchmarks.txt", "1_curated/lineage_map.csv",
+                    "2_model/multiaxis_eci/config.py", "2_model/multiaxis_eci/scripts.py",
+                    "3_fit.py", "4_diagnostics/4_build_dashboard.py",
+                    "4_diagnostics/dashboard_fits.json",
                     "notebooks", "docs/cli.md", "LICENSE", "NOTICE.md"]:
             assert (PROJECT_ROOT / rel).exists(), f"missing: {rel}"
 

@@ -30,15 +30,15 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
+import figbase  # noqa: E402
 import matplotlib.dates as mdates  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+from make_all import AXES, END, forecast_cache  # noqa: E402
 
-import figbase  # noqa: E402
 from multiaxis_eci.analysis import FLAGSHIP_TRACE  # noqa: E402
 from multiaxis_eci.config import AXIS_TITLES as LW_TITLES  # noqa: E402
-from make_all import AXES, END, forecast_cache  # noqa: E402
 
 TREND_START = pd.Timestamp("2020-01-01")
 

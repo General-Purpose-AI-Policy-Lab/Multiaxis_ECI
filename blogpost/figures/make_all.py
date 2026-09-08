@@ -38,14 +38,19 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
 
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_TRACE, open_flagship,  # noqa: E402
-                      prepare_fit)
+from figbase import FOREST_FRONTIER, pretty  # noqa: E402
+
+from multiaxis_eci.analysis import (  # noqa: E402
+    FLAGSHIP,
+    FLAGSHIP_TRACE,
+    open_flagship,
+    prepare_fit,
+)
 from multiaxis_eci.config import AXIS_TITLES, FORECAST_KW, FORECAST_NO_SOTA_AXES  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
-from figbase import FOREST_FRONTIER, pretty  # noqa: E402
 
 AXES = ["axis1", "axis2", "axis3"]      # Legacy QA is out of the forecast scope
 HDI = 0.8                               # every interval on both forecast figures
@@ -104,8 +109,11 @@ def compute(view, data, raw) -> dict:
     The crossover figure reads only the ForecastResult (slope/intercept draws)
     out of this, through `make_trend_plotly.forecast`'s cache.
     """
-    from multiaxis_eci.analysis import (mirt_frontier_forecast, mirt_human_axis_stats,
-                          mirt_model_timeline_df)
+    from multiaxis_eci.analysis import (
+        mirt_frontier_forecast,
+        mirt_human_axis_stats,
+        mirt_model_timeline_df,
+    )
     from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
 
     out = {}

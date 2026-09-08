@@ -1,6 +1,6 @@
 """Every test-taker the flagship fit splits on, majority chains against the rest.
 
-`3_diagnostics/theta_bimodality.py` flags a taker as split when the gap in its
+`4_diagnostics/theta_bimodality.py` flags a taker as split when the gap in its
 sorted per-chain theta means is wider than 3 within-chain sds with at least two
 chains each side. Nearly all of the flags land on one axis, the agentic one, and
 this figure draws that axis only.
@@ -39,14 +39,14 @@ import xarray as xr
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
-sys.path.insert(0, str(REPO / "3_diagnostics"))
+sys.path.insert(0, str(REPO / "2_model"))
+sys.path.insert(0, str(REPO / "4_diagnostics"))
 
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
-                      FLAGSHIP_TRACE as TRACE)
 from theta_bimodality import PERM_STRIDE, axis_permutations, residual_groups  # noqa: E402
-from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
+from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN  # noqa: E402
+from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.

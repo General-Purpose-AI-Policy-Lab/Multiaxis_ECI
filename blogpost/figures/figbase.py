@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.dates as mdates  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
@@ -26,12 +27,11 @@ import pandas as pd  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 
 from multiaxis_eci.analysis import mirt_model_timeline_df  # noqa: E402
 from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
-from multiaxis_eci.viz.core import (AI_COLOR, FUTURE_COLOR, HUMAN_COLOR,  # noqa: E402
-                                    PASSED_COLOR)
+from multiaxis_eci.viz.core import AI_COLOR, FUTURE_COLOR, HUMAN_COLOR, PASSED_COLOR  # noqa: E402
 
 __all__ = ["AI_COLOR", "HUMAN_COLOR", "PASSED_COLOR", "FUTURE_COLOR",
            "AXIS_TITLES", "FOREST_FRONTIER", "pretty",

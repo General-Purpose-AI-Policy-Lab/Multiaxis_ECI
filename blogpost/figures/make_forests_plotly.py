@@ -29,17 +29,16 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
 
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
-                      FLAGSHIP_TRACE as TRACE, prepare_fit)
+from make_all import check_axis_identity, forest_frames, two_column_layout  # noqa: E402
+
+from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
-from make_all import (check_axis_identity, forest_frames,  # noqa: E402
-                      two_column_layout)
 from multiaxis_eci.viz import forest_grid_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
-
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.

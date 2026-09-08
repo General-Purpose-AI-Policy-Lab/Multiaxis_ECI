@@ -30,18 +30,19 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
-                      FLAGSHIP_TRACE as TRACE, prepare_fit)
+from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
-from multiaxis_eci.viz.core import FUTURE_COLOR as FUTURE, PASSED_COLOR as PAST, save_html, save_print  # noqa: E402
-
+from multiaxis_eci.viz.core import FUTURE_COLOR as FUTURE  # noqa: E402
+from multiaxis_eci.viz.core import PASSED_COLOR as PAST
+from multiaxis_eci.viz.core import save_html, save_print
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again.
@@ -119,12 +120,12 @@ def crossovers(trace: Path, cached: bool = False,
     if cached:
         raise SystemExit(f"--cached but {cache} is missing — run without "
                          "--cached once to rebuild it from the trace.")
-    from multiaxis_eci.analysis import mirt_crossover_df, mirt_frontier_forecast
-    from multiaxis_eci.config import (FORECAST_BACKCAST_FLOOR, FORECAST_KW,
-                                      FORECAST_NO_SOTA_AXES)
-    from multiaxis_eci.data import PROCESSED_FILE
     from make_all import END, check_axis_identity
     from make_trend_plotly import forecast
+
+    from multiaxis_eci.analysis import mirt_crossover_df, mirt_frontier_forecast
+    from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW, FORECAST_NO_SOTA_AXES
+    from multiaxis_eci.data import PROCESSED_FILE
 
     idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
                                     thin=FLAGSHIP_THIN, chains=chains, path=trace)

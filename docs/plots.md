@@ -13,10 +13,10 @@ fit CLI: [../README.md](../README.md).
 
 | destination | written by | tracked? |
 |---|---|---|
-| `plots/mirt_k{K}{tag}/` | `3_diagnostics/3_plot_mirt.py`, and `2_fit.py --plots` | no |
-| `plots/canonical/` | `2_fit.py --preset canonical` | no |
-| `plots/dashboard/` | `3_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
-| `index.html` (repo root) | `3_diagnostics/4_build_dashboard.py` | **yes** |
+| `plots/mirt_k{K}{tag}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit.py --plots` | no |
+| `plots/canonical/` | `3_fit.py --preset canonical` | no |
+| `plots/dashboard/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
+| `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |
 | `blogpost/figures/` | `blogpost/figures/make_all.py` | **yes**, except `*.html` |
 
 `plots/` is gitignored entirely: figures there are regenerable from the traces,
@@ -36,7 +36,7 @@ Single trace. A trace path is the only argument: `FitSpec.from_trace` recovers
 the flag set, the data scope and the destination folder from it.
 
 ```bash
-python 3_diagnostics/3_plot_mirt.py --forecast --trace \
+python 4_diagnostics/3_plot_mirt.py --forecast --trace \
   results/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
@@ -45,8 +45,8 @@ each, forecasts on. `--dry-run` prints the per-trace decision and renders
 nothing.
 
 ```bash
-python 3_diagnostics/3_plot_mirt.py --folder results/ --dry-run
-python 3_diagnostics/3_plot_mirt.py --folder results/mirt_humanmerge_lineageprior_lineagebm
+python 4_diagnostics/3_plot_mirt.py --folder results/ --dry-run
+python 4_diagnostics/3_plot_mirt.py --folder results/mirt_humanmerge_lineageprior_lineagebm
 ```
 
 Dashboard. `--force-all` ignores the render cache, which is the only way to be
@@ -54,8 +54,8 @@ sure no superseded card is served. `--add TRACE --name NAME --label LABEL`
 registers a new card, `--remove NAME` drops one, `--list` prints the registry.
 
 ```bash
-python 3_diagnostics/4_build_dashboard.py --list
-python 3_diagnostics/4_build_dashboard.py --force-all
+python 4_diagnostics/4_build_dashboard.py --list
+python 4_diagnostics/4_build_dashboard.py --force-all
 ```
 
 Blog-post figures. Every one reads the flagship through

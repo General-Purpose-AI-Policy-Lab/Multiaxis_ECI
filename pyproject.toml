@@ -1,5 +1,62 @@
+[project]
+name = "multiaxis-eci"
+version = "0.2.0"
+description = "K-axis Bayesian Beta-MIRT rebuild of the Epoch Capabilities Index with human baselines, fed by benchmark-data-pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pymc==5.28.5",
+    "arviz==0.23.4",
+    "pytensor==2.38.3",
+    "nutpie==0.16.7",
+    "plotly>=6,<7",
+    "kaleido",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "requests",
+    "scipy",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["2_model"]
+
 [tool.pytest.ini_options]
-pythonpath = ["."]
+pythonpath = ["2_model", "."]
+testpaths = ["tests"]
 markers = [
     "slow: tests that run actual NUTS sampling (skip with -m 'not slow')",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["2_model", "tests"]
+extend-exclude = ["notebooks", "evals", "results", "blogpost/ladder"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B", "UP"]
+# E501: long lines are frequent in the analysis code and the LaTeX/plotly strings.
+# E701/E702: this codebase writes one-line guards (`if x: return`) on purpose.
+# B905: zip(strict=) would touch ~70 call sites for no bug found. B028: warnings carry no stacklevel.
+ignore = ["E203", "E501", "E701", "E702", "B905", "B028"]
+
+[tool.ruff.lint.per-file-ignores]
+# Scripts bootstrap sys.path before importing the library.
+"3_fit.py" = ["E402"]
+"4_diagnostics/*.py" = ["E402"]
+"1_curated/*.py" = ["E402"]
+"blogpost/**/*.py" = ["E402"]
+"deliverables/**/*.py" = ["E402"]
+"tests/*.py" = ["E402"]
+"docs/*.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["multiaxis_eci"]

@@ -37,7 +37,7 @@ import plotly.graph_objects as go
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
 
 from multiaxis_eci.viz.core import save_html, save_print, save_svg  # noqa: E402

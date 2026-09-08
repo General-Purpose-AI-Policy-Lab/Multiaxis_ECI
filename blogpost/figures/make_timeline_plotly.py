@@ -24,7 +24,7 @@ import pandas as pd
 import xarray as xr
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 import multiaxis_eci.config as config  # noqa: E402
 import multiaxis_eci.viz.core as vc  # noqa: E402
 from multiaxis_eci.analysis.stats import eci_affine  # noqa: E402
@@ -118,7 +118,7 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     hg = pd.read_csv(results / "human_groups.csv")
     human_names = set(hg["name"])
 
-    raw = pd.read_csv(REPO / "1_data/processed/benchmarks_merged.csv").dropna(
+    raw = pd.read_csv(REPO / "0_input/all_scores_flat.csv").dropna(
         subset=["release_date"])
     dates = raw.groupby("model_version")["release_date"].min()
     dates = pd.concat([dates, pd.Series({m: d for m, d in config.RELEASE_DATES.items()

@@ -35,17 +35,17 @@ from plotly.subplots import make_subplots
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
-sys.path.insert(0, str(REPO / "3_diagnostics"))
+sys.path.insert(0, str(REPO / "2_model"))
+sys.path.insert(0, str(REPO / "4_diagnostics"))
 sys.path.insert(0, str(HERE))
 
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
-                      FLAGSHIP_TRACE as TRACE, prepare_fit)
-from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
 from make_all import two_column_layout  # noqa: E402
 from theta_bimodality import PERM_STRIDE, axis_permutations, residual_groups  # noqa: E402
-from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
+from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
+from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.
@@ -116,7 +116,10 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE) -> None:
         FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"], thin=FLAGSHIP_THIN,
                                 chains=majority, path=trace),
         data).require_A(), axis=0)
-    zc = lambda X: (X - X.mean(0)) / (X.std(0) + 1e-12)
+
+    def zc(X):
+        return (X - X.mean(0)) / (X.std(0) + 1e-12)
+
     corr = zc(rep_med).T @ zc(raw_med) / raw_med.shape[0]
     slot = [int(np.argmax(np.abs(corr[k]))) for k in range(corr.shape[0])]
     assert sorted(slot) == list(range(corr.shape[0])), f"ambiguous match {slot}"

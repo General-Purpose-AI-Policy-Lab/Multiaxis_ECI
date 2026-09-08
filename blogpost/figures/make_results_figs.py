@@ -16,15 +16,16 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-import numpy as np  # noqa: E402
-from matplotlib import pyplot as plt  # noqa: E402
 from textwrap import shorten  # noqa: E402
 
 import figbase  # noqa: E402
+import numpy as np  # noqa: E402
 from figbase import AI_COLOR, AXIS_TITLES, HUMAN_COLOR  # noqa: E402
+
 # The fit comes from `make_all`, which axis-checks it, so this file and the
 # Plotly set cannot read a different posterior or accept a different labelling.
 from make_all import forest_candidates, load_flagship  # noqa: E402
+from matplotlib import pyplot as plt  # noqa: E402
 
 
 def forests_axes_2x2(view, data, out: Path, n_top: int = 11) -> Path:

@@ -4,14 +4,15 @@ Represents the flagship fit: K=4, non-negative loadings, fixed guessing
 floors, pooled per-benchmark noise, merged human order,
 Brownian-motion lineage steps over release gaps.
 """
-import numpy as np
 from pathlib import Path
 
 import matplotlib
+import numpy as np
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle, FancyBboxPatch, Rectangle, FancyArrowPatch
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Rectangle
 
 INK = "#26324B"
 MUT = "#5a6478"
@@ -127,6 +128,7 @@ def canvas(w, h, xlim, ylim):
 
 
 import argparse
+
 _ap = argparse.ArgumentParser()
 _ap.add_argument("--lang", choices=["en", "fr"], default="en")
 _ap.add_argument("--png-dir", type=Path, default=None,

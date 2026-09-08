@@ -26,19 +26,18 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly.colors as pc
-from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))   # the pickle holds analysis.ForecastResult
+sys.path.insert(0, str(REPO / "2_model"))   # the pickle holds analysis.ForecastResult
 sys.path.insert(0, str(HERE))
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
-                      FLAGSHIP_TRACE as TRACE, prepare_fit)
+from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
-
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.

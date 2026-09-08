@@ -21,6 +21,7 @@ import sys
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -29,7 +30,7 @@ import pandas as pd
 import xarray as xr
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 import multiaxis_eci.config as config  # noqa: E402  (anchors + dateless-model backfill)
 from multiaxis_eci.analysis.stats import eci_affine  # noqa: E402
 from multiaxis_eci.viz.core import AI_COLOR, HUMAN_COLOR  # noqa: E402
@@ -101,7 +102,7 @@ def main(results: Path, tag: str) -> None:
     # the tier list from the fit's own human table so the split is not guessed.
     human_names = set(pd.read_csv(results / "human_groups.csv")["name"])
 
-    raw = pd.read_csv(REPO / "1_data/processed/benchmarks_merged.csv").dropna(
+    raw = pd.read_csv(REPO / "0_input/all_scores_flat.csv").dropna(
         subset=["release_date"])
     model_dates = raw.groupby("model_version")["release_date"].min()
     curated = {m: d for m, d in config.RELEASE_DATES.items()

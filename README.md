@@ -15,46 +15,57 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 
 <img src="blogpost/figures/forecast_trend_plotly_majority.png" width="560" alt="Frontier trend per axis (majority chains): record envelope extended at its recent rate, with human tiers">
 
-Scope: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions.
+Scope of the published fits: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions. On the pipeline build of 2026-09-07 the same scopes hold 5,402 / 905 / 97 and 4,571 / 846 / 89 (see the Data section).
 
 ## Setup
 
-Any Python >= 3.11 environment works.
+Python 3.11 or later, with the pinned scientific stack (`pyproject.toml`):
 
 ```bash
-pip install "pymc==5.28.5" "arviz==0.23.4" "pytensor==2.38.3" "nutpie==0.16.7" \
-            "plotly>=6,<7" numpy pandas scipy kaleido matplotlib requests pytest
-plotly_get_chrome -y   # once per env; figure export raises without it
-python -m pytest -m "not slow"     # sanity check, ~4 min cold, ~250 tests
+uv venv --python 3.11 .venv && uv pip install -e . --group dev   # or: pip install -e .
+plotly_get_chrome -y                                             # once per env; figure export needs it
+python -m multiaxis_eci sync                                     # 0_input/ from ../benchmark-data-pipeline
+python -m pytest -m "not slow"                                   # ~1 min, ~260 tests
+ruff check .
 ```
 
-The pins are load-bearing, not a suggestion: arviz >= 1.0 replaces `InferenceData` with xarray's `DataTree`, and nutpie >= 0.16.8 hands a `DataTree` back from a zarr store, either of which breaks this code and the golden logp tests. The set above was verified against a fresh environment on 2026-08-31 (254/254 fast tests, with numpy 2.4.6, pandas 3.0.5, xarray 2026.7.0, zarr 3.3.0, plotly 6.9.0). `nutpie` (Rust NUTS) is the default sampler, 2-3x faster than PyMC NUTS on CPU.
+The pins are load-bearing: arviz >= 1.0 replaces `InferenceData` with xarray's `DataTree`, and nutpie >= 0.16.8 hands a `DataTree` back from a zarr store, either of which breaks this code and the golden logp tests. `nutpie` (Rust NUTS) is the default sampler, 2-3x faster than PyMC NUTS on CPU.
+
+## Data
+
+The scores, release dates, organizations, countries, categories, chance floors, known ceilings, access classes and human baselines all come from [`benchmark-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/benchmark-data-pipeline). `python -m multiaxis_eci sync` copies its consumer views and tables from a checkout (the sibling directory by default, `--pipeline PATH` otherwise) into `0_input/`, and writes `provenance.json` with the pipeline commit and build date. The copies are tracked, so a fit is reproducible without the pipeline. Anything wrong in the data (a date, an alias, a floor, a benchmark's inclusion) is fixed in the pipeline, then synced here.
+
+What stays in this repository is what belongs to the model, under `1_curated/`: the "easy for humans" exclusion list of the canonical K=1 index, the reviewed lineage map and its overrides, the data-driven SOTA list, the reviewed clips of below-floor scores, the optional SimpleQA original column and Epoch's reference ECI table. See [`1_curated/README.md`](1_curated/README.md).
+
+The data generation is part of every output folder name: `results/canonical_data20260907/` was fitted on the pipeline build of 2026-09-07 (`config.DATA_SUFFIX`), so a fit on a newer build never overwrites an older one. The results published with the post (`results/canonical/`, `results/mirt_*/`, `index.html`) were fitted on the pre-pipeline dataset described in the post; they are kept as they were.
 
 ## Run
 
 Main project fit with K=4.
 
 ```bash
-python 2_fit.py --K 4 --human-merge --lineage-prior --lineage-bm
+python 3_fit.py --K 4 --human-merge --lineage-prior --lineage-bm
 ```
 
-The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `results/canonical/`:
+The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `results/canonical<data suffix>/`:
 
 ```bash
-python 2_fit.py --preset canonical
+python 3_fit.py --preset canonical
 ```
 
 ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2024-10-22) = 130 and GPT-5 (2025-08-07, medium) = 150, matching the scale of Epoch's dashboard. Every other flag, where a fit's output lands, and the plot / diagnose / dashboard commands: [docs/cli.md](docs/cli.md).
 
 ```
 .
-├── 1_data/              # step 1: the pipeline notebook, the curated-input builders, the tables
-├── 2_fit.py             # step 2: the fit CLI (canonical preset + exploration)
-├── 3_diagnostics/       # step 3: post-fit tools, the numbered four in reproduction order
-├── multiaxis_eci/       # the library: config, data loading, models, analysis, figures
+├── 0_input/             # step 0: the pipeline's views and tables, synced (all_scores_flat, human_baselines, models, benchmarks, manifest, provenance)
+├── 1_curated/           # step 1: inputs specific to this model, and the two builders (SOTA list, lineage map)
+├── 2_model/multiaxis_eci/  # step 2: the library: config, data loading, models, analysis, figures, sync
+├── 3_fit.py             # step 3: the fit CLI (canonical preset + exploration)
+├── 4_diagnostics/       # step 4: post-fit tools, the numbered four in reproduction order
 ├── notebooks/           # one-off investigations, kept for the record, not maintained
 ├── evals/               # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
-├── results/             # one folder per fit; canonical/ is the index, Old/ the archive
+├── results/             # one folder per fit; canonical/ is the published index, Old/ the archive
+├── plots/               # figures per fit (gitignored, regenerable)
 ├── blogpost/            # the research post's figures and its LOO ladder (the deliverable)
 ├── deliverables/        # figure + table sets built for a specific write-up
 ├── docs/                # model math, CLI reference, figure catalogue
@@ -62,9 +73,9 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 └── index.html           # the all-fits dashboard (tracked)
 ```
 
-Numbered entries are the reproduction path, in order. Everything else is a library, an output folder or a reference. Inside `1_data/` and `3_diagnostics/` the same rule applies.
+Numbered entries are the reproduction path, in order. Everything else is a library, an output folder or a reference. Inside `1_curated/` and `4_diagnostics/` the same rule applies.
 
-Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [3_diagnostics/README.md](3_diagnostics/README.md). What each notebook investigated: [notebooks/README.md](notebooks/README.md).
+Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [4_diagnostics/README.md](4_diagnostics/README.md). What each notebook investigated: [notebooks/README.md](notebooks/README.md).
 
 ## Method
 
@@ -81,7 +92,7 @@ This is the *compensatory* family: a strong skill can make up for a weak one ins
 
 Without priors the runs split into two sets of axes; with the human ordering alone they still disagree; with both, they agree. On leave-one-out cross-validation the final model beats the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33.
 
-Four things are on by default with no flag over them: non-negative loadings, the fixed-c chance floors, hierarchical benchmark noise, and four retired benchmarks (FrontierMath v1, FrontierMath Tier 4 v1, AlgoTune, MindCube) dropped at load time for every fit. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
+Three things are on by default with no flag over them: non-negative loadings, the fixed-c chance floors (the pipeline's `lower_bound`), and hierarchical benchmark noise. Each has an opt-out documented in [docs/cli.md](docs/cli.md). Benchmarks retired for measurement validity (FrontierMath v1, AlgoTune, MindCube) are excluded by the pipeline itself.
 
 ## Reading the results
 
@@ -99,12 +110,6 @@ Whether the chains agree on those axes is a different question, with its own num
 
 On the **Legacy QA** axis specifically, the human lead is a comparison against a frozen pool of pre-mid-2024 models. The eight benchmarks that define the axis most purely were never run on a frontier model, so this is a data artifact rather than a finding. The axis is left out of the headline forecasts (it gets no SOTA exemption), though the dashboard still renders its panel for diagnostic purposes.
 
-## Data
-
-`multiaxis_eci/data.py` reads `1_data/processed/benchmarks_merged.csv`, produced by the in-repo notebook `1_data/1_pipeline/pipeline.ipynb` (Restart Kernel → Run All; see [1_data/1_pipeline/README.md](1_data/1_pipeline/README.md)).
-
-That notebook will soon be superseded by [`eval-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/eval-data-pipeline), as a standalone repository.
-
 ## Resources
 
 - Epoch Capabilities Index: <https://epoch.ai/eci>
@@ -114,6 +119,6 @@ That notebook will soon be superseded by [`eval-data-pipeline`](https://github.c
 
 ## License
 
-CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `1_data/curated/` and `results/`.
+CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `1_curated/` and `results/`.
 
 The upstream benchmark scores carry their own terms. Epoch AI is CC-BY and requires attribution, RAND is cited under RR-A3797-1, and Scale SEAL has no open license. What to credit when republishing: [NOTICE.md](NOTICE.md).

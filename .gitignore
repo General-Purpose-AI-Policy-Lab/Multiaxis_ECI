@@ -101,3 +101,8 @@ results/**/*.log
 
 # Agent tooling
 .claude/
+
+# Local environment and scratch
+.venv/
+tmp*/
+tmp_*

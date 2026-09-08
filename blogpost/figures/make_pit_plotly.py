@@ -32,13 +32,12 @@ import plotly.graph_objects as go
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "2_model"))
 
-from multiaxis_eci.analysis import (FLAGSHIP, FLAGSHIP_THIN,  # noqa: E402
-                      FLAGSHIP_TRACE as TRACE)
+from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN  # noqa: E402
+from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.ppc import boundary_mask, pit_values, posterior_predictive_mirt  # noqa: E402
 from multiaxis_eci.viz.core import AI_COLOR, save_html, save_print  # noqa: E402
-
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again.

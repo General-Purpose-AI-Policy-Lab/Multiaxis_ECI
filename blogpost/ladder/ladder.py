@@ -27,7 +27,7 @@ import pandas as pd
 import xarray as xr
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci.analysis.convergence import _rhat_subset_idx  # noqa: E402
 from multiaxis_eci.config import ECI_EPS  # noqa: E402

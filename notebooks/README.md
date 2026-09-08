@@ -5,7 +5,7 @@ answered a question at a point in time; none is part of a workflow, nothing
 imports them, and their cell outputs are the result they were kept for. Imports
 may predate the current layout, so expect to fix a path before re-running one.
 
-The maintained equivalents live in [`../3_diagnostics/`](../3_diagnostics/README.md).
+The maintained equivalents live in [`../4_diagnostics/`](../4_diagnostics/README.md).
 
 **How many axes are there?**
 

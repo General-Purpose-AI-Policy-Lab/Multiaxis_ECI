@@ -18,7 +18,7 @@ import pandas as pd
 import xarray as xr
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "2_model"))
 from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors, load_eci_data  # noqa: E402
 from ladder import FITS, OUT  # noqa: E402
 

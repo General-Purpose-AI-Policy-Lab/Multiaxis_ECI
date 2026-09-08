@@ -1,10 +1,10 @@
 # CLI reference
 
-Every flag `2_fit.py` accepts, where a fit's output lands, and the commands that
+Every flag `3_fit.py` accepts, where a fit's output lands, and the commands that
 plot, diagnose and publish it. The [README](../README.md) covers the two runs
 that matter; this file is the rest of the surface.
 
-`python 2_fit.py --help` is the generated version of the flag tables below.
+`python 3_fit.py --help` is the generated version of the flag tables below.
 
 ## Flags
 
@@ -46,13 +46,12 @@ unmarked to both.
 | `--apply-exclusions` | `[expl]` apply `excluded_benchmarks.txt`, i.e. fit the canonical scope |
 | `--include-all-benchmarks` | `[canon]` the mirror: keep the curated-excluded benchmarks |
 | `--drop-benchmarks A,B` | `[expl]` drop the named benchmarks (comma-separated, exact names) for a sensitivity run |
-| `--cyber` | `[expl]` append the cyber ECI benchmarks |
-| `--open-only` | `[canon]` keep only benchmarks whose items are public; results go to `results/canonical_open/` |
-| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks NOT public+verified in `1_data/curated/benchmark_access.csv`; results go to `results/canonical_closed/` |
-| `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_data/curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
+| `--open-only` | `[canon]` keep only benchmarks whose access class in `0_input/benchmarks.csv` is `public`; results go to `results/canonical_open/` |
+| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks whose access class in `0_input/benchmarks.csv` is not `public`; results go to `results/canonical_closed/` |
+| `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
 | `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
 | `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
-| `--eci-data-only` | `[canon]` fit `1_data/raw/eci_data.csv`, the original reference ECI dataset, instead of the processed file |
+| `--eci-data-only` | `[canon]` fit `1_curated/eci_data.csv`, the original reference ECI dataset, instead of the pipeline's score view |
 
 **Likelihood**
 
@@ -75,6 +74,8 @@ unmarked to both.
 
 ## Where a fit's output goes
 
+Every results and plots folder name ends with `_data<YYYYMMDD>`, the build date of the pipeline tables in `0_input/provenance.json` (`config.DATA_SUFFIX`): `results/canonical_data20260907/`. Fits on two data generations therefore never overwrite each other; the folders without a suffix are the published fits on the pre-pipeline dataset.
+
 A fit's flags become one tag, and the tag names the results folder, the trace
 and the plots folder, so the three cannot drift apart. A default contributes no
 token, so the K=4 command above reduces to:
@@ -93,8 +94,8 @@ the only thing a plotting or diagnostic caller has to name.
 ## Country frontier and crossovers (reproduction steps 1-2)
 
 ```bash
-python 3_diagnostics/1_country_frontier.py
-python 3_diagnostics/2_plot_crossovers.py
+python 4_diagnostics/1_country_frontier.py
+python 4_diagnostics/2_plot_crossovers.py
 ```
 
 `1_country_frontier.py` builds the US/China frontier comparison from the
@@ -110,7 +111,7 @@ published snapshot date in the source, not the wall clock.
 ## Plot a fit
 
 ```bash
-python 3_diagnostics/3_plot_mirt.py --trace \
+python 4_diagnostics/3_plot_mirt.py --trace \
   results/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
@@ -122,8 +123,8 @@ destination. Full catalogue: [plots.md](plots.md).
 ### Plot everything
 
 ```bash
-python 3_diagnostics/3_plot_mirt.py --folder results/ --dry-run   # decisions only
-python 3_diagnostics/3_plot_mirt.py --folder results/             # render
+python 4_diagnostics/3_plot_mirt.py --folder results/ --dry-run   # decisions only
+python 4_diagnostics/3_plot_mirt.py --folder results/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder
@@ -144,9 +145,9 @@ count over its denominator.
 Two scripts go further when chains disagree.
 
 ```bash
-python 3_diagnostics/diagnose_chains.py --trace TRACE --name LABEL
-python 3_diagnostics/diagnose_chains.py --trace TRACE --write-modes
-python 3_diagnostics/theta_bimodality.py --trace TRACE
+python 4_diagnostics/diagnose_chains.py --trace TRACE --name LABEL
+python 4_diagnostics/diagnose_chains.py --trace TRACE --write-modes
+python 4_diagnostics/theta_bimodality.py --trace TRACE
 ```
 
 `diagnose_chains.py` asks whether the chains found one solution or several. It
@@ -182,7 +183,7 @@ is omitted.
 ## Build the dashboard
 
 ```bash
-python 3_diagnostics/4_build_dashboard.py --force-all
+python 4_diagnostics/4_build_dashboard.py --force-all
 ```
 
 Renders every registered fit into the tracked repo-root `index.html`: a fit
@@ -201,15 +202,15 @@ snapshot it was built from, not as something the repo regenerates on demand.
 Cards are managed by command, not by editing source.
 
 ```bash
-python 3_diagnostics/4_build_dashboard.py --list
-python 3_diagnostics/4_build_dashboard.py --add TRACE --name NAME --label LABEL
-python 3_diagnostics/4_build_dashboard.py --remove NAME
-python 3_diagnostics/4_build_dashboard.py --force NAME       # re-render one card
+python 4_diagnostics/4_build_dashboard.py --list
+python 4_diagnostics/4_build_dashboard.py --add TRACE --name NAME --label LABEL
+python 4_diagnostics/4_build_dashboard.py --remove NAME
+python 4_diagnostics/4_build_dashboard.py --force NAME       # re-render one card
 ```
 
 `--add` reads the fit's identity off the trace with `FitSpec.from_trace`,
 validates it, appends it to the tracked registry
-`3_diagnostics/dashboard_fits.json`, and renders nothing. `--name` is the cache
+`4_diagnostics/dashboard_fits.json`, and renders nothing. `--name` is the cache
 key and the `--force` target, so it must be unique; `--label` is the section
 header and nav entry. Four options refine the card: `--type` is one of `data`,
 `baseline`, `exploratory` (the default), `confirmed`; `--short` is the axis

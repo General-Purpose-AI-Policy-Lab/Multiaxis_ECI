@@ -9,12 +9,14 @@ are copied verbatim from docs/make_prior_graph.py so the look matches exactly.
                                 with effort variants hanging off a release,
                                 in the same visual language.
 """
-import numpy as np
 import matplotlib
+import numpy as np
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 INK = "#26324B"
 MUT = "#5a6478"
