@@ -591,6 +591,7 @@ def load_eci_data(drop_low_obs_models: bool = False,
                    eci_data_only: bool = False,
                    collapse_effort_variants: bool = False,
                    include_all_benchmarks: bool = False,
+                   drop_isolated_families: bool = True,
                    fit_simpleqa_original: bool = False,
                    drop_benchmarks: list[str] | None = None,
                    min_release_date: str | None = None,
@@ -620,6 +621,17 @@ def load_eci_data(drop_low_obs_models: bool = False,
         no-exclusions sensitivity analyses. Ignored when eci_data_only is True.
         Epoch's cyber ECI benchmarks are part of the view since September 2026
         (the former --cyber flag).
+      • drop_isolated_families (default True) — drop every model family (the
+        pipeline's base_model + snapshot, so all reasoning efforts and run
+        variants together, see `model_family`) whose observations in this fit's
+        scope sit on a single benchmark. Such a family carries no information
+        across benchmarks: its ability is a free parameter tied to one
+        difficulty, invisible in the figures (informed filter) and absent from
+        the SOTA tables, and the 2020-2022 tail of them fed a second posterior
+        mode on the legacy QA series. Applied after the benchmark filters, so a
+        family isolated only because its other benchmarks are excluded goes too.
+        SOTA models and the ECI anchors are protected; humans are added later
+        and never concerned. Off with --keep-isolated-families (`_keepiso`).
       • fit_simpleqa_original (default False) — append
         `1_curated/simpleqa_original/simpleqa_original.csv`, the original
         OpenAI SimpleQA (4,326 questions). A separate column from SimpleQA
@@ -746,6 +758,21 @@ def load_eci_data(drop_low_obs_models: bool = False,
         df = df[~df["benchmark"].isin(drop_benchmarks)].reset_index(drop=True)
         print(f"   drop_benchmarks: removed {sorted(drop_benchmarks)} "
               f"({n_rows} obs); {df['benchmark'].nunique()} benchmarks remain")
+
+    # Isolated families: a release seen on one benchmark only, across all its
+    # reasoning efforts and run variants, once the scope above is settled.
+    if drop_isolated_families and not eci_data_only:
+        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
+        protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+        fam = df["model_version"].map(model_family)
+        n_bench = df.groupby(fam)["benchmark"].nunique()
+        isolated = set(n_bench[n_bench == 1].index)
+        drop = fam.isin(isolated) & ~df["model_version"].isin(protected)
+        print(f"   isolated families: dropped {int(drop.sum())} obs of "
+              f"{df.loc[drop, 'model_version'].nunique()} test-takers in "
+              f"{len(isolated)} families seen on one benchmark only; "
+              f"{df.loc[~drop, 'model_version'].nunique()} models remain")
+        df = df[~drop].reset_index(drop=True)
 
     # Humans as IRT rows — must be added after benchmark filtering (so excluded
     # benchmarks like ARC-AGI / HellaSwag drop their human rows too) but

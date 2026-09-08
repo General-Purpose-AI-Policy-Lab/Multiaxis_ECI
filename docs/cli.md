@@ -60,6 +60,7 @@ unmarked to both.
 | `--no-floors` | `[expl]` drop the chance floors, which are on by default. Emits the `_nofloors` tag token, so the sensitivity run gets its own folder |
 | `--no-pooled-noise` | `[expl]` drop the hierarchical `sigma_b`, which is on by default, and give a thin benchmark a free scale. Emits the `_unpooled` tag token |
 | `--ceiling-noise` | `[expl]` estimate a per-benchmark upper asymptote confined to a noise-sized gap, Beta(1,20). Grading noise, not walls |
+| `--keep-isolated-families` | keep the model families (base model + snapshot, all efforts and variants together) seen on a single benchmark in the fit's scope; dropped by default since 2026-09-08 because they carry no cross-benchmark information and the 2020-2022 tail of them fed a second posterior mode. Both modes; emits `_keepiso` |
 | `--censor-bounds` | censored Beta likelihood at the score bounds: a reported 0 (or 1) is the event y ≤ eps_b (y ≥ 1 − eps_b), eps_b = 1 / (2 N_b) from `1_curated/benchmark_n_items.csv` (half an item), instead of a density at a clipped 0.001. Both modes; emits `_censor` |
 | `--known-se` | `[expl]` split the Beta noise: fixed per-cell instrument precision from the reported harness stderr (`n_eff = p(1-p)/se^2`), so `sigma_b` becomes excess-only. Cells without stderr are unchanged |
 

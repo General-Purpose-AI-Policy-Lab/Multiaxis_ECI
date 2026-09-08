@@ -279,6 +279,8 @@ def run_canonical(args) -> None:
     # its own folder suffix: results/canonical stays the plain index.
     human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
                    else config.HUMAN_ORDER if args.human_prior else None)
+    if args.keep_isolated:
+        scope_tag += "_keepiso"
     if args.censor_bounds:
         scope_tag += "_censor"
     if args.human_merge:
@@ -322,6 +324,7 @@ def run_canonical(args) -> None:
 
     print("── Loading data ─────────────────────────────────────────────────")
     data = load_eci_data(eci_data_only=args.eci_data_only,
+                         drop_isolated_families=not args.keep_isolated,
                          drop_low_obs_models=False,
                          collapse_effort_variants=False,
                          include_all_benchmarks=args.include_all_benchmarks,
@@ -374,6 +377,8 @@ def run_canonical(args) -> None:
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
         if args.censor_bounds:
             trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
+        if args.keep_isolated:
+            trace.posterior.attrs["mirt_keep_isolated"] = json.dumps(True)
         if human_order:
             trace.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
         save_trace(trace, trace_path)
@@ -590,6 +595,8 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_pooled_noise"] = json.dumps(True)
     if args.censor_bounds:
         attrs["mirt_censor_bounds"] = json.dumps(True)
+    if args.keep_isolated:
+        attrs["mirt_keep_isolated"] = json.dumps(True)
     censor_eps = load_boundary_eps(data) if args.censor_bounds else None
 
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
@@ -910,6 +917,10 @@ def main():
                              "instrument precision from reported harness stderr "
                              "(n_eff = p(1-p)/se^2), sigma_b becomes excess-only. "
                              "Cells without stderr are unchanged.")
+    parser.add_argument("--keep-isolated-families", dest="keep_isolated", action="store_true",
+                        help="keep the model families seen on a single benchmark (dropped by "
+                             "default: no cross-benchmark information, free abilities; see "
+                             "data.load_eci_data). Both modes; emits the `_keepiso` tag token")
     parser.add_argument("--censor-bounds", action="store_true",
                         help="censored Beta likelihood at the score bounds: a reported 0 "
                              "(or 1) is the event y <= eps_b (y >= 1 - eps_b) with "

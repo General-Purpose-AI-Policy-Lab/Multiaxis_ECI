@@ -57,6 +57,9 @@ class FitSpec:
     theta_pos: bool = False
     no_sg: bool = False
     apply_exclusions: bool = False
+    # Isolated model families (one benchmark across all variants) are dropped by default
+    # (data.load_eci_data); the opt-out emits `_keepiso`.
+    keep_isolated: bool = False
     # Kept so folders of pre-September-2026 fits (`_cyber`) still parse; the cyber
     # benchmarks are part of the pipeline's view now and this flag changes nothing.
     cyber: bool = False
@@ -107,6 +110,7 @@ class FitSpec:
         if self.theta_pos: tag += "_thetapos"
         if self.no_sg: tag += "_noSG"
         if self.apply_exclusions: tag += "_excluded"
+        if self.keep_isolated: tag += "_keepiso"
         if self.cyber: tag += "_cyber"
         if self.simpleqa_original: tag += "_sqaorig"
         if self.drop_benchmarks:
@@ -170,6 +174,7 @@ class FitSpec:
                 theta_pos=args.theta_pos,
                 no_sg=args.no_sg,
                 apply_exclusions=args.apply_exclusions,
+                keep_isolated=args.keep_isolated,
                 simpleqa_original=args.simpleqa_original,
                 drop_benchmarks=tuple(args.drop_benchmarks or ()),
                 private_bases=args.private_bases,
@@ -248,6 +253,7 @@ class FitSpec:
         )
         data = load_eci_data(
             include_all_benchmarks=not self.apply_exclusions,
+            drop_isolated_families=not self.keep_isolated,
             fit_simpleqa_original=self.simpleqa_original,
             drop_benchmarks=list(self.drop_benchmarks) or None)
         if self.apply_exclusions:
@@ -374,6 +380,8 @@ def _attr_flags(post) -> dict:
         out["simpleqa_original"] = True
     if json.loads(a.get("mirt_censor_bounds", "false")):
         out["censor_bounds"] = True
+    if json.loads(a.get("mirt_keep_isolated", "false")):
+        out["keep_isolated"] = True
     if "mirt_drop_benchmarks" in a:
         out["drop_benchmarks"] = tuple(json.loads(a["mirt_drop_benchmarks"]))
     if "mirt_floor_c" in a:
@@ -430,6 +438,7 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         if take(tok):
             out[fl] = True
     for tok, fl in (("_noSG", "no_sg"), ("_excluded", "apply_exclusions"),
+                    ("_keepiso", "keep_isolated"),
                     ("_cyber", "cyber"), ("_sqaorig", "simpleqa_original")):
         if take(tok):
             out[fl] = True

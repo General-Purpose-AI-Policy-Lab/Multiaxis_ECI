@@ -132,6 +132,13 @@ def raw_df(data: ECIData) -> pd.DataFrame:
 
     df = read_scores()[SCORE_COLUMNS]
     df = df[~df["benchmark"].isin(load_excluded_benchmarks())].reset_index(drop=True)
+    # Isolated families (one benchmark across all variants) leave too, SOTA and anchors kept.
+    from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
+    from multiaxis_eci.data import model_family
+    fam = df["model_version"].map(model_family)
+    lonely = set(df.groupby(fam)["benchmark"].nunique().pipe(lambda n: n[n == 1]).index)
+    protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+    df = df[~(fam.isin(lonely) & ~df["model_version"].isin(protected))].reset_index(drop=True)
     humans = _load_human_baselines_as_models()
     humans = humans[humans["benchmark"].isin(df["benchmark"].unique())]
     df = pd.concat([df, humans], ignore_index=True)
@@ -2337,7 +2344,7 @@ class TestFitSpec:
             apply_exclusions=True, cyber=True, simpleqa_original=True,
             drop_benchmarks=("FrontierMath v1", "AlgoTune"), private_bases=True,
             floors=True, ceiling_noise=True, known_se=True,
-            pooled_noise=True, censor_bounds=True)
+            pooled_noise=True, censor_bounds=True, keep_isolated=True)
         idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(spec)})
         got = analysis.FitSpec.from_trace(idata, spec.trace_path)
         assert got == spec
@@ -2705,3 +2712,23 @@ class TestPipelineIdentity:
         # Every exact zero sits at its bound; so do the scores below half an item
         # (a 1/350 partial credit on a 71-item benchmark), censored the same way.
         assert (observed == eps).sum() >= int(data.zero_score_mask.sum())
+
+
+class TestIsolatedFamilies:
+    def test_every_fitted_family_spans_two_benchmarks_unless_protected(self, data):
+        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
+        from multiaxis_eci.data import model_family
+        names = data.mlookup.sort_values("model_idx")["model"].tolist()
+        obs = pd.DataFrame({"model": np.array(names)[data.model_idx],
+                            "bench": np.array(data.blookup.sort_values("benchmark_idx")["benchmark"])[data.bench_idx]})
+        obs = obs[~obs["model"].isin(set(names[i] for i in np.flatnonzero(data.is_human)))]
+        fam = obs["model"].map(model_family)
+        n_bench = obs.groupby(fam)["bench"].nunique()
+        protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+        lonely = [f for f, n in n_bench.items() if n == 1
+                  and not obs.loc[fam == f, "model"].isin(protected).any()]
+        assert not lonely, lonely[:5]
+
+    def test_keep_isolated_restores_them(self, data):
+        kept = load_eci_data(drop_isolated_families=False)
+        assert kept.n_obs > data.n_obs and kept.n_models > data.n_models

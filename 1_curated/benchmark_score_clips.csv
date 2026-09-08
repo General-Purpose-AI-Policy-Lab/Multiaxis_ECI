@@ -117,7 +117,7 @@ Mystery Game Puzzles,Qwen3-235B-A22B-Thinking-2507,False,0.09,0.0922,0.0922,2025
 Mystery Game Puzzles,gpt-5-nano-2025-08-07_low,False,0.09,0.0922,0.0922,2025-08-07,frontier
 Mystery Game Puzzles,gpt-5-nano-2025-08-07_medium,False,0.09,0.0922,0.0922,2025-08-07,frontier
 Mystery Game Puzzles,gpt-5.4-nano-2026-03-17_none,False,0.09,0.0922,0.0922,2026-03-17,frontier
-OTIS Mock AIME 2024-2025,Llama-2-70b-chat-hf,False,0.0,0.001,0.001,2023-07-18,old/weak
+OTIS Mock AIME 2024-2025,Llama-2-70b-chat,False,0.0,0.001,0.001,2023-07-18,old/weak
 OpenBookQA,gpt2-xl,False,0.224,0.25,0.25,2019-11-05,old/weak
 OpenBookQA,gpt-neo-2.7B,False,0.232,0.25,0.25,2021-03-30,old/weak
 OpenBookQA,opt-1.3b,False,0.24,0.25,0.25,2022-05-11,old/weak
