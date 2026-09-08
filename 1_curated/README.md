@@ -11,7 +11,7 @@ Inputs that belong to this model rather than to the data. Everything about the s
 | `benchmark_score_clips.csv` | generated draft, then reviewed | `data.clip_scores_to_floors` applies these row-level clips at fit time (floors fits, the default); drift against the current data warns loudly | no, refresh with `python 4_diagnostics/audit_lower_bounds.py --write-clips` after a sync, review the diff, commit |
 | `simpleqa_original/` | curated extra column | `--simpleqa-original` | see its README |
 | `eci_data.csv` | reference | `--eci-data-only` (Epoch's original ECI table) | no |
-| `benchmark_n_items.csv` | reference | nothing reads it; item counts per benchmark, kept for the record | yes |
+| `benchmark_n_items.csv` | hand-researched | `data.load_boundary_eps` for `--censor-bounds` (eps_b = 1 / (2 N_b)); a benchmark without a row falls back to 0.001 with a warning | yes, `benchmark, n_items, source_url, note, verification` with the pipeline's names |
 
 The two builders are numbered in the order they run after a sync: `1_compute_sota.py` needs the lineage map that `2_build_lineage_map.py` writes only when chains changed, so re-run `2_` first when the model list moved.
 

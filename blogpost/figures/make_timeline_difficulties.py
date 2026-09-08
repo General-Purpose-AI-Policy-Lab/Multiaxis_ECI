@@ -60,14 +60,13 @@ _YLIM = (30, 218)
 
 # Effort suffixes stripped when labelling top models; variants of one model
 # collapse to a single label.
-_EFFORTS = {"unknown", "max", "xhigh", "high", "medium", "low", "minimal",
-            "promax", "proxhigh", "prohigh", "promedium", "prolow"}
 _N_TOP_MODELS = 4
 
 
 def _base_name(name: str) -> str:
-    stem, _, suffix = name.rpartition("_")
-    return stem if stem and suffix in _EFFORTS else name
+    """The release a test-taker belongs to, by the pipeline's identity (data.model_family)."""
+    from multiaxis_eci.data import model_family
+    return model_family(name)
 
 
 def _interval(x: np.ndarray, axis: int = 0):
@@ -105,9 +104,6 @@ def main(results: Path, tag: str) -> None:
     raw = pd.read_csv(REPO / "0_input/all_scores_flat.csv").dropna(
         subset=["release_date"])
     model_dates = raw.groupby("model_version")["release_date"].min()
-    curated = {m: d for m, d in config.RELEASE_DATES.items()
-               if m not in model_dates.index}
-    model_dates = pd.concat([model_dates, pd.Series(curated)])
 
     ai = pd.DataFrame({"name": models, "med": m_med, "lo": m_lo, "hi": m_hi})
     ai["date"] = pd.to_datetime(ai["name"].map(model_dates))

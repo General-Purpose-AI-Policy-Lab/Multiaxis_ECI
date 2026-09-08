@@ -71,6 +71,9 @@ class FitSpec:
     floors: bool = True
     ceiling_noise: bool = False
     known_se: bool = False
+    # Censored Beta likelihood at the score bounds (data.load_boundary_eps); off by default,
+    # emits `_censor`.
+    censor_bounds: bool = False
     # Hierarchical sigma_b is the basic noise model, not an option: thin
     # benchmarks shrink to the shared median instead of keeping a free scale
     # the panel cannot pin. The default (ON) carries no token; the opt-out
@@ -114,6 +117,7 @@ class FitSpec:
         if self.ceiling_noise: tag += "_ceilnoise"
         if self.known_se: tag += "_knownse"
         if not self.pooled_noise: tag += "_unpooled"
+        if self.censor_bounds: tag += "_censor"
         return tag
 
     @property
@@ -171,7 +175,8 @@ class FitSpec:
                 private_bases=args.private_bases,
                 floors=args.floors,
                 ceiling_noise=args.ceiling_noise, known_se=args.known_se,
-                pooled_noise=args.pooled_noise)
+                pooled_noise=args.pooled_noise,
+                censor_bounds=args.censor_bounds)
         except ValueError as e:
             if parser is None:
                 raise
@@ -367,6 +372,8 @@ def _attr_flags(post) -> dict:
         out["cyber"] = True
     if a.get("mirt_simpleqa_original"):
         out["simpleqa_original"] = True
+    if json.loads(a.get("mirt_censor_bounds", "false")):
+        out["censor_bounds"] = True
     if "mirt_drop_benchmarks" in a:
         out["drop_benchmarks"] = tuple(json.loads(a["mirt_drop_benchmarks"]))
     if "mirt_floor_c" in a:
@@ -457,6 +464,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["pooled_noise"] = True
     if take("_unpooled"):
         out["pooled_noise"] = False
+    if take("_censor"):
+        out["censor_bounds"] = True
     if rest:
         raise ValueError(f"unrecognized tag token {rest!r} in folder tag {tag!r} "
                          "— refusing to guess the fit's data scope")

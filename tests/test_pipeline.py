@@ -2337,7 +2337,7 @@ class TestFitSpec:
             apply_exclusions=True, cyber=True, simpleqa_original=True,
             drop_benchmarks=("FrontierMath v1", "AlgoTune"), private_bases=True,
             floors=True, ceiling_noise=True, known_se=True,
-            pooled_noise=True)
+            pooled_noise=True, censor_bounds=True)
         idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(spec)})
         got = analysis.FitSpec.from_trace(idata, spec.trace_path)
         assert got == spec
@@ -2664,3 +2664,42 @@ class TestLayoutPaths:
                 for p in self._files({".py", ".md", ".sh", ".ipynb", ".toml"})
                 if home.search(p.read_text(encoding="utf-8", errors="ignore"))]
         assert not hits, f"hardcoded home / env paths: {hits}"
+
+
+class TestPipelineIdentity:
+    """Model families and boundary censoring read the pipeline's tables, not name regexes."""
+
+    def test_model_family_groups_efforts_and_run_variants(self):
+        from multiaxis_eci.data import is_bare, model_family
+        m = pd.read_csv("0_input/models.csv", dtype=str).fillna("")
+        fam = m.groupby(["base_model", "snapshot"])["model_version"].apply(list)
+        multi = next(v for v in fam if len(v) > 1)
+        assert len({model_family(x) for x in multi}) == 1
+        assert sum(is_bare(x) for x in multi) <= 1, "at most one bare configuration per release"
+        assert model_family("Average Human") == "Average Human", "unknown names fall back"
+
+    def test_boundary_eps_is_half_an_item(self, data):
+        from multiaxis_eci.data import N_ITEMS_FILE, load_boundary_eps
+        n = pd.read_csv(N_ITEMS_FILE).set_index("benchmark")["n_items"]
+        eps = load_boundary_eps(data)
+        assert eps.shape == (data.n_obs,) and ((eps > 0) & (eps < 0.5)).all()
+        bench = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+        known = [i for i, b in enumerate(bench) if b in n.index]
+        i = known[0]
+        rows = np.flatnonzero(data.bench_idx == i)
+        assert np.allclose(eps[rows], np.clip(1.0 / (2.0 * float(n[bench[i]])), 1e-5, 0.05))
+
+    def test_censored_likelihood_is_finite_and_moves_only_boundary_terms(self, data):
+        from multiaxis_eci.data import load_boundary_eps
+        from multiaxis_eci.models.mirt import build_mirt_model
+        eps = load_boundary_eps(data)
+        plain = build_mirt_model(data, K=1, loading_prior="pt1")
+        censored = build_mirt_model(data, K=1, loading_prior="pt1", censor_eps=eps)
+        lp_plain = float(plain.compile_logp()(plain.initial_point()))
+        lp_cens = float(censored.compile_logp()(censored.initial_point()))
+        assert np.isfinite(lp_cens) and lp_cens != lp_plain
+        obs = censored["obs"]
+        assert type(obs.owner.op).__name__.startswith("Censored")
+        observed = censored.rvs_to_values[obs].eval()
+        assert (observed >= eps - 1e-12).all() and (observed <= 1 - eps + 1e-12).all()
+        assert (observed == eps).sum() == int(data.zero_score_mask.sum()), "every zero is censored"

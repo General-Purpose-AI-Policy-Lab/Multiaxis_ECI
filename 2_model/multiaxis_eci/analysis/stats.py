@@ -93,7 +93,7 @@ def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
     """Per-SOTA-model posterior mean + 95% HDI for C and ECI.
 
     Release dates come from the dataset (earliest per model), with
-    `config.RELEASE_DATES` filling dateless previews. Models listed in
+    Models listed in
     `config.SOTA_MODELS` that have no rows in the filtered dataset (e.g. all
     their benchmarks fell into a dropped category) are skipped with a warning
     rather than crashing the pipeline.
@@ -175,7 +175,7 @@ def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFram
     D = trace.posterior["D"].values.reshape(-1, data.n_benchmarks)
 
     # Same date source as sota_stats_df / the MIRT timelines: dataset dates
-    # with config.RELEASE_DATES filling dateless previews, so a SOTA release
+    # so a SOTA release
     # that appears in sota.csv is never silently absent from the timeline.
     model_dates, bench_dates = _release_dates(raw_df)
 
@@ -239,11 +239,8 @@ def forest_stats_df(trace, var_name: str, names: list[str]) -> pd.DataFrame:
 
 
 def _release_dates(raw_df: pd.DataFrame):
-    """Earliest release_date per model/benchmark; fills gaps from config.RELEASE_DATES."""
+    """Earliest release_date per model/benchmark (the pipeline dates every model it can)."""
     valid = raw_df.dropna(subset=["release_date"])
     model_dates = valid.groupby("model_version")["release_date"].min()
     bench_dates = valid.groupby("benchmark")["release_date"].min()
-    curated = {m: d for m, d in config.RELEASE_DATES.items() if m not in model_dates.index}
-    if curated:
-        model_dates = pd.concat([model_dates, pd.Series(curated)])
     return model_dates, bench_dates

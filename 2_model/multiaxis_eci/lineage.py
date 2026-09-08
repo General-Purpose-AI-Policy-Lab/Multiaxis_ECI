@@ -68,12 +68,13 @@ def build_lineage_structure(mlookup: pd.DataFrame,
         # the keys the same way. Safe because no base model spans two
         # (chain, node) pairs — variants of one release always share a node —
         # and `variant` stops meaning anything once the settings are merged.
-        from multiaxis_eci.data import _effort_base
-        m["raw_string"] = m["raw_string"].map(_effort_base)
+        from multiaxis_eci.data import model_family
+        m["raw_string"] = m["raw_string"].map(model_family)
         m["variant"] = "bare"
         m = m.drop_duplicates("raw_string")
-
-    row_of = {name: i for i, name in enumerate(mlookup["model"].tolist())}
+        row_of = {model_family(name): i for i, name in enumerate(mlookup["model"].tolist())}
+    else:
+        row_of = {name: i for i, name in enumerate(mlookup["model"].tolist())}
     m = m[m["raw_string"].isin(row_of)]
     if m.empty:
         return None

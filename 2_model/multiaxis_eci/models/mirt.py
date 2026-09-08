@@ -376,6 +376,7 @@ def build_mirt_model(data: ECIData, K: int,
                       floor_c: np.ndarray | None = None,
                       ceiling_noise: bool = False,
                       known_se: bool = False,
+                      censor_eps: np.ndarray | None = None,
                       pooled_noise: bool = False,
                       shared_base_zsn: bool = True,
                       time_t: np.ndarray | None = None,
@@ -589,6 +590,11 @@ def build_mirt_model(data: ECIData, K: int,
     read from a curated file was the retired --ceilings flag, and a freely
     estimated one (the retired soft_ceiling flag) was weakly identified /
     multimodal on this data, which is why the gap is confined to noise size.
+
+    censor_eps: per-observation bound (data.load_boundary_eps) turning the Beta
+    likelihood into a censored one: a score at or beyond eps_b contributes
+    P(y <= eps_b) (or P(y >= 1 - eps_b)) instead of the density at a clipped
+    point. None (default) keeps the clipped-density likelihood.
 
     known_se: split the Beta noise into a KNOWN per-cell part and an estimated
     per-benchmark remainder, using data.n_eff (the effective test length the
@@ -1029,7 +1035,22 @@ def build_mirt_model(data: ECIData, K: int,
         a = mu_n * phi_n
         b = (1.0 - mu_n) * phi_n
 
-        clipped = np.clip(data.scores, ECI_EPS, 1.0 - ECI_EPS)
-        pm.Beta("obs", alpha=a, beta=b, observed=clipped)
+        if censor_eps is None:
+            clipped = np.clip(data.scores, ECI_EPS, 1.0 - ECI_EPS)
+            pm.Beta("obs", alpha=a, beta=b, observed=clipped)
+        else:
+            # Censored bounds (data.load_boundary_eps): a score at or beyond eps_b is
+            # the event "y <= eps_b" (Beta CDF), not a point at a clipped value. The
+            # density at 0.001 is enormous and extremely sensitive to mu and phi, so
+            # every exact zero pulled hard on its model's ability or its benchmark's
+            # noise; the CDF term is bounded and says only what is known. Interior
+            # scores keep the plain Beta density.
+            lo = np.asarray(censor_eps, dtype=np.float64)
+            if lo.shape != (data.n_obs,) or np.any(lo <= 0.0) or np.any(lo >= 0.5):
+                raise ValueError("censor_eps must have one value per observation in (0, 0.5)")
+            hi = 1.0 - lo
+            clipped = np.clip(data.scores, lo, hi)
+            pm.Censored("obs", pm.Beta.dist(alpha=a, beta=b), lower=lo, upper=hi,
+                        observed=clipped)
 
     return model

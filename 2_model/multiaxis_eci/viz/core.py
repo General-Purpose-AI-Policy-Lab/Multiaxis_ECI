@@ -190,14 +190,11 @@ def raw_scores_by_date_fig(raw: pd.DataFrame, initial: int = 3) -> go.Figure:
     absent, since they have no x.
 
     A row's own `release_date` is often blank (the SEAL / RAND feeds carry
-    none), so each taker's date is filled from its earliest dated row, then from
-    config.RELEASE_DATES — the same two-step fill the era filters use."""
-    from multiaxis_eci.config import RELEASE_DATES
+    none), so each taker's date is filled from its earliest dated row — the same
+    fill the era filters use."""
     df = raw.dropna(subset=["score"]).copy()
     d = pd.to_datetime(df["release_date"], errors="coerce")
     d = d.fillna(df["model_version"].map(d.groupby(df["model_version"]).min()))
-    d = d.fillna(pd.to_datetime(df["model_version"].map(RELEASE_DATES),
-                                errors="coerce"))
     df["release_date"] = d.dt.strftime("%Y-%m-%d")
     df = df.dropna(subset=["release_date"])
     fig = go.Figure()

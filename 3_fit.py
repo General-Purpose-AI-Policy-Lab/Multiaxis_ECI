@@ -59,6 +59,7 @@ from multiaxis_eci.data import (
     PROCESSED_FILE,
     REFERENCE_ECI_FILE,
     drop_zero_scores,
+    load_boundary_eps,
     load_eci_data,
     open_only_drop_list,
     release_time_covariate,
@@ -120,7 +121,7 @@ class _Heartbeat:
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
                 loading_prior="signed", floor_c=None,
-                ceiling_noise=False, known_se=False,
+                ceiling_noise=False, known_se=False, censor_eps=None,
                 pooled_noise=False, shared_base_zsn=True, time_t=None,
                 theta_t_cells=False, theta_pos=False, link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None):
@@ -138,6 +139,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         tag += ", noise-ceiling 4PL"
     if known_se:
         tag += ", known-SE noise"
+    if censor_eps is not None:
+        tag += ", censored bounds"
     if pooled_noise:
         tag += ", pooled noise"
     if not shared_base_zsn:
@@ -158,6 +161,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                              variant_offsets=variant_offsets,
                              floor_c=floor_c,
                              ceiling_noise=ceiling_noise, known_se=known_se,
+                             censor_eps=censor_eps,
                              pooled_noise=pooled_noise,
                              shared_base_zsn=shared_base_zsn,
                              time_t=time_t, theta_t_cells=theta_t_cells,
@@ -275,6 +279,8 @@ def run_canonical(args) -> None:
     # its own folder suffix: results/canonical stays the plain index.
     human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
                    else config.HUMAN_ORDER if args.human_prior else None)
+    if args.censor_bounds:
+        scope_tag += "_censor"
     if args.human_merge:
         scope_tag += "_humanmerge"
     elif args.human_prior:
@@ -312,21 +318,6 @@ def run_canonical(args) -> None:
             "o1-mini", "Gemini 1.5 Pro", "GPT-4o (May 2024)",
             "GPT-4 Turbo (Apr 2024)", "Claude 3 Opus", "GPT-4 (Mar 2023)",
         ]
-        config.RELEASE_DATES.update({
-            "Claude 3.5 Sonnet (October 2024)": "2024-10-22",
-            "GPT-5":                            "2025-08-07",
-            "GPT-5 Pro":                        "2025-10-06",
-            "o3-pro":                           "2025-06-10",
-            "o3":                               "2025-04-16",
-            "Gemini 2.5 Pro (Mar 2025)":        "2025-03-25",
-            "o1":                               "2024-12-17",
-            "o1-mini":                          "2024-09-12",
-            "Gemini 1.5 Pro":                   "2024-05-24",
-            "GPT-4o (May 2024)":                "2024-05-13",
-            "GPT-4 Turbo (Apr 2024)":           "2024-04-09",
-            "Claude 3 Opus":                    "2024-02-29",
-            "GPT-4 (Mar 2023)":                 "2023-03-14",
-        })
         print("── --eci-data-only mode: using the reference ECI dataset ─────")
 
     print("── Loading data ─────────────────────────────────────────────────")
@@ -377,9 +368,12 @@ def run_canonical(args) -> None:
         # pt1 is the canonical loading prior: product-1 identification (Epoch's
         # sum-to-zero log-alpha gauge), fewer divergences than `normal` on this
         # scope at unchanged abilities (rank corr 0.9988).
+        censor_eps = load_boundary_eps(data) if args.censor_bounds else None
         trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
-                               human_order=human_order)
+                               human_order=human_order, censor_eps=censor_eps)
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
+        if args.censor_bounds:
+            trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
         if human_order:
             trace.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
         save_trace(trace, trace_path)
@@ -398,7 +392,7 @@ def run_canonical(args) -> None:
     if args.eci_data_only:
         raw_df = (pd.read_csv(REFERENCE_ECI_FILE)
                     .rename(columns={"model": "model_version"}))
-        raw_df["release_date"] = raw_df["model_version"].map(config.RELEASE_DATES)
+        raw_df["release_date"] = raw_df["model_version"].map(config.REFERENCE_ECI_DATES)
     else:
         raw_df = pd.read_csv(PROCESSED_FILE)
     sota = sota_stats_df(trace, data, raw_df)
@@ -594,6 +588,9 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_known_se"] = json.dumps(True)
     if args.pooled_noise:
         attrs["mirt_pooled_noise"] = json.dumps(True)
+    if args.censor_bounds:
+        attrs["mirt_censor_bounds"] = json.dumps(True)
+    censor_eps = load_boundary_eps(data) if args.censor_bounds else None
 
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
     idata_k, conv_k = sample_mirt(data, spec.K, sample_kw,
@@ -602,6 +599,7 @@ def run_exploration(args, parser) -> None:
                                   loading_prior=spec.loading_prior, floor_c=floor_c,
                                   ceiling_noise=spec.ceiling_noise,
                                   known_se=spec.known_se,
+                                  censor_eps=censor_eps,
                                   pooled_noise=spec.pooled_noise,
                                   shared_base_zsn=not spec.private_bases,
                                   theta_t_cells=spec.theta_t,
@@ -727,6 +725,7 @@ def run_exploration(args, parser) -> None:
                 floor_c=floor_c,
                 ceiling_noise=args.ceiling_noise,
                 known_se=args.known_se,
+                censor_eps=censor_eps,
                 spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
                             "mirt_loading_prior": "normal",
                             "mirt_link": "linear"})
@@ -911,6 +910,12 @@ def main():
                              "instrument precision from reported harness stderr "
                              "(n_eff = p(1-p)/se^2), sigma_b becomes excess-only. "
                              "Cells without stderr are unchanged.")
+    parser.add_argument("--censor-bounds", action="store_true",
+                        help="censored Beta likelihood at the score bounds: a reported 0 "
+                             "(or 1) is the event y <= eps_b (y >= 1 - eps_b) with "
+                             "eps_b = 1 / (2 N_b) from 1_curated/benchmark_n_items.csv, "
+                             "instead of a density at a clipped 0.001. Both modes; "
+                             "emits the `_censor` tag token"),
     parser.add_argument("--no-pooled-noise", dest="pooled_noise",
                         action="store_false",
                         help="[exploration] fix the per-benchmark noise prior "

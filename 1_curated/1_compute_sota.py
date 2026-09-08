@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci.analysis import _release_dates, capability_draws  # noqa: E402
 from multiaxis_eci.config import SAMPLE_KW  # noqa: E402
-from multiaxis_eci.data import PROCESSED_FILE, _effort_base, load_eci_data  # noqa: E402
+from multiaxis_eci.data import PROCESSED_FILE, is_bare, load_eci_data, model_family  # noqa: E402
 from multiaxis_eci.lineage import LINEAGE_MAP  # noqa: E402
 from multiaxis_eci.models.mirt import build_mirt_model  # noqa: E402
 
@@ -115,10 +115,11 @@ def main():
     # is in the data — the timelines should show the base model alongside its
     # reasoning variant, not only the best-C effort config
     picked = set(envelope) | set(flagships) | set(pins)
+    bare_of_family = {model_family(m): m for m in c_of if is_bare(m)}
     bases = set()
     for m in picked:
-        b = _effort_base(m)
-        if b != m and b in c_of and b not in picked:
+        b = bare_of_family.get(model_family(m))
+        if b is not None and b != m and b not in picked:
             bases.add(b)
             date_of.setdefault(b, date_of.get(m, pd.Timestamp.min))
 

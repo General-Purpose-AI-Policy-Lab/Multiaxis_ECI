@@ -328,6 +328,16 @@ class TestGoldenLogp:
             total_logp(build_mirt_model(data, K=3, loading_prior="normal")),
             -105666.139888, rtol=self.RTOL)
 
+    def test_mirt_k1_pt1_censored(self, data):
+        """--censor-bounds: boundary scores enter as Beta CDF terms (data.load_boundary_eps
+        gives eps_b = 1 / (2 N_b)); interior scores are unchanged. Pinned 2026-09-08 on the
+        pipeline data (4,571 obs, 102 zeros and 13 ones censored)."""
+        from multiaxis_eci.data import load_boundary_eps
+        np.testing.assert_allclose(
+            total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
+                                        censor_eps=load_boundary_eps(data))),
+            -96077.780656, rtol=self.RTOL)
+
     def test_mirt_k1_pt1(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1")),
@@ -1137,7 +1147,8 @@ class TestPublicAPISurface:
             "PROCESSED_FILE", "drop_model_observations", "drop_zero_scores",
             "load_eci_data", "find_model_idx",
             "drop_model_benchmark_cells", "load_excluded_benchmarks",
-            "read_scores", "benchmark_floors_table",
+            "read_scores", "benchmark_floors_table", "load_boundary_eps",
+            "model_family", "is_bare",
             "load_benchmark_floors", "clip_scores_to_floors",
             "release_time_covariate",
         ],

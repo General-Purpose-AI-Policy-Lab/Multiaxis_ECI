@@ -6,6 +6,7 @@ exact-1 row would land at PIT = 1 by construction (every Beta draw is < 1).
 """
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 import numpy as np
@@ -71,7 +72,8 @@ def posterior_predictive_mirt(trace, data: ECIData,
                               max_draws: int = 2000,
                               floor_c: np.ndarray | None = None,
                               n_eff: np.ndarray | None = None,
-                              return_mean: bool = False) -> np.ndarray:
+                              return_mean: bool = False,
+                              censor_eps: np.ndarray | None = None) -> np.ndarray:
     """MIRT posterior predictive: mu = sigmoid(sum_k A theta - D), draw Beta.
 
     Posterior predictive for the k-factor compensatory model (models/mirt.py). Thins to `max_draws` posterior samples — the (n_samples,
@@ -93,8 +95,16 @@ def posterior_predictive_mirt(trace, data: ECIData,
     return_mean: return the per-observation fitted means mu = E[y|theta] per
     draw (shape S x n_obs) instead of Beta draws — the noise-free fitted values
     the Gelman Bayesian R² needs.
+
+    censor_eps: per-observation censoring bound of a fit built with
+    `censor_eps` (data.load_boundary_eps); the predictive draws are clipped to
+    [eps, 1 - eps] like the censored observations. Detected from the trace's
+    `mirt_censor_bounds` attr when omitted.
     """
     post = trace.posterior
+    if censor_eps is None and json.loads(post.attrs.get("mirt_censor_bounds", "false")):
+        from multiaxis_eci.data import load_boundary_eps
+        censor_eps = load_boundary_eps(data)
     soft_d = "ceiling_d" in post
     ceil_names = ["ceiling_d"] if soft_d else []
     if "alpha" in post:
@@ -133,7 +143,11 @@ def posterior_predictive_mirt(trace, data: ECIData,
         mu = c_obs + (1.0 - c_obs) * mu
     if return_mean:
         return mu
-    return _beta_draw(mu, phi, data, seed, n_eff=n_eff)
+    y = _beta_draw(mu, phi, data, seed, n_eff=n_eff)
+    if censor_eps is not None:
+        lo = np.asarray(censor_eps, dtype=np.float64)
+        y = np.clip(y, lo, 1.0 - lo)
+    return y
 
 
 def posterior_predictive_mirt_nc(trace, data: ECIData,

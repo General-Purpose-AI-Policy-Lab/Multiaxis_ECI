@@ -83,13 +83,11 @@ HIGH_COL_X = "2024-03-01"
 # instead, where the top-right corner above the tier names is empty.
 HIGH_COL_Y = [216, 179]
 N_TOP_MODELS = 3
-_EFFORTS = {"unknown", "max", "xhigh", "high", "medium", "low", "minimal",
-            "promax", "proxhigh", "prohigh", "promedium", "prolow"}
-
 
 def _base_name(name: str) -> str:
-    stem, _, suffix = name.rpartition("_")
-    return stem if stem and suffix in _EFFORTS else name
+    """The release a test-taker belongs to, by the pipeline's identity (data.model_family)."""
+    from multiaxis_eci.data import model_family
+    return model_family(name)
 
 
 def _interval(x: np.ndarray):
@@ -121,8 +119,6 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
     raw = pd.read_csv(REPO / "0_input/all_scores_flat.csv").dropna(
         subset=["release_date"])
     dates = raw.groupby("model_version")["release_date"].min()
-    dates = pd.concat([dates, pd.Series({m: d for m, d in config.RELEASE_DATES.items()
-                                         if m not in dates.index})])
 
     ai = pd.DataFrame({"name": models, "mean": m_med,
                        "hdi_low": m_lo, "hdi_high": m_hi})

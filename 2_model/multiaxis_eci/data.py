@@ -187,6 +187,30 @@ def load_benchmark_floors(data: ECIData) -> np.ndarray:
 
 
 BENCHMARK_CLIPS_FILE = CURATED_DIR / "benchmark_score_clips.csv"
+N_ITEMS_FILE = CURATED_DIR / "benchmark_n_items.csv"
+
+
+def load_boundary_eps(data: ECIData) -> np.ndarray:
+    """Per-observation censoring bound for the Beta likelihood (`build_mirt_model(censor_eps=)`).
+
+    A reported 0 means "no item solved" and a reported 1 "every item solved"; under a censored
+    likelihood the observation is "score <= eps_b" (or ">= 1 - eps_b") rather than a point.
+    eps_b is half an item on the benchmark's own scale, 1 / (2 N_b), with N_b from
+    `1_curated/benchmark_n_items.csv`, bounded to [1e-5, 0.05]. A benchmark without an item
+    count falls back to ECI_EPS and is listed in a warning. Returns one value per observation.
+    """
+    benchmarks = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+    table = pd.read_csv(N_ITEMS_FILE)
+    counts = pd.to_numeric(table["n_items"], errors="coerce")
+    n_by = {b: float(n) for b, n in zip(table["benchmark"], counts) if np.isfinite(n) and n > 0}
+    missing = [b for b in benchmarks if b not in n_by]
+    if missing:
+        warnings.warn(
+            f"{len(missing)} benchmark(s) have no item count in {N_ITEMS_FILE.name} "
+            f"(censoring bound falls back to ECI_EPS={ECI_EPS}): {missing}", UserWarning)
+    eps_b = np.array([np.clip(1.0 / (2.0 * n_by[b]), 1e-5, 0.05) if b in n_by else ECI_EPS
+                      for b in benchmarks], dtype=np.float64)
+    return eps_b[data.bench_idx]
 
 
 def clip_scores_to_floors(data: ECIData, floors: np.ndarray) -> ECIData:
@@ -289,8 +313,50 @@ _EFFORT_SUFFIX_RE = re.compile(
 
 
 def _effort_base(model_version: str) -> str:
-    """Strip a trailing effort/context-length suffix to get the base model id."""
+    """Strip a trailing effort/context-length suffix to get the base model id.
+
+    Fallback for names the pipeline's models table does not know (human tiers, the
+    reference ECI table's pretty names); `model_family` is the rule for everything else.
+    """
     return _EFFORT_SUFFIX_RE.sub("", str(model_version))
+
+
+_IDENTITY: pd.DataFrame | None = None
+
+
+def _identity() -> pd.DataFrame:
+    """The pipeline's models table (0_input/models.csv) indexed by model_version, read once."""
+    global _IDENTITY
+    if _IDENTITY is None:
+        cols = ["model_version", "base_model", "snapshot", "reasoning_level", "reasoning_tokens",
+                "variant"]
+        table = pd.read_csv(MODELS_FILE, dtype=str).fillna("")[cols]
+        _IDENTITY = table.drop_duplicates("model_version").set_index("model_version")
+    return _IDENTITY
+
+
+def model_family(model_version: str) -> str:
+    """The release a test-taker belongs to, across its reasoning efforts and run variants.
+
+    The pipeline's identity tuple decides: `base_model` plus `snapshot`, dropping the reasoning
+    level, the token budget and the run variant, so `gpt-5-2025-08-07_high`,
+    `gpt-5-2025-08-07_medium` and `gpt-5-2025-08-07` share one family. A name absent from the
+    models table (a human tier, a reference-ECI pretty name) falls back to the suffix regex.
+    """
+    ident = _identity()
+    if model_version in ident.index:
+        row = ident.loc[model_version]
+        return row["base_model"] + (f"@{row['snapshot']}" if row["snapshot"] else "")
+    return _effort_base(model_version)
+
+
+def is_bare(model_version: str) -> bool:
+    """True for the base configuration of a release: no reasoning level, budget or run variant."""
+    ident = _identity()
+    if model_version in ident.index:
+        row = ident.loc[model_version]
+        return row["reasoning_level"] == "" and row["reasoning_tokens"] == "" and row["variant"] == ""
+    return _effort_base(model_version) == model_version
 
 
 def _collapse_effort_variants(df: pd.DataFrame,
@@ -305,7 +371,7 @@ def _collapse_effort_variants(df: pd.DataFrame,
     protected = protected or set()
     counts = df.groupby("model_version").size()
     df = df.copy()
-    df["__base__"] = df["model_version"].map(_effort_base)
+    df["__base__"] = df["model_version"].map(model_family)
 
     def pick_winner(group: pd.Series) -> str:
         variants = group.unique()
@@ -320,7 +386,7 @@ def _collapse_effort_variants(df: pd.DataFrame,
             return (
                 -counts[v],
                 0 if v.endswith("_high") else 1,            # _high preferred on tie
-                0 if v == group.name else 1,                # bare base next
+                0 if is_bare(v) else 1,                     # bare base next
                 0 if v.endswith("_medium") else 1,
                 v,
             )
@@ -332,21 +398,18 @@ def _collapse_effort_variants(df: pd.DataFrame,
 
 
 def _known_release_date_by_model() -> pd.Series:
-    """Best-known release date per model, from the FULL score view plus the
-    config.RELEASE_DATES fallback. Used by the era filters, which must see a
-    model's date even when its dated rows sit on benchmarks the current fit
-    excludes.
+    """Best-known release date per model, from the FULL score view. Used by the era
+    filters, which must see a model's date even when its dated rows sit on benchmarks
+    the current fit excludes. The pipeline dates every model it can (its
+    release_dates.csv); the two it leaves undated are undated on purpose.
 
     Ties are broken by MAX over a model's dated rows; analysis/stats.py's
     `_release_dates` (the SOTA envelope) takes the MIN instead. The two agree
     whenever a model's rows carry one date — the near-universal case — but a
     badly-dated duplicate row in a data refresh would make the era filter and
     the SOTA envelope disagree silently; keep row dates consistent per model."""
-    from multiaxis_eci.config import RELEASE_DATES
     full = read_scores()
     dates = pd.to_datetime(full["release_date"], errors="coerce")
-    dates = dates.fillna(pd.to_datetime(full["model_version"].map(RELEASE_DATES),
-                                        errors="coerce"))
     return dates.groupby(full["model_version"]).max()
 
 
@@ -354,9 +417,8 @@ def release_time_covariate(mlookup: pd.DataFrame, lineage=None) -> np.ndarray:
     """Centered release year per theta row: the covariate for the time prior
     (models/mirt.py, build_mirt_model(..., time_t=...)).
 
-    Dates come from `_known_release_date_by_model` (processed file, then the
-    config.RELEASE_DATES fill), so a model dated only on benchmarks this fit
-    excludes still gets its date.
+    Dates come from `_known_release_date_by_model` (the full score view), so a
+    model dated only on benchmarks this fit excludes still gets its date.
 
     Two rules make the covariate safe to add to the theta prior mean:
 
@@ -626,8 +688,7 @@ def load_eci_data(drop_low_obs_models: bool = False,
 
     # Era filter (opt-in). Drops models with a KNOWN release date before the
     # cutoff; undated models are kept (they are overwhelmingly recent SEAL/RAND
-    # entries — a missing date is not evidence of age). config.RELEASE_DATES
-    # fills dates the file lacks (e.g. dateless SOTA previews).
+    # entries — a missing date is not evidence of age).
     if (min_release_date or max_release_date) and not eci_data_only:
         # Dates come from the FULL score view, not the already-filtered df:
         # a model whose only dated rows sit on excluded benchmarks would
