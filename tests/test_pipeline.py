@@ -2699,7 +2699,7 @@ class TestPipelineIdentity:
         lp_cens = float(censored.compile_logp()(censored.initial_point()))
         assert np.isfinite(lp_cens) and lp_cens != lp_plain
         obs = censored["obs"]
-        assert type(obs.owner.op).__name__.startswith("Censored")
+        assert "CustomDist" in type(obs.owner.op).__name__, "the censored likelihood, not a plain Beta"
         observed = censored.rvs_to_values[obs].eval()
         assert (observed >= eps - 1e-12).all() and (observed <= 1 - eps + 1e-12).all()
         # Every exact zero sits at its bound; so do the scores below half an item
