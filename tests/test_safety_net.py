@@ -336,7 +336,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         censor_eps=load_boundary_eps(data))),
-            -96077.780656, rtol=self.RTOL)
+            -95922.982405, rtol=self.RTOL)
 
     def test_mirt_k1_pt1(self, data):
         np.testing.assert_allclose(

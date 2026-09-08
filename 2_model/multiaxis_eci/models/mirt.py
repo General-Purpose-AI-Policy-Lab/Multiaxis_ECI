@@ -364,6 +364,26 @@ def _apply_plt(A, plt_idx, K):
     return A
 
 
+
+CENSOR_LOG_FLOOR = -700.0  # log of the smallest censored probability kept finite
+
+
+def _censored_beta_logp(value, a, b, lo, hi):
+    """Beta log-density with left censoring at ``lo`` and right censoring at ``hi``.
+
+    Elementwise: a value at ``lo`` contributes log F(lo), one at ``hi`` log(1 - F(hi)), the
+    rest the density; every term is floored at CENSOR_LOG_FLOOR so an underflowing tail
+    cannot return -inf. Used by build_mirt_model(censor_eps=...).
+    """
+    import pytensor.tensor as pt
+    dist = pm.Beta.dist(alpha=a, beta=b)
+    log_cdf_lo = pm.logcdf(dist, lo)
+    log_sf_hi = pt.log1mexp(pt.minimum(pm.logcdf(dist, hi), -1e-12))
+    term = pt.switch(pt.le(value, lo), log_cdf_lo,
+                     pt.switch(pt.ge(value, hi), log_sf_hi, pm.logp(dist, value)))
+    return pt.maximum(term, CENSOR_LOG_FLOOR)
+
+
 def build_mirt_model(data: ECIData, K: int,
                       anchors: dict | None = None,
                       loading_prior: str = "normal",
@@ -1044,13 +1064,16 @@ def build_mirt_model(data: ECIData, K: int,
             # density at 0.001 is enormous and extremely sensitive to mu and phi, so
             # every exact zero pulled hard on its model's ability or its benchmark's
             # noise; the CDF term is bounded and says only what is known. Interior
-            # scores keep the plain Beta density.
+            # scores keep the plain Beta density. Written as a CustomDist rather than
+            # pm.Censored so the tail probabilities can be floored: far from the data
+            # (a jittered start, a nutpie initial point) the CDF underflows to 0 and
+            # pm.Censored returns -inf, which no sampler can start from. A censored
+            # probability below exp(-700) reads as "impossible", not as an error, and
+            # the observed variable keeps its pointwise log-likelihood for LOO.
             lo = np.asarray(censor_eps, dtype=np.float64)
             if lo.shape != (data.n_obs,) or np.any(lo <= 0.0) or np.any(lo >= 0.5):
                 raise ValueError("censor_eps must have one value per observation in (0, 0.5)")
             hi = 1.0 - lo
             clipped = np.clip(data.scores, lo, hi)
-            pm.Censored("obs", pm.Beta.dist(alpha=a, beta=b), lower=lo, upper=hi,
-                        observed=clipped)
-
+            pm.CustomDist("obs", a, b, lo, hi, logp=_censored_beta_logp, observed=clipped)
     return model
