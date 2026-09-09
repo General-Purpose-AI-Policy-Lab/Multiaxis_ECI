@@ -3,11 +3,12 @@
 SOTA = (world frontier records of the recent era) ∪ (every family within NEAR_ECI points of
 the best model of each organisation present in that frontier). The file lists families (a
 release: base model plus snapshot, `data.model_family`), so every reasoning effort of a SOTA
-release is protected and shown; the canonical fit's SOTA table keeps the best effort of each.
+release is shown; the canonical fit's SOTA table keeps the best effort of each.
 Read off the canonical K=1 fit of the current data generation (`all_models_eci.csv`,
-`timeline.csv`): no separate sampling. Candidates need MIN_OBS observations, which is also the
-threshold of the drop filter the list protects against, so the previous list cannot decide the
-next one through the models it kept (user decisions 2026-09-09).
+`timeline.csv`): no separate sampling. The list drives the timelines, the country frontier's
+record candidates and the SOTA table; it decides nothing about what a fit sees, so reading it
+off the canonical fit is not circular. Candidates need MIN_OBS observations, Epoch's rule for a
+record-setter and the repository's low-observation threshold (user decisions 2026-09-09).
 
   python 1_curated/1_compute_sota.py [--results-dir DIR]
 """
@@ -27,7 +28,7 @@ from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.data import MODELS_FILE, model_family  # noqa: E402
 
 WINDOW_MONTHS = 24        # "recent era": records set in the last 24 months before the newest release
-MIN_OBS = 4               # Epoch's ≥4-benchmark rule for record-setters, and the drop filter's threshold
+MIN_OBS = config.LOW_OBS_THRESHOLD   # Epoch's >= 4-benchmark rule for record-setters
 NEAR_ECI = 10.0           # a family counts as top-line when within this many ECI points of its organisation's best
 OUT = ROOT / "1_curated" / "sota_families.txt"
 

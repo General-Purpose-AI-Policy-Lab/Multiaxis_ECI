@@ -15,7 +15,7 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 
 <img src="6_writeups/blogpost/figures/forecast_trend_plotly_majority.png" width="560" alt="Frontier trend per axis (majority chains): record envelope extended at its recent rate, with human tiers">
 
-Scope of the published fits: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions. On the pipeline build of 2026-09-07 the same scopes hold 5,402 / 905 / 97 and 4,571 / 846 / 89 (see the Data section).
+Scope of the published fits: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions. On the pipeline build of 2026-09-08, without the isolated families, the same scopes hold 5,307 / 802 / 97 and 4,461 / 727 / 89 (see the Data section).
 
 ## Setup
 
@@ -25,7 +25,7 @@ Python 3.11 or later, with the pinned scientific stack (`pyproject.toml`):
 uv venv --python 3.11 .venv && uv pip install -e . --group dev   # or: pip install -e .
 plotly_get_chrome -y                                             # once per env; figure export needs it
 python -m multiaxis_eci sync                                     # 0_input/ from ../benchmark-data-pipeline
-python -m pytest -m "not slow"                                   # ~1 min, ~260 tests
+python -m pytest -m "not slow"                                   # ~3 min, about 280 tests
 ruff check .
 ```
 
@@ -65,9 +65,9 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 ├── 3_fit/fit.py             # step 3: the fit CLI (canonical preset + exploration)
 ├── 4_diagnostics/       # step 4: post-fit tools, the numbered four in reproduction order
 ├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace, figures/; pre_pipeline/ holds the published fits
-├── 6_writeups/          # step 6: the research post (blogpost/), the US-China frontier note (us_cn_frontier/), the dashboard's card registry
+├── 6_writeups/          # step 6: the research post (blogpost), the US-China frontier note (us_cn_frontier), the dashboard's card registry
 ├── internal_evals/      # the lab's own scoring runs (LAB-Bench cloning through OpenRouter); needs OPENROUTER_API_KEY
-├── archive/             # kept for the record, not maintained: notebooks/ (one-off investigations), results_old/ (superseded fits)
+├── archive/             # kept for the record, not maintained: notebooks (one-off investigations), results_old (superseded fits)
 ├── docs/                # model math, CLI reference, figure catalogue
 ├── tests/               # fast unit tests + golden logp locks
 └── index.html           # the all-fits dashboard (tracked, served as is)

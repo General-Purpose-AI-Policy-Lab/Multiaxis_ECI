@@ -24,7 +24,7 @@ only when the remaining majority is internally converged (eta r-hat <=
 conv threshold) and the drop is a minority of chains.
 
 `--write-modes` is the other entry point: instead of a verdict it writes the
-chain→mode split to `results/<fit>/mirt_modes_<trace-stem>.json`, which is what
+chain→mode split to `<fit>/mirt_modes_<trace-stem>.json`, which is what
 the dashboard reads to render one loading/timeline figure set per mode. Detection
 happens ONCE, here, so a dashboard build never loads a multi-GB trace to
 re-detect it. That path needs no data scope, so it also works on a trace whose
@@ -40,9 +40,9 @@ Outputs:
 
 Run:
   python 4_diagnostics/diagnose_chains.py \
-      --trace results/mirt/trace_mirt_k2.nc --name k2_demo --fig
+      --trace 5_outputs/pre_pipeline/mirt/trace_mirt_k2.nc --name k2_demo --fig
   python 4_diagnostics/diagnose_chains.py \
-      --trace results/mirt/trace_mirt_k2.nc --write-modes
+      --trace 5_outputs/pre_pipeline/mirt/trace_mirt_k2.nc --write-modes
 """
 from __future__ import annotations
 

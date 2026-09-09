@@ -434,7 +434,7 @@ HUMAN_LEVEL_LABELS_FR = {
 HUMAN_LEVEL_LABELS = {"en": {}, "fr": HUMAN_LEVEL_LABELS_FR}
 
 # Every string the timeline draws, per language. English is the default of every
-# figure; the French render goes to a `fr/` folder beside it (3_fit.py writes both).
+# figure; the French render goes to a `fr/` folder beside it (3_fit/fit.py writes both).
 TIMELINE_TEXT = {
     "en": {"title": "AI capability, human baselines and benchmark difficulty",
            "xaxis": "Release date", "yaxis": "Estimated capability / difficulty",

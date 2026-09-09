@@ -36,7 +36,7 @@ those cells is to run the public set.
 - **The `canary` field is never sent.** It is a training-contamination marker; the selftest
   asserts it stays out of the prompt.
 - **Option counts vary**: 5 of them 24 times, up to 9 (including abstention). Real-option
-  chance averages **0.226**; `benchmark_lower_bounds.csv` carries 0.20, slightly conservative.
+  chance averages **0.226**; the pipeline's floor is 0.20, slightly conservative.
 
 ## Effort is part of the test-taker identity
 

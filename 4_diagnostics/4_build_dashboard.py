@@ -99,14 +99,13 @@ FITS = [
     {"name": "k4_humanmerge_flagship",
      "spec": FLAGSHIP,
      "trace_path": FLAGSHIP_TRACE,
-     "label": "K=4 · full exploration scope (4,923 obs / 829 takers / 96 "
-              "benchmarks, 2026-08 snapshot) · positive loadings · "
+     # The card renders the flagship fit of the CURRENT data generation
+     # (analysis.FLAGSHIP_TRACE); the tracked index.html was built on the
+     # 2026-08 run (4,923 obs / 829 takers / 96 benchmarks, 10x12,000 draws,
+     # one basin, R² 0.9643), now under 5_outputs/pre_pipeline/.
+     "label": "K=4 · full exploration scope · positive loadings · "
               "raw rank-tracked axes (no rotation) · "
-              "human-merge+lineage(BM) priors · 3PL floors · pooled noise · "
-              "10×12,000 · one logp basin and one axis system (10/10 chains, "
-              "matched corr 0.818), 37/120,000 divergences; the chains split "
-              "6/4 on the human tiers and 18 older models on the Agentic axis "
-              "(majority = chains 2,4,5,6,7,9) · R² 0.9643 — "
+              "human-merge+lineage(BM) priors · 3PL floors · pooled noise — "
               "THE forecasting base (the blog post's fit)",
      "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
@@ -164,7 +163,7 @@ def _trace_path(fit):
 # A K=3 fit's chains can sit in several likelihood basins, and a figure over ALL
 # chains then averages incompatible solutions. The split is detected ONCE, off
 # the trace, by `4_diagnostics/diagnose_chains.py --write-modes`, which writes
-# `results/<dir>/mirt_modes_<trace-stem>.json`; the dashboard only READS that
+# `<fit>/mirt_modes_<trace-stem>.json`; the dashboard only READS that
 # file, so a build never loads a multi-GB trace to re-detect. Mode views are
 # ADDITIONS: the whole-fit figures stay, and no diagnostic number is ever
 # mode-restricted (convergence, PPC and PIT describe the whole fit; see the

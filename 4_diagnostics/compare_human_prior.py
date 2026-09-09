@@ -1,7 +1,7 @@
 """Ordered-human-prior vs independent-θ humans — head-to-head, confirmed Q-matrix.
 
-Pairs each ordered-human-prior skill fit (results/Old/mirt_humanprior/) with its
-independent-θ counterpart (results/mirt/) on the same data. Because both fits pin
+Pairs each ordered-human-prior skill fit (archive/results_old/mirt_humanprior/) with its
+independent-θ counterpart (archive/results_old/mirt/) on the same data. Because both fits pin
 the axes with the same Q-matrix, the axes ARE comparable across fits (unlike the
 exploratory fits), so the per-axis tier comparison is meaningful.
 
@@ -283,8 +283,8 @@ def main():
 
     (OUT / "README.md").write_text(
         "# Ordered vs independent human baselines (confirmed Q-matrix)\n\n"
-        "Each ordered-human-prior skill fit (`results/Old/mirt_humanprior/`) paired with "
-        "its independent-θ counterpart (`results/mirt/`) on the same data. The "
+        "Each ordered-human-prior skill fit (`archive/results_old/mirt_humanprior/`) paired with "
+        "its independent-θ counterpart (`archive/results_old/mirt/`) on the same data. The "
         "Q-matrix pins the axes, so axes are comparable across the two fits.\n\n"
         "## Summary\n\n" + tab.to_string(index=False) + "\n\n"
         "- `viol_*` — # benchmarks where a weaker tier out-scores a COMPARABLE "

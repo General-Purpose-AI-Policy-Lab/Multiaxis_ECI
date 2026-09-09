@@ -1,6 +1,6 @@
 """The two forecast figures for the blog post, in matplotlib.
 
-The flagship K=4 fit, record-envelope basis, SD cap 0.4. Three axes only
+The flagship K=4 fit, record-envelope basis, the shared SD cap (config.INFORMED_SD_CAP). Three axes only
 (axis 4, Legacy QA, is out of the post's forecast scope). Every interval drawn
 on either figure is an 80% HDI (FORECAST_KW).
 

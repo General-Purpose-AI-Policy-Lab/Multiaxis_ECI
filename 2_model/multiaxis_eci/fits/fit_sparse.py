@@ -12,7 +12,7 @@ What it does:
   3. --prior-check: sample the prior predictive, report the score distribution, stop.
   4. Otherwise fit (nutpie), judge convergence on identified quantities
      (analysis.mirt_identified_rhat_sparse), run the PPC + GoF, and write factor
-     scores, the surviving-gate structure, and GoF under results/mirt_sparse/.
+     scores, the surviving-gate structure, and GoF under the data generation's mirt_sparse/ folder.
 
 Run:
   python fits/fit_sparse.py --prior-check

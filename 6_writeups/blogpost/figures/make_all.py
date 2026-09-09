@@ -20,7 +20,7 @@ The three per-axis figures have a matplotlib twin in `make_results_figs.py`,
 drawn by `figbase`; the Plotly ones here write `*_lw_plotly.png`, so the two
 sets can be compared side by side.
 
-The forecast cache is `results/mirt.../lw_forecast_cache_80.pkl`, next to the
+The forecast cache is `lw_forecast_cache_80.pkl` in the flagship's results folder, next to the
 trace it was computed from, not in the temp dir: it is derived from one specific
 fit and it takes a 14 GB trace read to rebuild.
 """
@@ -250,9 +250,8 @@ def loadings(out_dir: Path, top_n: int = 20) -> Path:
     return save_print(fig, out_dir / "loadings_axes_lw_plotly")
 
 
-# The dashboard timeline builder labels its two data series in French.
 def axis_timelines(out_dir: Path) -> Path:
-    """Per-axis ability over release date, the measured (SD < 0.4) cloud.
+    """Per-axis ability over release date, the measured cloud (config.INFORMED_SD_CAP).
 
     The panels come from `viz.dashboard.build_axis_figures`, the same builder the
     dashboard cards use, so the post cannot drift from the card.

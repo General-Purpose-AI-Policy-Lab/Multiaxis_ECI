@@ -21,7 +21,7 @@ Outputs (beside the trace, in its own folder):
 
 Run:
   python 4_diagnostics/align_mirt.py \
-      --trace results/mirt_signed_humanprior_lineageprior/trace_mirt_k3_signed_humanprior_lineageprior.nc
+      --trace 5_outputs/<data>/mirt_signed_humanprior_lineageprior/trace_mirt_k3_signed_humanprior_lineageprior.nc
 """
 from __future__ import annotations
 

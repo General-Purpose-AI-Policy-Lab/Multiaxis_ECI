@@ -2,7 +2,7 @@
 
 Same content as `make_all.loadings()` but drawn as a 2x2 grid at the post's
 type scale (the constants match `make_timeline_plotly.py`), reading the
-flagship trace in `results/mirt_humanmerge_lineageprior_lineagebm`.
+flagship trace (`analysis.FLAGSHIP_TRACE`).
 The panels come from the dashboard's own `viz.loadings_grid_fig`, so the bar,
 whisker and share definitions are the ones the fit's CSVs use. Axis identity
 is checked against `make_all.EXPECTED_TOPS` before any label is applied.

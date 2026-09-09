@@ -1,26 +1,22 @@
-"""Read-only checker for the curated benchmark chance floors.
+"""Checker for the benchmark chance floors the fit uses.
 
-The pipeline's `lower_bound` column (0_input/all_scores_flat.csv) is the ground truth
-(one reviewed row per benchmark: value, reason, source URL — edit it directly).
-This script validates it against the fit data and PRINTS three review tables:
+The floors are the `lower_bound` column of `0_input/all_scores_flat.csv`, one value per
+benchmark, owned by benchmark-data-pipeline (`0_input/metadata/benchmarks.csv` there carries
+the reason and the source URL; a wrong floor is fixed there, then synced). This script
+checks them against the fit data and PRINTS two review tables:
 
-  1. coverage — every fit benchmark must have a floor row (a missing row is an
+  1. coverage — every fit benchmark must have a floor (a missing one is an
      inert 0.0 floor at fit time, warned by data.load_benchmark_floors);
-  2. format consistency — a floor should match the format its own reason states
-     (e.g. a "4-option MCQ" reason implies 0.25);
-  3. below-floor tally — who scores under each floor (human / old-weak /
+  2. below-floor tally — who scores under each floor (human / old-weak /
      frontier). A frontier model below a floor usually means the floor is wrong
      (though not always: at-chance performance on a hard task is legitimate,
      e.g. VPCT's three buckets).
 
 By default it writes nothing. `--write-clips` refreshes
-`1_curated/benchmark_score_clips.csv` — the reviewed row-level list of
+`1_curated/benchmark_score_clips.csv`, the reviewed row-level list of
 below-floor scores that `data.clip_scores_to_floors` APPLIES at fit time
 (same draft-then-review convention as `lineage_map.csv`): run it after a data
-or floor change, review the diff, commit. The floors file itself is never
-written; it was originally bootstrapped from a hand-built spreadsheet via a
-generator layer (drafts/corrections/aliases) retired on 2026-07-13 after a
-source-by-source review of all 85 floors made the curated file authoritative.
+or floor change, review the diff, commit.
 """
 import sys
 from pathlib import Path
@@ -45,34 +41,6 @@ PROCESSED = PROCESSED_FILE
 # a model dated on/after this counts as recent for the below-floor who-split
 FRONTIER_DATE = "2025-06-01"
 
-
-def expected_from_reason(reason):
-    """Floor implied by the stated format, or nan if not a clean rule."""
-    r = str(reason).lower()
-    if "binary" in r or "yes/no" in r or "yes / no" in r or "true/false" in r or "true or false" in r:
-        return 0.5
-    for n in (10, 6, 5, 4, 3, 2):
-        if f"{n}-option" in r or f"{n} option" in r or f"{n}-label" in r or f"{n}-choice" in r:
-            return round(1.0 / n, 3)
-    if "three buckets" in r:
-        return round(1.0 / 3, 3)
-    return np.nan
-
-
-def format_check(floors):
-    """Flag rows where the stated format implies a different floor.
-
-    The pipeline's view carries the floor values only; their reasons and sources live in
-    its `0_input/metadata/benchmarks.csv`, so without a `reason` column nothing is flagged.
-    """
-    out = []
-    for _, r in floors.iterrows():
-        exp = expected_from_reason(r["reason"]) if "reason" in floors.columns else np.nan
-        ok = np.isnan(exp) or abs(exp - r["lower_bound"]) <= 1e-3
-        out.append("" if ok else f"reason implies {exp:.3f}")
-    floors = floors.copy()
-    floors["format_flag"] = out
-    return floors
 
 
 def score_table():
@@ -157,11 +125,6 @@ def main(write_clips=False):
           f"{missing if missing else 'none'}")
     print(f"  curated rows for benchmarks not in the fit: "
           f"{extra if extra else 'none'}")
-
-    floors = format_check(floors)
-    flagged = floors[floors["format_flag"] != ""]
-    print(f"\n=== format-consistency flags ({len(flagged)}) ===")
-    print(flagged[["benchmark", "lower_bound", "reason", "format_flag"]].to_string(index=False) if len(flagged) else "  none")
 
     scores = score_table()
     audit = below_floor_audit(floors, scores)

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from multiaxis_eci.analysis.stats import _release_dates, post_stats
-from multiaxis_eci.analysis.timelines import mirt_informed_mask
+from multiaxis_eci.analysis.timelines import candidate_mask
 from multiaxis_eci.data import ECIData
 
 # ── Frontier forecasting (when does the AI frontier outpace human tiers) ─────
@@ -181,25 +181,18 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         if fit_basis != "envelope":
             fit_basis = "frozen"
     else:
-        informed = (mirt_informed_mask(theta_draws, sd_cap)[:, k] if sd_cap is not None
-                    else np.ones(data.n_models, dtype=bool))
+        # The timelines' guard (`candidate_mask`). SOTA models are exempt from the
+        # informed/low-obs filter UNLESS sota_exempt=False, which requires every
+        # model, SOTA included, to be measured on THIS axis: the informed-only
+        # frontier, never bent by a sparse SOTA point (e.g. an n=1 release with
+        # SD > 0.5). Such releases still appear on the timeline plot.
+        keep = candidate_mask(theta_draws, k, data, model_dates, sd_cap=sd_cap,
+                              drop_low_obs=drop_low_obs, sota_exempt=sota_exempt)
         sota = (data.is_sota if data.is_sota is not None
                 else np.zeros(data.n_models, dtype=bool))
-
         idx, dates = [], []
         for i, m in enumerate(names):
-            if data.is_human[i] or m not in model_dates.index:
-                continue
-            # SOTA models are exempt from the informed/low-obs filter (a frontier
-            # release is always shown even when sparsely evaluated) UNLESS
-            # sota_exempt=False, which requires every model — SOTA included — to be
-            # well-measured (SD < sd_cap, enough obs) on THIS axis. Off is the
-            # informed-only frontier: the trend is anchored only by models actually
-            # measured on the axis, never by a sparse SOTA point (e.g. an n=1 release
-            # with SD > 0.5). Such releases still appear on the timeline plot; they
-            # just do not bend the fitted slope.
-            fails_filter = (drop_low_obs and data.is_low_obs[i]) or not informed[i]
-            if fails_filter and not (sota_exempt and sota[i]):
+            if not keep[i]:
                 continue
             idx.append(i)
             dates.append(model_dates[m])

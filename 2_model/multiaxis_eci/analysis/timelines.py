@@ -6,10 +6,11 @@ import pandas as pd
 
 from multiaxis_eci.analysis.convergence import nc_difficulty_draws
 from multiaxis_eci.analysis.stats import _release_dates, forest_stats_from_draws, post_stats
+from multiaxis_eci.config import INFORMED_SD_CAP
 from multiaxis_eci.data import ECIData
 
 
-def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = 0.33) -> np.ndarray:
+def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = INFORMED_SD_CAP) -> np.ndarray:
     """(M, K) bool: True where a model's per-axis posterior SD < sd_cap.
 
     Filters out models whose ability is extrapolated rather than measured
@@ -27,9 +28,33 @@ def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = 0.33) -> np.ndar
     return theta_canon.std(axis=0) < sd_cap
 
 
+def candidate_mask(theta_canon: np.ndarray, k: int, data: ECIData, model_dates: pd.Series, *,
+                   sd_cap: float | None = INFORMED_SD_CAP, drop_low_obs: bool = True,
+                   sota_exempt: bool = True) -> np.ndarray:
+    """(M,) bool: the test-takers a timeline, a forecast or a frontier may draw on for axis k.
+
+    The one guard shared by the measured timelines, the forecast candidates, the country
+    frontier and the post's forests: dated, not a human tier, and either measured on the axis
+    (posterior SD < sd_cap, and not flagged is_low_obs when drop_low_obs) or a SOTA family
+    member when sota_exempt (a frontier release is shown with its wide interval rather than
+    dropped). `sd_cap=None` disables the SD test; `drop_low_obs=False` the observation count.
+    """
+    names = data.mlookup.sort_values("model_idx")["model"].tolist()
+    theta_k = theta_canon[..., k] if theta_canon.ndim == 3 else theta_canon
+    informed = (theta_k.std(axis=0) < sd_cap if sd_cap is not None
+                else np.ones(data.n_models, dtype=bool))
+    low_obs = (data.is_low_obs if drop_low_obs and data.is_low_obs is not None
+               else np.zeros(data.n_models, dtype=bool))
+    sota = (data.is_sota if sota_exempt and data.is_sota is not None
+            else np.zeros(data.n_models, dtype=bool))
+    dated = np.array([m in model_dates.index for m in names], dtype=bool)
+    measured = informed & ~low_obs
+    return dated & ~np.asarray(data.is_human, dtype=bool) & (measured | sota)
+
+
 def mirt_model_timeline_df(theta_canon: np.ndarray, k: int,
                            data: ECIData, raw_df: pd.DataFrame,
-                           sd_cap: float | None = 0.33,
+                           sd_cap: float | None = INFORMED_SD_CAP,
                            drop_low_obs: bool = True,
                            hdi_prob: float = 0.5) -> pd.DataFrame:
     """Model-ability timeline for axis k (kind='model'); humans excluded
@@ -47,22 +72,15 @@ def mirt_model_timeline_df(theta_canon: np.ndarray, k: int,
     even when sparse and wide (e.g. Fable 5 / Mythos): a frontier release is the
     headline of the timeline, and its uncertainty is communicated honestly by the
     drawn CI rather than by silently dropping the point. Humans and the
-    missing-release-date guard still apply to every model."""
+    missing-release-date guard still apply to every model (`candidate_mask`)."""
     model_dates, _ = _release_dates(raw_df)
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
-    informed = (mirt_informed_mask(theta_canon, sd_cap)[:, k] if sd_cap is not None
-                else np.ones(data.n_models, dtype=bool))
-    sota = (data.is_sota if data.is_sota is not None
-            else np.zeros(data.n_models, dtype=bool))
+    keep = candidate_mask(theta_canon, k, data, model_dates, sd_cap=sd_cap,
+                          drop_low_obs=drop_low_obs)
     rows = []
     for i, m in enumerate(names):
-        if data.is_human[i] or m not in model_dates.index:
+        if not keep[i]:
             continue
-        if not sota[i]:                       # SOTA bypasses the low-obs / sd_cap filters
-            if drop_low_obs and data.is_low_obs[i]:
-                continue
-            if not informed[i]:
-                continue
         mean, lo, hi = post_stats(theta_canon[:, i, k], hdi_prob=hdi_prob)
         rows.append({"name": m, "kind": "model", "release_date": model_dates[m],
                      "mean": mean, "hdi_low": lo, "hdi_high": hi})

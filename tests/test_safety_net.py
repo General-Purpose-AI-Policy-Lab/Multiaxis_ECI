@@ -9,7 +9,7 @@ Those two benchmarks are on the curated exclusion list, so only include_all
 scopes see them: each affected golden moved by exactly -325.632421.
 
 All goldens were re-pinned on 2026-07-27 when the pipeline began auto-swapping
-its output into 1_data/processed (97 -> 96 benchmarks after BTF3 was parked for
+its output into the processed folder of the time (97 -> 96 benchmarks after BTF3 was parked for
 lacking a sourceable chance floor), and again when FrontierMath v1 was restored
 as its own pair of items (96 -> 98 benchmarks, 4447 obs / 765 models), and a
 third time when GBAEval's two harness-failure rows were dropped (4447 -> 4445
@@ -95,7 +95,7 @@ and BlueprintBench 2 0.59 (n=1, provisional) — the human-side tie-breaker
 cells for the K=3 axis-3 mode competition. Human rows enter every fit, so all
 24 values move. `_none` also joined the effort-suffix vocabulary in
 data._EFFORT_SUFFIX_RE the same day; verified inert here (no default-path
-consumer — only collapse_effort_variants and the lineage collapse read it).
+consumer — only the lineage collapse reads it).
 
 21 goldens were re-pinned a fifth time on 2026-08-06 after the name-audit
 corrections (4_diagnostics/audit_model_names.py; same snapshot, zero score

@@ -30,8 +30,8 @@ unmarked to both.
 | `--K N` | `[expl]` latent dimension. Default 4 |
 | `--loading-prior {normal,signed,pt1,bifactor}` | `[expl]` default `normal`, non-negative. `signed` allows a contrast axis and is rotation-invariant; `pt1` is `normal` under product-to-one loadings per axis (Epoch's identification); `bifactor` is a dense general column plus horseshoe specifics, `--K >= 2` |
 | `--link {linear,loglog}` | `[expl]` `linear` is the 2PL; `loglog` is a disjunctive best-axis family |
-| `--human-prior` | order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order. Also accepted by `--preset canonical`, which then writes to `results/canonical_humanprior/` |
-| `--human-merge` | instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents. Also accepted by `--preset canonical` (`results/canonical_humanmerge/`) |
+| `--human-prior` | order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order. Also accepted by `--preset canonical`, which then writes to `canonical_humanprior/` under the data generation's folder |
+| `--human-merge` | instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents. Also accepted by `--preset canonical` (`canonical_humanmerge/`) |
 | `--lineage-prior` | `[expl]` soft vendor release-chain prior: each release's mean step over its predecessor is positive, but a node can regress |
 | `--lineage-bm` | `[expl]` with `--lineage-prior`: index the chain by time, so each step scales with the release gap in years |
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
@@ -46,8 +46,8 @@ unmarked to both.
 | `--apply-exclusions` | `[expl]` apply `excluded_benchmarks.txt`, i.e. fit the canonical scope |
 | `--include-all-benchmarks` | `[canon]` the mirror: keep the curated-excluded benchmarks |
 | `--drop-benchmarks A,B` | `[expl]` drop the named benchmarks (comma-separated, exact names) for a sensitivity run |
-| `--open-only` | `[canon]` keep only benchmarks whose access class in `0_input/benchmarks.csv` is `public`; results go to `results/canonical_open/` |
-| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks whose access class in `0_input/benchmarks.csv` is not `public`; results go to `results/canonical_closed/` |
+| `--open-only` | `[canon]` keep only benchmarks whose access class in `0_input/benchmarks.csv` is `public`; results go to `canonical_open/` |
+| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks whose access class in `0_input/benchmarks.csv` is not `public`; results go to `canonical_closed/` |
 | `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
 | `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
 | `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
@@ -212,7 +212,7 @@ python 4_diagnostics/4_build_dashboard.py --force NAME       # re-render one car
 
 `--add` reads the fit's identity off the trace with `FitSpec.from_trace`,
 validates it, appends it to the tracked registry
-`4_diagnostics/dashboard_fits.json`, and renders nothing. `--name` is the cache
+`6_writeups/dashboard/dashboard_fits.json`, and renders nothing. `--name` is the cache
 key and the `--force` target, so it must be unique; `--label` is the section
 header and nav entry. Four options refine the card: `--type` is one of `data`,
 `baseline`, `exploratory` (the default), `confirmed`; `--short` is the axis

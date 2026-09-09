@@ -35,7 +35,7 @@ from multiaxis_eci.analysis.stats import (  # noqa: E402
     capability_draws,
     eci_transform,
 )
-from multiaxis_eci.analysis.timelines import mirt_informed_mask  # noqa: E402
+from multiaxis_eci.analysis.timelines import candidate_mask, mirt_informed_mask  # noqa: E402
 from multiaxis_eci.data import (  # noqa: E402
     MODELS_FILE,
     PROCESSED_FILE,
@@ -49,7 +49,7 @@ from multiaxis_eci.viz.core import _rgba as _rgb_to_rgba  # noqa: E402
 # Width of the interval band drawn on the bottom and top human tiers.
 HUMAN_BAND_PROB = 0.80
 
-SD_CAP = 0.4                              # informed-model cutoff
+SD_CAP = config.INFORMED_SD_CAP           # informed-model cutoff, shared with the timelines
 DEFAULT_HORIZON = "2029-01-01"
 US_COLOR, CN_COLOR = "#0072B2", "#D55E00" # Okabe-Ito blue / vermillion
 VARIANTS = [("informed", False), ("sota_exempt", True)]   # (label, sota_bypass)
@@ -62,6 +62,7 @@ class _MiniData:
     n_models: int
     is_human: np.ndarray
     is_sota: np.ndarray
+    is_low_obs: np.ndarray
 
 
 def load_scope(scope: str):
@@ -84,8 +85,8 @@ def load_matched(trace_path: Path, scope: str, allow_stale: bool):
     if trace_names != data_names:
         msg = (f"trace has {len(trace_names)} models, rebuilt data scope has "
                f"{len(data_names)} models — they don't match "
-               "(results/canonical/trace.nc predates the current data "
-               "snapshot; re-fit before quoting numbers)")
+               "(the canonical trace predates the current data generation; "
+               "re-fit before quoting numbers)")
         if not allow_stale:
             raise AssertionError(msg + ". Pass --allow-stale for a quick look "
                                  "that joins by model-name intersection.")
@@ -105,7 +106,8 @@ def load_matched(trace_path: Path, scope: str, allow_stale: bool):
         mlookup=pd.DataFrame({"model": common, "model_idx": np.arange(1, len(common) + 1)}),
         n_models=len(common),
         is_human=data.is_human[rows],
-        is_sota=data.is_sota[rows] if data.is_sota is not None else np.zeros(len(common), bool))
+        is_sota=data.is_sota[rows] if data.is_sota is not None else np.zeros(len(common), bool),
+        is_low_obs=data.is_low_obs[rows])
     return trace, mini, theta0
 
 
@@ -118,18 +120,16 @@ def load_country_map() -> dict:
 def country_records(theta0: np.ndarray, mini: _MiniData, model_dates: pd.Series,
                     country_map: dict, country: str, *, sota_bypass: bool):
     """(candidate_names_by_date, is_record, n_candidates) for one country:
-    dated non-human informed models (sota_bypass admits is_sota regardless);
+    the timelines' candidates (`candidate_mask`: dated, non-human, measured on the axis,
+    SOTA families admitted regardless when sota_bypass) of that country;
     records = running max of posterior-median capability."""
     names_all = mini.mlookup.sort_values("model_idx")["model"].tolist()
-    informed = mirt_informed_mask(theta0[:, :, None], SD_CAP)[:, 0]
+    keep = candidate_mask(theta0[:, :, None], 0, mini, model_dates, sd_cap=SD_CAP,
+                          sota_exempt=sota_bypass)
 
     idx, dates = [], []
     for i, m in enumerate(names_all):
-        if mini.is_human[i] or m not in model_dates.index:
-            continue
-        if country_map.get(m) != country:
-            continue
-        if not (informed[i] or (sota_bypass and mini.is_sota[i])):
+        if not keep[i] or country_map.get(m) != country:
             continue
         idx.append(i)
         dates.append(model_dates[m])

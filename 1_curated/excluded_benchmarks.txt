@@ -1,10 +1,9 @@
 # Benchmarks excluded from the index — one name per line, '#' starts a comment.
-# Matches the `benchmark` column of processed/benchmarks_merged.csv exactly.
+# Matches the `benchmark` column of 0_input/all_scores_flat.csv (the pipeline's names) exactly.
 #
 # Current list filters out "intentionally easy for humans" benchmarks —
 # keeping them (even with the scores dropped) would bias both capability
 # estimates and the positioning of other benchmarks.
-# TriviaQA is listed for documentation; it is already absent from the source.
 
 ARC-AGI
 ARC-AGI-2

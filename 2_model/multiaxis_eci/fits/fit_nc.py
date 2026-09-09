@@ -19,7 +19,7 @@ What it does:
   4. Otherwise fit, judge convergence on identified quantities
      (analysis.mirt_identified_rhat_nc — log_mu + theta/sigma_b/tau_c),
      run the PPC + GoF, and write factor scores / factor correlation / per-axis
-     difficulty / residuals / GoF under results/mirt_nc/.
+     difficulty / residuals / GoF under the data generation's mirt_nc/ folder.
 
 Run:
   python fits/fit_nc.py --K 3 --prior-check

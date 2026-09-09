@@ -17,4 +17,4 @@ The two builders run after a sync: `2_build_lineage_map.py` redrafts the lineage
 
 ## Effort variants
 
-A release appears as several test-takers when the sources record it at several reasoning efforts (`_low`, `_high`, a token budget, `_thinking`); they are fitted separately and grouped into one family by `data.model_family` where a rule needs the release (isolated families, the SOTA list). Since 2026-09-09 the pipeline folds Epoch's `_unknown` suffix into the bare name: an unrecorded effort and no suffix are the same state of knowledge, only an explicit `_none` (reasoning off) is a configuration of its own.
+A release appears as several test-takers when the sources record it at several reasoning efforts (`_low`, `_high`, a token budget, `_thinking`); they are fitted separately and grouped into one family by `data.model_family` where a rule needs the release (isolated families, the SOTA list). From its 2026-09-09 build (the next sync here) the pipeline folds Epoch's `_unknown` suffix into the bare name: an unrecorded effort and no suffix are the same state of knowledge, only an explicit `_none` (reasoning off) is a configuration of its own.

@@ -1,6 +1,6 @@
 """Locks on the 5_outputs/<data generation>/ layout and the figure file names.
 
-Written for the 2026-09 restructure: results/ and plots/ merged into one tree
+Written for the 2026-09 restructure: the former results and plots folders merged into one tree
 whose first level is the data generation, figures beside their tables with
 the interactive twins under html/, and explicit file names instead of the
 `_C` / `_D` / `_1` shorthands.

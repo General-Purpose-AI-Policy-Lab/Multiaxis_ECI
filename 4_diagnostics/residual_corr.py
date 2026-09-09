@@ -5,7 +5,7 @@ For each benchmark pair (b1, b2):
   implied[b1,b2]   = corr(mu[m,b1],         mu[m,b2])         using posterior-mean theta,D,A
   residual         = observed - implied
 
-Reads the canonical K=1 trace (results/canonical/trace.nc, from
+Reads the canonical K=1 trace (the data generation's canonical/trace.nc, from
 `3_fit/fit.py --preset canonical`). If 1D is enough, residuals are tiny and
 unstructured. Clustered structure (e.g. all-math residuals coordinated
 positive, math-vs-agentic negative) is the signature of a second latent factor.

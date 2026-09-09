@@ -83,8 +83,8 @@ class FitSpec:
     pooled_noise: bool = True
 
     def __post_init__(self):
-        # The three cross-flag constraints the model cannot express on its own.
-        # Checked here so every construction path pays them, not just the CLI.
+        # The cross-flag constraint the model cannot express on its own. Checked
+        # here so every construction path pays it, not just the CLI.
         if self.lineage_bm and not self.lineage_prior:
             raise ValueError(
                 "--lineage-bm re-indexes the lineage increments by time; it "
@@ -93,7 +93,7 @@ class FitSpec:
     # ── identity ────────────────────────────────────────────────────────────
     @property
     def tag(self) -> str:
-        """One tag identifying the fit config; reused for BOTH the results/plots
+        """One tag identifying the fit config; reused for BOTH the results
         folder and the trace filename, so distinct configs never overwrite each
         other's fixed-name artefacts. The loading prior leads the tag (matching
         the historical `trace_mirt_k3_signed_...` convention); "normal" stays
@@ -307,21 +307,23 @@ class FitSpec:
 
 # ── the flagship fit ────────────────────────────────────────────────────────
 # K=4, positive loadings, merged human order + Brownian lineage prior, 3PL
-# floors, pooled noise, the exploration scope. THE forecasting base — the fit
-# the blog post reports (10 chains x 12,000 draws on the 2026-08 snapshot:
-# 4,923 obs / 829 test-takers / 96 benchmarks, R² 0.9643).
-# FrontierMath v1 and AlgoTune are out of this scope through the retirement
-# list, so no drop flag names them and the tag carries no `_drop`.
+# floors, pooled noise, the exploration scope. THE forecasting base. The blog
+# post reports its 2026-08 run (10 chains x 12,000 draws on the pre-pipeline
+# snapshot: 4,923 obs / 829 test-takers / 96 benchmarks, R² 0.9643), archived
+# under 5_outputs/pre_pipeline/; FrontierMath v1 and AlgoTune were out of that
+# scope, and the pipeline excludes them today, so no drop flag names them.
 # `loading_prior` and `floors` are named explicitly although both hold the
 # default: the flagship is a statement of one fit, and a later default change
-# must not silently redefine it. The superseded 2026-07 fit (old tag grammar,
-# 10x20,000 on the previous snapshot) is archived under `results/Old/`.
+# must not silently redefine it. The superseded 2026-07 fit (old tag grammar)
+# is archived under `archive/results_old/`.
 FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
                    lineage_prior=True, lineage_bm=True, floors=True)
 # The one path every consumer reads, so the figures, the dashboard card and the
-# post cannot name different traces. `FLAGSHIP_TRACE.parent` is the fit's
-# results folder and holds its CSVs and caches. 10 chains x 12,000 draws over
-# 829 test-takers and 96 benchmarks, which is the current exploration scope.
+# post cannot name different traces: the flagship fit of the CURRENT data
+# generation (`config.RESULTS_DIR`). It exists once `3_fit/fit.py --K 4
+# --human-merge --lineage-prior --lineage-bm` has run on that generation;
+# `open_flagship` says so when it has not. `FLAGSHIP_TRACE.parent` is the fit's
+# results folder and holds its CSVs and caches.
 FLAGSHIP_TRACE = FLAGSHIP.trace_path
 # One posterior mode over all ten chains (`mirt_modes_<trace-stem>.json`), so
 # every chain is read. The chains do split 6/4 on where the human tiers and 18
@@ -335,7 +337,16 @@ FLAGSHIP_THIN = 10
 
 
 def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
-    """The flagship posterior, thinned. `chains=None` reads every chain."""
+    """The flagship posterior, thinned. `chains=None` reads every chain.
+
+    Raises:
+        FileNotFoundError: the flagship has not been fitted on the current data generation.
+    """
+    if not FLAGSHIP_TRACE.exists():
+        raise FileNotFoundError(
+            f"{FLAGSHIP_TRACE}: the flagship K=4 fit does not exist for this data generation; "
+            "run `python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm` first "
+            "(the published run sits under 5_outputs/pre_pipeline/).")
     return FLAGSHIP.open_posterior(keep=keep, thin=thin, chains=chains,
                                    path=FLAGSHIP_TRACE)
 
@@ -404,7 +415,7 @@ def _folder_tag(trace_path: Path) -> str:
     if name != "mirt" and not name.startswith("mirt_"):
         raise ValueError(f"{trace_path.parent.name!r} is not a MIRT results "
                          "folder (expected mirt or mirt_<tag>)")
-    # Legacy folders carried the data generation as a suffix (config.DATA_SUFFIX);
+    # Legacy folders carried the data generation as a `_data<YYYYMMDD>` suffix;
     # it named the folder, never the spec.
     return re.sub(r"_data\d{8}$", "", name[4:])
 
@@ -484,7 +495,7 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
 
 
 # The model-side flags 3_fit/fit.py does NOT forward to the K=1 baseline (3_fit/fit.py's
-# baseline call passes floors / ceiling_noise / known_se only). Every
+# baseline call passes floors / ceiling_noise / known_se / censor_eps only). Every
 # other model-side flag is off there whatever the folder tag says; the data-scope
 # flags are the folder's.
 _BASELINE_OFF = dict(loading_prior="normal", link="linear",

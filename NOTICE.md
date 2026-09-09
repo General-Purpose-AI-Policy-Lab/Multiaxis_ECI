@@ -6,7 +6,7 @@ SPDX-License-Identifier: CC-BY-4.0
 The `LICENSE` file carries the full CC-BY-4.0 legal code. It covers what this
 project produces: the model code, the analysis and diagnostics layer, the
 curated files under `1_curated/`, and the fitted results under
-`results/`. Suggested attribution:
+`5_outputs/`. Suggested attribution:
 
 > General-Purpose AI Policy Lab, "Multiaxis_ECI", CC-BY-4.0,
 > <https://github.com/General-Purpose-AI-Policy-Lab/Multiaxis_ECI>
@@ -29,7 +29,7 @@ The feeds, their licences and the per-source processing are documented in [`benc
 | [`epoch.ai/data/benchmark_data.zip`](https://epoch.ai/data/benchmark_data.zip) and [`epoch.ai/data/benchmarks.csv`](https://epoch.ai/data/benchmarks.csv) | **CC-BY** (Epoch AI), attribution required |
 | RAND **RR-A3797-1** (Dev et al. 2025, *Toward Comprehensive Benchmarking of the Biological Knowledge of Frontier LLMs*) | Cite [RR-A3797-1](https://www.rand.org/pubs/research_reports/RRA3797-1.html) |
 | [Scale SEAL leaderboards](https://labs.scale.com/leaderboard) | **No open license.** Scale AI Terms of Service applies. Aggregated as research with attribution; confirm terms at <https://scale.com/legal/terms> before redistributing |
-| [Kaggle Open Benchmarks](https://www.kaggle.com/benchmarks) boards (`open-benchmarks/mmlu`, `deepmind/simpleqa-verified`) | Public leaderboard JSON; **no explicit open license on the boards** — Kaggle's Terms of Service applies. Credit Kaggle and the board owners; details in [`1_data/1_pipeline/README.md`](1_data/1_pipeline/README.md) (Kaggle Open Benchmarks section) |
+| [Kaggle Open Benchmarks](https://www.kaggle.com/benchmarks) boards (`open-benchmarks/mmlu`, `deepmind/simpleqa-verified`) | Public leaderboard JSON; **no explicit open license on the boards** — Kaggle's Terms of Service applies. Credit Kaggle and the board owners; details in the data pipeline's `NOTICE.md` |
 | SimpleQA original scores (`1_curated/simpleqa_original/`) | MIT, from the upstream benchmark repository |
 
 The Epoch Capabilities Index this project recreates is Epoch AI's:
@@ -37,11 +37,11 @@ The Epoch Capabilities Index this project recreates is Epoch AI's:
 
 ## Evaluation harness
 
-`evals/lab_bench_cloning/` runs the public CloningScenarios split of
+`internal_evals/lab_bench_cloning/` runs the public CloningScenarios split of
 **LAB-Bench** ([futurehouse/lab-bench](https://huggingface.co/datasets/futurehouse/lab-bench),
 [arXiv 2407.10362](https://arxiv.org/abs/2407.10362)). The dataset is fetched on
 demand and is **not** redistributed here; its own license applies. Run outputs
-under `evals/*/out/` are gitignored.
+under `internal_evals/*/out/` are gitignored.
 
 ## Attribution when citing
 

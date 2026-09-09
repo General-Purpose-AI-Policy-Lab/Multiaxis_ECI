@@ -134,12 +134,14 @@ same results folder.
 
 ## Conventions a reader must know
 
-**The informed filter is plot-side only.** `mirt_informed_mask` drops a
-model's axis ability from a figure when its posterior SD >= 0.4. It never
-touches the fit and never touches a diagnostic: convergence, PPC, PIT, GoF
-and LOO always describe the whole fit. The same holds for a mode-restricted
-dashboard card, which is an addition to the whole-fit figures, not a
-replacement. The 0.4 cap corresponds to a 95% interval width of about 1.57.
+**The informed filter is plot-side only.** `analysis.timelines.candidate_mask` drops a
+model's axis ability from a figure when its posterior SD is at or above
+`config.INFORMED_SD_CAP` (0.33, a 95% interval width of about 1.3) or when the
+model is flagged low-observation, SOTA families excepted. It never touches the
+fit and never touches a diagnostic: convergence, PPC, PIT, GoF and LOO always
+describe the whole fit. The same holds for a mode-restricted dashboard card,
+which is an addition to the whole-fit figures, not a replacement. The K=1 ECI-H
+timeline of the canonical fit draws every dated model.
 
 **SOTA models are exempt from that drop.** Models of the `config.SOTA_FAMILIES` releases
 stay on every timeline even when sparse and wide, because a frontier release

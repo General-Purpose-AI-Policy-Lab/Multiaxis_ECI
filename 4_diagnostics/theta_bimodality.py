@@ -36,10 +36,10 @@ The same scan runs on the loading matrix A, which has the identical
 (chain, draw, unit, axis) shape, to check whether benchmark loadings split too.
 
 Outputs:
-  results/<fit>/theta_bimodality.csv   — one row per taker x axis, the whole
+  <fit>/theta_bimodality.csv           — one row per taker x axis, the whole
                                          scan (machines and humans, every axis),
                                          on the ALIGNED draws.
-  results/<fit>/bimodality.html        — four sections, no prose. Chain
+  <fit>/bimodality.html                — four sections, no prose. Chain
                                          alignment: which raw slot each chain
                                          filed each common axis in. One human
                                          story: the tier profiles, per chain and
@@ -59,7 +59,7 @@ semantic name would be invented.
 Run:
   python 4_diagnostics/theta_bimodality.py
   python 4_diagnostics/theta_bimodality.py \
-      --trace results/mirt/trace_mirt_k2.nc
+      --trace 5_outputs/pre_pipeline/mirt/trace_mirt_k2.nc
 """
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ from multiaxis_eci.analysis.timelines import (  # noqa: E402
     mirt_informed_mask,
     mirt_model_timeline_df,
 )
-from multiaxis_eci.config import FORECAST_KW  # noqa: E402
+from multiaxis_eci.config import FORECAST_KW, INFORMED_SD_CAP  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.scripts import load as _load_script  # noqa: E402
 
@@ -103,8 +103,8 @@ DEFAULT_TRACE = FLAGSHIP_TRACE
 GAP_SDS = 3.0
 # min chains on each side of the gap — 1 chain apart is an outlier, not a lump
 MIN_SIDE = 2
-# posterior SD below which an ability counts as data-informed
-SD_CAP = 0.4
+# posterior SD below which an ability counts as data-informed (the shared cap)
+SD_CAP = INFORMED_SD_CAP
 # draw stride for the figure histograms: 600 draws per chain resolve two lumps,
 # and the page ships binned COUNTS, so the stride costs smoothness, not weight
 FIG_STRIDE = 10

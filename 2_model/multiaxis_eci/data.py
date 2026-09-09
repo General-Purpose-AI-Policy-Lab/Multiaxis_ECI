@@ -4,8 +4,8 @@ Runtime source: `0_input/all_scores_flat.csv`, the consumer view of benchmark-da
 copied by `python -m multiaxis_eci sync` (with `human_baselines.csv`, `models.csv` and
 `benchmarks.csv` from the same build). The pipeline owns the data preparation: feeds, model
 identities and aliases, release dates, benchmark inclusion, categories, chance floors and known
-ceilings. This module does only the modeling-stage transforms (humans as test-takers, effort
-collapse, era filters, low-obs flags, indices).
+ceilings. This module does only the modeling-stage transforms (humans as test-takers, the
+curated exclusions, isolated families, era filters, low-obs flags, indices).
 
 Scores are on the [0, 1] scale via unit conversion; they are NOT chance-corrected. The
 per-benchmark chance floor is the view's `lower_bound` column, read by the default-on fixed-c
@@ -296,16 +296,12 @@ def clip_scores_to_floors(data: ECIData, floors: np.ndarray) -> ECIData:
     )
 
 
-# Human groups dropped before fitting (empty — all groups kept).
-HUMAN_GROUPS_DROP: set[str] = set()
-
-
 # Regex for effort-variant suffixes — strip everything after the last
 # underscore that matches the known suffix vocabulary. `none` is a real setting
 # upstream ("GPT-5.1 (Thinking, None)" -> gpt-5.1-2025-11-13_none), so it
 # belongs here: 15 test-takers carry it, and leaving it out made every one of
-# them its own BASE model, which silently defeated collapse_effort_variants and
-# the lineage's variant collapse for those rows.
+# them its own BASE model, which silently defeated the lineage's variant
+# collapse for those rows.
 _EFFORT_SUFFIX_RE = re.compile(
     r"_(?:low|medium|high|minimal|max|xhigh|none|unknown|web-?app|"
     r"\d+[kK]|reasoning-(?:low|medium|high))$"
@@ -350,17 +346,6 @@ def model_family(model_version: str) -> str:
     return _effort_base(model_version)
 
 
-def sota_families() -> set[str]:
-    """The releases of `1_curated/sota_families.txt` (config.SOTA_FAMILIES), as `model_family` names."""
-    from multiaxis_eci.config import SOTA_FAMILIES
-    return set(SOTA_FAMILIES)
-
-
-def is_sota_model(model_version: str) -> bool:
-    """True when the test-taker belongs to a SOTA family, whatever its reasoning effort."""
-    return model_family(model_version) in sota_families()
-
-
 def is_bare(model_version: str) -> bool:
     """True for the base configuration of a release: no reasoning level, budget or run variant."""
     ident = _identity()
@@ -370,42 +355,15 @@ def is_bare(model_version: str) -> bool:
     return _effort_base(model_version) == model_version
 
 
-def _collapse_effort_variants(df: pd.DataFrame,
-                                protected: set[str] | None = None) -> pd.DataFrame:
-    """For each base model (e.g. 'gpt-5-2025-08-07'), keep one effort variant.
-    Selection order:
-       1. any variant in `protected` (SOTA / anchor list) wins.
-       2. most-obs wins.
-       3. tie-breaks among equally-observed variants:
-            `_high` > bare base > `_medium` > alphabetical.
-    """
-    protected = protected or set()
-    counts = df.groupby("model_version").size()
-    df = df.copy()
-    df["__base__"] = df["model_version"].map(model_family)
+def sota_families() -> set[str]:
+    """The releases of `1_curated/sota_families.txt` (config.SOTA_FAMILIES), as `model_family` names."""
+    from multiaxis_eci.config import SOTA_FAMILIES
+    return set(SOTA_FAMILIES)
 
-    def pick_winner(group: pd.Series) -> str:
-        variants = group.unique()
-        if len(variants) == 1:
-            return variants[0]
-        # Protected variants always win, regardless of obs count
-        prot_in_group = [v for v in variants if v in protected]
-        if prot_in_group:
-            return sorted(prot_in_group)[0]
-        # Most-obs wins; equally-tested variants tie-broken by suffix preference.
-        def key(v):
-            return (
-                -counts[v],
-                0 if v.endswith("_high") else 1,            # _high preferred on tie
-                0 if is_bare(v) else 1,                     # bare base next
-                0 if v.endswith("_medium") else 1,
-                v,
-            )
-        return sorted(variants, key=key)[0]
 
-    winners = df.groupby("__base__")["model_version"].agg(pick_winner)
-    keep = set(winners.values)
-    return df[df["model_version"].isin(keep)].drop(columns="__base__").reset_index(drop=True)
+def is_sota_model(model_version: str) -> bool:
+    """True when the test-taker belongs to a SOTA family, whatever its reasoning effort."""
+    return model_family(model_version) in sota_families()
 
 
 def _known_release_date_by_model() -> pd.Series:
@@ -484,7 +442,7 @@ def _load_human_baselines_as_models() -> pd.DataFrame:
         return pd.DataFrame()
     hb = pd.read_csv(src)
     # Guard against accidental row duplication. Human rows bypass the pipeline's
-    # dedup step (which runs on the AI rows in the notebook), so a re-pasted block
+    # dedup step (which runs on the AI scores), so a re-pasted block
     # in the CSV would otherwise be fit as repeated Beta observations — inflating
     # a group's apparent obs count and over-tightening its posterior. Dedup on the
     # full (benchmark, group, score) triple: exact repeats are dropped, but an
@@ -493,12 +451,11 @@ def _load_human_baselines_as_models() -> pd.DataFrame:
     # Trim the tier and benchmark keys. A stray leading space forks a tier into a
     # second test-taker that HUMAN_ORDER does not name, so it silently loses the
     # ordered-human prior and takes its observations with it — invisible in every
-    # diagnostic, since both names look identical when printed. Dedup and the
-    # HUMAN_GROUPS_DROP anti-join both key off these strings, so trim first.
+    # diagnostic, since both names look identical when printed. Dedup keys off
+    # these strings, so trim first.
     hb["group"] = hb["group"].astype(str).str.strip()
     hb["benchmark"] = hb["benchmark"].astype(str).str.strip()
     hb = hb.drop_duplicates(subset=["benchmark", "group", "score"])
-    hb = hb[~hb["group"].isin(HUMAN_GROUPS_DROP)]
     out = pd.DataFrame({
         "model_version": hb["group"].astype(str),
         "score":         hb["score"].astype(float),
@@ -590,9 +547,10 @@ class ECIData:
     # None on a hand-built ECIData, which is what known_se=True rejects.
     n_eff: np.ndarray | None = None
     # (n_models,) bool — True for models of a config.SOTA_FAMILIES release. Parallels
-    # is_low_obs / is_human: lets plots ALWAYS show SOTA models (e.g. sparse new
-    # frontier releases like Fable 5 / Mythos) even when their posterior is wide,
-    # rather than dropping them as un-informed. Defaults to None so existing
+    # is_low_obs / is_human: the MIRT axis timelines, the forecast candidates and the
+    # country frontier keep SOTA models (e.g. sparse new frontier releases) even when
+    # their posterior is wide (analysis.timelines.candidate_mask); the K=1 ECI-H
+    # timeline draws every dated model anyway. Defaults to None so existing
     # constructors (tests, replace()) don't have to supply it.
     is_sota: np.ndarray | None = None
 
@@ -600,7 +558,6 @@ class ECIData:
 def load_eci_data(drop_low_obs_models: bool = False,
                    fit_humans: bool = True,
                    eci_data_only: bool = False,
-                   collapse_effort_variants: bool = False,
                    include_all_benchmarks: bool = False,
                    drop_isolated_families: bool = True,
                    fit_simpleqa_original: bool = False,
@@ -616,13 +573,11 @@ def load_eci_data(drop_low_obs_models: bool = False,
     the canonical broad-index configuration (keep everything except the curated
     `excluded_benchmarks.txt` list, which is filtered out here at fit time):
       • drop_low_obs_models (default False) — when True, models with
-        <LOW_OBS_THRESHOLD obs are deleted (anchors + humans protected). No fit
-        uses it: the sparse test-takers stay in the fit and are only hidden on
-        the measured timelines (is_low_obs), where SOTA families are exempt.
-        Paused: every model is fit, sparse ones get wide posteriors.
-      • collapse_effort_variants (default False) — when True, for each base
-        model (e.g. `gpt-5-2025-08-07`) keep one effort variant. Paused:
-        `_low` / `_medium` / `_high` are fit as distinct models.
+        <LOW_OBS_THRESHOLD obs are deleted (anchors + humans protected). The
+        compensatory fits (3_fit/fit.py, FitSpec) leave it off: the sparse
+        test-takers stay in the fit with wide posteriors and are only hidden
+        on the MIRT axis timelines (is_low_obs, SOTA families exempt); the
+        non-compensatory drivers in fits/ expose it as --drop-low-obs.
       • fit_humans (default True) — concatenate `0_input/human_baselines.csv`
         rows as IRT test-takers.
       • eci_data_only (default False) — bypass the view and use the reference
@@ -706,12 +661,6 @@ def load_eci_data(drop_low_obs_models: bool = False,
                 print(f"   curated exclusions: {len(fully_dropped)} models have "
                       f"no observations left and leave the fit entirely "
                       f"({preview}, ...)")
-
-        if collapse_effort_variants:
-            # Only the anchors are pinned by name here: the SOTA list names
-            # families, and collapsing a family to one effort is the point.
-            from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
-            df = _collapse_effort_variants(df, protected={ANCHOR_LOW[0], ANCHOR_HIGH[0]})
 
     excluded = load_excluded_benchmarks()
     df = df.reset_index(drop=True)
@@ -937,6 +886,6 @@ def open_only_drop_list(include_all_benchmarks: bool, keep_open: bool = True) ->
     drop = sorted(in_scope - open_ok) if keep_open else sorted(in_scope & open_ok)
     label = "--open-only" if keep_open else "--closed-only"
     print(f"── {label}: {len(in_scope) - len(drop)} "
-          f"{'public/verified' if keep_open else 'closed'} "
+          f"{'public' if keep_open else 'closed'} "
           f"benchmarks kept, {len(drop)} dropped ─────")
     return drop

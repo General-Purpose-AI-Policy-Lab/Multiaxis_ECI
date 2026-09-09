@@ -25,7 +25,7 @@
       "known_se": false,
       "pooled_noise": true
     },
-    "trace_path": "results/mirt/trace_mirt_k2.nc",
+    "trace_path": "5_outputs/pre_pipeline/mirt/trace_mirt_k2.nc",
     "short": "K=2 demo",
     "forecast": true
   }

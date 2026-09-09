@@ -45,8 +45,8 @@ def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
     dashed vertical marker at each tier's projected crossover date. Built on top
     of `capability_timeline_fig`, so styling and legend are inherited verbatim.
 
-    The cloud and the trend fit share one SD cap (0.4, set by the caller), so
-    every fitted record is also a plotted point."""
+    The cloud and the trend fit share one SD cap (config.INFORMED_SD_CAP, set by
+    the caller), so every fitted record is also a plotted point."""
     text = FORECAST_TEXT[lang]
     fig = capability_timeline_fig(timeline_df, human_stats=human_stats, lang=lang)
     gx = pd.to_datetime(fc.grid_dates).strftime("%Y-%m-%d")

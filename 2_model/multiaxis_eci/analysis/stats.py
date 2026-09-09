@@ -263,7 +263,7 @@ def human_stats_df(trace, data: ECIData, *, metric: str = "C",
 
 
 def forest_stats_from_draws(draws: np.ndarray, names: list[str]) -> pd.DataFrame:
-    """Posterior mean + 95% HDI per entry of pre-flattened (n_samples, n) draws, sorted."""
+    """Posterior median + central 95% interval per entry of pre-flattened (n_samples, n) draws, sorted."""
     rows = []
     for i, n in enumerate(names):
         mean, lo, hi = post_stats(draws[:, i])
@@ -272,7 +272,7 @@ def forest_stats_from_draws(draws: np.ndarray, names: list[str]) -> pd.DataFrame
 
 
 def forest_stats_df(trace, var_name: str, names: list[str]) -> pd.DataFrame:
-    """Posterior mean + 95% HDI for every entry of a vector-valued variable, sorted."""
+    """Posterior median + central 95% interval for every entry of a vector-valued variable, sorted."""
     post = trace.posterior[var_name].values
     return forest_stats_from_draws(post.reshape(-1, post.shape[-1]), names)
 

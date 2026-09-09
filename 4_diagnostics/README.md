@@ -1,4 +1,4 @@
-# 3. Diagnostics
+# 4. Diagnostics
 
 Post-fit tools, all command-line scripts. They read a fitted trace (the
 canonical one at `5_outputs/<data generation>/canonical/trace.nc`, from
@@ -44,7 +44,7 @@ trace as a card, then build.
 
 | Script | Purpose |
 |---|---|
-| `audit_lower_bounds.py` | Read-only check of the curated chance floors in `benchmark_lower_bounds.csv` |
+| `audit_lower_bounds.py` | Checks the pipeline's chance floors (`lower_bound` of the view) against the fit data: coverage and below-floor scores; `--write-clips` refreshes `1_curated/benchmark_score_clips.csv` |
 
 ## `residual_corr.py`
 

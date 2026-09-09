@@ -280,7 +280,7 @@ def run_canonical(args) -> None:
     scope_tag = "canonical_open" if args.open_only else \
         ("canonical_closed" if args.closed_only else "canonical")
     # The ordered-human prior is a MODEL choice on top of the scope, so it gets
-    # its own folder suffix: results/canonical stays the plain index.
+    # its own folder suffix: canonical/ stays the plain index.
     human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
                    else config.HUMAN_ORDER if args.human_prior else None)
     if args.keep_isolated:
@@ -330,7 +330,6 @@ def run_canonical(args) -> None:
     data = load_eci_data(eci_data_only=args.eci_data_only,
                          drop_isolated_families=not args.keep_isolated,
                          drop_low_obs_models=False,
-                         collapse_effort_variants=False,
                          include_all_benchmarks=args.include_all_benchmarks,
                          drop_benchmarks=access_drop)
     if args.drop_zero_scores:
@@ -344,7 +343,7 @@ def run_canonical(args) -> None:
         # Sampling costs hours; catch a missing anchor here rather than in
         # eci_transform after the fact.
         flag = "--open-only" if args.open_only else "--closed-only"
-        n_ge4 = int((data.n_obs_per_model >= 4).sum())
+        n_ge4 = int((data.n_obs_per_model >= config.LOW_OBS_THRESHOLD).sum())
         print(f"   {flag} preflight: n_benchmarks={data.n_benchmarks} "
               f"(dropped {len(access_drop)})  n_obs={data.n_obs}  "
               f"n_models_with_ge4_obs={n_ge4}/{data.n_models}")
@@ -770,7 +769,7 @@ def main():
                     "headline ECI-H pipeline (K=1), or the K-axis exploration flags.")
     parser.add_argument("--preset", choices=["canonical"],
                         help="'canonical': K=1, pt1 prior, curated exclusions, "
-                             "humans in, full ECI deliverables → results/canonical/")
+                             "humans in, full ECI deliverables → <data generation>/canonical/")
     # Shared sampling controls.
     parser.add_argument("--draws", type=int, default=None,
                         help="posterior draws per chain (default: config.SAMPLE_KW "
@@ -792,7 +791,7 @@ def main():
                         help="NUTS backend (default nutpie: Rust, ~2-3x faster on CPU)")
     # Canonical-preset flags.
     parser.add_argument("--skip-sampling", action="store_true",
-                        help="[canonical] reuse results/canonical/trace.nc")
+                        help="[canonical] reuse the canonical folder's trace.nc")
     parser.add_argument("--drop-zero-scores", action="store_true",
                         help="[canonical] drop score==0 observations (diagnostic)")
     parser.add_argument("--eci-data-only", action="store_true",
@@ -804,13 +803,11 @@ def main():
                         help="[canonical] keep the curated-excluded benchmarks in the fit")
     parser.add_argument("--open-only", action="store_true",
                         help="[canonical] fit only benchmarks whose items are public "
-                             "(access==public and verified==yes in "
-                             "0_input/benchmarks.csv, access = public); results go to "
+                             "(access == public in 0_input/benchmarks.csv); results go to "
                              "canonical_open/ under the data generation's folder")
     parser.add_argument("--closed-only", action="store_true",
-                        help="[canonical] fit only benchmarks NOT public+verified "
-                             "in 0_input/benchmarks.csv, access = public (the complement "
-                             "of --open-only); results go to "
+                        help="[canonical] fit only benchmarks whose items are not public "
+                             "(the complement of --open-only); results go to "
                              "canonical_closed/ under the data generation's folder")
     # Exploration flags.
     parser.add_argument("--K", type=int, default=4,
@@ -834,7 +831,7 @@ def main():
                              "mu = 1/(1+(theta.A)^-alpha)")
     parser.add_argument("--human-prior", action="store_true",
                         help="order human tiers by config.HUMAN_ORDER (exploration, "
-                             "or --preset canonical → results/canonical_humanprior/)")
+                             "or --preset canonical → <data generation>/canonical_humanprior/)")
     parser.add_argument("--stream-draws", action="store_true",
                         help="[exploration] write every draw to "
                              "<fit>/live_draws.zarr as it is sampled, so a "
@@ -844,7 +841,7 @@ def main():
                              "save_warmup)")
     parser.add_argument("--human-merge", action="store_true",
                         help="instead use config.HUMAN_ORDER_MERGED (exploration, or "
-                             "--preset canonical → results/canonical_humanmerge/): "
+                             "--preset canonical → <data generation>/canonical_humanmerge/): "
                              "the same tiers with the High School branch merged "
                              "into the adult spine (Domain Expert beats both a "
                              "Skilled Generalist and a High School Qualifier, Top "

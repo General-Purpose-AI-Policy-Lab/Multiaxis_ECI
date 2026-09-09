@@ -35,8 +35,6 @@ def data_tag() -> str:
 
 
 DATA_TAG = data_tag()
-# Legacy folder suffix (`results/canonical_data20260908`); the tag parser still strips it.
-DATA_SUFFIX = f"_data{DATA_TAG}" if DATA_TAG else ""
 
 # ── Output layout ──────────────────────────────────────────────────────────
 # Everything a fit or a diagnostic writes goes under 5_outputs/<data generation>/:
@@ -67,9 +65,18 @@ ECI_EPS = 1e-3
 
 # ── Low-observation flag ─────────────────────────────────────────────────
 # Models with fewer than this many benchmark observations are flagged as
-# data-poor: their posterior C is dominated by prior + a few extreme points
-# and shouldn't appear in the headline timeline / forest.
+# data-poor (ECIData.is_low_obs): their posterior is dominated by the prior and
+# a few extreme points. Every fit keeps them; the MIRT axis timelines and the
+# forecast candidates hide them (SOTA families exempt), the K=1 ECI-H timeline
+# draws every dated model. Also the "4 benchmarks" rule of the SOTA list.
 LOW_OBS_THRESHOLD = 4
+
+# ── Informed-ability cap ────────────────────────────────────────────────────
+# A model's ability on an axis counts as measured when its posterior SD is below
+# this cap (analysis.timelines.mirt_informed_mask; history 0.6 -> 0.3 -> 0.4 ->
+# 0.33 in its docstring). The one value behind the measured timelines, the
+# forecast candidates (FORECAST_KW), the country frontier and the bimodality scan.
+INFORMED_SD_CAP = 0.33
 
 # ── Priors (LogNormal mu, sigma on the log scale) ─────────────────────────
 PRIOR_SIGMA_B   = dict(mu=math.log(0.05), sigma=0.5)
@@ -246,7 +253,7 @@ def _load_sota_families() -> list[str]:
 SOTA_FAMILIES: list[str] = _load_sota_families()
 
 # Axes (0-based) where the frontier forecast does NOT grant SOTA the exemption
-# from the SD < 0.4 informed filter. Axis 4 is the legacy knowledge/NLP axis:
+# from the informed filter (SD < INFORMED_SD_CAP). Axis 4 is the legacy knowledge/NLP axis:
 # its defining benchmarks (OpenBookQA 0.89 axis share, ARC (AI2) 0.84,
 # Adversarial NLI 0.82, BoolQ, CSQA2, BBH, SuperGLUE, HellaSwag, PIQA) have no
 # observation on any model released after 2025-06, so every SOTA candidate
@@ -260,13 +267,13 @@ SOTA_FAMILIES: list[str] = _load_sota_families()
 FORECAST_NO_SOTA_AXES: set[int] = {3}
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
-# the per-draw running-max ENVELOPE over the SD<0.33 cloud (non-decreasing by
+# the per-draw running-max ENVELOPE over the informed cloud (non-decreasing by
 # definition, so no draw can carry a negative trend — the record regression it
 # replaces left a third of the Agentic axis's draws with negative slopes),
 # extended forward at its recent rate; 80% HDIs. `fit_start` only matters to
 # the regression bases kept for sensitivity runs (records/frontier/informed).
 # Each caller still supplies its own sota_exempt/backcast_floor/horizon_date.
-FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=0.33,
+FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=INFORMED_SD_CAP,
                    hdi_prob=0.8)
 
 # Optional backcast clamp per axis (envelope basis): a tier already passed at

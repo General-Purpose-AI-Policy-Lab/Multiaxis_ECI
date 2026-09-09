@@ -118,7 +118,7 @@ def raw_df(data: ECIData) -> pd.DataFrame:
 
     Data prep (merge/dedup, benchmark inclusion) is done by benchmark-data-pipeline
     and lives in `0_input/all_scores_flat.csv`. With the canonical defaults
-    (collapse_effort_variants=False, drop_low_obs_models=False) the modeling-stage
+    (drop_low_obs_models=False) the modeling-stage
     transforms that change the row count are (1) the curated exclusion filter
     applied at fit time and (2) the human-baseline merge, so this mirror applies
     both.
@@ -2669,10 +2669,22 @@ class TestLayoutPaths:
         # folder only ever appeared as a path string, the second alternative.
         stale = _re.compile(r'/ *"(data|results|plots|deliverables|blogpost|notebooks)[/"]'
                             r'|"(diagnostics|eci|results|plots|deliverables|blogpost)/')
+        # Prose too (help strings, docstrings, docs, the tracked registry): the
+        # old top-level folders named as paths. `archive/` keeps its history and
+        # the decisions log may quote old paths in dated entries.
+        prose = _re.compile(r"(?<![\w/.\-])(results/(canonical|mirt|Old)|plots/|evals/|notebooks/"
+                            r"|deliverables/|blogpost/|4_diagnostics/dashboard_fits\.json"
+                            r"|1_data/|3_fit\.py)")
         hits = [f"{p.relative_to(PROJECT_ROOT)}:{i}"
                 for p in self._files({".py"})
                 for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
                 if stale.search(line)]
+        hits += [f"{p.relative_to(PROJECT_ROOT)}:{i}"
+                 for p in self._files({".py", ".md", ".json", ".txt", ".sh"})
+                 if not str(p.relative_to(PROJECT_ROOT)).startswith(
+                     ("archive/", "tests/parity", "5_outputs/pre_pipeline/"))
+                 for i, line in enumerate(p.read_text(encoding="utf-8", errors="ignore").splitlines(), 1)
+                 if prose.search(line)]
         assert not hits, f"pre-rename path literals: {hits}"
 
     def test_no_doubled_rename_artifacts(self):
@@ -2776,3 +2788,33 @@ class TestIsolatedFamilies:
     def test_keep_isolated_restores_them(self, data):
         kept = load_eci_data(drop_isolated_families=False)
         assert kept.n_obs > data.n_obs and kept.n_models > data.n_models
+
+
+
+def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
+    """The one guard of the measured timelines, the forecast candidates and the country frontier:
+    a dated, non-human test-taker passes when measured on the axis (SD below the cap, not
+    low-observation) or when its family is SOTA; `sota_exempt=False` withdraws the exemption."""
+    from multiaxis_eci.analysis.timelines import candidate_mask
+    names = ["measured", "wide", "sparse", "sota_wide", "human", "undated"]
+    n = len(names)
+    rng = np.random.default_rng(0)
+    sd = np.array([0.05, 0.9, 0.05, 0.9, 0.05, 0.05])
+    theta = rng.normal(0, 1, (400, n, 1)) * sd[None, :, None]
+    data = ECIData(
+        scores=np.zeros(1), zero_score_mask=np.zeros(1, bool), model_idx=np.zeros(1, int),
+        bench_idx=np.zeros(1, int),
+        mlookup=pd.DataFrame({"model": names, "model_idx": np.arange(1, n + 1)}),
+        blookup=pd.DataFrame({"benchmark": ["b"], "benchmark_idx": [1]}),
+        n_models=n, n_benchmarks=1, n_obs=1, zero_diag_threshold=0.01,
+        n_obs_per_model=np.array([10, 10, 2, 2, 10, 10]),
+        is_low_obs=np.array([False, False, True, True, False, False]),
+        excluded_benchmarks=set(), is_human=np.array([False] * 4 + [True, False]),
+        bench_category=None, is_sota=np.array([False, False, False, True, False, False]))
+    dates = pd.Series(pd.to_datetime(["2025-01-01"] * 5), index=names[:5])
+    keep = candidate_mask(theta, 0, data, dates)
+    assert keep.tolist() == [True, False, False, True, False, False]
+    strict = candidate_mask(theta, 0, data, dates, sota_exempt=False)
+    assert strict.tolist() == [True, False, False, False, False, False]
+    loose = candidate_mask(theta, 0, data, dates, sd_cap=None, drop_low_obs=False)
+    assert loose.tolist() == [True, True, True, True, False, False]

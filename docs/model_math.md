@@ -159,7 +159,7 @@ $$
 
 | Symbol | Meaning |
 |---|---|
-| $c_b \in [0,1)$ | **fixed** lower asymptote (chance floor) of benchmark $b$ — e.g. $0.25$ for 4-choice MC. Read from `benchmark_lower_bounds.csv`. |
+| $c_b \in [0,1)$ | **fixed** lower asymptote (chance floor) of benchmark $b$ — e.g. $0.25$ for 4-choice MC. Read from the view's `lower_bound` column (the pipeline's `benchmarks.csv`). |
 
 As $\eta_n\to-\infty$, $\mu_n\to c_b$; as $\eta_n\to+\infty$, $\mu_n\to 1$. This
 is the classic **3PL** lower-asymptote guessing term, with one crucial

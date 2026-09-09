@@ -188,37 +188,28 @@ def forecast_figures(view, data, raw, names, th_fc,
     from multiaxis_eci.config import FORECAST_KW, FORECAST_NO_SOTA_AXES
     for k in range(K):
         disp = titles.get(names[k], names[k])
-        # Informed cloud at SD < 0.4 (low-obs dropped): the forecast panel
-        # shows only measured abilities — an extrapolated pre-2023 model at
-        # prior-wide CI is not evidence about the frontier. The forecast
-        # set uses 0.4, looser than the 0.3 of the measured timelines,
-        # because the record fit below shares this cap and at 0.3 a thin
-        # axis freezes at 2 records and the line detaches from the data
-        # (axis 4, 2026-08-13). The cloud and the fit must share one cap so
-        # every fitted point is a plotted point. SOTA releases bypass the
-        # filter inside mirt_model_timeline_df and stay drawn with their
-        # honest wide CI. All intervals on this figure set are 50% HDIs:
-        # the whiskers, the human bands, the forecast band and the
-        # crossover dates.
+        # The measured cloud (config.INFORMED_SD_CAP, low-obs dropped, SOTA
+        # families exempt: `candidate_mask`): an extrapolated pre-2023 model at
+        # prior-wide CI is not evidence about the frontier. The cloud and the
+        # fit below share the cap, so every fitted point is a plotted point.
+        # All intervals on this figure set are 50% HDIs: the whiskers, the
+        # human bands, the forecast band and the crossover dates.
         tl = mirt_model_timeline_df(th_fc, k, data, raw,
                                     sd_cap=FORECAST_KW["sd_cap"],
                                     hdi_prob=0.5)
         if tl.empty:
             continue
         try:
-            # Frontier trend on the record set (fit_basis="records",
-            # SD < 0.4 on this axis, low-obs dropped, SOTA exempt from
-            # both filters), fit from Oct 2024 on (the reasoning-model
-            # cutoff). The exemption keeps the frontier releases in the
-            # fit: on a thin axis they carry SD ~1.0-1.5 and their means
-            # are mostly the lineage prior (successor + positive drift),
-            # so the slope is part evidence and part prior. That is the
-            # accepted cost of a line that tracks the visible frontier
-            # instead of stopping at the last well-measured record.
-            # back_start only matters to the regression bases; the
-            # envelope (FORECAST_KW's default) ignores it and draws the
-            # observed record steps from its own window start, with the
-            # forward rate measured over the last rate_window years.
+            # The frontier forecast of config.FORECAST_KW (envelope basis
+            # over the same measured cloud, 80% HDIs), SOTA exempt except
+            # on the axes of FORECAST_NO_SOTA_AXES. On a thin axis the
+            # exempted frontier releases carry SD ~1.0-1.5 and means that
+            # are mostly the lineage prior, so the slope is part evidence
+            # and part prior: the accepted cost of a line that tracks the
+            # visible frontier. back_start only matters to the regression
+            # bases; the envelope draws the observed record steps from its
+            # own window start, the forward rate measured over the last
+            # rate_window years.
             back = pd.to_datetime(tl["release_date"]).min()
             from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
             fc = mirt_frontier_forecast(th_fc, k, data, raw,
