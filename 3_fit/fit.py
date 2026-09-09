@@ -119,8 +119,10 @@ class _Heartbeat:
                   flush=True)
 
 
-# Interval width of the ECI-H timeline figure (the post's figure 1).
+# Interval width and y-range of the ECI-H timeline figure (the post's figure 1): the range
+# keeps one benchmark with a very uncertain difficulty from squashing the cloud.
 TIMELINE_HDI_PROB = 0.80
+TIMELINE_ECI_RANGE = (30, 230)
 
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
@@ -493,7 +495,7 @@ def run_canonical(args) -> None:
         save_fig(capability_timeline_fig(
                     tl_eci, human_stats=humans_eci, lang=lang,
                     hdi_prob=TIMELINE_HDI_PROB, y_label="ECI-H",
-                    human_bands=DEFAULT_HUMAN_BANDS,
+                    y_range=TIMELINE_ECI_RANGE, human_bands=DEFAULT_HUMAN_BANDS,
                     annotate_benchmarks=["GSM8K", "MMLU", "GPQA Diamond", "HLE",
                                          "GSO-Bench", "OSWorld"],
                     annotate_models=[config.ANCHOR_LOW[0], config.ANCHOR_HIGH[0]]),

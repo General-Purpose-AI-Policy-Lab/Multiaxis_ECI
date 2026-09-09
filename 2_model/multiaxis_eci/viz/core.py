@@ -481,7 +481,8 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                              human_band_alpha: float = 0.06,
                              tier_names_at_right: bool = False,
                              tier_font_size: int = 12,
-                             x_min: str | None = None) -> go.Figure:
+                             x_min: str | None = None,
+                             y_range: tuple[float, float] | None = None) -> go.Figure:
     """Capability (models) + difficulty (benchmarks) vs release date.
 
     The one builder behind the canonical ECI-H figure, the blog post's figure 1
@@ -499,7 +500,9 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
     tier display names. `tier_names_at_right` writes each tier's name at the
     right end of its line instead of the legend (the post's arrangement).
     `x_min` drops models and benchmarks released before that date; `y_label`
-    overrides the y-axis title (e.g. "ECI-H" when the frame is on that scale)."""
+    overrides the y-axis title (e.g. "ECI-H" when the frame is on that scale);
+    `y_range` pins the y-axis (the post uses 30 to 220 on ECI-H, so one benchmark
+    with a very uncertain difficulty does not squash the cloud)."""
     text = TIMELINE_TEXT[lang]
     labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
     annotate_benchmarks = set(annotate_benchmarks or [])
@@ -618,7 +621,8 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
         xaxis=dict(type="date", title=text["xaxis"],
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
         yaxis=dict(title=y_label or text["yaxis"],
-                   showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
+                   showgrid=True, gridcolor="rgba(0,0,0,0.06)",
+                   **({"range": list(y_range)} if y_range else {})),
         template="plotly_white",
         height=620, width=1380,
         # Right margin holds the legend (human groups + the two data series):
