@@ -6,7 +6,7 @@ module is the single owner of all four, so a folder name, a trace name and a
 plotted data set cannot drift apart.
 
 `from_trace` recovers the spec of an already-fitted trace. Three sources, in
-order: the `mirt_spec` JSON attr, which 3_fit.py writes, the individual `mirt_*`
+order: the `mirt_spec` JSON attr, which 3_fit/fit.py writes, the individual `mirt_*`
 attrs, and the tokens of the results-folder name for the flags no attr carries
 (`--apply-exclusions`, `--no-sg`, `--ceiling-noise`). A flag a tag cannot carry
 losslessly is REFUSED, not guessed: `_dropFrontierMathv1AlgoTune` cannot be
@@ -25,10 +25,9 @@ import arviz as az
 import numpy as np
 
 from multiaxis_eci.config import (
-    DATA_SUFFIX,
+    FIGURES_DIRNAME,
     HUMAN_ORDER,
     HUMAN_ORDER_MERGED,
-    PLOTS_DIR,
     RESULTS_DIR,
     SG_MODEL_NAME,
 )
@@ -42,7 +41,7 @@ _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
 class FitSpec:
     """The flag set of one compensatory MIRT fit.
 
-    Field names match 3_fit.py's CLI flags. Hashable, so a caller can memoize a
+    Field names match 3_fit/fit.py's CLI flags. Hashable, so a caller can memoize a
     loaded data scope on the spec itself.
     """
     K: int
@@ -126,14 +125,16 @@ class FitSpec:
 
     @property
     def results_dir(self) -> Path:
-        return RESULTS_DIR / ((f"mirt{self.tag}" if self.tag else "mirt") + DATA_SUFFIX)
+        """`5_outputs/<data generation>/mirt{tag}/`: the data generation is the
+        parent folder, so the tag carries only the flag set."""
+        return RESULTS_DIR / (f"mirt{self.tag}" if self.tag else "mirt")
 
     @property
-    def plots_dir(self) -> Path:
-        """Figures land here. K is in the name, unlike `results_dir`: two fits of
-        one flag set differing only in K share a results folder but must not
-        overwrite each other's figures."""
-        return PLOTS_DIR / f"mirt_k{self.K}{self.tag}{DATA_SUFFIX}"
+    def figures_dir(self) -> Path:
+        """`<results_dir>/figures/k{K}/` (PNG) with `html/` beneath it. K is in the
+        name, unlike `results_dir`: two fits of one flag set differing only in K
+        share a results folder but must not overwrite each other's figures."""
+        return self.results_dir / FIGURES_DIRNAME / f"k{self.K}"
 
     @property
     def trace_path(self) -> Path:
@@ -141,10 +142,10 @@ class FitSpec:
 
     @property
     def baseline_trace_path(self) -> Path:
-        """The K=1 baseline 3_fit.py fits beside a K-axis fit. It carries no tag
+        """The K=1 baseline 3_fit/fit.py fits beside a K-axis fit. It carries no tag
         in its filename; current saves stamp its spec as the `mirt_spec` attr,
         and an old attr-less baseline is reconstructed from the folder plus
-        3_fit.py's baseline rule (see `_baseline_spec`)."""
+        3_fit/fit.py's baseline rule (see `_baseline_spec`)."""
         return self.results_dir / "trace_mirt_k1.nc"
 
     @property
@@ -154,8 +155,8 @@ class FitSpec:
                 else HUMAN_ORDER if self.human_prior else None)
 
     def baseline_spec(self) -> FitSpec:
-        """The spec of the K=1 baseline 3_fit.py fits beside this fit: same data
-        scope, every model-side flag off (see `_BASELINE_OFF`). 3_fit.py stamps
+        """The spec of the K=1 baseline 3_fit/fit.py fits beside this fit: same data
+        scope, every model-side flag off (see `_BASELINE_OFF`). 3_fit/fit.py stamps
         this as the baseline trace's `mirt_spec` attr so the trace stays
         self-describing — its folder tokens describe the K-axis fit, not it."""
         return _baseline_spec(self)
@@ -163,7 +164,7 @@ class FitSpec:
     # ── construction ────────────────────────────────────────────────────────
     @classmethod
     def from_args(cls, args, parser=None) -> FitSpec:
-        """Spec from 3_fit.py's parsed exploration flags. `parser` turns a flag
+        """Spec from 3_fit/fit.py's parsed exploration flags. `parser` turns a flag
         conflict into an argparse error instead of a traceback."""
         try:
             return cls(
@@ -238,7 +239,7 @@ class FitSpec:
     def load_data(self, idata=None):
         """The fit's data scope: `(data, floor_c, n_eff)`.
 
-        Same loads, drops, clips and prints 3_fit.py runs before sampling, so a
+        Same loads, drops, clips and prints 3_fit/fit.py runs before sampling, so a
         plot or a GoF number is scored on exactly the observations the trace saw.
         Pass `idata` to have the trace's own `model` / `bench` dims checked
         against it — a trace from an older data generation cannot be indexed
@@ -394,7 +395,7 @@ def _attr_flags(post) -> dict:
 
 
 def _folder_tag(trace_path: Path) -> str:
-    """The tag carried by the trace's PARENT DIRECTORY (`results/mirt{tag}`).
+    """The tag carried by the trace's PARENT DIRECTORY (`5_outputs/<data>/mirt{tag}`).
 
     Read from the folder, not the filename, because a K=1 baseline trace is
     named `trace_mirt_k1.nc` with no tag at all.
@@ -403,12 +404,13 @@ def _folder_tag(trace_path: Path) -> str:
     if name != "mirt" and not name.startswith("mirt_"):
         raise ValueError(f"{trace_path.parent.name!r} is not a MIRT results "
                          "folder (expected mirt or mirt_<tag>)")
-    # The data-generation suffix (config.DATA_SUFFIX) names the folder, not the spec.
+    # Legacy folders carried the data generation as a suffix (config.DATA_SUFFIX);
+    # it named the folder, never the spec.
     return re.sub(r"_data\d{8}$", "", name[4:])
 
 
 def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
-    """The flags a results-folder tag encodes, consumed in the order 3_fit.py
+    """The flags a results-folder tag encodes, consumed in the order 3_fit/fit.py
     writes them. Raises on a token this parser does not know, and on the two
     lossy `_drop` token when no attr supplied its value."""
     rest, out = tag, {}
@@ -481,7 +483,7 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
     return out
 
 
-# The model-side flags 3_fit.py does NOT forward to the K=1 baseline (3_fit.py's
+# The model-side flags 3_fit/fit.py does NOT forward to the K=1 baseline (3_fit/fit.py's
 # baseline call passes floors / ceiling_noise / known_se only). Every
 # other model-side flag is off there whatever the folder tag says; the data-scope
 # flags are the folder's.

@@ -163,16 +163,40 @@ def all_models_stats_df(trace, data: ECIData,
     return df
 
 
-def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
+def _eci_scale_draws(trace, data: ECIData, metric: str):
+    """(C, D) draw matrices on the requested scale.
+
+    metric='C'   → raw capability and raw difficulty D.
+    metric='ECI' → the per-draw affine anchor transform applied to C, and to the
+                   benchmark's 50 % point D/A (the ability at which a model has
+                   even odds on it), so benchmarks sit on the ability scale.
+    """
+    C = flat_C(trace)
+    D = trace.posterior["D"].values.reshape(-1, data.n_benchmarks)
+    if metric == "C":
+        return C, D
+    if metric != "ECI":
+        raise ValueError(f"metric must be 'C' or 'ECI', got {metric!r}")
+    A = trace.posterior["A"].values
+    A = A.reshape(-1, *A.shape[2:])
+    if A.ndim == 3:                       # (draws, bench, axis): K=1 loading
+        A = A[..., 0]
+    t = eci_transform(C, data)
+    return (t.a[:, None] + t.b[:, None] * C,
+            t.a[:, None] + t.b[:, None] * (D / A))
+
+
+def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame, *,
+                      metric: str = "C", hdi_prob: float = 0.95) -> pd.DataFrame:
     """Per-entity posterior summary with release_date attached.
 
     Returns one DataFrame with rows for both models (kind='model', value=C)
     and benchmarks (kind='benchmark', value=D). Used by the capability
     timeline plot. release_date for a benchmark is the earliest release_date
-    among models evaluated against it.
+    among models evaluated against it. `metric='ECI'` puts both on the anchored
+    ECI-H scale (see `_eci_scale_draws`); `hdi_prob` sets the interval width.
     """
-    C = capability_draws(trace)
-    D = trace.posterior["D"].values.reshape(-1, data.n_benchmarks)
+    C, D = _eci_scale_draws(trace, data, metric)
 
     # Same date source as sota_stats_df / the MIRT timelines: dataset dates
     # so a SOTA release
@@ -183,7 +207,7 @@ def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFram
     for i, m in enumerate(data.mlookup["model"].values):
         if m not in model_dates.index:
             continue
-        mean, lo, hi = post_stats(C[:, i])
+        mean, lo, hi = post_stats(C[:, i], hdi_prob)
         rows.append({"name": m, "kind": "model",
                      "release_date": model_dates[m],
                      "mean": mean, "hdi_low": lo, "hdi_high": hi,
@@ -192,7 +216,7 @@ def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFram
     for j, b in enumerate(data.blookup["benchmark"].values):
         if b not in bench_dates.index:
             continue
-        mean, lo, hi = post_stats(D[:, j])
+        mean, lo, hi = post_stats(D[:, j], hdi_prob)
         rows.append({"name": b, "kind": "benchmark",
                      "release_date": bench_dates[b],
                      "mean": mean, "hdi_low": lo, "hdi_high": hi,
@@ -203,21 +227,22 @@ def timeline_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFram
     return out
 
 
-def human_stats_df(trace, data: ECIData) -> pd.DataFrame:
-    """Posterior mean + 95% HDI of C for each fitted human group.
+def human_stats_df(trace, data: ECIData, *, metric: str = "C",
+                   hdi_prob: float = 0.95) -> pd.DataFrame:
+    """Posterior median + central interval of C (or ECI-H) for each fitted human group.
 
     Humans are now full test-takers in the IRT (added to the dataset as
     rows in load_eci_data). This returns one row per group: name, mean,
-    hdi_low, hdi_high, n_obs.
+    hdi_low, hdi_high, n_obs. `metric` and `hdi_prob` as in `timeline_stats_df`.
     """
     if not data.is_human.any():
         return pd.DataFrame(columns=["name", "mean", "hdi_low", "hdi_high", "n_obs"])
-    C_flat = flat_C(trace)
+    C_flat, _ = _eci_scale_draws(trace, data, metric)
     rows = []
     for i, m in enumerate(data.mlookup["model"].values):
         if not data.is_human[i]:
             continue
-        mean, lo, hi = post_stats(C_flat[:, i])
+        mean, lo, hi = post_stats(C_flat[:, i], hdi_prob)
         rows.append({"name": m, "mean": mean, "hdi_low": lo, "hdi_high": hi,
                      "n_obs": int(data.n_obs_per_model[i])})
     return pd.DataFrame(rows).sort_values("mean").reset_index(drop=True)

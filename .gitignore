@@ -15,31 +15,30 @@ build/
 # nutpie's store writes unconditionally. Thousands of chunk files each.
 **/live_draws.zarr/
 
-# Generated plots (regenerable via 2_fit.py --plots / 3_diagnostics/3_plot_mirt.py) — incl. the optional --png dashboard stills
-plots/
+# Generated figures: every fit's figures/ (PNG + html/) under 5_outputs/, regenerable from the
+# traces via 3_fit.py --plots / 4_diagnostics/3_plot_mirt.py; the dashboard stills likewise.
+5_outputs/**/figures/
+5_outputs/**/dashboard_stills/
 
-# Dashboard render cache (regenerable via 3_diagnostics/4_build_dashboard.py);
+# Dashboard render cache (regenerable via 4_diagnostics/4_build_dashboard.py);
 # the dashboard itself is the tracked repo-root index.html.
-results/dashboard_cache/
+5_outputs/dashboard_cache/
 
-# Diagnostic outputs (regenerable via 3_diagnostics/*.py)
-results/residual_corr_*.csv
+# Diagnostic outputs (regenerable via 4_diagnostics/*.py)
+5_outputs/**/diagnostics/
 
 # Per-row result dumps (regenerable from the traces on every fit). These are the
 # big ones — per-observation residuals (~3,700 rows) and per-model factor scores
 # (~750 rows) — and they churned the diff by ~15k lines per run for no signal.
 # The small summary tables (loadings, inclusion, factor_corr, tau, gof JSON) stay
 # tracked.
-results/**/*residuals*.csv
-results/**/*factor_scores*.csv
+5_outputs/**/*residuals*.csv
+5_outputs/**/*factor_scores*.csv
 
 # Regenerable comparison/diagnostic HTML under results/ (bulky inlined Plotly,
 # ~4 MB each). Keep the curated PNGs + CSV/JSON summaries; drop the interactive
 # HTML — it regenerates from compare_human_prior.py / the fit drivers.
-results/**/*.html
-
-# Data pipeline snapshots (one dated folder per fetch; regenerable)
-1_data/1_pipeline/snapshots/
+5_outputs/**/*.html
 
 # Backup files
 *.bak
@@ -60,14 +59,11 @@ nohup.out
 *.swp
 *.bak-*
 
-# Pipeline per-stage intermediates (regenerable by the notebook)
-1_data/1_pipeline/intermediate/
-
-# Eval harness artifacts (evals/*): run outputs are large and regenerable, the
+# Local scoring-harness artifacts (internal_evals/*): run outputs are large and regenerable, the
 # dataset is third-party and fetched on demand, and a key file must never be
 # committed. The harness reads OPENROUTER_API_KEY from the environment.
-evals/*/out/
-evals/*/data_cache/
+internal_evals/*/out/
+internal_evals/*/data_cache/
 .env
 
 # Agent tool scratch
@@ -78,7 +74,7 @@ memo/
 slides/
 
 # Legacy PPCA/ARD posterior dumps (regenerable, >100 MB, over GitHub's file limit)
-results/**/*.nc
+5_outputs/**/*.nc
 CLAUDE.md
 
 # LaTeX writes this at the repo root when a compile is started from here
@@ -88,16 +84,16 @@ texput.log
 # deliverable itself, not a render of one. Their interactive Plotly twins are
 # not, on the same grounds as the results/ HTML above — ~4.7 MB each of inlined
 # JS that no diff compresses, rebuilt by figures/make_all.py from the trace.
-blogpost/**/*.html
+6_writeups/blogpost/**/*.html
 
 # Per-fit caches rebuilt from the trace on demand. The theta view is a 2.5 GB
 # float32 dump, over GitHub's file limit on its own.
-results/**/*.f32.npy
-results/**/lw_forecast_cache_*.pkl
-results/**/rhat_cache.npz
+5_outputs/**/*.f32.npy
+5_outputs/**/lw_forecast_cache_*.pkl
+5_outputs/**/rhat_cache.npz
 
 # Per-fit run logs
-results/**/*.log
+5_outputs/**/*.log
 
 # Agent tooling
 .claude/

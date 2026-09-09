@@ -120,7 +120,7 @@ def build_mirt_interaction_model(data: ECIData, plt_founders, K: int = 3,
         HalfNormal cells, no founders (see module docstring).
     floor_c : optional (n_benchmarks,) array
         Fixed per-benchmark chance floors -> fixed-c 3PL link. Pair with
-        data.clip_scores_to_floors in the driver, as 3_fit.py does under its default-on floors.
+        data.clip_scores_to_floors in the driver, as 3_fit/fit.py does under its default-on floors.
 
     Trace variables: `A` (loadings), `D` (difficulty), `gamma` (interaction,
     bench x pair — always present), `theta` (reported ability), `theta_pos`

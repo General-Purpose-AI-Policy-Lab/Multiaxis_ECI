@@ -13,7 +13,7 @@ def convergence(idata) -> dict:
     """Global max r-hat / min ESS / divergences (nan-safe for masked entries).
 
     The one copy every fit driver imports — it drifted when each driver
-    carried its own (3_fit.py's lacked the nan-safety, so pt1's constant
+    carried its own (3_fit/fit.py's lacked the nan-safety, so pt1's constant
     tau_A printed NaN as the max r-hat)."""
     rh = az.rhat(idata)
     ess = az.ess(idata)

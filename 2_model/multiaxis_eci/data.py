@@ -570,7 +570,7 @@ class ECIData:
     is_human: np.ndarray          # (n_models,) bool — True for fitted human-group rows
     # Benchmark category per benchmark index (same order as blookup). Surfaced
     # for downstream metadata only — e.g. labelling MIRT factor loadings by
-    # category (3_fit.py). The model never reads it. Defaults to
+    # category (3_fit/fit.py). The model never reads it. Defaults to
     # None so existing constructors (tests, replace()) don't have to supply it.
     bench_category: np.ndarray | None = None
     # (n_obs,) float — effective test length implied by the reported harness

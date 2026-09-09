@@ -2,6 +2,7 @@
 capability/difficulty timeline."""
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import numpy as np
@@ -21,11 +22,37 @@ PASSED_COLOR = "#2ca02c"
 FUTURE_COLOR = "#d62728"
 
 
-def save_fig(fig: go.Figure, name: str, plots_dir: Path) -> None:
-    plots_dir.mkdir(parents=True, exist_ok=True)
-    fig.write_html(plots_dir / f"{name}.html")
+_AXIS_KEY = re.compile(r"^(timeline|loadings|forecast)_(\d+)_(.+)$")
+_KEY_SUFFIXES = {"_when": "_crossover_dates", "_prob": "_exceedance_probability"}
+
+
+def figure_filename(key: str) -> str:
+    """The on-disk name of a figure key.
+
+    Figure keys stay short because the dashboard and the blog post address panels
+    by them; files get the explicit form: `timeline_2_reasoning` ->
+    `timeline_axis2_reasoning`, `forecast_1_math_when` ->
+    `forecast_axis1_math_crossover_dates`, `forecast_1_math_prob` ->
+    `forecast_axis1_math_exceedance_probability`. Other keys are unchanged.
+    """
+    m = _AXIS_KEY.match(key)
+    if m is None:
+        return key
+    kind, k, rest = m.groups()
+    for short, long in _KEY_SUFFIXES.items():
+        if rest.endswith(short):
+            rest = rest[: -len(short)] + long
+            break
+    return f"{kind}_axis{k}_{rest}"
+
+
+def save_fig(fig: go.Figure, name: str, figures_dir: Path) -> None:
+    """One PNG in `figures_dir`, its interactive twin in `figures_dir/html/`."""
+    html_dir = figures_dir / "html"
+    html_dir.mkdir(parents=True, exist_ok=True)
+    fig.write_html(html_dir / f"{name}.html")
     try:
-        fig.write_image(plots_dir / f"{name}.png", scale=2)
+        fig.write_image(figures_dir / f"{name}.png", scale=2)
     except Exception as e:
         print(f"  PNG export skipped for {name} ({type(e).__name__}: {e})")
 
@@ -390,7 +417,7 @@ def sota_forest_fig(sota_df: pd.DataFrame,
     return fig
 
 
-# ── Capability / difficulty timeline ──────────────────────────────────────
+# ── Capability / difficulty timeline ──────────────────────────────────────────
 HUMAN_LEVEL_LABELS_FR = {
     "Committee of Average Humans":  "Comité d'humains moyens",
     "Average Human":                "Humain moyen",
@@ -403,30 +430,90 @@ HUMAN_LEVEL_LABELS_FR = {
     "High School Qualifier":        "Lycéen qualifié",
     "High School Top Performer":    "Lycéen, meilleur performeur",
 }
+# Tier display names per language; English keeps the raw tier names.
+HUMAN_LEVEL_LABELS = {"en": {}, "fr": HUMAN_LEVEL_LABELS_FR}
+
+# Every string the timeline draws, per language. English is the default of every
+# figure; the French render goes to a `fr/` folder beside it (3_fit.py writes both).
+TIMELINE_TEXT = {
+    "en": {"title": "AI capability, human baselines and benchmark difficulty",
+           "xaxis": "Release date", "yaxis": "Estimated capability / difficulty",
+           "humans": "Human tiers", "bench": "Benchmark difficulty", "models": "AI models",
+           "interval": lambda p: f"{p:.0%} interval"},
+    "fr": {"title": "Capacités des IA, références humaines et difficulté des benchmarks",
+           "xaxis": "Date de sortie", "yaxis": "Capacité / difficulté estimée",
+           "humans": "Niveaux humains", "bench": "Difficulté des benchmarks",
+           "models": "Modèles d'IA",
+           "interval": lambda p: f"intervalle à {p * 100:.0f} %"},
+}
+# The two tiers whose interval the 1D ECI-H figures draw as a band by default:
+# the bottom and the top of the human ladder, so the reader gets its bounds.
+DEFAULT_HUMAN_BANDS = ("Average Human", "Top Performer")
+BENCH_COLOR = "#d63384"
+MODEL_COLOR = "#20a39e"
+
+
+def _rgba(rgb_str: str, alpha: float) -> str:
+    """'rgb(R,G,B)' → 'rgba(R,G,B,alpha)'. Plotly's sample_colorscale returns
+    rgb()-form strings; add_hrect needs rgba() to honor alpha."""
+    inner = rgb_str[rgb_str.index("(") + 1 : rgb_str.index(")")]
+    return f"rgba({inner},{alpha})"
+
+
+def human_tier_palette(n: int) -> list[str]:
+    """Sequential Blues, strongest tier darkest; both ends avoided (too light is
+    invisible on white, too dark too bold under translucent band overlap)."""
+    import plotly.colors as pc
+    fractions = np.linspace(0.92, 0.35, n) if n > 1 else [0.7]
+    return [pc.sample_colorscale("Blues", float(f))[0] for f in fractions]
 
 
 def capability_timeline_fig(timeline_df: pd.DataFrame,
                              human_stats: pd.DataFrame | None = None,
                              annotate_benchmarks: list[str] | None = None,
                              annotate_models: list[str] | None = None,
-                             human_labels: dict | None = None) -> go.Figure:
+                             human_labels: dict | None = None,
+                             *,
+                             lang: str = "en",
+                             hdi_prob: float | None = None,
+                             y_label: str | None = None,
+                             human_bands: bool | tuple[str, ...] | None = None,
+                             human_band_alpha: float = 0.06,
+                             tier_names_at_right: bool = False,
+                             tier_font_size: int = 12,
+                             x_min: str | None = None) -> go.Figure:
     """Capability (models) + difficulty (benchmarks) vs release date.
 
-    Recreates the EpochAI-style chart: latent IRT scale on Y, release date on X.
+    The one builder behind the canonical ECI-H figure, the blog post's figure 1
+    and the dashboard's per-axis timelines. Latent scale on Y, release date on X.
     Models in teal, benchmarks in pink, both with interval bars at the width the
-    caller's stats frame carries (95% on the 1D path, 50% on the MIRT
-    timelines — the on-figure titles set by callers say which). Human groups
-    appear as dashed horizontal mean lines, labeled via `human_labels` (default
-    HUMAN_LEVEL_LABELS_FR; pass {} for the raw English tier names)."""
-    labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
+    caller's stats frame carries; pass `hdi_prob` to name that width in the legend
+    (the dashboard titles its 50% timelines itself and leaves it unset).
+
+    Human tiers are dashed horizontal median lines, strongest darkest. `human_bands`
+    adds the tier's interval as a faint band under every point: True for every
+    tier (the post), a tuple of tier names for a subset (`DEFAULT_HUMAN_BANDS`, the
+    canonical ECI-H figure), None for lines only.
+
+    `lang` picks the labels ("en" default, "fr"); `human_labels` overrides the
+    tier display names. `tier_names_at_right` writes each tier's name at the
+    right end of its line instead of the legend (the post's arrangement).
+    `x_min` drops models and benchmarks released before that date; `y_label`
+    overrides the y-axis title (e.g. "ECI-H" when the frame is on that scale)."""
+    text = TIMELINE_TEXT[lang]
+    labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
     annotate_benchmarks = set(annotate_benchmarks or [])
     annotate_models = set(annotate_models or [])
+    interval = f" ({text['interval'](hdi_prob)})" if hdi_prob else ""
 
     # Cast to date strings — plotly auto-detects as time-axis, kaleido can JSON-serialize.
     # (Timestamps break kaleido PNG export; .dt.to_pydatetime() trips a benches-only NaN
     # bug in the trace builder. Strings sidestep both.)
     tl = timeline_df.copy()
-    tl["release_date"] = pd.to_datetime(tl["release_date"]).dt.strftime("%Y-%m-%d")
+    tl["release_date"] = pd.to_datetime(tl["release_date"])
+    if x_min is not None:
+        tl = tl[tl["release_date"] >= pd.Timestamp(x_min)]
+    tl["release_date"] = tl["release_date"].dt.strftime("%Y-%m-%d")
 
     models = tl[tl["kind"] == "model"]
     benches = tl[tl["kind"] == "benchmark"]
@@ -434,38 +521,32 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
     fig = go.Figure()
 
     # Human posterior reference levels (drawn first so AI/benchmark points sit
-    # on top). For each group: a dashed mean line in a per-group color, sampled
-    # from a sequential "Blues" palette so weakest → strongest reads light →
-    # dark. No HDI band: with 9 groups the translucent bands overlap into one
-    # unreadable slab wherever tiers are prior-driven and near-identical.
-    # Labels live in the Plotly legend on the right (not as on-plot
-    # annotations) so the chart body stays uncluttered even with 7+ groups.
+    # on top): a dashed median line per tier, the interval band for the tiers
+    # `human_bands` names. Tier names live in the legend on the right, or at the
+    # right end of the lines with `tier_names_at_right`.
     if human_stats is not None and len(human_stats):
-        import plotly.colors as pc
-        # Sort strongest → weakest so the legend reads top-down in the same
-        # order as the plot (highest mean at top of legend AND top of chart).
         rows = human_stats.sort_values("mean", ascending=False).reset_index(drop=True)
-        n = len(rows)
-        # Sample a sequential colorscale; strongest = darkest, weakest = lightest.
-        # Avoid both ends — too-light invisible on white, too-dark too bold
-        # under translucent band overlap.
-        fractions = np.linspace(0.92, 0.35, n) if n > 1 else [0.7]
-        palette = [pc.sample_colorscale("Blues", float(f))[0] for f in fractions]
-
-        def _to_rgba(rgb_str: str, alpha: float) -> str:
-            """'rgb(R,G,B)' → 'rgba(R,G,B,alpha)'. Plotly's sample_colorscale
-            returns rgb()-form strings; add_hrect needs rgba() to honor alpha."""
-            inner = rgb_str[rgb_str.index("(") + 1 : rgb_str.index(")")]
-            return f"rgba({inner},{alpha})"
-
+        palette = human_tier_palette(len(rows))
+        if human_bands is True:
+            banded = set(rows["name"])
+        else:
+            banded = set(human_bands or ())
+        for i, (_, r) in enumerate(rows.iterrows()):
+            if r["name"] in banded:
+                fig.add_hrect(y0=float(r["hdi_low"]), y1=float(r["hdi_high"]),
+                              fillcolor=_rgba(palette[i], human_band_alpha),
+                              line_width=0, layer="below")
         for i, (_, r) in enumerate(rows.iterrows()):
             label_name = labels.get(r["name"], r["name"])
-            legend_label = f"{label_name} (n={r['n_obs']})"
-            line_color = _to_rgba(palette[i], 0.85)
-
+            line_color = _rgba(palette[i], 0.85)
             fig.add_hline(y=r["mean"],
                           line=dict(color=line_color, dash="dash", width=1.3),
                           layer="below")
+            if tier_names_at_right:
+                continue
+            legend_label = f"{label_name} (n={r['n_obs']})"
+            if r["name"] in banded and hdi_prob:
+                legend_label += f", {text['interval'](hdi_prob)}"
             # Invisible Scatter trace solely to surface this group in the
             # Plotly legend (add_hrect/add_hline don't produce legend entries).
             fig.add_trace(go.Scatter(
@@ -473,19 +554,33 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                 line=dict(color=line_color, dash="dash", width=1.8),
                 name=legend_label,
                 legendgroup="humans",
-                legendgrouptitle_text="Niveaux humains" if i == 0 else None,
+                legendgrouptitle_text=text["humans"] if i == 0 else None,
                 hoverinfo="skip",
             ))
+        if tier_names_at_right:
+            # Crowded tiers are nudged apart vertically (top-down), so a name can
+            # sit a little off its line.
+            lo = min(tl["hdi_low"].min(), rows["hdi_low"].min())
+            hi = max(tl["hdi_high"].max(), rows["hdi_high"].max())
+            gap = 0.038 * (hi - lo)
+            prev = np.inf
+            for i, (_, r) in enumerate(rows.iterrows()):
+                y = min(float(r["mean"]), prev - gap)
+                prev = y
+                fig.add_annotation(
+                    x=1.005, y=y, xref="paper", yref="y",
+                    text=labels.get(r["name"], r["name"]), showarrow=False,
+                    xanchor="left", font=dict(size=tier_font_size, color=palette[i]))
 
     # Benchmarks (difficulty)
     fig.add_trace(go.Scatter(
         x=benches["release_date"], y=benches["mean"], mode="markers",
-        marker=dict(color="#d63384", size=8, line=dict(width=0)),
+        marker=dict(color=BENCH_COLOR, size=8, line=dict(width=0)),
         error_y=dict(type="data", symmetric=False,
                      array=(benches["hdi_high"] - benches["mean"]).values,
                      arrayminus=(benches["mean"] - benches["hdi_low"]).values,
-                     color="#d63384", thickness=1.4, width=2),
-        name="Difficulté des benchmarks",
+                     color=BENCH_COLOR, thickness=1.4, width=2),
+        name=text["bench"] + interval, legendgroup="benchmarks",
         text=benches["name"],
         hovertemplate="<b>%{text}</b><br>D = %{y:.2f}<br>%{x|%Y-%m-%d}<extra></extra>",
     ))
@@ -493,12 +588,12 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
     # Models (capability)
     fig.add_trace(go.Scatter(
         x=models["release_date"], y=models["mean"], mode="markers",
-        marker=dict(color="#20a39e", size=7, opacity=0.85, line=dict(width=0)),
+        marker=dict(color=MODEL_COLOR, size=7, opacity=0.85, line=dict(width=0)),
         error_y=dict(type="data", symmetric=False,
                      array=(models["hdi_high"] - models["mean"]).values,
                      arrayminus=(models["mean"] - models["hdi_low"]).values,
                      color="rgba(32,163,158,0.35)", thickness=1.0, width=0),
-        name="Capacité des modèles IA",
+        name=text["models"] + interval, legendgroup="models",
         text=models["name"],
         hovertemplate="<b>%{text}</b><br>C = %{y:.2f}<br>%{x|%Y-%m-%d}<extra></extra>",
     ))
@@ -516,19 +611,18 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                                font=dict(size=10, color="#666"))
 
     fig.update_layout(
-        title=dict(text="Capacités IA vs niveaux humains", x=0.5),
+        title=dict(text=text["title"], x=0.5),
         # type="date" is explicit because we add legend-only dummy traces
         # (x=[None]) before the real data traces; without it Plotly defaults
         # to numeric and silently drops the date-string scatters.
-        xaxis=dict(type="date", title="Date de sortie",
+        xaxis=dict(type="date", title=text["xaxis"],
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
-        yaxis=dict(title="Capacité / difficulté estimée",
+        yaxis=dict(title=y_label or text["yaxis"],
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
         template="plotly_white",
         height=620, width=1380,
-        # Right margin holds the legend (human groups + the two data series) —
-        # bumped from 200 because adding the human group title + 7 entries
-        # needs ~ 290px before clipping.
+        # Right margin holds the legend (human groups + the two data series):
+        # the group title + 7 entries need ~290px before clipping.
         margin=dict(l=70, r=290, t=80, b=55),
         legend=dict(
             orientation="v",
@@ -540,5 +634,3 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
         ),
     )
     return fig
-
-

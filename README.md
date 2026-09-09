@@ -11,9 +11,9 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
 
-<img src="blogpost/figures/loadings_axes_plotly_draft.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
+<img src="6_writeups/blogpost/figures/loadings_axes_plotly_draft.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
 
-<img src="blogpost/figures/forecast_trend_plotly_majority.png" width="560" alt="Frontier trend per axis (majority chains): record envelope extended at its recent rate, with human tiers">
+<img src="6_writeups/blogpost/figures/forecast_trend_plotly_majority.png" width="560" alt="Frontier trend per axis (majority chains): record envelope extended at its recent rate, with human tiers">
 
 Scope of the published fits: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions. On the pipeline build of 2026-09-07 the same scopes hold 5,402 / 905 / 97 and 4,571 / 846 / 89 (see the Data section).
 
@@ -39,20 +39,20 @@ Two modeling-stage filters apply at load time: the curated exclusion list below,
 
 What stays in this repository is what belongs to the model, under `1_curated/`: the "easy for humans" exclusion list of the canonical K=1 index, the reviewed lineage map and its overrides, the data-driven SOTA list, the reviewed clips of below-floor scores, the optional SimpleQA original column and Epoch's reference ECI table. See [`1_curated/README.md`](1_curated/README.md).
 
-The data generation is part of every output folder name: `results/canonical_data20260907/` was fitted on the pipeline build of 2026-09-07 (`config.DATA_SUFFIX`), so a fit on a newer build never overwrites an older one. The results published with the post (`results/canonical/`, `results/mirt_*/`, `index.html`) were fitted on the pre-pipeline dataset described in the post; they are kept as they were.
+Every output goes under `5_outputs/<data generation>/`: `5_outputs/data20260908/canonical/` was fitted on the pipeline build of 2026-09-08 (`config.DATA_TAG`), so a fit on a newer build never overwrites an older one. The results published with the post (`5_outputs/pre_pipeline/`, `index.html`) were fitted on the pre-pipeline dataset described in the post; they are kept as they were.
 
 ## Run
 
 Main project fit with K=4.
 
 ```bash
-python 3_fit.py --K 4 --human-merge --lineage-prior --lineage-bm
+python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm
 ```
 
-The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `results/canonical<data suffix>/`:
+The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical/`:
 
 ```bash
-python 3_fit.py --preset canonical
+python 3_fit/fit.py --preset canonical
 ```
 
 ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2024-10-22) = 130 and GPT-5 (2025-08-07, medium) = 150, matching the scale of Epoch's dashboard. Every other flag, where a fit's output lands, and the plot / diagnose / dashboard commands: [docs/cli.md](docs/cli.md).
@@ -62,22 +62,20 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 ├── 0_input/             # step 0: the pipeline's views and tables, synced (all_scores_flat, human_baselines, models, benchmarks, manifest, provenance)
 ├── 1_curated/           # step 1: inputs specific to this model, and the two builders (SOTA list, lineage map)
 ├── 2_model/multiaxis_eci/  # step 2: the library: config, data loading, models, analysis, figures, sync
-├── 3_fit.py             # step 3: the fit CLI (canonical preset + exploration)
+├── 3_fit/fit.py             # step 3: the fit CLI (canonical preset + exploration)
 ├── 4_diagnostics/       # step 4: post-fit tools, the numbered four in reproduction order
-├── notebooks/           # one-off investigations, kept for the record, not maintained
-├── evals/               # local eval harnesses (LAB-Bench cloning); needs OPENROUTER_API_KEY
-├── results/             # one folder per fit; canonical/ is the published index, Old/ the archive
-├── plots/               # figures per fit (gitignored, regenerable)
-├── blogpost/            # the research post's figures and its LOO ladder (the deliverable)
-├── deliverables/        # figure + table sets built for a specific write-up
+├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace, figures/; pre_pipeline/ holds the published fits
+├── 6_writeups/          # step 6: the research post (blogpost/), the US-China frontier note (us_cn_frontier/), the dashboard's card registry
+├── internal_evals/      # the lab's own scoring runs (LAB-Bench cloning through OpenRouter); needs OPENROUTER_API_KEY
+├── archive/             # kept for the record, not maintained: notebooks/ (one-off investigations), results_old/ (superseded fits)
 ├── docs/                # model math, CLI reference, figure catalogue
 ├── tests/               # fast unit tests + golden logp locks
-└── index.html           # the all-fits dashboard (tracked)
+└── index.html           # the all-fits dashboard (tracked, served as is)
 ```
 
-Numbered entries are the reproduction path, in order. Everything else is a library, an output folder or a reference. Inside `1_curated/` and `4_diagnostics/` the same rule applies.
+Numbered entries are the reproduction path, in order: inputs, curation, model, fit, diagnostics, outputs, write-ups. Everything else is a reference. Inside `1_curated/` and `4_diagnostics/` the same rule applies.
 
-Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [4_diagnostics/README.md](4_diagnostics/README.md). What each notebook investigated: [notebooks/README.md](notebooks/README.md).
+Full model math, priors and identification: [docs/model_math.md](docs/model_math.md). Figures and how to read them: [docs/plots.md](docs/plots.md). What each post-fit script does: [4_diagnostics/README.md](4_diagnostics/README.md). What each notebook investigated: [archive/notebooks/README.md](archive/notebooks/README.md).
 
 ## Method
 
@@ -121,6 +119,6 @@ On the **Legacy QA** axis specifically, the human lead is a comparison against a
 
 ## License
 
-CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `1_curated/` and `results/`.
+CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `1_curated/` and `5_outputs/`.
 
 The upstream benchmark scores carry their own terms. Epoch AI is CC-BY and requires attribution, RAND is cited under RR-A3797-1, and Scale SEAL has no open license. What to credit when republishing: [NOTICE.md](NOTICE.md).

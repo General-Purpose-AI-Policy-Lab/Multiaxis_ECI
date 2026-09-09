@@ -42,7 +42,7 @@ DATE_COLS = ["crossover_date_median", "crossover_hdi_low", "crossover_hdi_high",
 
 
 def main():
-    cmp_dir = config.RESULTS_DIR / "comparisons"
+    cmp_dir = config.COMPARISONS_DIR
     dfs = {tag: pd.read_csv(cmp_dir / f"country_crossover_{tag}.csv",
                             parse_dates=DATE_COLS)
            for tag in ("canonical", "canonical_open", "canonical_closed")}
@@ -102,8 +102,9 @@ def main():
                    xanchor="center", x=0.5),
         margin=dict(l=200, r=40, t=90, b=80), height=820, width=1650)
 
-    save_fig(fig, "country_crossovers", config.PLOTS_DIR)
-    print(f"wrote {config.PLOTS_DIR / 'country_crossovers.html'}")
+    figures_dir = config.COMPARISONS_DIR / config.FIGURES_DIRNAME
+    save_fig(fig, "country_crossovers", figures_dir)
+    print(f"wrote {figures_dir / 'country_crossovers.png'} (+ html/)")
 
 
 if __name__ == "__main__":

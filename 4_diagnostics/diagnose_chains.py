@@ -31,11 +31,11 @@ re-detect it. That path needs no data scope, so it also works on a trace whose
 data generation has since moved.
 
 Outputs:
-  results/comparisons/chain_verdicts.csv  — one row per --name (idempotent:
-                                            re-running replaces the row).
-  plots/mirt/chains_<name>.pdf            — with --fig: Δlogp bars, top
+  <data generation>/comparisons/chain_verdicts.csv — one row per --name
+                                            (idempotent: re-running replaces the row).
+  <data generation>/diagnostics/chains_<name>.pdf — with --fig: Δlogp bars, top
                                             D-spread, chain-distance map.
-  results/<fit>/mirt_modes_<stem>.json    — with --write-modes: chains, Δlogp
+  <fit>/mirt_modes_<stem>.json            — with --write-modes: chains, Δlogp
                                             and matched loading corr per mode.
 
 Run:
@@ -64,6 +64,7 @@ from scipy.spatial.distance import pdist, squareform
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
+from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis import mirt_identified_rhat  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
 
@@ -314,7 +315,7 @@ def main():
                     help="write mirt_modes.json next to the trace and stop "
                          "(no data load, so a superseded trace still splits)")
     ap.add_argument("--out-csv",
-                    default=str(ROOT / "results/comparisons/chain_verdicts.csv"))
+                    default=str(config.COMPARISONS_DIR / "chain_verdicts.csv"))
     args = ap.parse_args()
 
     print(f"Loading {args.trace} ...", flush=True)
@@ -411,7 +412,7 @@ def main():
     print(f"  verdict row → {out_csv}")
 
     if args.fig:
-        fig_path = ROOT / "plots" / "mirt" / f"chains_{args.name}.pdf"
+        fig_path = config.DIAGNOSTICS_DIR / f"chains_{args.name}.pdf"
         _figure(f"{args.name} — {verdict} (logp spread {logp_spread:.0f} nats, "
                 f"div {divergences})",
                 below, ~island_mask, dspread,

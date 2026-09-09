@@ -24,7 +24,7 @@ Plus one shared figure (in comparison/):
 Run:  python 4_diagnostics/compare_human_prior.py
 
 HISTORICAL: the trace pairs in `PAIRS` were fitted under the retired
-`noard_aqmatrix` grammar, which no current 3_fit.py flag set can regenerate.
+`noard_aqmatrix` grammar, which no current 3_fit/fit.py flag set can regenerate.
 The script skips gracefully when the traces are absent (any fresh clone), and
 is kept as the record of how the human-prior confirmation was run.
 """
@@ -50,15 +50,15 @@ from multiaxis_eci.persistence import save_df  # noqa: E402
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt  # noqa: E402
 from multiaxis_eci.viz import save_fig  # noqa: E402
 
-OUT = ROOT / "results" / "Old" / "mirt_humanprior" / "comparison"
+OUT = ROOT / "archive" / "results_old" / "mirt_humanprior" / "comparison"
 MONO_EPS = 1e-3
 PAIRS = [
     {"K": 3, "label": "K=3 skills",
-     "independent": ROOT / "results" / "Old" / "mirt" / "trace_mirt_k3_noard_aqmatrix3.nc",
-     "ordered": ROOT / "results" / "Old" / "mirt_humanprior" / "trace_mirt_k3_noard_aqmatrix3_humanprior.nc"},
+     "independent": ROOT / "archive" / "results_old" / "mirt" / "trace_mirt_k3_noard_aqmatrix3.nc",
+     "ordered": ROOT / "archive" / "results_old" / "mirt_humanprior" / "trace_mirt_k3_noard_aqmatrix3_humanprior.nc"},
     {"K": 4, "label": "K=4 skills + multimodal",
-     "independent": ROOT / "results" / "Old" / "mirt" / "trace_mirt_k4_noard_aqmatrix4.nc",
-     "ordered": ROOT / "results" / "Old" / "mirt_humanprior" / "trace_mirt_k4_noard_aqmatrix4_humanprior.nc"},
+     "independent": ROOT / "archive" / "results_old" / "mirt" / "trace_mirt_k4_noard_aqmatrix4.nc",
+     "ordered": ROOT / "archive" / "results_old" / "mirt_humanprior" / "trace_mirt_k4_noard_aqmatrix4_humanprior.nc"},
 ]
 
 

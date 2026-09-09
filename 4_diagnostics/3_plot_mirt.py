@@ -1,4 +1,4 @@
-"""Plot a SINGLE MIRT fit in detail — run AFTER a 3_fit.py / fits/* fit.
+"""Plot a SINGLE MIRT fit in detail — run AFTER a 3_fit/fit.py / fits/* fit.
 
 Single-fit deep-dive. Rotation/identity handling (`analysis.prepare_fit`) and
 every figure builder (`viz/`) are the dashboard's
@@ -8,7 +8,8 @@ block.
 
 The fit's flag set, its data scope and its results folder come from
 `analysis.FitSpec.from_trace`, so a trace path is the only thing a caller has
-to name. Per-figure PNG/HTML are written to `plots/<out>/` (git-ignored) for
+to name. Per-figure PNG (and HTML under `html/`) are written to the fit's
+`figures/k{K}/` folder (git-ignored) for
 iterating on one freshly-fit trace without rebuilding the whole dashboard.
 
 Run:
@@ -53,6 +54,7 @@ from multiaxis_eci.viz import (  # noqa: E402
     axes_scatter_matrix_fig,
     build_fit_figures,
     factor_vs_1d_fig,
+    figure_filename,
     per_bench_r2_delta_fig,
     pit_ecdf_fig,
     pred_scatter_fig,
@@ -95,11 +97,11 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     # earlier tag grammar sits in a folder the spec no longer derives, and its
     # own folder is the one that holds its files.
     results_dir = trace_path.parent
-    plots_dir = Path(out) if out else spec.plots_dir
-    plots_dir.mkdir(parents=True, exist_ok=True)
+    figures_dir = Path(out) if out else spec.figures_dir
+    figures_dir.mkdir(parents=True, exist_ok=True)
     if results_dir != spec.results_dir:
         print(f"  trace folder {results_dir.name!r} predates this spec's tag "
-              f"{spec.tag!r}; per-fit files read from there, figures → {plots_dir}")
+              f"{spec.tag!r}; per-fit files read from there, figures → {figures_dir}")
 
     raw = pd.read_csv(PROCESSED_FILE)
     data, floor_c, n_eff = spec.load_data(idata)
@@ -165,7 +167,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             r = float(np.corrcoef(a1, tb)[0, 1])
             figs["factor1_vs_1d"] = factor_vs_1d_fig(tb, a1, mod, r)
 
-            # 3_fit.py fits the K=1 baseline with the same likelihood options.
+            # 3_fit/fit.py fits the K=1 baseline with the same likelihood options.
             pred_1d = posterior_predictive_mirt(idata_1d, data, floor_c=floor_c,
                                                 n_eff=n_eff).mean(axis=0)
             resid_kd = data.scores - gof.y_pred_mean
@@ -187,18 +189,18 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             figs["r2_delta_per_bench"] = per_bench_r2_delta_fig(bench_df)
 
     for name, fig in figs.items():
-        save_fig(fig, f"mirt_{name}", plots_dir)
+        save_fig(fig, figure_filename(name), figures_dir)
     print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
           f"MAE={gof.metrics['mae']:.3f}")
-    print(f"figures → {plots_dir}")
-    return plots_dir
+    print(f"figures → {figures_dir}")
+    return figures_dir
 
 
 def folder_decision(name: str, size_bytes: int, thin: int | None = None):
     """(skip reason or None, thin) for one candidate trace under `--folder`.
 
     Two filenames are not fits of their own: `trace.nc` is the canonical index,
-    and a bare `trace_mirt_k1.nc` is the helper baseline 3_fit.py fits beside a
+    and a bare `trace_mirt_k1.nc` is the helper baseline 3_fit/fit.py fits beside a
     K-axis fit, which `plot_fit` already reads from the K-axis trace's own
     folder. Thin keeps one draw per 2 GB of file, the ratio
     that fits the 38 GB flagship inside 26 GB of RAM. An explicit `thin` wins.
@@ -213,7 +215,7 @@ def folder_decision(name: str, size_bytes: int, thin: int | None = None):
 def sweep(folder, *, axes=None, thin=None, forecast=True, dry_run=False) -> int:
     """Render every MIRT trace under `folder`. Returns a process exit code.
 
-    Traces sit one level down (`results/mirt{tag}/trace_*.nc`); the flat glob
+    Traces sit one level down (`5_outputs/<data>/mirt{tag}/trace_*.nc`); the flat glob
     also accepts a single fit folder. Each render is a child process, so its
     memory goes back to the OS and a crash costs one fit. Exit is non-zero only
     when every candidate failed, since a skip is a decision, not a failure.
@@ -225,7 +227,7 @@ def sweep(folder, *, axes=None, thin=None, forecast=True, dry_run=False) -> int:
         why, n = folder_decision(p.name, p.stat().st_size, thin)
         if why is None:
             try:
-                target = _spec_of(p).plots_dir
+                target = _spec_of(p).figures_dir
             except Exception as e:
                 why = f"unreadable fit spec: {e}"
         if why is not None:
@@ -260,7 +262,7 @@ def main():
     ap.add_argument("--axes", type=int, default=None,
                     help="how many top axes to plot (default: all of them)")
     ap.add_argument("--out", default=None,
-                    help="output folder (default: the fit's plots/mirt_k{K}{tag}/)")
+                    help="output folder (default: the fit's figures/k{K}/ under its results folder)")
     ap.add_argument("--thin", type=int, default=None,
                     help="keep every n-th draw — needed on a trace larger than "
                          "RAM. --folder picks it from the file size unless set")

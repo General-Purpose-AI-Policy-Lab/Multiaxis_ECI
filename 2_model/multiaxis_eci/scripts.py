@@ -1,6 +1,6 @@
 """Load a numbered entry-point script as a module.
 
-The reproduction-path scripts carry an order prefix (`3_fit.py`,
+The reproduction-path scripts carry an order prefix (`3_fit/fit.py`,
 `4_diagnostics/4_build_dashboard.py`) so the sequence is visible in a directory
 listing. A Python module name cannot start with a digit and neither can a
 package directory, so `import` cannot reach them: the prefix buys readability at

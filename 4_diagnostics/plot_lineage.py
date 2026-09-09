@@ -32,6 +32,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
+from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
 from multiaxis_eci.lineage import LINEAGE_MAP, build_lineage_structure  # noqa: E402
 
@@ -183,7 +184,7 @@ def chain_page(nd, chain):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=str(ROOT / "plots" / "lineage_map.pdf"))
+    ap.add_argument("--out", default=str(config.DIAGNOSTICS_DIR / "lineage_map.pdf"))
     ap.add_argument("--apply-exclusions", action="store_true",
                     help="canonical benchmark scope instead of the exploration scope")
     args = ap.parse_args()

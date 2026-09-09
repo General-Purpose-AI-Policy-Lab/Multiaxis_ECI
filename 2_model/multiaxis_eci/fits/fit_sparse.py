@@ -38,7 +38,14 @@ from multiaxis_eci.analysis import (  # noqa: E402
     factor_scores_df,
     mirt_identified_rhat_sparse,
 )
-from multiaxis_eci.config import HUMAN_ORDER, RH_TAU_SCALE, SAMPLE_KW, SG_MODEL_NAME  # noqa: E402
+from multiaxis_eci.config import (  # noqa: E402
+    FIGURES_DIRNAME,
+    HUMAN_ORDER,
+    RH_TAU_SCALE,
+    SAMPLE_KW,
+    SG_MODEL_NAME,
+)
+from multiaxis_eci.config import RESULTS_DIR as _RESULTS_ROOT  # noqa: E402
 from multiaxis_eci.data import (  # noqa: E402
     drop_model_benchmark_cells,
     drop_model_observations,
@@ -49,10 +56,10 @@ from multiaxis_eci.models.mirt_sparse import build_mirt_sparse_model  # noqa: E4
 from multiaxis_eci.persistence import save_df, save_json, save_trace  # noqa: E402
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_sparse  # noqa: E402
 
-RESULTS_DIR = ROOT / "results" / "mirt_sparse"
-PLOTS_DIR = ROOT / "plots" / "mirt_sparse"
+RESULTS_DIR = _RESULTS_ROOT / "mirt_sparse"
+FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Identity-block anchors: one pure benchmark per axis.
 AXES = ["Reasoning", "Knowledge", "Agentic"]

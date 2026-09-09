@@ -43,7 +43,7 @@ def build_gof_figures(scores, y_pred_mean, yrep, pit, hover, bench_of_obs,
                       residual_mask=None, include_ecdf: bool = False,
                       model_of_obs=None, eta_of_obs=None,
                       floor=None, ceiling=None) -> dict:
-    """Shared goodness-of-fit figure set — the core figures 3_fit.py, `plot_mirt`
+    """Shared goodness-of-fit figure set — the core figures 3_fit/fit.py, `plot_mirt`
     and the dashboard all read from here.
 
     `bench_of_obs` is the benchmark name for each observation; `residual_mask`
@@ -104,8 +104,8 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     names the mode in every title, so each figure reads on its own. `axis_titles`
     (e.g. config.AXIS_TITLES) swaps the display text only — figure dict keys and
     axis widget titles keep `names[k]` so cache/anchor ids don't churn.
-    `human_labels` reaches `capability_timeline_fig` unchanged (None = its
-    default French tier labels, `{}` = the raw English tier names)."""
+    `human_labels` reaches `capability_timeline_fig` unchanged (None = the
+    English tier names; a dict overrides them)."""
     from multiaxis_eci.analysis import (
         loadings_forest_df,
         mirt_human_axis_stats,

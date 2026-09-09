@@ -26,8 +26,8 @@
 # 1 MB of Python) and renders those files in every diff. They stay tracked and
 # viewable; they just stop counting as hand-written source.
 index.html             linguist-generated=true
-deliverables/**/*.html linguist-generated=true
-results/**/*.html      linguist-generated=true
+6_writeups/**/*.html   linguist-generated=true
+5_outputs/**/*.html    linguist-generated=true
 
 # Records of past investigations, not the library.
-notebooks/**           linguist-documentation=true
+archive/**             linguist-documentation=true

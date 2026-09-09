@@ -6,7 +6,7 @@ For each benchmark pair (b1, b2):
   residual         = observed - implied
 
 Reads the canonical K=1 trace (results/canonical/trace.nc, from
-`3_fit.py --preset canonical`). If 1D is enough, residuals are tiny and
+`3_fit/fit.py --preset canonical`). If 1D is enough, residuals are tiny and
 unstructured. Clustered structure (e.g. all-math residuals coordinated
 positive, math-vs-agentic negative) is the signature of a second latent factor.
 """
@@ -26,6 +26,7 @@ from scipy.spatial.distance import squareform
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
+from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis import capability_draws  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
 from multiaxis_eci.persistence import save_df  # noqa: E402
@@ -37,13 +38,12 @@ from multiaxis_eci.viz import save_fig  # noqa: E402
 # to the clustering distance (so they don't drive cluster assignment).
 RELIABLE_N = 30
 
-PLOTS_DIR   = ROOT / "plots"
-RESULTS_DIR = ROOT / "results"
-PLOTS_DIR.mkdir(parents=True, exist_ok=True)
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+# Tables and the heatmap (PNG, with its html/ twin) under the data generation's diagnostics/.
+OUT_DIR = config.DIAGNOSTICS_DIR
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Load trace + data ─────────────────────────────────────────────────────
-trace = az.from_netcdf(ROOT / "results/canonical/trace.nc")
+trace = az.from_netcdf(config.RESULTS_DIR / "canonical" / "trace.nc")
 data = load_eci_data()
 
 C_mean = capability_draws(trace).mean(axis=0)                        # (M,)
@@ -60,7 +60,7 @@ B = data.n_benchmarks
 if (C_mean.shape[0], D_mean.shape[0]) != (M, B):
     raise RuntimeError(
         f"Trace shape (M={C_mean.shape[0]}, B={D_mean.shape[0]}) does not match "
-        f"data shape (M={M}, B={B}). Re-run `python 3_fit.py --preset canonical` "
+        f"data shape (M={M}, B={B}). Re-run `python 3_fit/fit.py --preset canonical` "
         f"with the same flags that produced the data you want to analyze."
     )
 
@@ -190,10 +190,10 @@ for k in [2, 3, 4, 5]:
 # CSVs are cheap and order matters — if the figure write fails, the
 # analysis tables are already on disk.
 pd.DataFrame(residual, index=bench_names, columns=bench_names).to_csv(
-    RESULTS_DIR / "residual_corr_matrix.csv")
+    OUT_DIR / "residual_corr_matrix.csv")
 save_df(top20.reset_index(drop=True),
-        RESULTS_DIR / "residual_corr_top20.csv")
-print(f"\nresidual_corr_matrix.csv, residual_corr_top20.csv → {RESULTS_DIR}")
+        OUT_DIR / "residual_corr_top20.csv")
+print(f"\nresidual_corr_matrix.csv, residual_corr_top20.csv → {OUT_DIR}")
 
 # ── Heatmap (clustered order) ─────────────────────────────────────────────
 ordered_names = [bench_names[i] for i in leaf_order]
@@ -222,5 +222,5 @@ fig.update_layout(
     height=900, width=1000,
     margin=dict(l=200, b=200),
 )
-save_fig(fig, "residual_corr_heatmap", PLOTS_DIR)
-print(f"residual_corr_heatmap → {PLOTS_DIR}")
+save_fig(fig, "residual_corr_heatmap", OUT_DIR)
+print(f"residual_corr_heatmap → {OUT_DIR}")

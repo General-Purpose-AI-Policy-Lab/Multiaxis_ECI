@@ -1,7 +1,7 @@
 """US vs China frontier on a K=1 canonical trace: per-country record-setters,
 per-draw OLS trends, gap/lag/crossovers in ECI. See CALC 1-3 in main().
 
-Country map: the `country` column of 0_input/models.csv (pipeline). Scope flags mirror 3_fit.py's
+Country map: the `country` column of 0_input/models.csv (pipeline). Scope flags mirror 3_fit/fit.py's
 --open-only / --closed-only. Both selection variants (informed-only and
 SOTA-admitted) land in the CSV; figures show informed-only.
 
@@ -43,7 +43,11 @@ from multiaxis_eci.data import (  # noqa: E402
     open_only_drop_list,  # noqa: E402
 )
 from multiaxis_eci.persistence import load_trace, save_df  # noqa: E402
-from multiaxis_eci.viz.core import save_fig  # noqa: E402
+from multiaxis_eci.viz.core import DEFAULT_HUMAN_BANDS, save_fig  # noqa: E402
+from multiaxis_eci.viz.core import _rgba as _rgb_to_rgba  # noqa: E402
+
+# Width of the interval band drawn on the bottom and top human tiers.
+HUMAN_BAND_PROB = 0.80
 
 SD_CAP = 0.4                              # informed-model cutoff
 DEFAULT_HORIZON = "2029-01-01"
@@ -61,7 +65,7 @@ class _MiniData:
 
 
 def load_scope(scope: str):
-    """Rebuild the data for scope 'all'/'open'/'closed' (drop lists from 3_fit.py)."""
+    """Rebuild the data for scope 'all'/'open'/'closed' (drop lists from 3_fit/fit.py)."""
     drop = (None if scope == "all"
             else open_only_drop_list(include_all_benchmarks=False,
                                      keep_open=(scope == "open")))
@@ -219,16 +223,28 @@ def build_figure(theta0, mini, transform, model_dates, country_map, records, for
     # Human tier reference lines at posterior-median ECI, strongest first so
     # the legend reads top-down in plot order. hlines carry no legend entry of
     # their own, hence the invisible traces (same convention as viz/core.py).
-    tiers = sorted(((names[i], eci_med[i]) for i in range(mini.n_models)
+    # The bottom and top tiers (viz DEFAULT_HUMAN_BANDS) also get their central
+    # HUMAN_BAND_PROB interval as a faint band, so the ladder's bounds read as
+    # the uncertain quantities they are.
+    eci_draws = transform.a[:, None] + transform.b[:, None] * theta0
+    tiers = sorted(((names[i], eci_med[i], i) for i in range(mini.n_models)
                     if mini.is_human[i]), key=lambda t: -t[1])
     fracs = np.linspace(0.9, 0.4, len(tiers)) if len(tiers) > 1 else [0.7]
-    for k, ((tname, ty), f) in enumerate(zip(tiers, fracs)):
+    q = [(1 - HUMAN_BAND_PROB) / 2, (1 + HUMAN_BAND_PROB) / 2]
+    for k, ((tname, ty, ti), f) in enumerate(zip(tiers, fracs)):
         col = pc.sample_colorscale("Greys", float(f))[0]
+        label = tname
+        if tname in DEFAULT_HUMAN_BANDS:
+            lo, hi = np.quantile(eci_draws[:, ti], q)
+            fig.add_hrect(y0=float(lo), y1=float(hi), fillcolor=_rgb_to_rgba(col, 0.10),
+                          line_width=0, layer="below")
+            label = f"{tname} ({HUMAN_BAND_PROB:.0%} interval)"
+            y_all += [float(lo), float(hi)]
         fig.add_hline(y=ty, line=dict(color=col, dash="dot", width=1.2),
                       layer="below")
         fig.add_trace(go.Scatter(
             x=[None], y=[None], mode="lines",
-            line=dict(color=col, dash="dot", width=1.8), name=tname,
+            line=dict(color=col, dash="dot", width=1.8), name=label,
             legendgroup="humans",
             legendgrouptitle_text="Human tiers (median)" if k == 0 else None,
             hoverinfo="skip"))
@@ -263,8 +279,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--results-dir", default=None,
-                    help="dir holding trace.nc (default: results/canonical<data suffix> "
-                         "or results/canonical_open<data suffix> with --open-only)")
+                    help="dir holding trace.nc (default: the current data generation's "
+                         "canonical/, or canonical_open/ with --open-only)")
     ap.add_argument("--open-only", action="store_true",
                     help="use the --open-only data scope (needs "
                          "0_input/benchmarks.csv)")
@@ -291,10 +307,10 @@ def main():
     if args.open_only and args.closed_only:
         raise ValueError("--open-only and --closed-only cannot compose")
     scope = "open" if args.open_only else "closed" if args.closed_only else "all"
-    # The data generation is part of the tag, as it is of every fit folder name, so
-    # a rerun on a newer pipeline build never overwrites the previous build's outputs.
+    # Outputs go under config.COMPARISONS_DIR, i.e. the current data generation's
+    # folder, so a rerun on a newer pipeline build never overwrites the previous one.
     tag = {"all": "canonical", "open": "canonical_open",
-           "closed": "canonical_closed"}[scope] + config.DATA_SUFFIX
+           "closed": "canonical_closed"}[scope]
     results_dir = Path(args.results_dir) if args.results_dir else config.RESULTS_DIR / tag
     trace_path = results_dir / "trace.nc"
 
@@ -364,8 +380,8 @@ def main():
             _, lag_lo95, lag_hi95 = summarize(lag_months, hdi_prob=0.95)
             if variant == "informed":
                 # per-draw arrays for downstream delta computations
-                np.savez(config.RESULTS_DIR / "comparisons"
-                         / f"country_frontier_draws_{tag}.npz",
+                config.COMPARISONS_DIR.mkdir(parents=True, exist_ok=True)
+                np.savez(config.COMPARISONS_DIR / f"country_frontier_draws_{tag}.npz",
                          slope_us_eci=transform.b * fc_us.slope,
                          slope_cn_eci=transform.b * fc_cn.slope,
                          gap_eci=gap_eci, lag_months=lag_months)
@@ -402,7 +418,7 @@ def main():
             })
 
     out = pd.DataFrame(rows)
-    out_path = config.RESULTS_DIR / "comparisons" / f"country_frontier_{tag}.csv"
+    out_path = config.COMPARISONS_DIR / f"country_frontier_{tag}.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     save_df(out, out_path)
     print(f"\nwrote {out_path}")
@@ -416,8 +432,9 @@ def main():
                        fit_label=fit_label,
                        y_range=(tuple(float(v) for v in args.y_range.split(","))
                                 if args.y_range else None))
-    save_fig(fig, f"country_frontier_{tag}", config.PLOTS_DIR)
-    print(f"wrote {config.PLOTS_DIR / f'country_frontier_{tag}.html'}")
+    figures_dir = config.COMPARISONS_DIR / config.FIGURES_DIRNAME
+    save_fig(fig, f"country_frontier_{tag}", figures_dir)
+    print(f"wrote {figures_dir / f'country_frontier_{tag}.png'} (+ html/)")
 
     # ── CALC 3: crossover dates (informed variant, matching the figure) ────
     # Per country x human tier via the shared mirt_crossover_df — dates are
@@ -446,7 +463,7 @@ def main():
         xdf["human_eci_median"] = xdf["tier"].map(tier_eci)
         xdfs.append(xdf)
     xover = pd.concat(xdfs, ignore_index=True) if xdfs else pd.DataFrame()
-    xover_path = config.RESULTS_DIR / "comparisons" / f"country_crossover_{tag}.csv"
+    xover_path = config.COMPARISONS_DIR / f"country_crossover_{tag}.csv"
     save_df(xover, xover_path)
     print(f"wrote {xover_path}")
 

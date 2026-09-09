@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 
 from multiaxis_eci.viz.core import (
     FUTURE_COLOR,
-    HUMAN_LEVEL_LABELS_FR,
+    HUMAN_LEVEL_LABELS,
     PASSED_COLOR,
     capability_timeline_fig,
 )
@@ -17,20 +17,38 @@ from multiaxis_eci.viz.core import (
 
 FORECAST_COLOR = "#ff9500"        # frontier extrapolation
 
+# Every string these figures draw, per language (English default, French for the
+# `fr/` renders); tier names come from core.HUMAN_LEVEL_LABELS.
+FORECAST_TEXT = {
+    "en": {"trend_informed": "Projected trend (all informed models)",
+           "trend_frontier": "Projected frontier", "trend_hover": "trend",
+           "no_crossover": "no projected crossover", "slope_hover": "slope ≤ 0",
+           "median": "median", "p_passed": "P(passed today)", "today": "today",
+           "crossing_axis": "Projected crossing date", "decisive": "0.975 (decisive)",
+           "p_axis": "P(frontier > tier)"},
+    "fr": {"trend_informed": "Tendance projetée (tous modèles informés)",
+           "trend_frontier": "Frontière projetée", "trend_hover": "tendance",
+           "no_crossover": "pas de croisement projeté", "slope_hover": "pente ≤ 0",
+           "median": "médiane", "p_passed": "P(dépassé aujourd'hui)", "today": "aujourd'hui",
+           "crossing_axis": "Date de croisement projetée", "decisive": "0.975 (décisif)",
+           "p_axis": "P(frontière > niveau)"},
+}
+
 
 def _crossover_color(status: str) -> str:
     return PASSED_COLOR if status.startswith("passed") else FUTURE_COLOR
 
 
 def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
-                            *, axis_name: str) -> go.Figure:
+                            *, axis_name: str, lang: str = "en") -> go.Figure:
     """Timeline (points + human bands) with the frontier forecast band and a
     dashed vertical marker at each tier's projected crossover date. Built on top
     of `capability_timeline_fig`, so styling and legend are inherited verbatim.
 
     The cloud and the trend fit share one SD cap (0.4, set by the caller), so
     every fitted record is also a plotted point."""
-    fig = capability_timeline_fig(timeline_df, human_stats=human_stats)
+    text = FORECAST_TEXT[lang]
+    fig = capability_timeline_fig(timeline_df, human_stats=human_stats, lang=lang)
     gx = pd.to_datetime(fc.grid_dates).strftime("%Y-%m-%d")
 
     fig.add_trace(go.Scatter(                                       # HDI band
@@ -38,14 +56,14 @@ def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
         y=list(fc.hi) + list(fc.lo[::-1]),
         fill="toself", fillcolor="rgba(255,149,0,0.12)",
         line=dict(width=0), hoverinfo="skip", showlegend=False))
-    line_name = ("Tendance projetée (tous modèles informés)"
+    line_name = (text["trend_informed"]
                  if getattr(fc, "fit_basis", "frontier") == "informed"
-                 else "Frontière projetée")
+                 else text["trend_frontier"])
     fig.add_trace(go.Scatter(                                       # median line
         x=gx, y=fc.median, mode="lines",
         line=dict(color=FORECAST_COLOR, dash="dash", width=2.2),
         name=line_name,
-        hovertemplate="tendance ≈ %{y:.2f}<br>%{x|%Y-%m}<extra></extra>"))
+        hovertemplate=text["trend_hover"] + " ≈ %{y:.2f}<br>%{x|%Y-%m}<extra></extra>"))
 
     for _, r in crossover_df.iterrows():
         d = r["crossover_date_median"]
@@ -92,14 +110,16 @@ def capability_forecast_fig(timeline_df, human_stats, fc, crossover_df,
 
 
 def crossover_dotwhisker_fig(crossover_df, *, axis_name: str,
-                             human_labels: dict | None = None) -> go.Figure:
+                             human_labels: dict | None = None,
+                             lang: str = "en") -> go.Figure:
     """When the frontier is projected to reach each human tier: tier on Y,
     crossover date + interval on X (at the hdi_prob the crossover frame was
     built with; the dashboard renders 50% and titles it so), coloured passed
-    (vert) vs future (rouge).
+    (green) vs future (red).
 
-    `human_labels` defaults to HUMAN_LEVEL_LABELS_FR; pass {} for raw names."""
-    labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
+    `human_labels` defaults to the `lang` tier names (English = raw names)."""
+    text = FORECAST_TEXT[lang]
+    labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
     fig = go.Figure()
     for _, r in crossover_df.iterrows():
         label = labels.get(r["tier"], r["tier"])
@@ -107,8 +127,8 @@ def crossover_dotwhisker_fig(crossover_df, *, axis_name: str,
             fig.add_trace(go.Scatter(
                 x=[None], y=[label], mode="markers",
                 marker=dict(color="#999", symbol="x"),
-                name="pas de croisement projeté", showlegend=False,
-                hovertemplate=f"{label} : pente ≤ 0<extra></extra>"))
+                name=text["no_crossover"], showlegend=False,
+                hovertemplate=f"{label}: {text['slope_hover']}<extra></extra>"))
             continue
         color = _crossover_color(r["status"])
         lo = pd.Timestamp(r["crossover_hdi_low"]).strftime("%Y-%m-%d")
@@ -124,15 +144,15 @@ def crossover_dotwhisker_fig(crossover_df, *, axis_name: str,
             textposition="top center",
             textfont=dict(size=10, color=color),
             showlegend=False,
-            hovertemplate=(f"{label}<br>médiane %{{x|%Y-%m}}"
-                           f"<br>P(dépassé aujourd'hui) = {r['p_passed_now']:.2f}"
+            hovertemplate=(f"{label}<br>{text['median']} %{{x|%Y-%m}}"
+                           f"<br>{text['p_passed']} = {r['p_passed_now']:.2f}"
                            "<extra></extra>")))
     fig.add_vline(x=pd.Timestamp.today().normalize().strftime("%Y-%m-%d"),
                   line=dict(color="#444", dash="dot", width=1),
-                  annotation_text="aujourd'hui", annotation_position="top")
+                  annotation_text=text["today"], annotation_position="top")
     fig.update_layout(
         title=dict(text=f"Forecast — {axis_name} (crossover dates)", x=0.5),
-        xaxis=dict(type="date", title="Date de croisement projetée",
+        xaxis=dict(type="date", title=text["crossing_axis"],
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
         yaxis=dict(title="", showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
         template="plotly_white", height=460, width=1000,
@@ -141,12 +161,14 @@ def crossover_dotwhisker_fig(crossover_df, *, axis_name: str,
 
 
 def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str,
-                        human_labels: dict | None = None) -> go.Figure:
+                        human_labels: dict | None = None,
+                        lang: str = "en") -> go.Figure:
     """P(frontier > tier) over the forecast grid — one S-curve per human tier,
     with reference lines at 0.5 and 0.975 (decisive).
 
-    `human_labels` defaults to HUMAN_LEVEL_LABELS_FR; pass {} for raw names."""
-    labels = HUMAN_LEVEL_LABELS_FR if human_labels is None else human_labels
+    `human_labels` defaults to the `lang` tier names (English = raw names)."""
+    text = FORECAST_TEXT[lang]
+    labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
     from multiaxis_eci.analysis.forecast import _to_year, frontier_paths
 
     xg = _to_year(fc.grid_dates)
@@ -172,13 +194,13 @@ def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str,
             x=gx, y=p, mode="lines", line=dict(color=col, width=2),
             name=labels.get(m, m),
             hovertemplate="P = %{y:.2f}<br>%{x|%Y-%m}<extra></extra>"))
-    for yv, lab in [(0.5, "0.5"), (0.975, "0.975 (décisif)")]:
+    for yv, lab in [(0.5, "0.5"), (0.975, text["decisive"])]:
         fig.add_hline(y=yv, line=dict(color="#888", dash="dot", width=1),
                       annotation_text=lab, annotation_position="right")
     fig.update_layout(
         title=dict(text=f"Forecast — {axis_name} (P exceed human)", x=0.5),
         xaxis=dict(type="date", title="Date", showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
-        yaxis=dict(title="P(frontière > niveau)", range=[0, 1],
+        yaxis=dict(title=text["p_axis"], range=[0, 1],
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
         template="plotly_white", height=520, width=1100,
         margin=dict(l=70, r=260, t=80, b=55),

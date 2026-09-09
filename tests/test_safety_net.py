@@ -917,7 +917,7 @@ class TestStreamedDraws:
                     "save_warmup": False,
                     "zarr_store": zarr_store.LocalStore(str(store), mkdir=True)})
         # The store IGNORES save_warmup and hands the warmup back too — the RAM
-        # that OOM-killed two finished runs, so 3_fit.py drops it and so does the
+        # that OOM-killed two finished runs, so 3_fit/fit.py drops it and so does the
         # reader.
         assert "warmup_posterior" in idata.groups()
         np.testing.assert_allclose(load_live_draws(store).posterior.x.values,
@@ -1180,7 +1180,7 @@ class TestPublicAPISurface:
 class TestCLISurface:
     def test_fit_help_exits_clean(self):
         result = subprocess.run(
-            [sys.executable, str(ROOT / "3_fit.py"), "--help"],
+            [sys.executable, str(ROOT / "3_fit/fit.py"), "--help"],
             capture_output=True, text=True, timeout=120)
         assert result.returncode == 0
         assert "--loading-prior" in result.stdout
@@ -1188,6 +1188,6 @@ class TestCLISurface:
 
     def test_fit_unknown_arg_fails(self):
         result = subprocess.run(
-            [sys.executable, str(ROOT / "3_fit.py"), "--nonsense"],
+            [sys.executable, str(ROOT / "3_fit/fit.py"), "--nonsense"],
             capture_output=True, text=True, timeout=120)
         assert result.returncode != 0

@@ -5,9 +5,9 @@ baseline / exploratory / confirmed) + a cross-fit Comparison view, with every
 figure a lazily-rendered Plotly plot (only the visible section is live in the
 DOM).
 
-Also writes `results/comparisons/{gof_table,loo_waic_table}.csv` and refreshes
-`results/comparisons/README.md`. Pass `--png` to also dump static stills
-(kaleido/Chrome) to the git-ignored `plots/dashboard/` for slides.
+Also writes `<data generation>/comparisons/{gof_table,loo_waic_table}.csv` and
+refreshes `<data generation>/comparisons/README.md`. Pass `--png` to also dump
+static stills (kaleido/Chrome) to the git-ignored `<data generation>/dashboard_stills/`.
 
 All rotation/identity handling lives in `analysis.prepare_fit`; all figures are
 pure builders in `viz/`. Each entry's `spec` (an `analysis.FitSpec`) owns its
@@ -34,6 +34,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
+from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
     FLAGSHIP_TRACE,
@@ -73,7 +74,7 @@ from multiaxis_eci.viz import (  # noqa: E402
 )
 
 INDEX_PATH = ROOT / "index.html"
-CMP_DIR = ROOT / "results" / "comparisons"
+CMP_DIR = config.COMPARISONS_DIR
 
 # One entry per card, rendered against the data scope its `spec` names.
 # Required: spec (a FitSpec: it owns the trace path and the data scope), name
@@ -116,7 +117,7 @@ FITS = [
 # collaborator gets the same dashboard; the file is a plain list of entries with
 # the spec serialised by `dataclasses.asdict` and the trace path stored
 # explicitly, which is what lets a legacy folder name keep resolving.
-FITS_JSON = ROOT / "3_diagnostics" / "dashboard_fits.json"
+FITS_JSON = config.WRITEUPS_DIR / "dashboard" / "dashboard_fits.json"
 
 
 def _json_fits() -> list[dict]:
@@ -249,7 +250,7 @@ def _modes_table_html(doc):
 # cached card with a "data superseded" label instead of a crash. Bump
 # RENDER_REV (or use --force) when the figure set itself changes.
 RENDER_REV = 14  # posterior summaries are median + central interval
-CACHE_DIR = ROOT / "results" / "dashboard_cache"
+CACHE_DIR = config.OUTPUTS_DIR / "dashboard_cache"
 
 
 def _fingerprint(trace_path, modes_file=None):
@@ -493,11 +494,11 @@ def _stat_line(r):
 
 
 def _static_dump(sections, comparison, fmt="png"):
-    """Optional static stills → plots/dashboard/ (git-ignored). Needs kaleido/Chrome.
+    """Optional static stills → <data generation>/dashboard_stills/ (git-ignored). Needs kaleido/Chrome.
 
     `fmt` is any kaleido format: "png" (raster, scale=2) or "pdf" (vector, crisper
     for slides/print — resolution-independent, so no `scale`)."""
-    base = ROOT / "plots" / "dashboard"
+    base = config.RESULTS_DIR / "dashboard_stills"
     for sec in sections + [{"id": "comparison", "figures": comparison["figures"]}]:
         out = base / sec["id"]
         out.mkdir(parents=True, exist_ok=True)
@@ -627,9 +628,9 @@ def _remove_fit(name):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--png", action="store_true",
-                    help="also dump static PNG stills to plots/dashboard/ (git-ignored)")
+                    help="also dump static PNG stills to <data generation>/dashboard_stills/ (git-ignored)")
     ap.add_argument("--pdf", action="store_true",
-                    help="also dump vector PDF stills to plots/dashboard/ (crisper; git-ignored)")
+                    help="also dump vector PDF stills to <data generation>/dashboard_stills/ (crisper; git-ignored)")
     ap.add_argument("--force", nargs="*", default=[],
                     help="fit names (registry `name`) to re-render even if cached")
     ap.add_argument("--force-all", action="store_true",
@@ -725,7 +726,7 @@ def main():
                 continue
         else:
             print(f"rendering {fit['label']} ({fit['type']}) …", flush=True)
-            # Floors are already clipped: the spec's load_data mirrors 3_fit.py.
+            # Floors are already clipped: the spec's load_data mirrors 3_fit/fit.py.
             figures, r = render_fit(fit, data, raw, bench, mod)
             _cache_save(fit["name"], figures, r, fp)
         # Comparison charts key on r["fit"]/r["name"]: use the SHORT label there
@@ -853,7 +854,7 @@ def _df_to_md(df):
 
 
 def _readme(fits, tab, scopes):
-    """Rewrite `results/comparisons/README.md` from the registry and the table
+    """Rewrite `<data generation>/comparisons/README.md` from the registry and the table
     this build just produced. `scopes` is the (n_models, n_benchmarks, n_obs) of
     every data scope the cards were scored on."""
     fit_list = "\n".join(f"- {f['label']}  ·  *{f['type']}*" for f in fits)
@@ -871,7 +872,7 @@ def _readme(fits, tab, scopes):
                  f"{tab['eta_rhat'].max()} across the {len(tab)} cards")
     txt = f"""# Capability-dimensionality fit dashboard
 
-**Open [`index.html`](../../index.html)** at the repo root — one
+**Open [`index.html`](../../../index.html)** at the repo root — one
 self-contained interactive page: a fit selector + a cross-fit Comparison view.
 Every figure renders lazily (only the visible fit is live in the DOM).
 
@@ -904,7 +905,7 @@ draws, ESS and divergences for every card whose trace is still on disk.
 
 One command: `python 4_diagnostics/4_build_dashboard.py` (`--force <name>` for one
 card, `--force-all` for every card, `--png` for static stills → git-ignored
-`plots/dashboard/`).
+`dashboard_stills/`).
 """
     (CMP_DIR / "README.md").write_text(txt)
 

@@ -1,10 +1,10 @@
 # CLI reference
 
-Every flag `3_fit.py` accepts, where a fit's output lands, and the commands that
+Every flag `3_fit/fit.py` accepts, where a fit's output lands, and the commands that
 plot, diagnose and publish it. The [README](../README.md) covers the two runs
 that matter; this file is the rest of the surface.
 
-`python 3_fit.py --help` is the generated version of the flag tables below.
+`python 3_fit/fit.py --help` is the generated version of the flag tables below.
 
 ## Flags
 
@@ -21,7 +21,7 @@ unmarked to both.
 | `--sampler {pymc,nutpie,numpyro}` | NUTS backend. Default `nutpie` |
 | `--target-accept X` | `[expl]` default 0.95. Raise toward 0.99 if divergences appear |
 | `--seed N` | `[expl]` override seed 42. Nutpie is deterministic given seed + data + model, so a multi-run recipe must vary this |
-| `--stream-draws` | `[expl]` nutpie writes every draw to `results/<fit>/live_draws.zarr` as it lands, so a killed run keeps what it had. Read a partial store with `multiaxis_eci.persistence.load_live_draws` |
+| `--stream-draws` | `[expl]` nutpie writes every draw to `<fit>/live_draws.zarr` as it lands, so a killed run keeps what it had. Read a partial store with `multiaxis_eci.persistence.load_live_draws` |
 
 **Model**
 
@@ -68,26 +68,26 @@ unmarked to both.
 
 | flag | effect |
 |---|---|
-| `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI-H deliverables to `results/canonical/` |
-| `--skip-sampling` | `[canon]` reuse `results/canonical/trace.nc`. Must match the current data shape |
+| `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI-H deliverables to `5_outputs/<data generation>/canonical/` |
+| `--skip-sampling` | `[canon]` reuse that folder's `trace.nc`. Must match the current data shape |
 | `--raw-c` | `[canon]` report raw C instead of anchored ECI-H |
 | `--skip-baseline` / `--refit-baseline` | `[expl]` skip or force the K=1 baseline fit |
 | `--plots` | `[expl]` render the fit's figures in-process |
 
 ## Where a fit's output goes
 
-Every results and plots folder name ends with `_data<YYYYMMDD>`, the build date of the pipeline tables in `0_input/provenance.json` (`config.DATA_SUFFIX`): `results/canonical_data20260907/`. Fits on two data generations therefore never overwrite each other; the folders without a suffix are the published fits on the pre-pipeline dataset.
+Everything a fit or a diagnostic writes lives under `5_outputs/`, whose first level is the data generation: `data<YYYYMMDD>`, the build date of the pipeline tables in `0_input/provenance.json` (`config.DATA_TAG`). Fits on two data generations therefore never overwrite each other. `5_outputs/pre_pipeline/` holds the fits published with the post, on the pre-pipeline dataset, kept as they were.
 
-A fit's flags become one tag, and the tag names the results folder, the trace
-and the plots folder, so the three cannot drift apart. A default contributes no
-token, so the K=4 command above reduces to:
+Inside a generation, one folder per fit holds its tables, its trace and its figures (`figures/` for the PNGs, `figures/html/` for the interactive twins, `figures/fr/` for the French versions); `comparisons/` holds the cross-fit tables (country frontier, chain verdicts) with their own `figures/`; `diagnostics/` the one-off diagnostic outputs.
+
+A fit's flags become one tag, and the tag names the results folder and the trace, so the two cannot drift apart. A default contributes no token, so the K=4 command above reduces to:
 
 ```
-flags   --K 4 --human-merge --lineage-prior --lineage-bm
-tag     _humanmerge_lineageprior_lineagebm
-results results/mirt_humanmerge_lineageprior_lineagebm/
-trace     └── trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
-plots   plots/mirt_k4_humanmerge_lineageprior_lineagebm/
+flags    --K 4 --human-merge --lineage-prior --lineage-bm
+tag      _humanmerge_lineageprior_lineagebm
+results  5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/
+trace      ├── trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+figures    └── figures/k4/            (PNG; html/ beneath it)
 ```
 
 `FitSpec.from_trace` reads that identity back off a trace, so a trace path is
@@ -102,7 +102,7 @@ python 4_diagnostics/2_plot_crossovers.py
 
 `1_country_frontier.py` builds the US/China frontier comparison from the
 canonical traces (all three scopes). Flags: `--results-dir DIR` overrides the
-default `results/`; `--open-only` / `--closed-only` restrict to one access
+default (the data generation's `canonical/`); `--open-only` / `--closed-only` restrict to one access
 scope; `--allow-stale` proceeds when a trace predates the current data snapshot
 (otherwise it refuses); `--horizon DATE` sets the forecast horizon;
 `--fit-start DATE` (default `2024-10-01`) sets the trend-fit window;
@@ -114,19 +114,19 @@ published snapshot date in the source, not the wall clock.
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --trace \
-  results/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+  5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
-Figures land in the fit's own `plots/mirt_k{K}{tag}/`, one HTML and one PNG
-each. `--forecast` adds the frontier-projection set, `--thin N` keeps every
+Figures land in the fit's own `figures/k{K}/`, one PNG each with the HTML twin
+under `html/`. `--forecast` adds the frontier-projection set, `--thin N` keeps every
 n-th draw, `--axes N` limits the axis count, `--out DIR` overrides the
 destination. Full catalogue: [plots.md](plots.md).
 
 ### Plot everything
 
 ```bash
-python 4_diagnostics/3_plot_mirt.py --folder results/ --dry-run   # decisions only
-python 4_diagnostics/3_plot_mirt.py --folder results/             # render
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260908/ --dry-run   # decisions only
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260908/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder
@@ -156,17 +156,17 @@ python 4_diagnostics/theta_bimodality.py --trace TRACE
 prints a row per chain, giving that chain's log-probability gap to the best
 chain, how well its loading columns match the pooled mean, and which basin it
 sits in, then a verdict. On the small K=2 demo trace
-(`results/mirt/trace_mirt_k2.nc`) it reports `chains=4 divergences=0`, a
+(`5_outputs/pre_pipeline/mirt/trace_mirt_k2.nc`) it reports `chains=4 divergences=0`, a
 98.2-nat logp spread with one island chain, `eta r-hat: all=1.534
 majority=1.225`, and `VERDICT: ISLANDS | recommended drop_chains = none`. A
-verdict row is appended to `results/comparisons/chain_verdicts.csv`.
+verdict row is appended to the data generation's `comparisons/chain_verdicts.csv`.
 
 Three refinements: `--fig` also renders the per-chain diagnostic figure,
 `--match-thresh X` overrides the loading-match threshold behind the basin
 assignment, and `--out-csv PATH` redirects the verdict row.
 
 `--write-modes` persists the split to
-`results/<fit>/mirt_modes_<trace-stem>.json` and stops, loading no data, so a
+`<fit>/mirt_modes_<trace-stem>.json` and stops, loading no data, so a
 superseded trace still splits. The dashboard only reads that file; when it is
 present a multimodal fit gets one extra loading and timeline figure set per
 mode, labelled with its chains and Δlogp. On the demo trace it writes
@@ -176,7 +176,7 @@ always describe the whole fit.
 
 `theta_bimodality.py` answers which test-takers the split actually moves. It
 reports per-axis how many abilities are bimodal across chains, before and after
-axis alignment, and writes `results/<fit>/theta_bimodality.csv` plus a
+axis alignment, and writes `<fit>/theta_bimodality.csv` plus a
 `bimodality.html` viewer. On the demo trace it reports
 `split takers: raw 210/829 -> aligned 1/829`, so axis alignment absorbs almost
 all of the apparent splits. It defaults to the flagship K=4 fit when `--trace`
@@ -197,7 +197,7 @@ The tracked `index.html` cannot be rebuilt from a fresh clone: it renders from
 the `.nc` traces, which are gitignored (the K=4 trace alone runs to tens of GB) and must
 be re-fitted first. Treat the committed dashboard as a published artifact of the
 snapshot it was built from, not as something the repo regenerates on demand.
-`--png` / `--pdf` also dump stills to `plots/dashboard/`.
+`--png` / `--pdf` also dump stills to the data generation's `dashboard_stills/`.
 
 ### Manage the cards
 

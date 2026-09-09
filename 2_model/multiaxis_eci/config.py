@@ -23,7 +23,7 @@ PROVENANCE_FILE = "provenance.json"
 def data_tag() -> str:
     """Date of the synced pipeline build as YYYYMMDD, or '' before the first sync.
 
-    Appended to every results/ and plots/ folder name (`_data<tag>`), so fits on two
+    Names the per-generation output folder (`5_outputs/data<tag>/`), so fits on two
     data generations never overwrite each other.
     """
     import json
@@ -35,9 +35,23 @@ def data_tag() -> str:
 
 
 DATA_TAG = data_tag()
+# Legacy folder suffix (`results/canonical_data20260908`); the tag parser still strips it.
 DATA_SUFFIX = f"_data{DATA_TAG}" if DATA_TAG else ""
-RESULTS_DIR  = PROJECT_ROOT / "results"
-PLOTS_DIR    = PROJECT_ROOT / "plots"
+
+# ── Output layout ──────────────────────────────────────────────────────────
+# Everything a fit or a diagnostic writes goes under 5_outputs/<data generation>/:
+#   <fit>/                 tables, trace.nc and figures/ (PNG) + figures/html/ per fit
+#   comparisons/           cross-fit tables (country frontier, chain verdicts) + figures/
+#   diagnostics/           one-off diagnostic outputs (residual correlations, chain plots)
+# 5_outputs/pre_pipeline/ holds the fits published before the data pipeline existed.
+OUTPUTS_DIR     = PROJECT_ROOT / "5_outputs"
+DATA_DIR_NAME   = f"data{DATA_TAG}" if DATA_TAG else "data_unsynced"
+RESULTS_DIR     = OUTPUTS_DIR / DATA_DIR_NAME
+COMPARISONS_DIR = RESULTS_DIR / "comparisons"
+DIAGNOSTICS_DIR = RESULTS_DIR / "diagnostics"
+LEGACY_RESULTS_DIR = OUTPUTS_DIR / "pre_pipeline"
+FIGURES_DIRNAME = "figures"
+WRITEUPS_DIR    = PROJECT_ROOT / "6_writeups"
 
 # ── Zero-score diagnostic threshold ───────────────────────────────────────
 # The level `ppc.py` scores `zero_pred_below_threshold` against: the posterior
@@ -47,7 +61,7 @@ ZERO_DIAG_THRESHOLD = 5e-3
 
 # ── Epsilon bound ────────────────────────────────────────────────────────
 # Beta likelihood has open support on (0, 1). `models/mirt.py` clips boundary
-# scores onto [ECI_EPS, 1 - ECI_EPS]; the same epsilon lets 3_fit.py's
+# scores onto [ECI_EPS, 1 - ECI_EPS]; the same epsilon lets 3_fit/fit.py's
 # --drop-zero-scores identify rows on or outside (ECI_EPS, 1 - ECI_EPS).
 ECI_EPS = 1e-3
 
@@ -289,5 +303,5 @@ DENSITY_SEED  = 1
 
 # ── Raw-C mode ─────────────────────────────────────────────────────────────
 # When True, ECI = C (identity affine — no anchor rescaling). Set via the
-# --raw-c CLI flag in 3_fit.py. Default False keeps the affine anchor transform.
+# --raw-c CLI flag in 3_fit/fit.py. Default False keeps the affine anchor transform.
 RAW_C_MODE = False

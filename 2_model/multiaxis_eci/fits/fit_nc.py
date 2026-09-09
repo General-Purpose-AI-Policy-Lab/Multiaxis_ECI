@@ -1,6 +1,6 @@
 """Fit the NON-COMPENSATORY (conjunctive) Beta-MIRT and write its artefacts.
 
-Companion to the root 3_fit.py (compensatory). Same data, same Beta
+Companion to the root 3_fit/fit.py (compensatory). Same data, same Beta
 likelihood — the link is the conjunctive product (see models/mirt_nc.py). The
 axes are pinned by a category-seeded Q-MATRIX (organic per-category
 multi-loading), so there is NO rotation and NO permutation to undo: theta is
@@ -48,17 +48,18 @@ from multiaxis_eci.analysis import (  # noqa: E402
     mirt_identified_rhat_nc,
     nc_difficulty_draws,
 )
-from multiaxis_eci.config import SAMPLE_KW  # noqa: E402
+from multiaxis_eci.config import FIGURES_DIRNAME, SAMPLE_KW  # noqa: E402
+from multiaxis_eci.config import RESULTS_DIR as _RESULTS_ROOT  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
 from multiaxis_eci.models.mirt_nc import build_mirt_nc_model  # noqa: E402
 from multiaxis_eci.models.qmatrix import QMATRIX_VARIANTS, axes_as_list  # noqa: E402
 from multiaxis_eci.persistence import save_df, save_json, save_trace  # noqa: E402
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_nc  # noqa: E402
 
-RESULTS_DIR = ROOT / "results" / "mirt_nc"
-PLOTS_DIR   = ROOT / "plots" / "mirt_nc"
+RESULTS_DIR = _RESULTS_ROOT / "mirt_nc"
+FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Category -> axis map: organic per-category multi-loading ────────────────
 # Single-loadings where a category is clean (gives each axis enough pure

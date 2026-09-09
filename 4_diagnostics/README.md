@@ -1,14 +1,14 @@
 # 3. Diagnostics
 
 Post-fit tools, all command-line scripts. They read a fitted trace (the
-canonical one at `results/canonical/trace.nc`, from
-`python 3_fit.py --preset canonical`; exploration traces in `results/mirt*/`).
+canonical one at `5_outputs/<data generation>/canonical/trace.nc`, from
+`python 3_fit/fit.py --preset canonical`; exploration traces in the `mirt*/` folders beside it).
 
 The four numbered scripts are the reproduction path, in order. The rest is a
 toolbox with no order to it, reached for when a fit looks wrong. The curated-data
 builders that used to live here moved to [`../1_curated/`](../1_curated/README.md),
 because they run before the fit, not after it. The exploratory notebooks moved
-to [`../notebooks/`](../notebooks/README.md).
+to [`../archive/notebooks/`](../archive/notebooks/README.md).
 
 Commands and their options: [`../docs/cli.md`](../docs/cli.md).
 
@@ -18,8 +18,8 @@ Commands and their options: [`../docs/cli.md`](../docs/cli.md).
 |---|---|
 | `1_country_frontier.py` | US vs China frontier on a K=1 canonical trace: per-country record-setters, per-draw OLS trends, gap / lag / crossovers |
 | `2_plot_crossovers.py` | Human-tier crossover dates as a 2x3 grid: US/CN x all / open-only / closed-only. Reads what `1_country_frontier.py` writes |
-| `3_plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → `plots/<out>/` |
-| `4_build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ `results/comparisons/*.csv`). Card registry: `dashboard_fits.json` |
+| `3_plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → the fit's `figures/k{K}/` |
+| `4_build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ the data generation's `comparisons/*.csv`). Card registry: `6_writeups/dashboard/dashboard_fits.json` |
 
 Step 4 needs traces (or their render cache) that are gitignored, so on a fresh
 clone every registered card is skipped with a warning and the build refuses to
@@ -77,5 +77,5 @@ python 4_diagnostics/residual_corr.py
 
 Outputs:
 - Console: pair coverage, top-20 table, cluster memberships + ratios.
-- `plots/residual_corr_heatmap.html` — clustered heatmap (gitignored).
-- `results/residual_corr_matrix.csv`, `results/residual_corr_top20.csv` (gitignored).
+- `diagnostics/residual_corr_heatmap.png` (+ `html/`) — clustered heatmap (gitignored).
+- `diagnostics/residual_corr_matrix.csv`, `diagnostics/residual_corr_top20.csv` (gitignored), all under the data generation's folder.

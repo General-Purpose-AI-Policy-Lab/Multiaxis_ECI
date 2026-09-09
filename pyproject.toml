@@ -39,7 +39,7 @@ markers = [
 line-length = 100
 target-version = "py311"
 src = ["2_model", "tests"]
-extend-exclude = ["notebooks", "evals", "results", "blogpost/ladder"]
+extend-exclude = ["archive", "internal_evals", "5_outputs", "6_writeups/blogpost/ladder"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "B", "UP"]
@@ -50,11 +50,10 @@ ignore = ["E203", "E501", "E701", "E702", "B905", "B028"]
 
 [tool.ruff.lint.per-file-ignores]
 # Scripts bootstrap sys.path before importing the library.
-"3_fit.py" = ["E402"]
+"3_fit/*.py" = ["E402"]
 "4_diagnostics/*.py" = ["E402"]
 "1_curated/*.py" = ["E402"]
-"blogpost/**/*.py" = ["E402"]
-"deliverables/**/*.py" = ["E402"]
+"6_writeups/**/*.py" = ["E402"]
 "tests/*.py" = ["E402"]
 "docs/*.py" = ["E402"]
 

@@ -16,7 +16,7 @@ Outputs (beside the trace, in its own folder):
   mirt_alignment_summary.json   — per method: aligned max r-hat, per-axis
                                   chain reproducibility, sign-confidence
                                   counts; plus per-chain divergence fractions.
-  plots/mirt/diag_k{K}_signed_alignment.png — loading medians ± HDI per axis
+  <data generation>/diagnostics/alignment_k{K}{tag}.png — loading medians ± HDI per axis
                                   (sign-confident highlighted) + agreement map.
 
 Run:
@@ -40,6 +40,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
+from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis import FitSpec, alignment_report  # noqa: E402
 from multiaxis_eci.persistence import save_df, save_json  # noqa: E402
 
@@ -148,7 +149,7 @@ def main():
     print(rep["agreement"].groupby("axis")["abs_corr"].agg(["min", "median"])
           .to_string(float_format=lambda x: f"{x:.3f}"))
 
-    fig_path = ROOT / "plots" / "mirt" / f"diag_k{K}{spec.tag}_alignment.png"
+    fig_path = config.DIAGNOSTICS_DIR / f"alignment_k{K}{spec.tag}.png"
     fig_path.parent.mkdir(parents=True, exist_ok=True)
     _diag_figure(rep, fig_path)
     print(f"\nOutputs → {results_dir}\nFigure  → {fig_path}")

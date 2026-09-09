@@ -1,14 +1,14 @@
 """Plotly figure builders, split by concern.
 
-- core: save_fig, trace grids, forests, the capability/difficulty timeline
+- core: save_fig / figure_filename, trace grids, forests, the capability/difficulty timeline
 - gof: PIT / density / predicted-vs-observed / residual figures
 - forecast: frontier-forecast figures
 - mirt: per-fit MIRT figures (loadings, factor correlation, Q-matrix, K-vs-1D)
 - compare: cross-fit comparison figures (cmp_* family)
 - dashboard: figure-set assemblers + the self-contained dashboard HTML
 
-The output directory stays `plots/` (config.PLOTS_DIR); this package holds
-the code. The namespace re-exports the full public API so call sites use
+Figures land in each fit's `figures/` folder under `5_outputs/<data generation>/`
+(config.RESULTS_DIR); this package holds the code. The namespace re-exports the full public API so call sites use
 `from viz import ...`.
 """
 from multiaxis_eci.viz.compare import (
@@ -24,9 +24,14 @@ from multiaxis_eci.viz.compare import (
     delpd_se,
 )
 from multiaxis_eci.viz.core import (
+    DEFAULT_HUMAN_BANDS,
+    HUMAN_LEVEL_LABELS,
+    TIMELINE_TEXT,
     all_models_forest_fig,
     capability_timeline_fig,
+    figure_filename,
     forest_fig,
+    human_tier_palette,
     hyperparams_fig,
     raw_scores_by_date_fig,
     save_fig,
@@ -72,7 +77,8 @@ from multiaxis_eci.viz.mirt import (
 )
 
 __all__ = [
-    "save_fig", "trace_posterior_grid", "hyperparams_fig", "forest_fig",
+    "save_fig", "figure_filename", "DEFAULT_HUMAN_BANDS", "HUMAN_LEVEL_LABELS",
+    "TIMELINE_TEXT", "human_tier_palette", "trace_posterior_grid", "hyperparams_fig", "forest_fig",
     "all_models_forest_fig", "sota_forest_fig", "capability_timeline_fig", "raw_scores_by_date_fig",
     "capability_forecast_fig", "crossover_dotwhisker_fig", "exceedance_prob_fig",
     "pit_hist_fig", "pit_ecdf_fig", "density_overlay_fig", "pred_vs_obs_fig",

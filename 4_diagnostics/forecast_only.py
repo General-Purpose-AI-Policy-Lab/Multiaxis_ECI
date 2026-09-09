@@ -142,7 +142,7 @@ def main():
           f"(replaced {len(stale)})", flush=True)
 
     if not args.no_html:
-        subprocess.run([sys.executable, str(ROOT / "3_diagnostics" / "4_build_dashboard.py")],
+        subprocess.run([sys.executable, str(ROOT / "4_diagnostics" / "4_build_dashboard.py")],
                        check=True, cwd=ROOT)
 
 

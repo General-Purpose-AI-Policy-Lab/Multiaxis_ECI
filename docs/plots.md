@@ -11,24 +11,23 @@ fit CLI: [../README.md](../README.md).
 
 ## Where figures go
 
+All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`), whose first level is the pipeline build date the fit was made on.
+
 | destination | written by | tracked? |
 |---|---|---|
-| `plots/mirt_k{K}{tag}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit.py --plots` | no |
-| `plots/canonical/` | `3_fit.py --preset canonical` | no |
-| `plots/dashboard/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
+| `mirt{tag}/figures/k{K}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit/fit.py --plots` | no |
+| `canonical/figures/` | `3_fit/fit.py --preset canonical` | no |
+| `comparisons/figures/` | `4_diagnostics/1_country_frontier.py`, `2_plot_crossovers.py` | no |
+| `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |
+| `dashboard_stills/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |
-| `blogpost/figures/` | `blogpost/figures/make_all.py` | **yes**, except `*.html` |
+| `6_writeups/blogpost/figures/` | `6_writeups/blogpost/figures/make_all.py` | **yes**, except `*.html` |
 
-`plots/` is gitignored entirely: figures there are regenerable from the traces,
-and one dashboard build writes hundreds of them. `index.html` is the tracked
-artifact and the thing you serve. It is self-contained, so a browser opens it
-with no server. `blogpost/figures/` is tracked because the post is a deliverable
-rather than a render, but its interactive Plotly twins are not: ~4.7 MB each of
-inlined JS, rebuilt by `make_all.py`.
+Every `figures/` folder holds the PNGs, with the interactive Plotly twins under `html/` and the French versions under `fr/` (same layout inside). They are gitignored: regenerable from the traces, and one dashboard build writes hundreds of them. `index.html` is the tracked artifact and the thing you serve. It is self-contained, so a browser opens it with no server. The blog post's figures are tracked because the post is a deliverable rather than a render, but their interactive twins are not: ~4.7 MB each of inlined JS, rebuilt by `make_all.py`.
 
-One fit writes one HTML and one PNG per figure into its own
-`plots/mirt_k{K}{tag}/`. K is in that folder name, so a K=3 and a K=4 run of
-one flag set do not overwrite each other.
+One fit writes one PNG (and one HTML) per figure into its own `figures/k{K}/`. K is in that folder name, so a K=3 and a K=4 run of one flag set share their tables and traces but never their figures.
+
+Every figure is English by default; builders that carry text take `lang="fr"`, and the canonical fit writes that render of its `capability_timeline` under `figures/fr/`. That figure is the post's figure 1 drawn by the same `capability_timeline_fig`: anchored ECI-H scale, 80% intervals, and the interval of the bottom and top human tiers (Average Human, Top Performer) as a faint band, so the human ladder's bounds read as uncertain. The country-frontier figure draws the same two bands.
 
 ## The commands
 
@@ -37,7 +36,7 @@ the flag set, the data scope and the destination folder from it.
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --forecast --trace \
-  results/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+  5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
 Folder sweep. Renders every MIRT trace under a directory, one child process
@@ -45,8 +44,8 @@ each, forecasts on. `--dry-run` prints the per-trace decision and renders
 nothing.
 
 ```bash
-python 4_diagnostics/3_plot_mirt.py --folder results/ --dry-run
-python 4_diagnostics/3_plot_mirt.py --folder results/mirt_humanmerge_lineageprior_lineagebm
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260908/ --dry-run
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm
 ```
 
 Dashboard. `--force-all` ignores the render cache, which is the only way to be
@@ -65,13 +64,16 @@ trace of its own. `--cached` never opens the trace: it reuses the forecast cache
 pickle and fails if it is missing.
 
 ```bash
-python blogpost/figures/make_all.py all --cached
+python 6_writeups/blogpost/figures/make_all.py all --cached
 ```
 
 ## Figure catalogue
 
-Names below are the figure keys. On disk each becomes
-`mirt_<key>.html` / `mirt_<key>.png`; on the dashboard each is one panel.
+Names below are the figure keys; on the dashboard each is one panel. On disk the
+name is the explicit form of the key (`viz.figure_filename`): `timeline_2_reasoning`
+becomes `timeline_axis2_reasoning.png`, `forecast_1_math_when` becomes
+`forecast_axis1_math_crossover_dates.png`, `forecast_1_math_prob` becomes
+`forecast_axis1_math_exceedance_probability.png`; other keys are unchanged.
 
 ### Goodness of fit
 

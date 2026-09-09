@@ -6,7 +6,7 @@ Layout
 * analysis helpers — anchor pinning, ECI affine, timeline split, human levels
 * model + sampler  — tiny NUTS run, verifies the full Beta IRT compiles + samples
 * PPC + plots      — every plot builder returns a valid go.Figure
-* CLI              — argparse contract for 3_fit.py
+* CLI              — argparse contract for 3_fit/fit.py
 
 The analysis / plot tests run against a synthetic InferenceData built from a
 seeded RNG — no NUTS needed, so they finish in a fraction of a second. The
@@ -774,6 +774,37 @@ class TestPlots:
         humans = human_stats_df(synth_trace, data)
         fig = capability_timeline_fig(tl, human_stats=humans)
         assert isinstance(fig, go.Figure)
+        # English by default, French on request; the legend names the interval
+        # width when the caller gives it, and the banded tiers get a band shape.
+        names = [t.name for t in fig.data]
+        assert "AI models" in names and "Benchmark difficulty" in names
+        fig_fr = capability_timeline_fig(tl, human_stats=humans, lang="fr", hdi_prob=0.8)
+        assert "Modèles d'IA (intervalle à 80 %)" in [t.name for t in fig_fr.data]
+        n_lines = len(humans)
+        banded = capability_timeline_fig(tl, human_stats=humans, hdi_prob=0.8,
+                                         human_bands=tuple(humans["name"][:1]))
+        rects = [s for s in banded.layout.shapes if s.type == "rect"]
+        lines = [s for s in banded.layout.shapes if s.type == "line"]
+        assert len(rects) == 1 and len(lines) == n_lines
+        assert any("80% interval" in t.name for t in banded.data if t.legendgroup == "humans")
+        # Tier names at the right replace the legend entries.
+        right = capability_timeline_fig(tl, human_stats=humans, tier_names_at_right=True)
+        assert not [t for t in right.data if t.legendgroup == "humans"]
+        assert len(right.layout.annotations) >= n_lines
+
+    def test_timeline_stats_on_the_eci_scale(self, synth_trace, data, raw_df):
+        # metric='ECI' pins the two anchors (when present) and narrows the
+        # interval with hdi_prob; benchmarks move onto the ability scale via D/A.
+        tl95 = timeline_stats_df(synth_trace, data, raw_df, metric="ECI", hdi_prob=0.95)
+        tl80 = timeline_stats_df(synth_trace, data, raw_df, metric="ECI", hdi_prob=0.8)
+        assert list(tl95["name"]) == list(tl80["name"])
+        width95 = (tl95["hdi_high"] - tl95["hdi_low"]).to_numpy()
+        width80 = (tl80["hdi_high"] - tl80["hdi_low"]).to_numpy()
+        assert (width80 <= width95 + 1e-12).all()
+        h = human_stats_df(synth_trace, data, metric="ECI", hdi_prob=0.8)
+        assert set(h.columns) == {"name", "mean", "hdi_low", "hdi_high", "n_obs"}
+        with pytest.raises(ValueError):
+            timeline_stats_df(synth_trace, data, raw_df, metric="logit")
 
     def test_pit_hist_and_ecdf(self, synth_trace, data):
         y_rep = posterior_predictive_mirt(synth_trace, data)
@@ -819,7 +850,7 @@ class TestCLI:
     def test_help_exits_clean(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "3_fit.py"), "--help"],
+            [py, str(PROJECT_ROOT / "3_fit/fit.py"), "--help"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -832,7 +863,7 @@ class TestCLI:
     def test_unknown_arg_fails(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "3_fit.py"), "--bogus-flag"],
+            [py, str(PROJECT_ROOT / "3_fit/fit.py"), "--bogus-flag"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -842,7 +873,7 @@ class TestCLI:
     def test_invalid_preset_fails(self):
         py = sys.executable
         r = subprocess.run(
-            [py, str(PROJECT_ROOT / "3_fit.py"), "--preset", "nonsense"],
+            [py, str(PROJECT_ROOT / "3_fit/fit.py"), "--preset", "nonsense"],
             cwd=str(PROJECT_ROOT),
             capture_output=True, text=True, timeout=60,
         )
@@ -2372,9 +2403,9 @@ class TestFitSpec:
                 / "trace_mirt_k3_lineagehard_floors.nc")
 
     def test_attrless_baseline_takes_folder_data_scope(self):
-        # 3_fit.py's K=1 baseline used to carry no attrs and no tag in its filename. It
+        # 3_fit/fit.py's K=1 baseline used to carry no attrs and no tag in its filename. It
         # keeps the folder's DATA scope and gets the model-side flags from
-        # 3_fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
+        # 3_fit/fit.py's baseline rule (floors/ceiling-noise/known_se forwarded, the priors
         # and the pooled noise not).
         idata = self._idata(K=1)
         p = (PROJECT_ROOT / "results"
@@ -2385,7 +2416,7 @@ class TestFitSpec:
         assert (spec.cyber, spec.floors, spec.known_se) == (True, True, True)
         assert not (spec.human_prior or spec.lineage_prior or spec.pooled_noise)
         # floors ON emits no token; the baseline is fit pooled_noise=False
-        # (3_fit.py's baseline rule), which the tag now names. Harmless for
+        # (3_fit/fit.py's baseline rule), which the tag now names. Harmless for
         # folders: a baseline lives untagged in its K-fit's folder.
         assert spec.tag == "_cyber_knownse_unpooled"
 
@@ -2581,8 +2612,9 @@ import re as _re
 
 class TestLayoutPaths:
     """The 2026-08 restructure renamed data/ -> 1_data/, diagnostics/ ->
-    4_diagnostics/, fit.py -> 3_fit.py and hoisted the library into
-    multiaxis_eci/. Paths built piecewise (`ROOT / "data" / "curated"`) survive
+    4_diagnostics/, fit.py -> 3_fit.py (now 3_fit/fit.py) and hoisted the library into
+    multiaxis_eci/; the 2026-09 one moved results/ and plots/ under
+    5_outputs/<data generation>/ and the write-ups under 6_writeups/. Paths built piecewise (`ROOT / "data" / "curated"`) survive
     a rename silently: they still evaluate to a Path, and only blow up when
     something reads them. These lock the layout so the next rename fails here
     instead of in a user's run.
@@ -2592,14 +2624,14 @@ class TestLayoutPaths:
     """
 
     _SELF = Path(__file__).resolve()
-    _SKIP_PARTS = {".git", "__pycache__", ".pytest_cache", "results", "plots"}
+    _SKIP_PARTS = {".git", "__pycache__", ".pytest_cache", "5_outputs", "archive"}
 
     @classmethod
     def _files(cls, suffixes):
         # git-visible files only, when git is available: tracked plus
         # untracked-but-not-ignored (--others --exclude-standard), so a new
         # file is scanned BEFORE it is staged, while gitignored local
-        # artifacts (blogpost/figures/html/, memo/, evals/*/out/) cannot raise false alarms
+        # artifacts (figures/html/, memo/, internal_evals/*/out/) cannot raise false alarms
         # a fresh cloner can never reproduce. Falls back to the rglob sweep
         # when the tree is not a git checkout (a tarball download) — including
         # when git succeeds but sees nothing, which happens when the tarball
@@ -2625,7 +2657,13 @@ class TestLayoutPaths:
         # `[/"]` after the name: catches both the exact segment (`/ "data"`)
         # and a longer literal (`/ "data/processed/..."`), which the
         # closing-quote-only form let through (found live in the post scripts).
-        stale = _re.compile(r'/ *"(data|diagnostics)[/"]|"(diagnostics|eci)/')
+        # 2026-09: results/ + plots/ became 5_outputs/<data generation>/, deliverables/
+        # and blogpost/ became 6_writeups/, notebooks/ moved under archive/.
+        # `/ "diagnostics"` is no longer stale on its own: it is the per-generation
+        # diagnostics/ output folder (config.DIAGNOSTICS_DIR); the old top-level
+        # folder only ever appeared as a path string, the second alternative.
+        stale = _re.compile(r'/ *"(data|results|plots|deliverables|blogpost|notebooks)[/"]'
+                            r'|"(diagnostics|eci|results|plots|deliverables|blogpost)/')
         hits = [f"{p.relative_to(PROJECT_ROOT)}:{i}"
                 for p in self._files({".py"})
                 for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
@@ -2658,9 +2696,10 @@ class TestLayoutPaths:
         for rel in ["0_input/all_scores_flat.csv", "0_input/provenance.json",
                     "1_curated/excluded_benchmarks.txt", "1_curated/lineage_map.csv",
                     "2_model/multiaxis_eci/config.py", "2_model/multiaxis_eci/scripts.py",
-                    "3_fit.py", "4_diagnostics/4_build_dashboard.py",
-                    "4_diagnostics/dashboard_fits.json",
-                    "notebooks", "docs/cli.md", "LICENSE", "NOTICE.md"]:
+                    "3_fit/fit.py", "4_diagnostics/4_build_dashboard.py",
+                    "6_writeups/dashboard/dashboard_fits.json", "6_writeups/blogpost",
+                    "5_outputs/pre_pipeline/canonical/sota.csv",
+                    "archive/notebooks", "docs/cli.md", "LICENSE", "NOTICE.md"]:
             assert (PROJECT_ROOT / rel).exists(), f"missing: {rel}"
 
     def test_no_hardcoded_home_paths(self):

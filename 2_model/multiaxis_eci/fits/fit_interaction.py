@@ -6,7 +6,7 @@ axis): ARC-AGI-2 -> reasoning, MMLU -> knowledge, OS World (Screenshot) -> agent
 --loading-prior normal switches to non-negative HalfNormal loadings with no
 founders (non-negativity pins the frame). --floors applies the fixed-c 3PL link
 (chance floors from the view's lower_bound column, scores clipped up to
-the floor), as 3_fit.py does under its default-on floors. Each benchmark gets a per-pair interaction
+the floor), as 3_fit/fit.py does under its default-on floors. Each benchmark gets a per-pair interaction
 coefficient gamma (DeMars a_3), non-negative and acting on softplus abilities:
 gamma > 0 means the item rewards having BOTH abilities ("needs both" /
 conjunctive), gamma = 0 is compensatory.
@@ -47,7 +47,13 @@ from multiaxis_eci.analysis import (  # noqa: E402
     factor_scores_df,
     mirt_identified_rhat_interaction,
 )
-from multiaxis_eci.config import HUMAN_ORDER, SAMPLE_KW, SG_MODEL_NAME  # noqa: E402
+from multiaxis_eci.config import (  # noqa: E402
+    FIGURES_DIRNAME,
+    HUMAN_ORDER,
+    SAMPLE_KW,
+    SG_MODEL_NAME,
+)
+from multiaxis_eci.config import RESULTS_DIR as _RESULTS_ROOT  # noqa: E402
 from multiaxis_eci.data import (  # noqa: E402
     clip_scores_to_floors,
     drop_model_benchmark_cells,
@@ -62,10 +68,10 @@ from multiaxis_eci.models.mirt_interaction import (  # noqa: E402
 from multiaxis_eci.persistence import save_df, save_json, save_trace  # noqa: E402
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_interaction  # noqa: E402
 
-RESULTS_DIR = ROOT / "results" / "mirt_interaction"
-PLOTS_DIR = ROOT / "plots" / "mirt_interaction"
+RESULTS_DIR = _RESULTS_ROOT / "mirt_interaction"
+FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 AXES = ["Reasoning", "Knowledge", "Agentic"]
 PLT_FOUNDERS = ["ARC-AGI-2", "MMLU", "OS World (Screenshot)"]   # one per axis, in order
