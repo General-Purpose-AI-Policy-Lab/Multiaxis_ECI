@@ -141,7 +141,7 @@ and LOO always describe the whole fit. The same holds for a mode-restricted
 dashboard card, which is an addition to the whole-fit figures, not a
 replacement. The 0.4 cap corresponds to a 95% interval width of about 1.57.
 
-**SOTA models are exempt from that drop.** Models in `config.SOTA_MODELS`
+**SOTA models are exempt from that drop.** Models of the `config.SOTA_FAMILIES` releases
 stay on every timeline even when sparse and wide, because a frontier release
 is the headline of the figure and its uncertainty is better communicated by
 the drawn interval than by a silent omission.

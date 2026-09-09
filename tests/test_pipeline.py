@@ -61,7 +61,7 @@ from multiaxis_eci.config import (
     ECI_EPS,
     HUMAN_ORDER,
     PROJECT_ROOT,
-    SOTA_MODELS,
+    SOTA_FAMILIES,
     ZERO_DIAG_THRESHOLD,
 )
 from multiaxis_eci.data import (
@@ -133,12 +133,13 @@ def raw_df(data: ECIData) -> pd.DataFrame:
     df = read_scores()[SCORE_COLUMNS]
     df = df[~df["benchmark"].isin(load_excluded_benchmarks())].reset_index(drop=True)
     # Isolated families (one benchmark across all variants) leave too, SOTA and anchors kept.
-    from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
+    from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
     from multiaxis_eci.data import model_family
     fam = df["model_version"].map(model_family)
     lonely = set(df.groupby(fam)["benchmark"].nunique().pipe(lambda n: n[n == 1]).index)
-    protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
-    df = df[~(fam.isin(lonely) & ~df["model_version"].isin(protected))].reset_index(drop=True)
+    anchors = {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+    df = df[~(fam.isin(lonely) & ~fam.isin(SOTA_FAMILIES)
+              & ~df["model_version"].isin(anchors))].reset_index(drop=True)
     humans = _load_human_baselines_as_models()
     humans = humans[humans["benchmark"].isin(df["benchmark"].unique())]
     df = pd.concat([df, humans], ignore_index=True)
@@ -345,7 +346,10 @@ class TestData:
         assert data.zero_diag_threshold == ZERO_DIAG_THRESHOLD
 
     def test_find_model_idx_round_trip(self, data):
-        for name in [ANCHOR_LOW[0], ANCHOR_HIGH[0], SOTA_MODELS[0], SOTA_MODELS[-1]]:
+        from multiaxis_eci.data import is_sota_model
+        sota_names = [m for m in data.mlookup["model"] if is_sota_model(m)]
+        assert sota_names, "no fitted test-taker of a SOTA family"
+        for name in [ANCHOR_LOW[0], ANCHOR_HIGH[0], sota_names[0], sota_names[-1]]:
             idx = find_model_idx(data.mlookup, name)
             assert 0 <= idx < data.n_models
             assert data.mlookup["model"].iloc[idx] == name
@@ -518,10 +522,12 @@ class TestAnalysis:
         expected = {"model", "release_date", "C_mean", "C_hdi_low", "C_hdi_high",
                     "ECI_mean", "ECI_hdi_low", "ECI_hdi_high"}
         assert expected.issubset(df.columns)
-        # Models with no surviving rows are skipped (with a warning print) —
-        # the resulting df is a subset of SOTA_MODELS in original order.
-        assert 0 < len(df) <= len(SOTA_MODELS)
-        assert set(df["model"]).issubset(SOTA_MODELS)
+        # One row per SOTA family that survives the filters, its best effort;
+        # families with no surviving test-taker are skipped (with a warning print).
+        from multiaxis_eci.data import model_family
+        assert 0 < len(df) <= len(SOTA_FAMILIES)
+        assert set(df["family"]).issubset(SOTA_FAMILIES) and df["family"].is_unique
+        assert (df["model"].map(model_family) == df["family"]).all()
         model_dates, _ = analysis._release_dates(raw_df)
         for _, row in df.iterrows():
             expected_date = model_dates.get(row["model"])
@@ -2755,7 +2761,7 @@ class TestPipelineIdentity:
 
 class TestIsolatedFamilies:
     def test_every_fitted_family_spans_two_benchmarks_unless_protected(self, data):
-        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
+        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_FAMILIES
         from multiaxis_eci.data import model_family
         names = data.mlookup.sort_values("model_idx")["model"].tolist()
         obs = pd.DataFrame({"model": np.array(names)[data.model_idx],
@@ -2763,9 +2769,9 @@ class TestIsolatedFamilies:
         obs = obs[~obs["model"].isin(set(names[i] for i in np.flatnonzero(data.is_human)))]
         fam = obs["model"].map(model_family)
         n_bench = obs.groupby(fam)["bench"].nunique()
-        protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
-        lonely = [f for f, n in n_bench.items() if n == 1
-                  and not obs.loc[fam == f, "model"].isin(protected).any()]
+        anchors = {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+        lonely = [f for f, n in n_bench.items() if n == 1 and f not in SOTA_FAMILIES
+                  and not obs.loc[fam == f, "model"].isin(anchors).any()]
         assert not lonely, lonely[:5]
 
     def test_keep_isolated_restores_them(self, data):

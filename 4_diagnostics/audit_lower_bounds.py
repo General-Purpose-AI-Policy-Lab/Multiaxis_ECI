@@ -31,12 +31,12 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
-from multiaxis_eci import config
-from multiaxis_eci.data import (
+from multiaxis_eci.data import (  # noqa: E402
     BENCHMARK_CLIPS_FILE,
     HUMAN_FILE,
     PROCESSED_FILE,
     benchmark_floors_table,
+    is_sota_model,
     load_eci_data,
 )
 
@@ -84,7 +84,7 @@ def score_table():
     h["is_human"] = True
     df = pd.concat([m, h], ignore_index=True)
     df["date"] = pd.to_datetime(df["release_date"], errors="coerce")
-    df["sota"] = df["model_version"].isin(set(config.SOTA_MODELS))
+    df["sota"] = df["model_version"].map(is_sota_model)
     return df
 
 

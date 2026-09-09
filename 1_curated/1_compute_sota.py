@@ -1,143 +1,96 @@
-"""Recompute the data-driven SOTA list and write 1_curated/sota_models.txt.
+"""Recompute the SOTA list and write 1_curated/sota_families.txt.
 
-SOTA = (frontier envelope on overall 1D capability) ∪ (each flagship lineage's
-current leader), restricted to the recent era. Epoch-faithful — the frontier is
-"the highest-capability model accessible at each date" (record-setters of the 1D
-Beta-IRT C), and the flagship union guarantees every major vendor's current
-top-line model is always shown even when it hasn't set a new all-time record.
+SOTA = (world frontier records of the recent era) ∪ (every family within NEAR_ECI points of
+the best model of each organisation present in that frontier). The file lists families (a
+release: base model plus snapshot, `data.model_family`), so every reasoning effort of a SOTA
+release is protected and shown; the canonical fit's SOTA table keeps the best effort of each.
+Read off the canonical K=1 fit of the current data generation (`all_models_eci.csv`,
+`timeline.csv`): no separate sampling. Candidates need MIN_OBS observations, which is also the
+threshold of the drop filter the list protects against, so the previous list cannot decide the
+next one through the models it kept (user decisions 2026-09-09).
 
-Refresh: re-run after a data/fit refresh. Reviewed like the other curated maps.
-
-  python 1_curated/1_compute_sota.py
+  python 1_curated/1_compute_sota.py [--results-dir DIR]
 """
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pymc as pm
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
-from multiaxis_eci.analysis import _release_dates, capability_draws  # noqa: E402
-from multiaxis_eci.config import SAMPLE_KW  # noqa: E402
-from multiaxis_eci.data import PROCESSED_FILE, is_bare, load_eci_data, model_family  # noqa: E402
-from multiaxis_eci.lineage import LINEAGE_MAP  # noqa: E402
-from multiaxis_eci.models.mirt import build_mirt_model  # noqa: E402
+from multiaxis_eci import config  # noqa: E402
+from multiaxis_eci.data import MODELS_FILE, model_family  # noqa: E402
 
-WINDOW_MONTHS = 24        # "recent era" cutoff for both the envelope and flagships
-MIN_OBS = 4               # Epoch's ≥4-benchmark rule for envelope record-setters
-OUT = ROOT / "1_curated" / "sota_models.txt"
-
-# Flagship lineage chains (the frontier tier). Small / mini / flash / open /
-# fast lines are intentionally excluded — a chain is flagship if it is the
-# vendor's top capability line. Names match lineage_map.csv `chain`.
-FLAGSHIP_CHAINS = {
-    "gpt", "o-flagship", "o-pro", "codex", "pro",   # OpenAI frontier lines
-    "opus", "sonnet",                                # Anthropic
-    "gemini-pro",                                    # Google DeepMind
-    "grok",                                          # xAI
-    "deepseek-v", "deepseek-r",                      # DeepSeek
-    "qwen-max",                                      # Alibaba
-    "glm", "kimi", "minimax",                        # Zhipu / Moonshot / MiniMax
-    "mistral-large",                                 # Mistral
-    "llama-70b",                                     # Meta (largest in-data line)
-}
-
-# Explicit always-include pins (prefix-matched → best-C variant present in data).
-# The flagship logic picks only a chain's LATEST node; a pin forces an earlier
-# model in too — e.g. Opus 4.8, which the opus chain's latest node (Fable 5)
-# otherwise supersedes.
-PINNED = ["claude-opus-4-8"]
+WINDOW_MONTHS = 24        # "recent era": records set in the last 24 months before the newest release
+MIN_OBS = 4               # Epoch's ≥4-benchmark rule for record-setters, and the drop filter's threshold
+NEAR_ECI = 10.0           # a family counts as top-line when within this many ECI points of its organisation's best
+OUT = ROOT / "1_curated" / "sota_families.txt"
 
 
-def main():
-    data = load_eci_data()                      # canonical 1D scope
-    kw = dict(SAMPLE_KW)
-    kw.update(draws=1500, tune=1000, chains=4, cores=4, progressbar=False,
-              nuts_sampler="nutpie")
-    with build_mirt_model(data, 1, loading_prior="normal"):
-        trace = pm.sample(**kw)
-    C = capability_draws(trace).mean(0)         # (M,) posterior-mean overall capability
-    names = data.mlookup.sort_values("model_idx")["model"].tolist()
-    c_of = dict(zip(names, C))
-    model_dates, _ = _release_dates(pd.read_csv(PROCESSED_FILE))
+def frontier_records(d: pd.DataFrame, since: pd.Timestamp) -> list[str]:
+    """Running-max record-setters of median ECI by release date, kept when released after `since`."""
+    run, out = -np.inf, []
+    for _, r in d.sort_values(["release_date", "mean"]).iterrows():
+        if r["mean"] > run + 1e-9:
+            run = r["mean"]
+            if r["release_date"] >= since:
+                out.append(r["name"])
+    return out
 
-    date_of = {m: pd.to_datetime(d) for m, d in model_dates.items()}
-    dated = [(date_of[m], m) for i, m in enumerate(names)
-             if not data.is_human[i] and m in date_of]
-    max_date = max(d for d, _ in dated)
-    cutoff = max_date - pd.DateOffset(months=WINDOW_MONTHS)
 
-    # ── frontier envelope: all-time running max of C, keep recent record-setters
-    df = pd.DataFrame([(d, m, c_of[m], int(data.n_obs_per_model[names.index(m)]))
-                       for d, m in dated], columns=["date", "model", "C", "n_obs"])
-    df = df[df["n_obs"] >= MIN_OBS].sort_values("date")
-    run, envelope = -np.inf, []
-    for _, r in df.iterrows():
-        if r.C > run + 1e-9:
-            run = r.C
-            if r.date >= cutoff:
-                envelope.append(r.model)
+def compute(results_dir: Path) -> pd.DataFrame:
+    """One row per selected family: best effort, ECI, release date, organisation, why."""
+    eci = pd.read_csv(results_dir / "all_models_eci.csv")
+    tl = pd.read_csv(results_dir / "timeline.csv")
+    humans = set(pd.read_csv(results_dir / "human_groups.csv")["name"])
+    models = pd.read_csv(MODELS_FILE, dtype=str).fillna("")
+    org = dict(zip(models["model_version"], models["organization"], strict=True))
 
-    # ── flagship union: each flagship chain's latest node, best in-data variant
-    lm_full = pd.read_csv(LINEAGE_MAP)
-    lin_date = dict(zip(lm_full["raw_string"],
-                        pd.to_datetime(lm_full["node_date"], errors="coerce")))
-    lm = lm_full[(lm_full["in_chain"].astype(str).str.lower() == "yes")
-                 & lm_full["chain"].isin(FLAGSHIP_CHAINS)].copy()
-    lm["date"] = pd.to_datetime(lm["node_date"], errors="coerce")
-    lm = lm[lm["raw_string"].isin(c_of)]        # present in data
-    flagships = []
-    for _chain, g in lm.groupby("chain"):
-        latest = g[g["date"] == g["date"].max()]
-        if latest.empty:                        # every in-data node undated
-            continue                            # (NaT max matches nothing)
-        if latest["date"].iloc[0] < cutoff:     # skip dead chains
-            continue
-        best = max(latest["raw_string"], key=lambda s: c_of[s])   # top variant
-        flagships.append(best)
-        date_of.setdefault(best, latest["date"].iloc[0])          # lineage date fallback
+    d = eci.merge(tl.loc[tl["kind"] == "model", ["name", "release_date"]], on="name")
+    d = d[~d["name"].isin(humans) & (d["n_obs"] >= MIN_OBS)].copy()
+    d["release_date"] = pd.to_datetime(d["release_date"])
+    d["family"] = d["name"].map(model_family)
+    d["org"] = d["name"].map(org).fillna("")
 
-    # explicit pins: best-C in-data variant of each pinned stem
-    pins = []
-    for stem in PINNED:
-        cands = [m for m in c_of if m.startswith(stem)]
-        if cands:
-            best = max(cands, key=lambda s: c_of[s])
-            pins.append(best)
-            date_of.setdefault(best, lin_date.get(best, pd.Timestamp.min))
+    cutoff = d["release_date"].max() - pd.DateOffset(months=WINDOW_MONTHS)
+    records = set(frontier_records(d, cutoff))
+    frontier_orgs = {org.get(m, "") for m in records} - {""}
 
-    # every selected effort variant also pulls in its bare BASE config when it
-    # is in the data — the timelines should show the base model alongside its
-    # reasoning variant, not only the best-C effort config
-    picked = set(envelope) | set(flagships) | set(pins)
-    bare_of_family = {model_family(m): m for m in c_of if is_bare(m)}
-    bases = set()
-    for m in picked:
-        b = bare_of_family.get(model_family(m))
-        if b is not None and b != m and b not in picked:
-            bases.add(b)
-            date_of.setdefault(b, date_of.get(m, pd.Timestamp.min))
+    # Best effort per family, then the two rules.
+    fam = (d.sort_values("mean", ascending=False).drop_duplicates("family")
+             .rename(columns={"name": "best_model"}))
+    fam["release_date"] = fam["family"].map(d.groupby("family")["release_date"].min())
+    fam["is_record"] = fam["family"].isin({model_family(m) for m in records})
+    org_best = fam.groupby("org")["mean"].transform("max")
+    fam["is_top_line"] = fam["org"].isin(frontier_orgs) & (fam["mean"] >= org_best - NEAR_ECI)
+    out = fam[fam["is_record"] | fam["is_top_line"]].sort_values("release_date", ascending=False)
+    out.attrs["cutoff"] = cutoff
+    out.attrs["frontier_orgs"] = sorted(frontier_orgs)
+    return out[["best_model", "family", "org", "release_date", "mean", "n_obs", "is_record", "is_top_line"]]
 
-    sota = sorted(picked | bases,
-                  key=lambda m: date_of.get(m, pd.Timestamp.min), reverse=True)  # newest first
-    OUT.write_text("\n".join(sota) + "\n")
 
-    print(f"cutoff {cutoff.date()} (max release {max_date.date()})")
-    print(f"envelope: {len(envelope)} | flagships: {len(flagships)} | pins: {len(pins)}"
-          f" | bases: {len(bases)} | union: {len(sota)}")
-    print(f"\nwrote {len(sota)} models -> {OUT.relative_to(ROOT)}:")
-    for m in sota:
-        tag = []
-        if m in envelope: tag.append("envelope")
-        if m in flagships: tag.append("flagship")
-        if m in pins: tag.append("pinned")
-        if m in bases: tag.append("base")
-        print(f"  {str(date_of[m].date())}  {m:42s} C={c_of[m]:+.2f}  [{'+'.join(tag)}]")
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--results-dir", default=str(config.RESULTS_DIR / "canonical"),
+                    help="a canonical fit folder (default: the current data generation's)")
+    args = ap.parse_args()
+    out = compute(Path(args.results_dir))
+    OUT.write_text("# SOTA families (release = base model + snapshot), newest first; written by "
+                   "1_curated/1_compute_sota.py, do not edit\n" + "\n".join(out["family"]) + "\n")
+    print(f"records since {out.attrs['cutoff'].date()}; frontier organisations: "
+          f"{', '.join(out.attrs['frontier_orgs'])}")
+    print(f"{int(out['is_record'].sum())} record families, {int(out['is_top_line'].sum())} top-line "
+          f"families, {len(out)} entries -> {OUT.relative_to(ROOT)}\n")
+    for _, r in out.iterrows():
+        why = "+".join(t for t, on in (("record", r.is_record), ("top-line", r.is_top_line)) if on)
+        print(f"  {r.release_date.date()}  {r.best_model:40s} {r.org:18s} ECI {r['mean']:6.1f}"
+              f"  n={int(r.n_obs):3d}  [{why}]")
 
 
 if __name__ == "__main__":

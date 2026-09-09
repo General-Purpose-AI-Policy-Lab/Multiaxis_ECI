@@ -222,21 +222,27 @@ SAMPLE_KW = dict(
 ANCHOR_LOW  = ("claude-3-5-sonnet-20241022", 130.0)
 ANCHOR_HIGH = ("gpt-5-2025-08-07_medium",    150.0)
 
-# ── SOTA models (data-driven; newest first) ─────────────────────────────────
+# ── SOTA families (data-driven; newest first) ───────────────────────────────
 # NOT hand-maintained. `1_curated/1_compute_sota.py` writes
-# 1_curated/sota_models.txt = (frontier envelope on overall 1D capability C,
-# Epoch-style "highest C accessible at each date") ∪ (each flagship lineage's
-# current leader), restricted to the recent era. Re-run that script after a
-# data/fit refresh. Used for the is_sota plot exemption + drop-filter protection;
-# the ECI ANCHORS above are separate and protected independently.
-def _load_sota_models() -> list[str]:
-    p = CURATED_DIR / "sota_models.txt"
+# 1_curated/sota_families.txt = (world frontier records of the last 24 months on
+# the canonical ECI-H, Epoch-style "highest capability accessible at each date")
+# ∪ (every family within 10 ECI of the best model of each organisation on that
+# frontier), candidates with >= 4 observations. A family is a release
+# (`data.model_family`: base model plus snapshot), every reasoning effort and
+# run variant included. Listing families means every effort of a SOTA release
+# is protected from the drop filters and shown on the timelines; the SOTA table
+# keeps the best effort of each (`analysis.sota_stats_df`). Re-run the script
+# after a canonical fit. Empty when the file is missing: the anchors are
+# protected by name anyway.
+def _load_sota_families() -> list[str]:
+    p = CURATED_DIR / "sota_families.txt"
     if p.exists():
-        return [ln.strip() for ln in p.read_text().splitlines() if ln.strip()]
-    return [ANCHOR_LOW[0], ANCHOR_HIGH[0]]      # fallback: at least protect the anchors
+        return [ln.strip() for ln in p.read_text().splitlines()
+                if ln.strip() and not ln.startswith("#")]
+    return []
 
 
-SOTA_MODELS: list[str] = _load_sota_models()
+SOTA_FAMILIES: list[str] = _load_sota_families()
 
 # Axes (0-based) where the frontier forecast does NOT grant SOTA the exemption
 # from the SD < 0.4 informed filter. Axis 4 is the legacy knowledge/NLP axis:

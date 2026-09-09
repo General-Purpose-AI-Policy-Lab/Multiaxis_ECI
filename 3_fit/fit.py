@@ -319,7 +319,7 @@ def run_canonical(args) -> None:
     if args.eci_data_only:
         config.ANCHOR_LOW  = ("Claude 3.5 Sonnet (October 2024)", 130.0)
         config.ANCHOR_HIGH = ("GPT-5", 150.0)
-        config.SOTA_MODELS = [
+        config.SOTA_FAMILIES = [
             "GPT-5", "o3-pro", "o3", "Gemini 2.5 Pro (Mar 2025)", "o1",
             "o1-mini", "Gemini 1.5 Pro", "GPT-4o (May 2024)",
             "GPT-4 Turbo (Apr 2024)", "Claude 3 Opus", "GPT-4 (Mar 2023)",

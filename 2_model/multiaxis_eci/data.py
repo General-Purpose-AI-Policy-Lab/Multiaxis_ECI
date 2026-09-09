@@ -350,6 +350,17 @@ def model_family(model_version: str) -> str:
     return _effort_base(model_version)
 
 
+def sota_families() -> set[str]:
+    """The releases of `1_curated/sota_families.txt` (config.SOTA_FAMILIES), as `model_family` names."""
+    from multiaxis_eci.config import SOTA_FAMILIES
+    return set(SOTA_FAMILIES)
+
+
+def is_sota_model(model_version: str) -> bool:
+    """True when the test-taker belongs to a SOTA family, whatever its reasoning effort."""
+    return model_family(model_version) in sota_families()
+
+
 def is_bare(model_version: str) -> bool:
     """True for the base configuration of a release: no reasoning level, budget or run variant."""
     ident = _identity()
@@ -578,7 +589,7 @@ class ECIData:
     # likelihood split (models/mirt.py); see load_eci_data for the conversion.
     # None on a hand-built ECIData, which is what known_se=True rejects.
     n_eff: np.ndarray | None = None
-    # (n_models,) bool — True for models in config.SOTA_MODELS. Parallels
+    # (n_models,) bool — True for models of a config.SOTA_FAMILIES release. Parallels
     # is_low_obs / is_human: lets plots ALWAYS show SOTA models (e.g. sparse new
     # frontier releases like Fable 5 / Mythos) even when their posterior is wide,
     # rather than dropping them as un-informed. Defaults to None so existing
@@ -691,9 +702,10 @@ def load_eci_data(drop_low_obs_models: bool = False,
                       f"({preview}, ...)")
 
         if collapse_effort_variants:
-            from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
-            protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
-            df = _collapse_effort_variants(df, protected=protected)
+            # Only the anchors are pinned by name here: the SOTA list names
+            # families, and collapsing a family to one effort is the point.
+            from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
+            df = _collapse_effort_variants(df, protected={ANCHOR_LOW[0], ANCHOR_HIGH[0]})
 
     excluded = load_excluded_benchmarks()
     df = df.reset_index(drop=True)
@@ -762,12 +774,12 @@ def load_eci_data(drop_low_obs_models: bool = False,
     # Isolated families: a release seen on one benchmark only, across all its
     # reasoning efforts and run variants, once the scope above is settled.
     if drop_isolated_families and not eci_data_only:
-        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
-        protected = set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
         fam = df["model_version"].map(model_family)
         n_bench = df.groupby(fam)["benchmark"].nunique()
         isolated = set(n_bench[n_bench == 1].index)
-        drop = fam.isin(isolated) & ~df["model_version"].isin(protected)
+        drop = (fam.isin(isolated) & ~fam.isin(sota_families())
+                & ~df["model_version"].isin({ANCHOR_LOW[0], ANCHOR_HIGH[0]}))
         print(f"   isolated families: dropped {int(drop.sum())} obs of "
               f"{df.loc[drop, 'model_version'].nunique()} test-takers in "
               f"{len(isolated)} families seen on one benchmark only; "
@@ -817,10 +829,12 @@ def load_eci_data(drop_low_obs_models: bool = False,
         # Drop AI models with fewer than LOW_OBS_THRESHOLD observations —
         # they cause posterior multimodality. Two exemptions kept regardless:
         #   • Humans — sparse anchors are still informative for level lines
-        #   • SOTA + anchor models — non-negotiable for the headline plots
-        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_MODELS
-        protected = human_groups | set(SOTA_MODELS) | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+        #   • SOTA families (every effort) + anchor models — non-negotiable for
+        #     the headline plots
+        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
         counts = df.groupby("model_version").size()
+        sota_names = {m for m in counts.index if is_sota_model(m)}
+        protected = human_groups | sota_names | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
         keep_models = set(counts[counts >= LOW_OBS_THRESHOLD].index) | protected
         df = df[df["model_version"].isin(keep_models)].reset_index(drop=True)
 
@@ -867,9 +881,7 @@ def load_eci_data(drop_low_obs_models: bool = False,
     # dropped from the dataset.
     is_low_obs = (n_obs_per_model < LOW_OBS_THRESHOLD) & ~is_human
     # SOTA flag (independent of obs count) — drives the always-show-on-plots rule.
-    from multiaxis_eci.config import SOTA_MODELS
-    sota_set = set(SOTA_MODELS)
-    is_sota = np.array([m in sota_set for m in models], dtype=bool)
+    is_sota = np.array([is_sota_model(m) for m in models], dtype=bool)
 
     return ECIData(
         scores              = raw,

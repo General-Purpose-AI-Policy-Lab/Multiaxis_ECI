@@ -90,24 +90,37 @@ def eci_transform(C_flat: np.ndarray, data: ECIData) -> ECITransform:
 
 
 def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
-    """Per-SOTA-model posterior mean + 95% HDI for C and ECI.
+    """One row per SOTA family: its best effort's posterior median + 95% interval for C and ECI.
 
-    Release dates come from the dataset (earliest per model), with
-    Models listed in
-    `config.SOTA_MODELS` that have no rows in the filtered dataset (e.g. all
-    their benchmarks fell into a dropped category) are skipped with a warning
-    rather than crashing the pipeline.
+    The list (`config.SOTA_FAMILIES`) names releases; among the fitted test-takers of a family
+    the one with the highest median C is the row (the reasoning effort that best represents
+    the release), in the list's order (newest first). A family with no surviving test-taker
+    (e.g. all its benchmarks fell into a dropped category) is skipped with a warning.
     """
+    from multiaxis_eci.data import model_family
     C_flat = flat_C(trace)
     transform = eci_transform(C_flat, data)
-    available = set(data.mlookup["model"].values)
+    names = list(data.mlookup.sort_values("model_idx")["model"].values)
+    medians = np.median(C_flat, axis=0)
     model_dates, _ = _release_dates(raw_df)
 
-    rows = []
-    for name in config.SOTA_MODELS:
-        if name not in available:
-            print(f"  [sota_stats_df] skipping {name!r} — no surviving rows in the filtered dataset")
+    best: dict[str, int] = {}
+    for i, name in enumerate(names):
+        if data.is_human[i]:
             continue
+        fam = model_family(name)
+        if fam in config.SOTA_FAMILIES and (fam not in best or medians[i] > medians[best[fam]]):
+            best[fam] = i
+    missing = [f for f in config.SOTA_FAMILIES if f not in best]
+    if missing:
+        print(f"  [sota_stats_df] skipping {len(missing)} SOTA family(ies) with no surviving "
+              f"test-taker: {missing}")
+
+    rows = []
+    for fam in config.SOTA_FAMILIES:
+        if fam not in best:
+            continue
+        name = names[best[fam]]
         idx = find_model_idx(data.mlookup, name)
         c_samples   = C_flat[:, idx]
         eci_samples = transform.apply(c_samples)
@@ -115,6 +128,7 @@ def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
         e_mean, e_lo, e_hi = post_stats(eci_samples)
         rows.append({
             "model":        name,
+            "family":       fam,
             "release_date": model_dates.get(name),
             "C_mean":       c_mean,
             "C_hdi_low":    c_lo,
