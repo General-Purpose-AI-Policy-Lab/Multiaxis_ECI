@@ -616,7 +616,9 @@ def load_eci_data(drop_low_obs_models: bool = False,
     the canonical broad-index configuration (keep everything except the curated
     `excluded_benchmarks.txt` list, which is filtered out here at fit time):
       • drop_low_obs_models (default False) — when True, models with
-        <LOW_OBS_THRESHOLD obs are deleted (SOTA + anchors + humans protected).
+        <LOW_OBS_THRESHOLD obs are deleted (anchors + humans protected). No fit
+        uses it: the sparse test-takers stay in the fit and are only hidden on
+        the measured timelines (is_low_obs), where SOTA families are exempt.
         Paused: every model is fit, sparse ones get wide posteriors.
       • collapse_effort_variants (default False) — when True, for each base
         model (e.g. `gpt-5-2025-08-07`) keep one effort variant. Paused:
@@ -641,8 +643,12 @@ def load_eci_data(drop_low_obs_models: bool = False,
         the SOTA tables, and the 2020-2022 tail of them fed a second posterior
         mode on the legacy QA series. Applied after the benchmark filters, so a
         family isolated only because its other benchmarks are excluded goes too.
-        SOTA models and the ECI anchors are protected; humans are added later
-        and never concerned. Off with --keep-isolated-families (`_keepiso`).
+        The ECI anchors are protected; humans are added later and never
+        concerned. The SOTA list is not: it names releases with at least four
+        observations, which a one-benchmark family cannot be, so the list never
+        decides what the fit sees (that is what keeps its construction from
+        the canonical fit non-circular). Off with --keep-isolated-families
+        (`_keepiso`).
       • fit_simpleqa_original (default False) — append
         `1_curated/simpleqa_original/simpleqa_original.csv`, the original
         OpenAI SimpleQA (4,326 questions). A separate column from SimpleQA
@@ -778,8 +784,7 @@ def load_eci_data(drop_low_obs_models: bool = False,
         fam = df["model_version"].map(model_family)
         n_bench = df.groupby(fam)["benchmark"].nunique()
         isolated = set(n_bench[n_bench == 1].index)
-        drop = (fam.isin(isolated) & ~fam.isin(sota_families())
-                & ~df["model_version"].isin({ANCHOR_LOW[0], ANCHOR_HIGH[0]}))
+        drop = fam.isin(isolated) & ~df["model_version"].isin({ANCHOR_LOW[0], ANCHOR_HIGH[0]})
         print(f"   isolated families: dropped {int(drop.sum())} obs of "
               f"{df.loc[drop, 'model_version'].nunique()} test-takers in "
               f"{len(isolated)} families seen on one benchmark only; "
@@ -829,12 +834,11 @@ def load_eci_data(drop_low_obs_models: bool = False,
         # Drop AI models with fewer than LOW_OBS_THRESHOLD observations —
         # they cause posterior multimodality. Two exemptions kept regardless:
         #   • Humans — sparse anchors are still informative for level lines
-        #   • SOTA families (every effort) + anchor models — non-negotiable for
-        #     the headline plots
+        #   • The ECI anchors — the scale needs them
+        # The SOTA list is deliberately not protected (see drop_isolated_families).
         from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
         counts = df.groupby("model_version").size()
-        sota_names = {m for m in counts.index if is_sota_model(m)}
-        protected = human_groups | sota_names | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
+        protected = human_groups | {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
         keep_models = set(counts[counts >= LOW_OBS_THRESHOLD].index) | protected
         df = df[df["model_version"].isin(keep_models)].reset_index(drop=True)
 

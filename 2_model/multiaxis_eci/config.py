@@ -230,10 +230,11 @@ ANCHOR_HIGH = ("gpt-5-2025-08-07_medium",    150.0)
 # frontier), candidates with >= 4 observations. A family is a release
 # (`data.model_family`: base model plus snapshot), every reasoning effort and
 # run variant included. Listing families means every effort of a SOTA release
-# is protected from the drop filters and shown on the timelines; the SOTA table
-# keeps the best effort of each (`analysis.sota_stats_df`). Re-run the script
-# after a canonical fit. Empty when the file is missing: the anchors are
-# protected by name anyway.
+# is shown on the timelines and admitted as a record candidate by the country
+# frontier; the SOTA table keeps the best effort of each (`analysis.sota_stats_df`).
+# Display and reporting only: the list does not decide what the fit sees, so it
+# can be read off the canonical fit without circularity. Re-run the script after
+# a canonical fit. Empty when the file is missing.
 def _load_sota_families() -> list[str]:
     p = CURATED_DIR / "sota_families.txt"
     if p.exists():

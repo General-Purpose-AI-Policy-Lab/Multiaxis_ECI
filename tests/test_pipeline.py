@@ -132,14 +132,13 @@ def raw_df(data: ECIData) -> pd.DataFrame:
 
     df = read_scores()[SCORE_COLUMNS]
     df = df[~df["benchmark"].isin(load_excluded_benchmarks())].reset_index(drop=True)
-    # Isolated families (one benchmark across all variants) leave too, SOTA and anchors kept.
+    # Isolated families (one benchmark across all variants) leave too, anchors kept.
     from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
     from multiaxis_eci.data import model_family
     fam = df["model_version"].map(model_family)
     lonely = set(df.groupby(fam)["benchmark"].nunique().pipe(lambda n: n[n == 1]).index)
     anchors = {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
-    df = df[~(fam.isin(lonely) & ~fam.isin(SOTA_FAMILIES)
-              & ~df["model_version"].isin(anchors))].reset_index(drop=True)
+    df = df[~(fam.isin(lonely) & ~df["model_version"].isin(anchors))].reset_index(drop=True)
     humans = _load_human_baselines_as_models()
     humans = humans[humans["benchmark"].isin(df["benchmark"].unique())]
     df = pd.concat([df, humans], ignore_index=True)
@@ -2761,7 +2760,7 @@ class TestPipelineIdentity:
 
 class TestIsolatedFamilies:
     def test_every_fitted_family_spans_two_benchmarks_unless_protected(self, data):
-        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW, SOTA_FAMILIES
+        from multiaxis_eci.config import ANCHOR_HIGH, ANCHOR_LOW
         from multiaxis_eci.data import model_family
         names = data.mlookup.sort_values("model_idx")["model"].tolist()
         obs = pd.DataFrame({"model": np.array(names)[data.model_idx],
@@ -2770,7 +2769,7 @@ class TestIsolatedFamilies:
         fam = obs["model"].map(model_family)
         n_bench = obs.groupby(fam)["bench"].nunique()
         anchors = {ANCHOR_LOW[0], ANCHOR_HIGH[0]}
-        lonely = [f for f, n in n_bench.items() if n == 1 and f not in SOTA_FAMILIES
+        lonely = [f for f, n in n_bench.items() if n == 1
                   and not obs.loc[fam == f, "model"].isin(anchors).any()]
         assert not lonely, lonely[:5]
 
