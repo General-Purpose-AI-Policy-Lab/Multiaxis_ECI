@@ -263,8 +263,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--results-dir", default=None,
-                    help="dir holding trace.nc (default: results/canonical or "
-                         "results/canonical_open with --open-only)")
+                    help="dir holding trace.nc (default: results/canonical<data suffix> "
+                         "or results/canonical_open<data suffix> with --open-only)")
     ap.add_argument("--open-only", action="store_true",
                     help="use the --open-only data scope (needs "
                          "0_input/benchmarks.csv)")
@@ -291,8 +291,10 @@ def main():
     if args.open_only and args.closed_only:
         raise ValueError("--open-only and --closed-only cannot compose")
     scope = "open" if args.open_only else "closed" if args.closed_only else "all"
+    # The data generation is part of the tag, as it is of every fit folder name, so
+    # a rerun on a newer pipeline build never overwrites the previous build's outputs.
     tag = {"all": "canonical", "open": "canonical_open",
-           "closed": "canonical_closed"}[scope]
+           "closed": "canonical_closed"}[scope] + config.DATA_SUFFIX
     results_dir = Path(args.results_dir) if args.results_dir else config.RESULTS_DIR / tag
     trace_path = results_dir / "trace.nc"
 
