@@ -58,8 +58,6 @@ from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_nc  # noqa:
 
 RESULTS_DIR = _RESULTS_ROOT / "mirt_nc"
 FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Category -> axis map: organic per-category multi-loading ────────────────
 # Single-loadings where a category is clean (gives each axis enough pure
@@ -188,6 +186,9 @@ def _residuals_df(data, y_pred_mean) -> pd.DataFrame:
 
 
 def main():
+    # Folders are made here, not at import: the tests import these drivers.
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--K", type=int, default=3, choices=[3, 4])
     ap.add_argument("--qvariant", default="full",

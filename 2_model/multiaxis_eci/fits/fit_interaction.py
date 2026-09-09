@@ -70,8 +70,6 @@ from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_interaction
 
 RESULTS_DIR = _RESULTS_ROOT / "mirt_interaction"
 FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 AXES = ["Reasoning", "Knowledge", "Agentic"]
 PLT_FOUNDERS = ["ARC-AGI-2", "MMLU", "OS World (Screenshot)"]   # one per axis, in order
@@ -137,6 +135,9 @@ def gamma_pooled_table(idata, K, interaction_scale):
 
 
 def main():
+    # Folders are made here, not at import: the tests import these drivers.
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--draws", type=int, default=2000)

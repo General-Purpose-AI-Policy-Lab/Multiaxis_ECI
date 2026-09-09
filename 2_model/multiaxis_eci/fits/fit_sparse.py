@@ -58,8 +58,6 @@ from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_sparse  # n
 
 RESULTS_DIR = _RESULTS_ROOT / "mirt_sparse"
 FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Identity-block anchors: one pure benchmark per axis.
 AXES = ["Reasoning", "Knowledge", "Agentic"]
@@ -94,6 +92,9 @@ def gate_table(idata, data, K):
 
 
 def main():
+    # Folders are made here, not at import: the tests import these drivers.
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--draws", type=int, default=2000)

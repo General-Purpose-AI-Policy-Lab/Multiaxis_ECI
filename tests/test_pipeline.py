@@ -2707,7 +2707,7 @@ class TestLayoutPaths:
         leak and a command nobody else can run."""
         home = _re.compile(r"/Users/[a-z]|miniforge3/envs")
         hits = [str(p.relative_to(PROJECT_ROOT))
-                for p in self._files({".py", ".md", ".sh", ".ipynb", ".toml"})
+                for p in self._files({".py", ".md", ".sh", ".ipynb", ".toml", ".json", ".txt"})
                 if home.search(p.read_text(encoding="utf-8", errors="ignore"))]
         assert not hits, f"hardcoded home / env paths: {hits}"
 
