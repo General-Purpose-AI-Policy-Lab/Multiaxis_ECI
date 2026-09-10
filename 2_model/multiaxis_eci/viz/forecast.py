@@ -1,4 +1,4 @@
-"""Frontier-forecast figures: the trend panels, the crossover panels, the exceedance curves.
+"""Frontier-forecast figures: the trend panels and the crossover panels.
 
 One design for the dashboard, the per-fit figure folders and the blog post: the builders take
 a `FigureStyle` (viz.style) and the post's scripts pass `POST`. The trend panel is the post's
@@ -35,14 +35,12 @@ FORECAST_TEXT = {
            "crossing_axis": "Crossing date", "behind": "already behind us",
            "ahead": "still ahead", "median": "median", "interval": "{p:.0%} interval",
            "thick": "{p:.0%} interval (thick)", "thin": "{p:.0%} interval (thin)",
-           "today": "today", "clipped": "continues past the window (date shown)",
-           "decisive": "0.975 (decisive)", "p_axis": "P(frontier > tier)"},
+           "today": "today", "clipped": "continues past the window (date shown)"},
     "fr": {"trend": "Frontière projetée", "release": "Date de sortie", "ability": "capacité",
            "crossing_axis": "Date de croisement", "behind": "déjà derrière nous",
            "ahead": "encore à venir", "median": "médiane", "interval": "intervalle à {p:.0%}",
            "thick": "intervalle à {p:.0%} (épais)", "thin": "intervalle à {p:.0%} (fin)",
-           "today": "aujourd'hui", "clipped": "dépasse la fenêtre (date indiquée)",
-           "decisive": "0.975 (décisif)", "p_axis": "P(frontière > niveau)"},
+           "today": "aujourd'hui", "clipped": "dépasse la fenêtre (date indiquée)"},
 }
 
 
@@ -284,51 +282,4 @@ def crossover_panels_fig(cx: pd.DataFrame, axes: list[str], titles: dict | None 
                     t=120 if title else 80, b=int(style.font_legend * 8)))
     if title:
         fig.update_layout(title=dict(text=title, x=0.5))
-    return apply_fonts(fig, style)
-
-
-def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str,
-                        human_labels: dict | None = None, lang: str = "en",
-                        style: FigureStyle = DASHBOARD) -> go.Figure:
-    """P(frontier > tier) over the forecast grid — one S-curve per human tier,
-    with reference lines at 0.5 and 0.975 (decisive).
-
-    `human_labels` defaults to the `lang` tier names (English = raw names)."""
-    text = FORECAST_TEXT[lang]
-    labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
-    from multiaxis_eci.analysis.forecast import _to_year, frontier_paths
-
-    xg = _to_year(fc.grid_dates)
-    # Through frontier_paths, NOT intercept + slope * t: an envelope result's
-    # line is only valid beyond the last record — evaluated backward it would
-    # extrapolate the recent rate over the observed window and misprice every
-    # historical exceedance probability.
-    f = frontier_paths(fc, xg)                                      # (S, G)
-    gx = pd.to_datetime(fc.grid_dates).strftime("%Y-%m-%d")
-    names = data.mlookup.sort_values("model_idx")["model"].tolist()
-    humans = [(i, m) for i, m in enumerate(names) if data.is_human[i]]
-    humans.sort(key=lambda im: theta_draws[:, im[0], k].mean())
-    palette = human_tier_palette(len(humans))[::-1]
-
-    fig = go.Figure()
-    for (i, m), col in zip(humans, palette):
-        th = theta_draws[:, i, k]
-        p = (f > th[:, None]).mean(0)                               # (G,)
-        fig.add_trace(go.Scatter(
-            x=gx, y=p, mode="lines", line=dict(color=col, width=style.trend),
-            name=labels.get(m, m),
-            hovertemplate="P = %{y:.2f}<br>%{x|%Y-%m}<extra></extra>"))
-    for yv, lab in [(0.5, "0.5"), (0.975, text["decisive"])]:
-        fig.add_hline(y=yv, line=dict(color="#888", dash="dot", width=style.refline),
-                      annotation_text=lab, annotation_position="right")
-    fig.update_layout(
-        title=dict(text=f"Forecast: {axis_name} (P exceed human)", x=0.5),
-        xaxis=dict(type="date", title="Date", showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
-        yaxis=dict(title=text["p_axis"], range=[0, 1],
-                   showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
-        template="plotly_white", height=style.height_per_row + 60, width=style.width,
-        margin=dict(l=70, r=int(style.font_legend * 22), t=80, b=55),
-        legend=dict(orientation="v", yanchor="top", y=0.99, xanchor="left", x=1.01,
-                    bgcolor="rgba(255,255,255,0.85)",
-                    bordercolor="rgba(0,0,0,0.1)", borderwidth=1))
     return apply_fonts(fig, style)

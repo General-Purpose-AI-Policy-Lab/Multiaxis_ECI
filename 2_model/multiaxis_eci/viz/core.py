@@ -25,7 +25,7 @@ FUTURE_COLOR = "#d62728"
 
 
 _AXIS_KEY = re.compile(r"^(timeline|loadings|forecast)_(\d+)_(.+)$")
-_KEY_SUFFIXES = {"_when": "_crossover_dates", "_prob": "_exceedance_probability"}
+_KEY_SUFFIXES = {"_when": "_crossover_dates"}
 
 
 def figure_filename(key: str) -> str:
@@ -34,8 +34,7 @@ def figure_filename(key: str) -> str:
     Figure keys stay short because the dashboard and the blog post address panels
     by them; files get the explicit form: `timeline_2_reasoning` ->
     `timeline_axis2_reasoning`, `forecast_1_math_when` ->
-    `forecast_axis1_math_crossover_dates`, `forecast_1_math_prob` ->
-    `forecast_axis1_math_exceedance_probability`. Other keys are unchanged.
+    `forecast_axis1_math_crossover_dates`. Other keys are unchanged.
     """
     m = _AXIS_KEY.match(key)
     if m is None:

@@ -19,7 +19,6 @@ from multiaxis_eci.viz.compare import (
 from multiaxis_eci.viz.core import capability_timeline_fig, forest_fig
 from multiaxis_eci.viz.forecast import (
     crossover_panels_fig,
-    exceedance_prob_fig,
     frontier_trend_fig,
 )
 from multiaxis_eci.viz.gof import (
@@ -173,8 +172,8 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
 
 def forecast_figures(view, data, raw, names, th_fc,
                      axis_titles: dict | None = None) -> dict:
-    """Frontier-projection figure set: per axis a timeline overlay, a crossover
-    'when' chart and an exceedance-probability curve.
+    """Frontier-projection figure set: per axis the trend panel and the crossover
+    panel.
 
     ONE definition for both the dashboard card and the forecast-only re-render
     (`4_diagnostics/forecast_only.py`), so the two cannot drift apart on
@@ -205,8 +204,6 @@ def forecast_figures(view, data, raw, names, th_fc,
         figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
             cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
             title=f"Forecast: {disp} (crossing dates)")
-        figs[f"forecast_{k+1}_{slug}_prob"] = exceedance_prob_fig(
-            inputs["fc"], th_fc, k, data, axis_name=disp)
     return figs
 
 
@@ -220,7 +217,7 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     timeline figures, never the returned metrics.
 
     `forecast=True` adds the frontier-projection figure set (per axis: timeline
-    overlay + crossover 'when' chart + exceedance-probability curves) in the same
+    trend panel + crossover panel) in the same
     oblique frame as the timelines. Opt-in per fit because it only makes sense
     where human tiers are in the fit."""
     from multiaxis_eci.analysis import (

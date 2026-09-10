@@ -150,10 +150,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     idata_1d = (spec.open_posterior(keep=PLOT_VARS, thin=thin, path=base)
                 if base.exists() and base != trace_path else None)
 
-    def render(idata, view, figures_dir: Path, suffix: str, note: str) -> dict:
+    def render(idata, view, figures_dir: Path, suffix: str, note: str, fr_dir: Path) -> dict:
         """The whole figure set for one posterior (the fit, or one chain group),
         saved under `figures_dir` with `suffix` in every file name, the main
-        figures also in French under `figures_dir/fr/`."""
+        figures also in French under `fr_dir` (one `fr/` for the whole fit)."""
         figures_dir.mkdir(parents=True, exist_ok=True)
         axis_titles = (load_axis_titles(results_dir, view, data)
                        if K >= 2 and view.A is not None else None)
@@ -247,8 +247,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         for name, fig in figs.items():
             save_fig(fig, figure_filename(name) + suffix, figures_dir)
             if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES:
-                save_fig(translate_fig(fig), figure_filename(name) + suffix + "_fr",
-                         figures_dir / "fr")
+                save_fig(translate_fig(fig), figure_filename(name) + suffix + "_fr", fr_dir)
         print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
               f"MAE={gof.metrics['mae']:.3f}")
         print(f"figures → {figures_dir}")
@@ -256,7 +255,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
     split = chain_split(trace_path, int(idata.posterior.sizes["chain"]))
     if split is None:
-        render(idata, view_all, figures_dir, "", "")
+        render(idata, view_all, figures_dir, "", "", figures_dir / "fr")
         return figures_dir
     # A multimodal posterior: the folder holds the majority chains' figures, the
     # minority chains' under minority/. Both groups are put back on the fit's
@@ -270,7 +269,8 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             view = align_to_reference_loadings(view, data, ref)
         label = suffix[1:]
         render(sub, view, sub_dir, suffix,
-               f"{label} chains {','.join(map(str, chains))} / {split['n_chains']}")
+               f"{label} chains {','.join(map(str, chains))} / {split['n_chains']}",
+               figures_dir / "fr")
     return figures_dir
 
 

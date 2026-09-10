@@ -1886,7 +1886,7 @@ class TestMIRT:
                                    fit_names=["m4", "m5"])
 
         # frontier_paths: observed record steps inside the window, the forward
-        # line beyond it — what the dashboard exceedance curves must consume.
+        # line beyond it, what the crossover probabilities consume.
         from multiaxis_eci.analysis.forecast import _to_year, frontier_paths
         xg = np.asarray(_to_year(pd.DatetimeIndex(["2024-02-01", "2027-01-01"])),
                         dtype=float)
@@ -1925,17 +1925,11 @@ class TestMIRT:
         assert abs((pd.Timestamp(ch.crossover_date_median)
                     - pd.Timestamp("2023-01-01")).days) <= 2
 
-        # The dashboard exceedance curves consume frontier_paths verbatim and
-        # are nondecreasing for an envelope (records never fall).
-        from multiaxis_eci.viz.forecast import exceedance_prob_fig
-        figx = exceedance_prob_fig(env, theta, 0, d, axis_name="axis1",
-                                   human_labels={})
-        tr = next(t for t in figx.data if t.name == "Average Human")
+        # frontier_paths over the whole grid is nondecreasing for an envelope
+        # (records never fall), the property the crossover probabilities rely on.
         xg_full = np.asarray(_to_year(pd.DatetimeIndex(env.grid_dates)), float)
-        p_manual = (frontier_paths(env, xg_full)
-                    > theta[:, 6, 0][:, None]).mean(0)
-        np.testing.assert_allclose(np.asarray(tr.y, float), p_manual, atol=1e-12)
-        assert (np.diff(np.asarray(tr.y, float)) >= -1e-12).all()
+        p_manual = (frontier_paths(env, xg_full) > theta[:, 6, 0][:, None]).mean(0)
+        assert (np.diff(p_manual) >= -1e-12).all()
 
         # The post's two forecast figures, from the library: the trend panel
         # (band, cloud, median, tiers named at the right, today line) and the

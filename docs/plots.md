@@ -27,7 +27,7 @@ Every `figures/` folder holds the PNGs, with the interactive Plotly twins under 
 
 One fit writes one PNG (and one HTML) per figure into its own `figures/k{K}/`. K is in that folder name, so a K=3 and a K=4 run of one flag set share their tables and traces but never their figures.
 
-When `diagnose_chains.py --write-modes` has found more than one posterior mode for the trace, the folder holds the **majority chains'** figures (file names end in `_majority`, titles name the chains) and a `minority/` subfolder holds the same set on every other chain (`_minority`); both groups are put back on the fit's display frame through `mirt_loadings.csv`, so axis k is the same axis in both. The figures a write-up would embed (per-axis timelines and forecasts, `forests_per_axis`, `loadings_per_axis`, `gof_pit`, `axes_timeline_compare`) are also rendered in French under `fr/` (`_fr` suffix) through the shared string table of `viz/i18n.py`, the same table the blog post's French renders use.
+When `diagnose_chains.py --write-modes` has found more than one posterior mode for the trace, the folder holds the **majority chains'** figures (file names end in `_majority`, titles name the chains) and a `minority/` subfolder holds the same set on every other chain (`_minority`); both groups are put back on the fit's display frame through `mirt_loadings.csv`, so axis k is the same axis in both. The figures a write-up would embed (per-axis timelines and forecasts, `forests_per_axis`, `loadings_per_axis`, `gof_pit`, `axes_timeline_compare`) are also rendered in French under one `fr/` folder for both chain groups (`_majority_fr`, `_minority_fr`) through the shared string table of `viz/i18n.py`, the same table the blog post's French renders use.
 
 **Axis names are given by hand.** Nothing in the code names an axis. The fit and the plotting CLI write an `axis_names.json` template beside the trace when none exists (each axis's top benchmarks by share, empty titles, `confirmed: false`), and every figure calls the axes `Axis 1`, `Axis 2`, ... until a person fills in the titles and two or three signature benchmarks and sets `confirmed: true`. A confirmed title is applied only while one of its signature benchmarks stays among the axis's top benchmarks (`analysis.load_axis_titles`); the blog post's scripts refuse to run on unconfirmed or drifted names (`analysis.require_axis_titles`). The published fit's names live in `5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`.
 
@@ -78,8 +78,7 @@ The post's figures are the same builders as the outputs at another scale: each b
 Names below are the figure keys; on the dashboard each is one panel. On disk the
 name is the explicit form of the key (`viz.figure_filename`): `timeline_2_reasoning`
 becomes `timeline_axis2_reasoning.png`, `forecast_1_math_when` becomes
-`forecast_axis1_math_crossover_dates.png`, `forecast_1_math_prob` becomes
-`forecast_axis1_math_exceedance_probability.png`; other keys are unchanged.
+`forecast_axis1_math_crossover_dates.png`; other keys are unchanged.
 
 ### Goodness of fit
 
@@ -119,7 +118,7 @@ Computed on the **whole** fit, never on a plot-side subset.
 
 ### Forecast trio
 
-Three figures per axis, added by `--forecast` on the CLI and by
+Two figures per axis, added by `--forecast` on the CLI and by
 `"forecast": True` on a dashboard entry. Gated on K > 1, the compensatory
 family, and human tiers being in the fit.
 
@@ -127,7 +126,6 @@ family, and human tiers being in the fit.
 |---|---|
 | `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the per-draw record envelope extended at its recent rate with its 80% band, the human tiers as dashed lines named in the right margin, and a today line |
 | `forecast_{k}_{axis}_when` | the post's crossover panel (`crossover_panels_fig`): per tier the median crossing date, a thick 50% bar over a thin 80% bar, both split at today (green behind us, red ahead); whatever runs past the window is clipped at the edge and dated |
-| `forecast_{k}_{axis}_prob` | P(frontier > tier) over the forecast grid, one S-curve per tier, with reference lines at 0.5 and 0.975. Read a date off it rather than a point estimate |
 
 ### K against K=1
 

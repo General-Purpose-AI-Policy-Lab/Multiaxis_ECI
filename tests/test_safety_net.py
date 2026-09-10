@@ -1140,7 +1140,7 @@ class TestPublicAPISurface:
             "assemble_dashboard", "build_comparison",
             "ppca_spectrum_fig", "write_dashboard", "frontier_trend_fig",
             "forest_grid_fig", "loadings_grid_fig", "subplot_grid",
-            "crossover_panels_fig", "exceedance_prob_fig",
+            "crossover_panels_fig",
             "FigureStyle", "DASHBOARD", "POST", "FR_TABLE", "translate_fig",
         ],
         "multiaxis_eci.ppc": [

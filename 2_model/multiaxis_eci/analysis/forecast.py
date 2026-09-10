@@ -321,7 +321,7 @@ def _frontier_paths(envelope: bool, env_x, env_E, slope, intercept,
 
     Envelope: the observed record steps inside the window, the forward line
     beyond it. Linear: the fitted line everywhere. Every consumer that walks a
-    frontier over a grid (the forecast band, the dashboard exceedance curves)
+    frontier over a grid (the forecast band, the crossover probabilities)
     must go through this — evaluating `intercept + slope * t` backward over an
     envelope's window extrapolates the recent rate into the past and is wrong.
     """

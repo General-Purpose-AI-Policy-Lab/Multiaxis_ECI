@@ -83,8 +83,8 @@ CMP_DIR = config.COMPARISONS_DIR
 # be descriptive), type (baseline / exploratory / confirmed).
 # Optional: short (the axis tick in every cross-fit comparison chart, where the
 # long label makes the graph unreadable), group (cards sharing a string are
-# grouped in the nav), nav (menu entry), forecast (adds the trend / crossover /
-# exceedance figures), drop_chains (a mode-restricted card: those chains go
+# grouped in the nav), nav (menu entry), forecast (adds the trend and crossover
+# figures), drop_chains (a mode-restricted card: those chains go
 # before every summary), kind ("comp" sum link default; "nc" conjunctive
 # product; "1d" original Beta-IRT), trace_path (an explicit file, for a trace
 # whose on-disk name predates the current tag grammar).

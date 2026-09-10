@@ -217,8 +217,8 @@ key and the `--force` target, so it must be unique; `--label` is the section
 header and nav entry. Four options refine the card: `--type` is one of `data`,
 `baseline`, `exploratory` (the default), `confirmed`; `--short` is the axis
 tick in cross-fit comparison charts, where the long label makes the graph
-unreadable; `--nav` overrides the menu entry; `--forecast` adds the trend,
-crossover and exceedance figures.
+unreadable; `--nav` overrides the menu entry; `--forecast` adds the trend and
+crossover figures.
 
 `--list` prints every card with an `origin` column, `code` for the entries in
 `4_build_dashboard.py` and `json` for the ones `--add` wrote. `--remove` drops a

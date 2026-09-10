@@ -40,7 +40,6 @@ def test_figure_filenames_are_explicit():
     assert figure_filename("timeline_1_math_all") == "timeline_axis1_math_all"
     assert figure_filename("loadings_3_agentic") == "loadings_axis3_agentic"
     assert figure_filename("forecast_1_math_when") == "forecast_axis1_math_crossover_dates"
-    assert figure_filename("forecast_1_math_prob") == "forecast_axis1_math_exceedance_probability"
     for unchanged in ("gof_pit", "timeline_difficulty", "loadings_heatmap", "hyperparameters"):
         assert figure_filename(unchanged) == unchanged
 
