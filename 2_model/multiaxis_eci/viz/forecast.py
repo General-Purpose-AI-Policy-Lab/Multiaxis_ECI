@@ -29,6 +29,8 @@ FORECAST_COLOR = "#ff9500"        # frontier extrapolation
 # Every crossover figure shares this x-range, so panels from different fits, chain groups
 # and scopes read against the same years.
 CROSSOVER_WINDOW = ("2015-01-01", "2030-01-01")
+# Every trend panel stops at the same year too; its start follows the data (the post fixes 2023).
+TREND_WINDOW_END = "2030-01-01"
 TODAY_COLOR = "#444"
 
 # Every string these figures draw, per language (English default, French for the
@@ -95,7 +97,8 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
     human tiers: name, mean). Each panel draws the dated models with their intervals, the
     forecast band (fc.lo to fc.hi) and its median, the tiers as dashed lines named in the
     right margin, and the today line; no legend, the caption names the series. `window` fixes
-    the x-range on every panel (the post uses 2023 to 2030); None spans the data.
+    the x-range on every panel (the post uses 2023 to 2030); None starts at the first candidate
+    and stops at `TREND_WINDOW_END` (2030), the crossover figures' right edge.
     """
     text = FORECAST_TEXT[lang]
     labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
@@ -141,8 +144,7 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         x_min = dates.min() if x_min is None else min(x_min, dates.min())
         x_max = gx.max() if x_max is None else max(x_max, gx.max())
     if window is None:
-        window = ((x_min - pd.Timedelta(days=90)).strftime("%Y-%m-%d"),
-                  (x_max + pd.Timedelta(days=30)).strftime("%Y-%m-%d"))
+        window = ((x_min - pd.Timedelta(days=90)).strftime("%Y-%m-%d"), TREND_WINDOW_END)
     fig.update_xaxes(range=list(window), dtick="M12", tickformat="%Y", gridcolor="#f4f4f4",
                      showticklabels=True)
     fig.update_xaxes(title_text=text["release"], row=len(axes), col=1)

@@ -125,7 +125,7 @@ family, and human tiers being in the fit.
 
 | key | what it shows |
 |---|---|
-| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the per-draw record envelope extended at its recent rate with its 80% band, the human tiers as dashed lines named in the right margin, and a today line |
+| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the per-draw record envelope extended at its recent rate with its 80% band, the human tiers as dashed lines named in the right margin, and a today line; the x-axis stops at 2030 like the crossover figures |
 | `forecast_{k}_{axis}_when` | the post's crossover panel (`crossover_panels_fig`): per tier the median crossing date, a thick 50% bar over a thin 80% bar, both split at today (green behind us, red ahead); whatever runs past the window is clipped at the edge and dated |
 
 ### K against K=1
