@@ -237,7 +237,13 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         if note:
             for fig in figs.values():
                 t = fig.layout.title.text
-                fig.update_layout(title_text=f"{t} · {note}" if t else note)
+                if t:
+                    fig.update_layout(title_text=f"{t} · {note}")
+                else:
+                    # A figure that leaves its description to the caption still
+                    # names its chain group, centred and clear of the panel titles.
+                    fig.update_layout(title=dict(text=note, x=0.5),
+                                      margin_t=max(fig.layout.margin.t or 0, 110))
         for name, fig in figs.items():
             save_fig(fig, figure_filename(name) + suffix, figures_dir)
             if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES:
