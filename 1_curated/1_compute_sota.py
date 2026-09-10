@@ -1,7 +1,10 @@
 """Recompute the SOTA list and write 1_curated/sota_families.txt.
 
-SOTA = (world frontier records of the recent era) ∪ (every family within NEAR_ECI points of
-the best model of each organisation present in that frontier). The file lists families (a
+SOTA = (every world frontier record, whenever it was set) ∪ (every family within NEAR_ECI points
+of the best model of each organisation on the recent frontier, the records of the last
+WINDOW_MONTHS).  A record of any era is the information the record envelope and the forecasts
+rest on, so it is kept whatever its age (user decision 2026-09-10); the organisations whose
+catalogue counts as top-line are read off the recent records only. The file lists families (a
 release: base model plus snapshot, `data.model_family`), so every reasoning effort of a SOTA
 release is shown; the canonical fit's SOTA table keeps the best effort of each.
 Read off the canonical K=1 fit of the current data generation (`all_models_eci.csv`,
@@ -27,7 +30,7 @@ sys.path.insert(0, str(ROOT / "2_model"))
 from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.data import MODELS_FILE, model_family  # noqa: E402
 
-WINDOW_MONTHS = 24        # "recent era": records set in the last 24 months before the newest release
+WINDOW_MONTHS = 24        # "recent frontier": the organisations whose records fall in the last 24 months
 MIN_OBS = config.LOW_OBS_THRESHOLD   # Epoch's >= 4-benchmark rule for record-setters
 NEAR_ECI = 10.0           # a family counts as top-line when within this many ECI points of its organisation's best
 OUT = ROOT / "1_curated" / "sota_families.txt"
@@ -59,8 +62,8 @@ def compute(results_dir: Path) -> pd.DataFrame:
     d["org"] = d["name"].map(org).fillna("")
 
     cutoff = d["release_date"].max() - pd.DateOffset(months=WINDOW_MONTHS)
-    records = set(frontier_records(d, cutoff))
-    frontier_orgs = {org.get(m, "") for m in records} - {""}
+    records = set(frontier_records(d, d["release_date"].min()))          # every era
+    frontier_orgs = {org.get(m, "") for m in frontier_records(d, cutoff)} - {""}
 
     # Best effort per family, then the two rules.
     fam = (d.sort_values("mean", ascending=False).drop_duplicates("family")
@@ -84,7 +87,8 @@ def main() -> None:
     out = compute(Path(args.results_dir))
     OUT.write_text("# SOTA families (release = base model + snapshot), newest first; written by "
                    "1_curated/1_compute_sota.py, do not edit\n" + "\n".join(out["family"]) + "\n")
-    print(f"records since {out.attrs['cutoff'].date()}; frontier organisations: "
+    print(f"records of every era; frontier organisations (records since "
+          f"{out.attrs['cutoff'].date()}): "
           f"{', '.join(out.attrs['frontier_orgs'])}")
     print(f"{int(out['is_record'].sum())} record families, {int(out['is_top_line'].sum())} top-line "
           f"families, {len(out)} entries -> {OUT.relative_to(ROOT)}\n")

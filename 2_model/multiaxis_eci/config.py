@@ -235,10 +235,11 @@ ANCHOR_HIGH = ("gpt-5-2025-08-07_medium",    150.0)
 
 # ── SOTA families (data-driven; newest first) ───────────────────────────────
 # NOT hand-maintained. `1_curated/1_compute_sota.py` writes
-# 1_curated/sota_families.txt = (world frontier records of the last 24 months on
-# the canonical ECI-H, Epoch-style "highest capability accessible at each date")
-# ∪ (every family within 10 ECI of the best model of each organisation on that
-# frontier), candidates with >= 4 observations. A family is a release
+# 1_curated/sota_families.txt = (every world frontier record on the canonical
+# ECI-H, whatever its age, Epoch-style "highest capability accessible at each
+# date") ∪ (every family within 10 ECI of the best model of each organisation
+# on the recent frontier, records of the last 24 months), candidates with
+# >= 4 observations. A family is a release
 # (`data.model_family`: base model plus snapshot), every reasoning effort and
 # run variant included. Listing families means every effort of a SOTA release
 # is shown on the timelines and admitted as a record candidate by the country
