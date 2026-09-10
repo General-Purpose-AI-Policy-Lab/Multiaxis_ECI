@@ -197,7 +197,8 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
         # ── single-fit comparative views (informed timelines) ────────────────────
         if n_axes >= 2:
-            axis_tl = {k: mirt_model_timeline_df(view.theta, k, data, raw) for k in range(n_axes)}
+            axis_tl = {k: mirt_model_timeline_df(view.theta, k, data, raw, A_draws=view.A)
+                       for k in range(n_axes)}
             figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, names, n_axes)
             keep = (mirt_informed_mask(view.theta)[:, :n_axes].all(axis=1)
                     & ~data.is_human & ~data.is_low_obs)

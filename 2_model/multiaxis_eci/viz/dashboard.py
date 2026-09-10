@@ -128,7 +128,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     for k in range(K):
         disp = titles.get(names[k], names[k])
         hstat = mirt_human_axis_stats(theta, k, data)
-        tl = mirt_model_timeline_df(theta, k, data, raw)
+        tl = mirt_model_timeline_df(theta, k, data, raw, A_draws=A)
         if not tl.empty:
             fig = capability_timeline_fig(tl, human_stats=hstat,
                                           human_labels=human_labels)
@@ -193,7 +193,8 @@ def forecast_figures(view, data, raw, names, th_fc,
         # every fitted point is a plotted point. Whiskers, human tiers and the
         # forecast band are all 80% HDIs, the post's convention.
         try:
-            inputs = axis_forecast_inputs(th_fc, k, data, raw, names[k], hdi_prob=0.8)
+            inputs = axis_forecast_inputs(th_fc, k, data, raw, names[k], hdi_prob=0.8,
+                                          A_draws=view.A)
         except ValueError:
             continue
         cx = crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8))
@@ -297,11 +298,12 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         # forecast (`candidate_mask`), 95% intervals.
         from multiaxis_eci.analysis import forest_frames
         from multiaxis_eci.config import FORECAST_KW
-        frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"])
+        frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A)
         figs["forests_per_axis"] = forest_grid_fig(
             frames, [(titles or {}).get(n, n) for n in names])
         # The same forest at the level of releases: one row per family, its best effort.
-        fam = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], by_family=True)
+        fam = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], by_family=True,
+                            A_draws=view.A)
         figs["forests_per_family"] = forest_grid_fig(
             fam, [(titles or {}).get(n, n) for n in names],
             title="Top releases (best effort), frontier releases and human tiers per axis")

@@ -2889,3 +2889,21 @@ def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
     assert strict.tolist() == [True, False, False, False, False, False, False]
     loose = candidate_mask(theta, 0, data, dates, sd_cap=None, drop_low_obs=False)
     assert loose.tolist() == [True, True, True, True, False, False, True]
+
+    # With the loadings, the exemption holds only where the release was evaluated: two
+    # benchmarks, b_on loading on axis 0 and b_off on axis 1. sota_wide was scored on b_on
+    # (coverage 1 on axis 0), sota_ghost on b_off only (coverage 0): the ghost drops out of
+    # axis 0 but stays a candidate on axis 1, and a lower threshold lets it back in.
+    A = np.zeros((400, 2, 2))
+    A[:, 0, 0] = 1.0                      # b_on -> axis 0
+    A[:, 1, 1] = 1.0                      # b_off -> axis 1
+    data2 = dataclasses.replace(data, n_benchmarks=2, n_obs=2,
+                                model_idx=np.array([3, 6]), bench_idx=np.array([0, 1]),
+                                blookup=pd.DataFrame({"benchmark": ["b_on", "b_off"],
+                                                      "benchmark_idx": [1, 2]}))
+    theta2 = np.repeat(theta, 2, axis=2)
+    covered = candidate_mask(theta2, 0, data2, dates, A_draws=A)
+    assert covered.tolist() == [True, False, False, True, False, False, False]
+    other_axis = candidate_mask(theta2, 1, data2, dates, A_draws=A)
+    assert other_axis[6] and not other_axis[3]
+    assert candidate_mask(theta2, 0, data2, dates, A_draws=A, min_coverage=0.0)[6]

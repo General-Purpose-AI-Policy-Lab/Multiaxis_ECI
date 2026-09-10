@@ -96,7 +96,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
     # tier). The post draws frontier releases as ordinary model rows: one
     # marker class for machines, no "shown even when wide" legend entry.
     frames = forest_frames(view, data, pd.read_csv(PROCESSED_FILE),
-                           sd_cap=FORECAST_KW["sd_cap"])
+                           sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A)
     fig = forest_grid_fig(frames, [titles[n] for n in view.names], title=TITLE,
                           style=POST, collapse_frontier=True, col_domains=COL_DOMAINS)
 

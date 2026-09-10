@@ -99,6 +99,7 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
                            sd_cap: float | None = 0.33,
                            drop_low_obs: bool = True,
                            sota_exempt: bool = True,
+                           A_draws: np.ndarray | None = None,
                            fit_basis: str = "frontier",
                            fit_names: list[str] | None = None,
                            weights: str | None = None,
@@ -186,7 +187,7 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         # model, SOTA included, to be measured on THIS axis: the informed-only
         # frontier, never bent by a sparse SOTA point (e.g. an n=1 release with
         # SD > 0.5). Such releases still appear on the timeline plot.
-        keep = candidate_mask(theta_draws, k, data, model_dates, sd_cap=sd_cap,
+        keep = candidate_mask(theta_draws, k, data, model_dates, sd_cap=sd_cap, A_draws=A_draws,
                               drop_low_obs=drop_low_obs, sota_exempt=sota_exempt)
         sota = (data.is_sota if data.is_sota is not None
                 else np.zeros(data.n_models, dtype=bool))
@@ -434,7 +435,8 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
 
 
 def axis_forecast_inputs(theta_draws: np.ndarray, k: int, data: ECIData, raw_df: pd.DataFrame,
-                         axis_name: str, *, hdi_prob: float = 0.8, **forecast_kw) -> dict:
+                         axis_name: str, *, hdi_prob: float = 0.8, A_draws: np.ndarray | None = None,
+                         **forecast_kw) -> dict:
     """Everything the frontier-trend panel of one axis draws: `fc` (the frontier forecast of
     `config.FORECAST_KW`, envelope basis, back_start at the first candidate), `tl` (the
     candidates' timeline frame) and `hs` (the human tiers), the last two at `hdi_prob`.
@@ -448,10 +450,11 @@ def axis_forecast_inputs(theta_draws: np.ndarray, k: int, data: ECIData, raw_df:
     from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
 
     tl = mirt_model_timeline_df(theta_draws, k, data, raw_df, sd_cap=FORECAST_KW["sd_cap"],
+                                A_draws=A_draws,
                                 hdi_prob=hdi_prob)
     if tl.empty:
         raise ValueError(f"{axis_name}: no dated candidate to forecast on")
-    kw = dict(FORECAST_KW, back_start=pd.to_datetime(tl["release_date"]).min(),
+    kw = dict(FORECAST_KW, back_start=pd.to_datetime(tl["release_date"]).min(), A_draws=A_draws,
               backcast_floor=FORECAST_BACKCAST_FLOOR.get(axis_name), **forecast_kw)
     fc = mirt_frontier_forecast(theta_draws, k, data, raw_df, **kw)
     hs = mirt_human_axis_stats(theta_draws, k, data, hdi_prob=hdi_prob)

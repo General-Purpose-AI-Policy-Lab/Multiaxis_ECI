@@ -257,11 +257,16 @@ def _load_sota_families() -> list[str]:
 
 SOTA_FAMILIES: list[str] = _load_sota_families()
 
-# The SOTA exemption of `candidate_mask` is unconditional: a SOTA family member is drawn
-# and fitted on every axis, with its interval, however wide (user decision 2026-09-10;
-# a per-axis uncertainty cap on the exemption was tried and dropped the same day: the
-# axis-4 trend that once sat under its cloud came from the cloud and the fit using
-# different candidate sets, not from the exemption itself).
+# The SOTA exemption of `candidate_mask` holds on an axis only where the release was
+# evaluated on it: the axis shares of the benchmarks its efforts were scored on
+# (union over the family) must sum to at least this much. One full axis-unit of
+# evidence, whatever the benchmarks. Below it the position is the prior and the
+# lineage link alone; on the 2026-09-08 K=4 fit that is GPT-2 XL, davinci,
+# text-davinci-002 and PaLM 540B on the fluid-intelligence axis, whose 5 to 8
+# scores are all on legacy QA sets (user decision 2026-09-10, replacing an
+# uncertainty cap tried the same day). A K=1 fit has one axis with share 1
+# everywhere, so any scored release passes.
+SOTA_MIN_AXIS_COVERAGE = 1.0
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
 # the per-draw running-max ENVELOPE over the informed cloud (non-decreasing by

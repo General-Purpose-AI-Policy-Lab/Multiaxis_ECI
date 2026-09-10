@@ -257,7 +257,7 @@ def build_chain_group_figures(view_a, view_b, data, raw, titles: dict | None, mo
             parts = []
             for k, name in enumerate(names):
                 try:
-                    fc = axis_forecast_inputs(view.theta, k, data, raw, name)["fc"]
+                    fc = axis_forecast_inputs(view.theta, k, data, raw, name, A_draws=view.A)["fc"]
                 except ValueError:
                     continue
                 parts.append(crossover_table(fc, view.theta, k, data, name, probs=(0.5,)))

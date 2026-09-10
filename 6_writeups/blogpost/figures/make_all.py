@@ -89,6 +89,7 @@ def compute(view, data, raw) -> dict:
     from multiaxis_eci.analysis import axis_forecast_inputs
 
     return {name: axis_forecast_inputs(view.theta, view.names.index(name), data, raw, name,
+                                       A_draws=view.A,
                                        hdi_prob=HDI, horizon_date=END)
             for name in AXES}
 
@@ -116,7 +117,7 @@ def forests(out_dir: Path) -> Path:
     from multiaxis_eci.viz.core import save_print
 
     view, data, raw = load_flagship()
-    frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"])
+    frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A)
     fig = forest_grid_fig(frames, [AXIS_TITLES[n] for n in view.names], title=None,
                           style=POST, collapse_frontier=True,
                           col_domains=[(0.0, 0.27), (0.73, 0.96)])

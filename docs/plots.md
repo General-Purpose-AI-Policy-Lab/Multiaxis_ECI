@@ -172,16 +172,18 @@ the two cannot drift apart on the basis, the cap or the interval width. The
 cloud and the trend fit share the one cap, which is what makes every fitted
 record also a plotted point.
 
-**The SOTA exemption is unconditional.** A SOTA release is admitted on every axis
-with its interval, however wide, even where none of its scores loads on the axis
-and its position comes from the prior and the lineage link alone (user decision
-2026-09-10). Such points lift the running-max envelope a little through their
-right tails (about half an ability point at the present on the axes concerned of
-the 2026-09-08 K=4 fit), which is accepted. An uncertainty cap on the exemption
-was tried and dropped the same day; the axis-4 trend that once sat under its cloud
-came from the cloud and the fit using different candidate sets (an axis index,
-`FORECAST_NO_SOTA_AXES`, named the published fit's fourth axis), which the shared
-`candidate_mask` rules out. Titles, too, follow identity:
+**The SOTA exemption holds where the release was evaluated.** A SOTA release is
+admitted on an axis with its interval, however wide, provided its family's scores
+cover the axis: the axis shares of the benchmarks any of its efforts was scored on
+must sum to at least `config.SOTA_MIN_AXIS_COVERAGE` (1.0, one full axis-unit of
+evidence). Below that the position is the prior and the lineage link alone and
+would lift the running-max envelope through its right tail: on the 2026-09-08
+K=4 fit, GPT-2 XL, davinci, text-davinci-002 and PaLM 540B on the
+fluid-intelligence axis, all scored on legacy QA sets only. An uncertainty cap on
+the exemption was tried and dropped the same day; the axis-4 trend that once sat
+under its cloud came from the cloud and the fit using different candidate sets
+(an axis index, `FORECAST_NO_SOTA_AXES`, named the published fit's fourth axis),
+which the shared `candidate_mask` rules out. Titles, too, follow identity:
 `analysis.load_axis_titles` applies a hand-confirmed title only to an axis whose
 top benchmarks still contain one of its signature benchmarks (`axis_names.json`).
 
