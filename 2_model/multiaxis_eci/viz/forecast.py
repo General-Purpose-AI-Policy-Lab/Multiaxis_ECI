@@ -52,7 +52,7 @@ def _today(today) -> pd.Timestamp:
 
 
 def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, float],
-                 style: FigureStyle, labels: dict, gap_frac: float = 0.066) -> None:
+                 style: FigureStyle, labels: dict, gap_frac: float | None = None) -> None:
     """Dashed tier lines in Blues (strongest darkest) plus their names in the right margin.
 
     Names are nudged apart top-down against the row's own y range, then the stack is centred
@@ -62,6 +62,10 @@ def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, 
     rows = hs.sort_values("mean", ascending=False).reset_index(drop=True)
     colors = human_tier_palette(len(rows))
     span = ylim[1] - ylim[0]
+    if gap_frac is None:
+        # Just the type height plus a little air, in axis units: names sit as close to
+        # their line as legibility allows, whatever the style's scale.
+        gap_frac = 1.3 * style.font_tier / (0.8 * style.height_per_row)
     gap = gap_frac * span
     ys, prev = [], np.inf
     for lvl in rows["mean"]:
