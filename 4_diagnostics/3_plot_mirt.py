@@ -47,12 +47,15 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
     align_to_reference_loadings,
     axis_title_translations,
+    human_unit_affine,
     load_axis_titles,
     mirt_factors_from_trace,
     mirt_informed_mask,
     mirt_model_timeline_df,
     prepare_fit,
     propose_axis_names,
+    rescale_frame,
+    rescale_theta,
     trace_loading_prior,
 )
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
@@ -196,8 +199,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                     break
 
         # ── single-fit comparative views (informed timelines) ────────────────────
+        affine = human_unit_affine(view.theta, data)
         if n_axes >= 2:
-            axis_tl = {k: mirt_model_timeline_df(view.theta, k, data, raw, A_draws=view.A)
+            axis_tl = {k: rescale_frame(mirt_model_timeline_df(view.theta, k, data, raw,
+                                                              A_draws=view.A), k, affine)
                        for k in range(n_axes)}
             figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, names, n_axes)
             keep = (mirt_informed_mask(view.theta)[:, :n_axes].all(axis=1)
@@ -208,7 +213,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                                 .groupby("model_version")["organization"].first())
                 orgs = np.array([org_by_model.get(mod[i], "other") for i in idx])
                 top = pd.Series(orgs).value_counts().head(7).index.tolist()
-                tmean = view.theta.mean(axis=0)
+                tmean = rescale_theta(view.theta, affine).mean(axis=0)
                 dfm = pd.DataFrame({names[k]: tmean[idx, k] for k in range(n_axes)})
                 dfm["model"] = [mod[i] for i in idx]
                 dfm["org"] = np.where(np.isin(orgs, top), orgs, "other")

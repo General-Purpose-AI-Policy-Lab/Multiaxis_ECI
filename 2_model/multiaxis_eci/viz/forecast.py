@@ -108,8 +108,8 @@ def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, 
 def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = None, *,
                        style: FigureStyle = DASHBOARD, window: tuple[str, str] | None = None,
                        today=None, lang: str = "en", human_labels: dict | None = None,
-                       title: str | None = None) -> go.Figure:
-    """The frontier trend per axis, one stacked panel each.
+                       title: str | None = None, y_label: str | None = None) -> go.Figure:
+    """The frontier trend per axis, one stacked panel each. `y_label` names the ability scale.
 
     `per_axis[name]` holds `fc` (a ForecastResult: grid_dates, lo, median, hi, slope), `tl`
     (the candidates' timeline frame: release_date, mean, hdi_low, hdi_high, name) and `hs` (the
@@ -190,7 +190,7 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         fig.add_vline(x=today_s, row=i, col=1,
                       line=dict(color=TODAY_COLOR, width=style.refline, dash="dot"))
         _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels)
-        fig.update_yaxes(title_text=text["ability"], range=list(ylim), gridcolor="#eeeeee",
+        fig.update_yaxes(title_text=y_label or text["ability"], range=list(ylim), gridcolor="#eeeeee",
                          zeroline=False, row=i, col=1)
         x_min = dates.min() if x_min is None else min(x_min, dates.min())
         x_max = gx.max() if x_max is None else max(x_max, gx.max())

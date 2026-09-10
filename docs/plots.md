@@ -141,6 +141,8 @@ same results folder.
 
 ## Conventions a reader must know
 
+**Abilities are shown in human units.** A fitted ability is a latent logit with an arbitrary origin and unit, so the ability-side figures (timelines, forecasts, forests, chain-group comparisons) re-express every axis with the Average Human tier's posterior median at 0 and the Top Performer's at 1, draw by draw (`config.ABILITY_SCALE`, `HUMAN_UNIT_ANCHORS`, `analysis.scale`). A model at 0.5 is halfway between the two on that axis; a slope of 0.3 per year is three tenths of the human span a year. Intervals, records and crossing dates keep their meaning under the per-draw affine map. Loadings, item characteristic curves and every table stay on the fitted scale.
+
 **The informed filter is plot-side only.** `analysis.timelines.candidate_mask` drops a
 model's axis ability from a figure when its posterior SD is at or above
 `config.INFORMED_SD_CAP` (0.33, a 95% interval width of about 1.3) or when the

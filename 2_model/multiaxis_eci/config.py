@@ -268,6 +268,12 @@ SOTA_FAMILIES: list[str] = _load_sota_families()
 # everywhere, so any scored release passes.
 SOTA_MIN_AXIS_COVERAGE = 1.0
 
+# The ability scale of the figures (analysis.scale): "human" re-expresses every axis so the
+# posterior median of the first anchor tier sits at 0 and the second at 1, draw by draw; any
+# other value keeps the fitted logit scale. Tables and loadings are never rescaled.
+ABILITY_SCALE = "human"
+HUMAN_UNIT_ANCHORS = ("Average Human", "Top Performer")
+
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
 # the per-draw running-max ENVELOPE over the informed cloud (non-decreasing by
 # definition, so no draw can carry a negative trend — the record regression it

@@ -124,26 +124,31 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     # little extra signal; the raw frame survives in the axis-strength forest).
     theta = signed_frames["oblique"].theta if signed_frames else view.theta
     A = signed_frames["oblique"].A if signed_frames else view.A
+    # Human units for the ability-side figures (analysis.scale): the filters run on the
+    # fitted scale, the finished frames are re-expressed; loadings stay fitted.
+    from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
+    affine = human_unit_affine(theta, data)
+    y_label = ability_label(affine)
     tag = "_oblique" if signed_frames else ""
     for k in range(K):
         disp = titles.get(names[k], names[k])
-        hstat = mirt_human_axis_stats(theta, k, data)
-        tl = mirt_model_timeline_df(theta, k, data, raw, A_draws=A)
+        hstat = rescale_frame(mirt_human_axis_stats(theta, k, data), k, affine)
+        tl = rescale_frame(mirt_model_timeline_df(theta, k, data, raw, A_draws=A), k, affine)
         if not tl.empty:
             fig = capability_timeline_fig(tl, human_stats=hstat,
                                           human_labels=human_labels)
             fig.update_layout(title=dict(text=f"{disp}: measured (50% intervals){suffix}", x=0.5),
-                              yaxis=dict(title=disp))
+                              yaxis=dict(title=y_label))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}"] = fig
         # ALL-models companion — every dated model, incl. sparse/extrapolated (wide CI).
-        tl_all = mirt_model_timeline_df(theta, k, data, raw,
-                                        sd_cap=None, drop_low_obs=False)
+        tl_all = rescale_frame(mirt_model_timeline_df(theta, k, data, raw, sd_cap=None,
+                                                      drop_low_obs=False), k, affine)
         if not tl_all.empty:
             fig_all = capability_timeline_fig(tl_all, human_stats=hstat,
                                               human_labels=human_labels)
             fig_all.update_layout(
                 title=dict(text=f"{disp}: all models (50% intervals){suffix}", x=0.5),
-                yaxis=dict(title=disp))
+                yaxis=dict(title=y_label))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}_all"] = fig_all
     if A is not None and K >= 2:
         # Per-axis loading forests: which benchmarks load ± on that axis (sorted,
@@ -185,6 +190,14 @@ def forecast_figures(view, data, raw, names, th_fc,
     K = view.K
     titles = axis_titles or {}
     from multiaxis_eci.analysis import axis_forecast_inputs, crossover_table
+    from multiaxis_eci.analysis.scale import (
+        ability_label,
+        human_unit_affine,
+        rescale_forecast,
+        rescale_frame,
+    )
+    affine = human_unit_affine(th_fc, data)
+    y_label = ability_label(affine)
     for k in range(K):
         disp = titles.get(names[k], names[k])
         # The measured cloud (config.INFORMED_SD_CAP, low-obs dropped, SOTA
@@ -198,10 +211,14 @@ def forecast_figures(view, data, raw, names, th_fc,
         except ValueError:
             continue
         cx = crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8))
+        # Crossings are read on the fitted scale; the drawn panel is in human units.
+        inputs = {"fc": rescale_forecast(inputs["fc"], k, affine),
+                  "tl": rescale_frame(inputs["tl"], k, affine),
+                  "hs": rescale_frame(inputs["hs"], k, affine)}
         slug = _slug(names[k])
         figs[f"forecast_{k+1}_{slug}"] = frontier_trend_fig(
             {names[k]: inputs}, [names[k]], {names[k]: disp},
-            title=f"Forecast: {disp} (80% intervals)")
+            title=f"Forecast: {disp} (80% intervals)", y_label=y_label)
         figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
             cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
             title=f"Forecast: {disp} (crossing dates)")
@@ -297,15 +314,20 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         # post's forest figure: same candidates as the timelines and the
         # forecast (`candidate_mask`), 95% intervals.
         from multiaxis_eci.analysis import forest_frames
+        from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
         from multiaxis_eci.config import FORECAST_KW
-        frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A)
+        affine = human_unit_affine(view.theta, data)
+        x_title = f"{ability_label(affine)} (median, 95% interval)"
+        frames = [rescale_frame(f, k, affine) for k, f in enumerate(
+            forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A))]
         figs["forests_per_axis"] = forest_grid_fig(
-            frames, [(titles or {}).get(n, n) for n in names])
+            frames, [(titles or {}).get(n, n) for n in names], x_title=x_title)
         # The same forest at the level of releases: one row per family, its best effort.
-        fam = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], by_family=True,
-                            A_draws=view.A)
+        fam = [rescale_frame(f, k, affine) for k, f in enumerate(
+            forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], by_family=True,
+                          A_draws=view.A))]
         figs["forests_per_family"] = forest_grid_fig(
-            fam, [(titles or {}).get(n, n) for n in names],
+            fam, [(titles or {}).get(n, n) for n in names], x_title=x_title,
             title="Top releases (best effort), frontier releases and human tiers per axis")
         # The benchmarks that define each axis, ranked by axis share (95%
         # intervals): the post's loadings figure, beside the heatmap.

@@ -71,6 +71,13 @@ from multiaxis_eci.analysis.rotation import (
     permutation_matched_reproducibility,
     promax_rotate,
 )
+from multiaxis_eci.analysis.scale import (
+    ability_label,
+    human_unit_affine,
+    rescale_forecast,
+    rescale_frame,
+    rescale_theta,
+)
 from multiaxis_eci.analysis.stats import (
     ECITransform,
     _release_dates,
@@ -121,6 +128,7 @@ __all__ = [
     "loadings_forest_df", "nc_difficulty_timeline_df",
     "ForecastResult", "mirt_frontier_forecast", "mirt_crossover_df",
     "axis_forecast_inputs", "crossover_table", "forest_frames",
+    "human_unit_affine", "rescale_frame", "rescale_forecast", "rescale_theta", "ability_label",
     "FitView", "prepare_fit",
     "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS",
     "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship",
