@@ -80,7 +80,8 @@ PLOT_VARS = ("A", "theta", "theta_pos", "tau_A", "D", "phi_b", "alpha", "ceiling
 # The figures a write-up would embed, rendered in French too (`fr/`): the
 # per-axis timelines and forecasts, the forests, the loadings, the PIT.
 MAIN_FIGURE_PREFIXES = {"timeline", "forecast"}
-MAIN_FIGURES = {"forests_per_axis", "loadings_per_axis", "gof_pit", "axes_timeline_compare"}
+MAIN_FIGURES = {"forests_per_axis", "forests_per_family", "loadings_per_axis", "gof_pit",
+                "axes_timeline_compare"}
 
 
 def chain_split(trace_path, n_chains: int) -> dict | None:
@@ -132,11 +133,17 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     # earlier tag grammar sits in a folder the spec no longer derives, and its
     # own folder is the one that holds its files.
     results_dir = trace_path.parent
-    figures_dir = Path(out) if out else spec.figures_dir
+    if out:
+        figures_dir = Path(out)
+    elif results_dir != spec.results_dir:
+        # A renamed folder (`_short2000x8`, a legacy `_data` suffix): its figures stay
+        # beside its trace, never in the folder the spec would derive.
+        figures_dir = results_dir / spec.figures_dir.parent.name / spec.figures_dir.name
+        print(f"  trace folder {results_dir.name!r} differs from the spec's "
+              f"{spec.results_dir.name!r}; per-fit files and figures stay beside the trace")
+    else:
+        figures_dir = spec.figures_dir
     figures_dir.mkdir(parents=True, exist_ok=True)
-    if results_dir != spec.results_dir:
-        print(f"  trace folder {results_dir.name!r} predates this spec's tag "
-              f"{spec.tag!r}; per-fit files read from there, figures → {figures_dir}")
 
     raw = pd.read_csv(PROCESSED_FILE)
     data, floor_c, n_eff = spec.load_data(idata)

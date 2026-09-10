@@ -114,6 +114,7 @@ Computed on the **whole** fit, never on a plot-side subset.
 | `axis_strength` | forest of per-axis strength, i.e. the loading column norms (or `tau_A` where the fit has a per-axis scale). How much of the fit each axis carries |
 | `qmatrix` | the allowed-loading pattern, for conjunctive and anchored fits only |
 | `forests_per_axis` | the post's forest figure (`forest_grid_fig`): per axis the top models among the timeline candidates, the pinned frontier releases (`config.FOREST_PINNED_RELEASES`, drawn even when wide) and every human tier, 95% intervals, K >= 2 |
+| `forests_per_family` | the same forest with one row per release (`data.model_family`, base model plus snapshot), each represented by its best reasoning effort on the axis; the row keeps the winning effort's name |
 | `loadings_per_axis` | the post's loadings figure (`loadings_grid_fig`): per axis the 20 benchmarks with the largest axis share, bar = loading with its 95% interval, colour and the right-hand number = share, K >= 2 |
 
 ### Forecast pair

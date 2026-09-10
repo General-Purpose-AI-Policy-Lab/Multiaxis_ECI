@@ -300,6 +300,11 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"])
         figs["forests_per_axis"] = forest_grid_fig(
             frames, [(titles or {}).get(n, n) for n in names])
+        # The same forest at the level of releases: one row per family, its best effort.
+        fam = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], by_family=True)
+        figs["forests_per_family"] = forest_grid_fig(
+            fam, [(titles or {}).get(n, n) for n in names],
+            title="Top releases (best effort), frontier releases and human tiers per axis")
         # The benchmarks that define each axis, ranked by axis share (95%
         # intervals): the post's loadings figure, beside the heatmap.
         from multiaxis_eci.analysis import loadings_table

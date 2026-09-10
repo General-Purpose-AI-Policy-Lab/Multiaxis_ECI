@@ -9,15 +9,19 @@ import pandas as pd
 from multiaxis_eci.analysis.stats import _release_dates
 from multiaxis_eci.analysis.timelines import candidate_mask
 from multiaxis_eci.config import FOREST_PINNED_RELEASES
-from multiaxis_eci.data import ECIData
+from multiaxis_eci.data import ECIData, model_family
 
 
 def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top: int = 11,
                   pinned: set[str] = FOREST_PINNED_RELEASES, hdi_prob: float = 0.95,
-                  **gate) -> list[pd.DataFrame]:
+                  by_family: bool = False, **gate) -> list[pd.DataFrame]:
     """Per axis, the forest rows: the top `n_top` models by median ability among the timeline
     candidates (`candidate_mask` with the forecast's gate, so the forest and the forecast can
     never show different frontiers), the `pinned` frontier releases, and every human tier.
+
+    `by_family` collapses the candidates to one row per release (`data.model_family`: base
+    model plus snapshot), keeping the effort with the highest median on the axis, so the forest
+    ranks releases rather than reasoning efforts; the row keeps the winning effort's name.
 
     Undated models cannot be candidates; without `raw_df` every model counts as dated. Rows are
     ascending by median, so the strongest lands at the top of a panel. Labels are shortened at
@@ -39,7 +43,12 @@ def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top
         med = np.median(th, axis=0)
         lo, hi = np.percentile(th, [q_lo, q_hi], axis=0)
         ok = candidate_mask(view.theta, k, data, dates, **gate)
-        top = [i for i in np.argsort(-med) if ok[i]][:n_top]
+        ranked = [i for i in np.argsort(-med) if ok[i]]
+        if by_family:
+            seen: set[str] = set()
+            ranked = [i for i in ranked
+                      if not (model_family(names[i]) in seen or seen.add(model_family(names[i])))]
+        top = ranked[:n_top]
         rows = ([(i, "model") for i in top]
                 + [(i, "frontier") for i in range(len(names))
                    if names[i] in pinned and not is_h[i] and i not in top]

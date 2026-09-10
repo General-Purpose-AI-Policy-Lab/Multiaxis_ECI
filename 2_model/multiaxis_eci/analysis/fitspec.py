@@ -416,8 +416,10 @@ def _folder_tag(trace_path: Path) -> str:
         raise ValueError(f"{trace_path.parent.name!r} is not a MIRT results "
                          "folder (expected mirt or mirt_<tag>)")
     # Legacy folders carried the data generation as a `_data<YYYYMMDD>` suffix;
-    # it named the folder, never the spec.
-    return re.sub(r"_data\d{8}$", "", name[4:])
+    # it named the folder, never the spec. A `_short<draws>x<chains>` suffix marks a
+    # smaller run of the same flag set kept beside the full one (the 2000x8 K=4
+    # test fit); it names the folder too.
+    return re.sub(r"(_data\d{8}|_short\d+x\d+)$", "", name[4:])
 
 
 def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:

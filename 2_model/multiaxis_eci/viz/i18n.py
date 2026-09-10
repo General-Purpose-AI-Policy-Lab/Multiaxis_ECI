@@ -17,6 +17,8 @@ FR_TABLE: list[tuple[str, str]] = [
     ("(crossing dates)", "(dates de croisement)"),
     (": measured", " : modèles mesurés"),
     (": all models", " : tous les modèles"),
+    ("Top releases (best effort), frontier releases and human tiers per axis",
+     "Meilleures sorties (meilleur effort), sorties frontière et niveaux humains par axe"),
     ("Top models, frontier releases and human tiers per axis",
      "Meilleurs modèles, sorties frontière et niveaux humains par axe"),
     ("frontier releases (shown even when wide)", "sorties frontière (même larges)"),
