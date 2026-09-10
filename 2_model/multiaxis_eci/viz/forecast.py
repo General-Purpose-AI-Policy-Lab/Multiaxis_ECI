@@ -26,6 +26,9 @@ from multiaxis_eci.viz.core import (
 from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 FORECAST_COLOR = "#ff9500"        # frontier extrapolation
+# Every crossover figure shares this x-range, so panels from different fits, chain groups
+# and scopes read against the same years.
+CROSSOVER_WINDOW = ("2015-01-01", "2030-01-01")
 TODAY_COLOR = "#444"
 
 # Every string these figures draw, per language (English default, French for the
@@ -150,16 +153,18 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
 
 def crossover_panels_fig(cx: pd.DataFrame, axes: list[str], titles: dict | None = None, *,
                          probs: tuple[float, ...] = (0.5,), style: FigureStyle = DASHBOARD,
-                         window: tuple[str, str] | None = None, today=None, lang: str = "en",
-                         human_labels: dict | None = None, title: str | None = None) -> go.Figure:
+                         window: tuple[str, str] | None = CROSSOVER_WINDOW, today=None,
+                         lang: str = "en", human_labels: dict | None = None,
+                         title: str | None = None) -> go.Figure:
     """Crossing dates per axis and human tier, one stacked panel per axis.
 
     `cx` is `analysis.mirt_crossover_df` output for every axis (columns axis, tier, human_mean,
     crossover_date_median, crossover_hdi_low, crossover_hdi_high, and hdi80_low / hdi80_high
     when a second, wider mass was computed). `probs` names the bars, widest last: one value
     draws one thick bar, two draw the thick first-mass bar over the thin second-mass bar. Every
-    bar is split at the today line, green behind, red ahead. `window` fixes the x-range (the
-    post uses 2015 to 2030); None spans the data. Whatever runs past the window is clipped at
+    bar is split at the today line, green behind, red ahead. `window` fixes the x-range, 2015
+    to 2030 by default (`CROSSOVER_WINDOW`) so every crossover figure is comparable; None spans
+    the data. Whatever runs past the window is clipped at
     the edge, marked by a small dot with the true year above it.
     """
     text = FORECAST_TEXT[lang]

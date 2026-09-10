@@ -45,6 +45,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.viz import POST, crossover_panels_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
+from multiaxis_eci.viz.forecast import CROSSOVER_WINDOW  # noqa: E402
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again.
@@ -57,7 +58,7 @@ AXES = ["axis1", "axis2", "axis3"]
 # Every panel backcasts (dates before an axis's first measured model are raw
 # backward extrapolations of its early record trend); the post's caption
 # carries that caveat, the panel titles do not.
-X0, X1 = "2015-01-01", "2030-01-01"
+X0, X1 = CROSSOVER_WINDOW            # the library's shared crossover window
 # Interval masses, widest last. One value draws a single thick bar.
 PROBS = (0.5, 0.8)
 

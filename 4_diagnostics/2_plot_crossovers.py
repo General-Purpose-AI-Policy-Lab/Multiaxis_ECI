@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.viz.core import save_fig  # noqa: E402
+from multiaxis_eci.viz.forecast import CROSSOVER_WINDOW  # noqa: E402
 
 US_COLOR, CN_COLOR = "#1A9641", "#D7191C"   # green US / red CN; the darkened
                                             # shades keep the pair separable
@@ -52,10 +53,9 @@ def main():
     order = (dfs["canonical"].drop_duplicates("tier")
              .sort_values("human_eci_median")["tier"].tolist())
 
-    # Shared x-range over everything drawn, so every panel is comparable.
-    all_dates = pd.concat([dfs[t][c].dropna() for t in dfs for c in DATE_COLS])
-    x0 = (all_dates.min() - pd.DateOffset(months=3)).strftime("%Y-%m-%d")
-    x1 = (all_dates.max() + pd.DateOffset(months=3)).strftime("%Y-%m-%d")
+    # The shared crossover window (2015 to 2030), so every crossover figure in the
+    # repository reads against the same years.
+    x0, x1 = CROSSOVER_WINDOW
 
     fig = make_subplots(rows=2, cols=3, shared_xaxes=True, shared_yaxes=True,
                         subplot_titles=[p[5] for p in PANELS],

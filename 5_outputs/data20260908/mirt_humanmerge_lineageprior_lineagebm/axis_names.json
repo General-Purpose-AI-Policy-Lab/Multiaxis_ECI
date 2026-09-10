@@ -1,10 +1,14 @@
 {
-  "confirmed": false,
-  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "confirmed": true,
+  "how": "Hand-named 2026-09-10 from the majority chains (2,4,5,7) of the short K=4 fit (2000 x 8). Signatures chosen so that they hold on the majority and the minority chains alike. A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
   "axes": {
     "axis1": {
-      "title": null,
-      "signature": [],
+      "title": "Fluid Intelligence & Mathematics",
+      "signature": [
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "OTIS Mock AIME 2024-2025"
+      ],
       "top_benchmarks": [
         "DeepSWE",
         "ARC-AGI-2",
@@ -17,8 +21,11 @@
       ]
     },
     "axis2": {
-      "title": null,
-      "signature": [],
+      "title": "Domain Knowledge",
+      "signature": [
+        "WMDP Biology",
+        "WMDP Chemistry"
+      ],
       "top_benchmarks": [
         "WMDP Biology",
         "WMDP Chemistry",
@@ -31,8 +38,13 @@
       ]
     },
     "axis3": {
-      "title": null,
-      "signature": [],
+      "title": "Agentic Capabilities & Legacy QA",
+      "signature": [
+        "OSWorld",
+        "GBAEval",
+        "OpenBookQA",
+        "ARC AI2"
+      ],
       "top_benchmarks": [
         "OSWorld",
         "CyScenarioBench",
@@ -45,8 +57,11 @@
       ]
     },
     "axis4": {
-      "title": null,
-      "signature": [],
+      "title": "World Knowledge",
+      "signature": [
+        "SimpleQA Verified",
+        "DeepResearch Bench"
+      ],
       "top_benchmarks": [
         "SimpleQA Verified",
         "DeepResearch Bench",
