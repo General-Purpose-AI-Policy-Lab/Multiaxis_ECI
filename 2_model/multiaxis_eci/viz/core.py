@@ -10,6 +10,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
+
 CHAIN_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
 
 # Shared palette: AI models, human tiers, display anchors, and the
@@ -44,6 +46,41 @@ def figure_filename(key: str) -> str:
             rest = rest[: -len(short)] + long
             break
     return f"{kind}_axis{k}_{rest}"
+
+
+# Vendor tokens whose casing a naive .title() would mangle.
+_CASE = {"gpt": "GPT", "glm": "GLM", "o1": "o1", "o3": "o3", "o4": "o4",
+         "ai": "AI", "xhigh": "xhigh", "xh": "xhigh", "sol": "Sol",
+         "minimax": "MiniMax", "deepseek": "DeepSeek", "terra": "Terra"}
+
+
+def pretty_model_name(raw: str) -> str:
+    """Readable label for a raw model id: effort suffix in parentheses, trailing release date
+    dropped, vendor casing fixed ("gpt-5.6-sol_max" -> "GPT 5.6 Sol (max)")."""
+    name, *effort = raw.split("_", 1)
+    name = re.sub(r"-\d{4}-\d{2}(-\d{2})?$", "", name)
+    toks = [_CASE.get(t, t.capitalize() if t.isalpha() else t) for t in name.split("-")]
+    label = " ".join(toks)
+    if effort:
+        e = effort[0].replace("_", " ")
+        label += f" ({_CASE.get(e, e)})"
+    return label
+
+
+def two_column_layout(fig: go.Figure, col_domains, panel_titles, n_panels: int = 4) -> None:
+    """Set a two-column grid's x domains directly and recentre each panel title.
+
+    At print scale the right column's y tick labels live in the inter-column gutter and need
+    more room than `make_subplots`' fractional spacing gives. `panel_titles` are the texts that
+    identify a panel-title annotation among the figure's other annotations.
+    """
+    axes = ["xaxis"] + [f"xaxis{n}" for n in range(2, n_panels + 1)]
+    for i, ax in enumerate(axes):
+        fig.layout[ax].domain = col_domains[i % 2]
+    titles = set(panel_titles)
+    panels = [a for a in fig.layout.annotations if a.text in titles]
+    for i, ann in enumerate(panels):
+        ann.x = sum(col_domains[i % 2]) / 2
 
 
 def save_fig(fig: go.Figure, name: str, figures_dir: Path) -> None:
@@ -480,7 +517,7 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                              human_bands: bool | tuple[str, ...] | None = None,
                              human_band_alpha: float = 0.06,
                              tier_names_at_right: bool = False,
-                             tier_font_size: int = 12,
+                             style: FigureStyle = DASHBOARD,
                              x_min: str | None = None,
                              y_range: tuple[float, float] | None = None) -> go.Figure:
     """Capability (models) + difficulty (benchmarks) vs release date.
@@ -573,16 +610,16 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                 fig.add_annotation(
                     x=1.005, y=y, xref="paper", yref="y",
                     text=labels.get(r["name"], r["name"]), showarrow=False,
-                    xanchor="left", font=dict(size=tier_font_size, color=palette[i]))
+                    xanchor="left", font=dict(size=style.font_tier, color=palette[i]))
 
     # Benchmarks (difficulty)
     fig.add_trace(go.Scatter(
         x=benches["release_date"], y=benches["mean"], mode="markers",
-        marker=dict(color=BENCH_COLOR, size=8, line=dict(width=0)),
+        marker=dict(color=BENCH_COLOR, size=style.marker + 1, line=dict(width=0)),
         error_y=dict(type="data", symmetric=False,
                      array=(benches["hdi_high"] - benches["mean"]).values,
                      arrayminus=(benches["mean"] - benches["hdi_low"]).values,
-                     color=BENCH_COLOR, thickness=1.4, width=2),
+                     color=BENCH_COLOR, thickness=style.errbar, width=style.errbar * 1.5),
         name=text["bench"] + interval, legendgroup="benchmarks",
         text=benches["name"],
         hovertemplate="<b>%{text}</b><br>D = %{y:.2f}<br>%{x|%Y-%m-%d}<extra></extra>",
@@ -591,11 +628,11 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
     # Models (capability)
     fig.add_trace(go.Scatter(
         x=models["release_date"], y=models["mean"], mode="markers",
-        marker=dict(color=MODEL_COLOR, size=7, opacity=0.85, line=dict(width=0)),
+        marker=dict(color=MODEL_COLOR, size=style.marker, opacity=0.85, line=dict(width=0)),
         error_y=dict(type="data", symmetric=False,
                      array=(models["hdi_high"] - models["mean"]).values,
                      arrayminus=(models["mean"] - models["hdi_low"]).values,
-                     color="rgba(32,163,158,0.35)", thickness=1.0, width=0),
+                     color="rgba(32,163,158,0.35)", thickness=style.errbar * 0.75, width=0),
         name=text["models"] + interval, legendgroup="models",
         text=models["name"],
         hovertemplate="<b>%{text}</b><br>C = %{y:.2f}<br>%{x|%Y-%m-%d}<extra></extra>",
@@ -606,12 +643,12 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
         if r["name"] in annotate_benchmarks:
             fig.add_annotation(x=r["release_date"], y=r["mean"],
                                text=r["name"], showarrow=False, yshift=-12,
-                               font=dict(size=10, color="#888"))
+                               font=dict(size=style.font_note - 2, color="#888"))
     for _, r in models.iterrows():
         if r["name"] in annotate_models:
             fig.add_annotation(x=r["release_date"], y=r["mean"],
-                               text=r["name"], showarrow=False, yshift=-12,
-                               font=dict(size=10, color="#666"))
+                               text=pretty_model_name(r["name"]), showarrow=False, yshift=-12,
+                               font=dict(size=style.font_note - 2, color="#666"))
 
     fig.update_layout(
         title=dict(text=text["title"], x=0.5),
@@ -624,10 +661,11 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)",
                    **({"range": list(y_range)} if y_range else {})),
         template="plotly_white",
-        height=620, width=1380,
+        height=int(style.height_per_row * 1.35), width=int(style.width * 1.25),
         # Right margin holds the legend (human groups + the two data series):
-        # the group title + 7 entries need ~290px before clipping.
-        margin=dict(l=70, r=290, t=80, b=55),
+        # the group title + 7 entries need ~290px at dashboard scale before clipping.
+        margin=dict(l=int(style.font_tick * 6), r=int(style.font_legend * 24),
+                    t=int(style.font_title * 4.5), b=int(style.font_tick * 4.5)),
         legend=dict(
             orientation="v",
             yanchor="top",   y=0.99,
@@ -637,4 +675,4 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
             borderwidth=1,
         ),
     )
-    return fig
+    return apply_fonts(fig, style)

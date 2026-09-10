@@ -774,6 +774,35 @@ class TestPlots:
         assert [len(t.x) for t in lg.data] == [3] * 4
         assert isinstance(subplot_grid([fg, lg], ["a", "b"]), go.Figure)
 
+    def test_post_scale_builders(self):
+        # The post's scale is the same builder with another FigureStyle: every
+        # size comes from the style, panel titles included, and the post's two
+        # options (frontier rows collapsed, x domains set by hand) hold.
+        from multiaxis_eci.viz import DASHBOARD, POST, FigureStyle
+        assert isinstance(POST, FigureStyle) and POST.font_tick > DASHBOARD.font_tick
+        dfs = [pd.DataFrame({"name": [f"m{i}" for i in range(5)],
+                             "kind": ["model"] * 3 + ["frontier", "human"],
+                             "mean": np.arange(5.0),
+                             "hdi_low": np.arange(5.0) - 1,
+                             "hdi_high": np.arange(5.0) + 1})
+               for _ in range(4)]
+        fg = forest_grid_fig(dfs, [f"axis{k+1}" for k in range(4)], title=None, style=POST,
+                             collapse_frontier=True, col_domains=[(0.0, 0.3), (0.7, 1.0)])
+        assert sum(t.showlegend for t in fg.data) == 2          # models, humans
+        assert fg.layout.title.text is None
+        assert fg.layout.xaxis2.domain == (0.7, 1.0)
+        panel = [a for a in fg.layout.annotations if a.text == "axis1"][0]
+        assert panel.font.size == POST.font_axis
+        assert fg.data[0].marker.size == POST.marker
+        rows = [{"axis": f"axis{k+1}", "benchmark": f"b{b}",
+                 "loading_median": 0.1 * b, "hdi_low": 0.0, "hdi_high": 0.2 * b,
+                 "axis_share": b / 10.0} for k in range(4) for b in range(10)]
+        lg = loadings_grid_fig(pd.DataFrame(rows), top_n=3, style=POST)
+        # The share column: one number per row, right-aligned in the panel.
+        shares = [a for a in lg.layout.annotations if a.xanchor == "right"]
+        assert len(shares) == 12 and shares[0].font.size == POST.font_tick
+        assert lg.layout.xaxis.range[1] > 0.2 * 9        # headroom past the whisker
+
     def test_capability_timeline(self, synth_trace, data, raw_df):
         tl = timeline_stats_df(synth_trace, data, raw_df)
         humans = human_stats_df(synth_trace, data)
@@ -1906,6 +1935,49 @@ class TestMIRT:
                     > theta[:, 6, 0][:, None]).mean(0)
         np.testing.assert_allclose(np.asarray(tr.y, float), p_manual, atol=1e-12)
         assert (np.diff(np.asarray(tr.y, float)) >= -1e-12).all()
+
+        # The post's two forecast figures, from the library: the trend panel
+        # (band, cloud, median, tiers named at the right, today line) and the
+        # crossover panel with the 50% bar over the 80% bar, split at today.
+        from multiaxis_eci.analysis import (
+            axis_forecast_inputs,
+            crossover_table,
+            mirt_human_axis_stats,
+            mirt_model_timeline_df,
+        )
+        from multiaxis_eci.viz import POST, crossover_panels_fig, frontier_trend_fig
+        tl = mirt_model_timeline_df(theta, 0, d, raw, sd_cap=None, drop_low_obs=False,
+                                    hdi_prob=0.8)
+        hs = mirt_human_axis_stats(theta, 0, d, hdi_prob=0.8)
+        per_axis = {"axis1": {"fc": env, "tl": tl, "hs": hs}}
+        ft = frontier_trend_fig(per_axis, ["axis1"], {"axis1": "Axis 1"}, style=POST,
+                                today="2026-01-01", window=("2023-01-01", "2030-01-01"))
+        assert [a.text for a in ft.layout.annotations][0] == "Axis 1"
+        assert ft.layout.xaxis.range == ("2023-01-01", "2030-01-01")
+        tier_notes = [a for a in ft.layout.annotations if a.xanchor == "left"]
+        assert len(tier_notes) == len(hs) and tier_notes[0].font.size == POST.font_tier
+        assert not ft.layout.showlegend
+        ft_fr = frontier_trend_fig(per_axis, ["axis1"], lang="fr")
+        assert ft_fr.layout.xaxis.title.text == "Date de sortie"
+
+        cx2 = crossover_table(env, theta, 0, d, "axis1", probs=(0.5, 0.8))
+        assert {"hdi80_low", "hdi80_high"} <= set(cx2.columns)
+        row = cx2[cx2.tier == "Average Human"].iloc[0]
+        assert row.hdi80_low <= row.crossover_hdi_low and row.hdi80_high >= row.crossover_hdi_high
+        cf = crossover_panels_fig(cx2, ["axis1"], probs=(0.5, 0.8), today="2026-01-01",
+                                  window=("2015-01-01", "2030-01-01"))
+        legend = [t.name for t in cf.data if t.showlegend]
+        assert "50% interval (thick)" in legend and "80% interval (thin)" in legend
+        drawn = [t for t in cf.data if t.mode == "lines" and not t.showlegend]
+        from multiaxis_eci.viz import DASHBOARD
+        assert {t.line.width for t in drawn} == {DASHBOARD.bar_thick, DASHBOARD.bar_thin}
+        cf_fr = crossover_panels_fig(cx2, ["axis1"], probs=(0.5,), lang="fr")
+        assert "déjà derrière nous" in [t.name for t in cf_fr.data if t.showlegend]
+
+        # axis_forecast_inputs bundles the same three objects the dashboard draws.
+        inputs = axis_forecast_inputs(theta, 0, d, raw, "axis1", hdi_prob=0.8, sd_cap=None,
+                                      drop_low_obs=False)
+        assert set(inputs) == {"fc", "tl", "hs"} and len(inputs["hs"]) == len(hs)
 
 
 # ─────────────────── MIRT non-compensatory (conjunctive) ────────────────────

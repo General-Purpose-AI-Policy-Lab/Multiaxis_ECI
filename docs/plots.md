@@ -67,6 +67,8 @@ pickle and fails if it is missing.
 python 6_writeups/blogpost/figures/make_all.py all --cached
 ```
 
+The post's figures are the same builders as the outputs at another scale: each builder takes a `FigureStyle` (`viz/style.py`), `DASHBOARD` for the cards and the per-fit folders, `POST` for a figure shared flat at about 2,000 pixels. The post's scripts own only the flagship trace, the caches beside it, the fixed windows (2023 to 2030 for the trend, 2015 to 2030 for the crossings) and the hand-placed callouts of figure 1; the figure design lives in `viz/` and cannot drift between the post and the outputs.
+
 ## Figure catalogue
 
 Names below are the figure keys; on the dashboard each is one panel. On disk the
@@ -108,6 +110,8 @@ Computed on the **whole** fit, never on a plot-side subset.
 | `factor_correlations` | correlation heatmap of the axis abilities, K >= 2 (single-fit CLI figure; the dashboard filters it out of its cards and reports `max_phi` in the comparison table instead). When the display frame is promax the title flags it and the raw ability correlation is annotated, so an oblique correlation is never read as the raw one |
 | `axis_strength` | forest of per-axis strength, i.e. the loading column norms (or `tau_A` where the fit has a per-axis scale). How much of the fit each axis carries |
 | `qmatrix` | the allowed-loading pattern, for conjunctive and anchored fits only |
+| `forests_per_axis` | the post's forest figure (`forest_grid_fig`): per axis the top models among the timeline candidates, the pinned frontier releases (`config.FOREST_PINNED_RELEASES`, drawn even when wide) and every human tier, 95% intervals, K >= 2 |
+| `loadings_per_axis` | the post's loadings figure (`loadings_grid_fig`): per axis the 20 benchmarks with the largest axis share, bar = loading with its 95% interval, colour and the right-hand number = share, K >= 2 |
 
 ### Forecast trio
 
@@ -117,8 +121,8 @@ family, and human tiers being in the fit.
 
 | key | what it shows |
 |---|---|
-| `forecast_{k}_{axis}` | the measured timeline with the per-draw record envelope extended at its recent rate, its 80% band, and a dashed marker at each human tier's projected crossover date |
-| `forecast_{k}_{axis}_when` | the crossover dates alone: tier on the y-axis, projected date and interval on the x-axis, coloured passed against future. The readable version of the dashed markers |
+| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the per-draw record envelope extended at its recent rate with its 80% band, the human tiers as dashed lines named in the right margin, and a today line |
+| `forecast_{k}_{axis}_when` | the post's crossover panel (`crossover_panels_fig`): per tier the median crossing date, a thick 50% bar over a thin 80% bar, both split at today (green behind us, red ahead); whatever runs past the window is clipped at the edge and dated |
 | `forecast_{k}_{axis}_prob` | P(frontier > tier) over the forecast grid, one S-curve per tier, with reference lines at 0.5 and 0.975. Read a date off it rather than a point estimate |
 
 ### K against K=1

@@ -17,7 +17,6 @@ from pathlib import Path
 import arviz as az
 import numpy as np
 import pandas as pd
-import plotly.colors as pc
 import plotly.graph_objects as go
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,7 +42,7 @@ from multiaxis_eci.data import (  # noqa: E402
     open_only_drop_list,  # noqa: E402
 )
 from multiaxis_eci.persistence import load_trace, save_df  # noqa: E402
-from multiaxis_eci.viz.core import DEFAULT_HUMAN_BANDS, save_fig  # noqa: E402
+from multiaxis_eci.viz.core import DEFAULT_HUMAN_BANDS, human_tier_palette, save_fig  # noqa: E402
 from multiaxis_eci.viz.core import _rgba as _rgb_to_rgba  # noqa: E402
 
 # Width of the interval band drawn on the bottom and top human tiers.
@@ -229,10 +228,9 @@ def build_figure(theta0, mini, transform, model_dates, country_map, records, for
     eci_draws = transform.a[:, None] + transform.b[:, None] * theta0
     tiers = sorted(((names[i], eci_med[i], i) for i in range(mini.n_models)
                     if mini.is_human[i]), key=lambda t: -t[1])
-    fracs = np.linspace(0.9, 0.4, len(tiers)) if len(tiers) > 1 else [0.7]
+    palette = human_tier_palette(len(tiers))          # Blues, strongest darkest
     q = [(1 - HUMAN_BAND_PROB) / 2, (1 + HUMAN_BAND_PROB) / 2]
-    for k, ((tname, ty, ti), f) in enumerate(zip(tiers, fracs)):
-        col = pc.sample_colorscale("Greys", float(f))[0]
+    for k, ((tname, ty, ti), col) in enumerate(zip(tiers, palette)):
         label = tname
         if tname in DEFAULT_HUMAN_BANDS:
             lo, hi = np.quantile(eci_draws[:, ti], q)

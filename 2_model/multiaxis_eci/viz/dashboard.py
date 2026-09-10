@@ -18,9 +18,9 @@ from multiaxis_eci.viz.compare import (
 )
 from multiaxis_eci.viz.core import capability_timeline_fig, forest_fig
 from multiaxis_eci.viz.forecast import (
-    capability_forecast_fig,
-    crossover_dotwhisker_fig,
+    crossover_panels_fig,
     exceedance_prob_fig,
+    frontier_trend_fig,
 )
 from multiaxis_eci.viz.gof import (
     benchmark_icc_fig,
@@ -31,7 +31,13 @@ from multiaxis_eci.viz.gof import (
     pred_vs_obs_fig,
     residuals_per_benchmark_fig,
 )
-from multiaxis_eci.viz.mirt import binary_qmatrix_fig, factor_corr_fig, loadings_heatmap_fig
+from multiaxis_eci.viz.mirt import (
+    binary_qmatrix_fig,
+    factor_corr_fig,
+    forest_grid_fig,
+    loadings_grid_fig,
+    loadings_heatmap_fig,
+)
 
 # ── shared figure-SETS (Unit 3): one GoF quad + one per-fit set, all callers ──
 
@@ -179,59 +185,28 @@ def forecast_figures(view, data, raw, names, th_fc,
     figs = {}
     K = view.K
     titles = axis_titles or {}
-    from multiaxis_eci.analysis import (
-        mirt_crossover_df,
-        mirt_frontier_forecast,
-        mirt_human_axis_stats,
-        mirt_model_timeline_df,
-    )
-    from multiaxis_eci.config import FORECAST_KW
+    from multiaxis_eci.analysis import axis_forecast_inputs, crossover_table
     for k in range(K):
         disp = titles.get(names[k], names[k])
         # The measured cloud (config.INFORMED_SD_CAP, low-obs dropped, SOTA
-        # families exempt: `candidate_mask`): an extrapolated pre-2023 model at
-        # prior-wide CI is not evidence about the frontier. The cloud and the
-        # fit below share the cap, so every fitted point is a plotted point.
-        # All intervals on this figure set are 50% HDIs: the whiskers, the
-        # human bands, the forecast band and the crossover dates.
-        tl = mirt_model_timeline_df(th_fc, k, data, raw,
-                                    sd_cap=FORECAST_KW["sd_cap"],
-                                    hdi_prob=0.5)
-        if tl.empty:
-            continue
+        # families exempt: `candidate_mask`) and the frontier forecast of
+        # config.FORECAST_KW (envelope basis) fitted on that same cloud, so
+        # every fitted point is a plotted point. Whiskers, human tiers and the
+        # forecast band are all 80% HDIs, the post's convention.
         try:
-            # The frontier forecast of config.FORECAST_KW (envelope basis
-            # over the same measured cloud, 80% HDIs). SOTA releases are
-            # exempt from the informed filter while their ability on the
-            # axis is at least weakly measured (config.SOTA_EXEMPT_SD_CAP);
-            # a prior-only position never enters the record set, so the
-            # trend cannot sit under the drawn cloud or be held by ghosts.
-            # back_start only matters to the regression
-            # bases; the envelope draws the observed record steps from its
-            # own window start, the forward rate measured over the last
-            # rate_window years.
-            back = pd.to_datetime(tl["release_date"]).min()
-            from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
-            fc = mirt_frontier_forecast(th_fc, k, data, raw,
-                                        **dict(FORECAST_KW,
-                                              back_start=back,
-                                              backcast_floor=FORECAST_BACKCAST_FLOOR.get(f"axis{k + 1}")))
+            inputs = axis_forecast_inputs(th_fc, k, data, raw, names[k], hdi_prob=0.8)
         except ValueError:
             continue
-        hstat = mirt_human_axis_stats(th_fc, k, data, hdi_prob=0.5)
-        cx = mirt_crossover_df(fc, th_fc, k, data, axis_name=names[k],
-                               hdi_prob=0.5)
+        cx = crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8))
         slug = _slug(names[k])
-        figs[f"forecast_{k+1}_{slug}"] = capability_forecast_fig(
-            tl, hstat, fc, cx, axis_name=disp)
-        figs[f"forecast_{k+1}_{slug}"].update_layout(
-            title_text=f"Forecast — {disp} (50% intervals)")
-        figs[f"forecast_{k+1}_{slug}_when"] = crossover_dotwhisker_fig(
-            cx, axis_name=disp)
-        figs[f"forecast_{k+1}_{slug}_when"].update_layout(
-            title_text=f"Forecast — {disp} (crossover dates, 50% intervals)")
+        figs[f"forecast_{k+1}_{slug}"] = frontier_trend_fig(
+            {names[k]: inputs}, [names[k]], {names[k]: disp},
+            title=f"Forecast — {disp} (80% intervals)")
+        figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
+            cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
+            title=f"Forecast — {disp} (crossing dates)")
         figs[f"forecast_{k+1}_{slug}_prob"] = exceedance_prob_fig(
-            fc, th_fc, k, data, axis_name=disp)
+            inputs["fc"], th_fc, k, data, axis_name=disp)
     return figs
 
 
@@ -316,6 +291,21 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         figs.update(forecast_figures(view, data, raw, names, th_fc, axis_titles=titles))
 
     figs.update(load_figs)          # held back above — legacy page position
+
+    if K >= 2 and view.A is not None:
+        # Top models, pinned frontier releases and human tiers per axis, the
+        # post's forest figure: same candidates as the timelines and the
+        # forecast (`candidate_mask`), 95% intervals.
+        from multiaxis_eci.analysis import forest_frames
+        from multiaxis_eci.config import FORECAST_KW
+        frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"])
+        figs["forests_per_axis"] = forest_grid_fig(
+            frames, [(titles or {}).get(n, n) for n in names])
+        # The benchmarks that define each axis, ranked by axis share (95%
+        # intervals): the post's loadings figure, beside the heatmap.
+        from multiaxis_eci.analysis import loadings_table
+        ldf = loadings_table(view.require_A(), bench, hdi=(2.5, 97.5))
+        figs["loadings_per_axis"] = loadings_grid_fig(ldf, titles or {}, top_n=20)
 
     if K >= 2:
         # A signed fit's display Phi is the promax factor correlation, an

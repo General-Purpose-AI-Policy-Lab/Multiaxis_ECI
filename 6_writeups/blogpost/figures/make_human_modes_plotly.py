@@ -39,13 +39,12 @@ sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(REPO / "4_diagnostics"))
 sys.path.insert(0, str(HERE))
 
-from make_all import two_column_layout  # noqa: E402
 from theta_bimodality import PERM_STRIDE, axis_permutations, residual_groups  # noqa: E402
 
 from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
-from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
+from multiaxis_eci.viz.core import save_html, save_print, two_column_layout  # noqa: E402
 
 # None drops the in-figure title: the post's caption carries the
 # description. Set a string to draw it on the canvas again, e.g.
@@ -173,7 +172,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE) -> None:
         fig.update_layout(title=dict(text=TITLE, x=0.5,
                                      font=dict(size=FONT_TITLE)), margin_t=190)
     # The gutter here holds a 31-character tier name.
-    two_column_layout(fig, COL_DOM, AXIS_TITLES, k=K)
+    two_column_layout(fig, COL_DOM, list(AXIS_TITLES.values()), n_panels=K)
     for ann in fig.layout.annotations[:K]:
         ann.font = dict(size=FONT_AXIS)
 

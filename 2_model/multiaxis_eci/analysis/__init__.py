@@ -46,9 +46,12 @@ from multiaxis_eci.analysis.fitspec import (
 from multiaxis_eci.analysis.fitview import FitView, prepare_fit
 from multiaxis_eci.analysis.forecast import (
     ForecastResult,
+    axis_forecast_inputs,
+    crossover_table,
     mirt_crossover_df,
     mirt_frontier_forecast,
 )
+from multiaxis_eci.analysis.forests import forest_frames
 from multiaxis_eci.analysis.rotation import (
     AlignResult,
     _aligned_reproducibility,
@@ -110,6 +113,7 @@ __all__ = [
     "mirt_difficulty_timeline_df", "mirt_human_axis_stats",
     "loadings_forest_df", "nc_difficulty_timeline_df",
     "ForecastResult", "mirt_frontier_forecast", "mirt_crossover_df",
+    "axis_forecast_inputs", "crossover_table", "forest_frames",
     "FitView", "prepare_fit",
     "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS",
     "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship",

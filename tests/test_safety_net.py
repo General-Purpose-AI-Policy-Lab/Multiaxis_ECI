@@ -1138,9 +1138,10 @@ class TestPublicAPISurface:
             "axes_scatter_matrix_fig", "build_fit_figures",
             "factor_vs_1d_fig", "per_bench_r2_delta_fig", "pred_scatter_fig",
             "assemble_dashboard", "build_comparison",
-            "ppca_spectrum_fig", "write_dashboard", "capability_forecast_fig",
+            "ppca_spectrum_fig", "write_dashboard", "frontier_trend_fig",
             "forest_grid_fig", "loadings_grid_fig", "subplot_grid",
-            "crossover_dotwhisker_fig", "exceedance_prob_fig",
+            "crossover_panels_fig", "exceedance_prob_fig",
+            "FigureStyle", "DASHBOARD", "POST",
         ],
         "multiaxis_eci.ppc": [
             "compute_gof", "posterior_predictive_mirt",

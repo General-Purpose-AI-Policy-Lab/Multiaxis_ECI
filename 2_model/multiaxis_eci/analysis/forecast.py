@@ -431,3 +431,42 @@ def mirt_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int,
     return pd.DataFrame(rows).sort_values("human_mean").reset_index(drop=True)
 
 
+
+
+def axis_forecast_inputs(theta_draws: np.ndarray, k: int, data: ECIData, raw_df: pd.DataFrame,
+                         axis_name: str, *, hdi_prob: float = 0.8, **forecast_kw) -> dict:
+    """Everything the frontier-trend panel of one axis draws: `fc` (the frontier forecast of
+    `config.FORECAST_KW`, envelope basis, back_start at the first candidate), `tl` (the
+    candidates' timeline frame) and `hs` (the human tiers), the last two at `hdi_prob`.
+
+    One definition for the dashboard, the per-fit figure folders and the blog post, so a
+    figure can never show a cloud the forecast was not fitted on. `forecast_kw` overrides
+    FORECAST_KW entries (the post fixes `horizon_date`). Raises ValueError, as
+    `mirt_frontier_forecast` does, when the axis carries too few candidates.
+    """
+    from multiaxis_eci.analysis.timelines import mirt_human_axis_stats, mirt_model_timeline_df
+    from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
+
+    tl = mirt_model_timeline_df(theta_draws, k, data, raw_df, sd_cap=FORECAST_KW["sd_cap"],
+                                hdi_prob=hdi_prob)
+    if tl.empty:
+        raise ValueError(f"{axis_name}: no dated candidate to forecast on")
+    kw = dict(FORECAST_KW, back_start=pd.to_datetime(tl["release_date"]).min(),
+              backcast_floor=FORECAST_BACKCAST_FLOOR.get(axis_name), **forecast_kw)
+    fc = mirt_frontier_forecast(theta_draws, k, data, raw_df, **kw)
+    hs = mirt_human_axis_stats(theta_draws, k, data, hdi_prob=hdi_prob)
+    return {"fc": fc, "tl": tl, "hs": hs}
+
+
+def crossover_table(fc: ForecastResult, theta_draws: np.ndarray, k: int, data: ECIData,
+                    axis_name: str, probs: tuple[float, ...] = (0.5, 0.8)) -> pd.DataFrame:
+    """`mirt_crossover_df` at `probs[0]`, plus `hdi80_low` / `hdi80_high` holding the second
+    mass when two are asked for: the crossover panel draws the first as its thick bar and the
+    second as its thin one. Both come from the same per-draw crossing distribution."""
+    cx = mirt_crossover_df(fc, theta_draws, k, data, axis_name=axis_name, hdi_prob=probs[0])
+    if len(probs) > 1:
+        wide = mirt_crossover_df(fc, theta_draws, k, data, axis_name=axis_name,
+                                 hdi_prob=probs[1]).set_index("tier")
+        cx["hdi80_low"] = cx["tier"].map(wide["crossover_hdi_low"]).values
+        cx["hdi80_high"] = cx["tier"].map(wide["crossover_hdi_high"]).values
+    return cx

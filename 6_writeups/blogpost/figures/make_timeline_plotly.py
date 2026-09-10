@@ -1,6 +1,6 @@
 """1D ECI timeline with benchmark difficulties, in the dashboard's Plotly style.
 
-Same content as the matplotlib draft (`make_timeline_difficulties.py`) but drawn
+The post's figure 1, drawn
 by the library's own `viz.core.capability_timeline_fig`, the builder behind the
 canonical fit's `capability_timeline` figure and the dashboard's timelines, so
 the post cannot drift from them. What this script adds on top of the builder's
@@ -29,6 +29,7 @@ from multiaxis_eci.analysis.stats import eci_affine  # noqa: E402
 
 # The canonical K=1 fit of the current data generation; the blog post's figure 1.
 DEFAULT_RESULTS = config.RESULTS_DIR / "canonical"
+from multiaxis_eci.viz import POST  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
@@ -46,11 +47,6 @@ FONT_TITLE = 42       # figure title
 FONT_AXIS = 36        # axis titles
 FONT_TICK = 26        # tick labels
 FONT_CALLOUT = 28     # named-point leader labels
-FONT_TIER = 26        # right-margin human tier names
-MARKER_BENCH = 13     # benchmark points
-MARKER_MODEL = 10     # model points
-ERRBAR_BENCH = 2.6    # benchmark error-bar line width
-ERRBAR_MODEL = 2.0    # model error-bar line width
 # Human tiers: every tier's HDI_PROB interval as a faint band in the tier's own
 # color, under every point (layer below), so a prior-driven tier reads as
 # uncertain. The alpha is low because the one-observation tiers span 40+ ECI
@@ -151,8 +147,7 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
                                      hdi_prob=HDI_PROB, y_label="ECI-H",
                                      human_bands=True,
                                      human_band_alpha=HUMAN_BAND_ALPHA,
-                                     tier_names_at_right=True,
-                                     tier_font_size=FONT_TIER)
+                                     tier_names_at_right=True, style=POST)
     fig.update_layout(showlegend=False)
     x_right = ai["release_date"].max()
     x_left = ai["release_date"].min()      # first dated model
@@ -172,14 +167,6 @@ def main(results: Path, tag: str, out_dir: Path = HERE) -> None:
         legend=dict(font=dict(size=15)),
         height=1250, width=1900, margin=dict(l=130, r=430, t=120, b=110),
     )
-    for tr in fig.data:
-        if tr.legendgroup == "benchmarks":
-            tr.marker.size = MARKER_BENCH
-            tr.error_y.thickness = ERRBAR_BENCH
-            tr.error_y.width = 4
-        elif tr.legendgroup == "models":
-            tr.marker.size = MARKER_MODEL
-            tr.error_y.thickness = ERRBAR_MODEL
     # Named points, each with a leader to a label in empty canvas.
     def _label(row, anchor, color):
         ax_, ay_ = anchor

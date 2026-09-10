@@ -49,9 +49,9 @@ from multiaxis_eci.viz.dashboard import (
     write_dashboard,
 )
 from multiaxis_eci.viz.forecast import (
-    capability_forecast_fig,
-    crossover_dotwhisker_fig,
+    crossover_panels_fig,
     exceedance_prob_fig,
+    frontier_trend_fig,
 )
 from multiaxis_eci.viz.gof import (
     benchmark_icc_fig,
@@ -75,12 +75,14 @@ from multiaxis_eci.viz.mirt import (
     ppca_spectrum_fig,
     pred_scatter_fig,
 )
+from multiaxis_eci.viz.style import DASHBOARD, POST, FigureStyle
 
 __all__ = [
     "save_fig", "figure_filename", "DEFAULT_HUMAN_BANDS", "HUMAN_LEVEL_LABELS",
     "TIMELINE_TEXT", "human_tier_palette", "trace_posterior_grid", "hyperparams_fig", "forest_fig",
     "all_models_forest_fig", "sota_forest_fig", "capability_timeline_fig", "raw_scores_by_date_fig",
-    "capability_forecast_fig", "crossover_dotwhisker_fig", "exceedance_prob_fig",
+    "frontier_trend_fig", "crossover_panels_fig", "exceedance_prob_fig",
+    "FigureStyle", "DASHBOARD", "POST",
     "pit_hist_fig", "pit_ecdf_fig", "density_overlay_fig", "pred_vs_obs_fig",
     "benchmark_obs_vs_pred_fig", "benchmark_icc_fig",
     "residuals_per_benchmark_fig",

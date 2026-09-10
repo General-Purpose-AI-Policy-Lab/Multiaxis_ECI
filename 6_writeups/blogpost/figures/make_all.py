@@ -16,9 +16,9 @@ settings are the ones the rest of the repo uses. Nothing is hand-copied.
     ...                 skipped, they have no cache
     ...   --out DIR     write the figures somewhere other than this folder
 
-The three per-axis figures have a matplotlib twin in `make_results_figs.py`,
-drawn by `figbase`; the Plotly ones here write `*_lw_plotly.png`, so the two
-sets can be compared side by side.
+Every figure is a `multiaxis_eci.viz` builder at the `POST` scale: the same code
+draws the dashboard cards and the per-fit figure folders, so the post cannot
+drift from the outputs. The `*_lw_plotly` names are the post's own file names.
 
 The forecast cache is `lw_forecast_cache_80.pkl` in the flagship's results folder, next to the
 trace it was computed from, not in the temp dir: it is derived from one specific
@@ -31,17 +31,13 @@ import pickle
 import sys
 from functools import lru_cache
 from pathlib import Path
-from textwrap import shorten
 
-import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
-
-from figbase import FOREST_FRONTIER, pretty  # noqa: E402
 
 from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
@@ -86,30 +82,15 @@ def load_flagship():
 def compute(view, data, raw) -> dict:
     """Per axis: the forecast plus its timeline/human tables, for the trend figure.
 
-    The crossover figure reads only the ForecastResult (slope/intercept draws)
-    out of this, through `make_trend_plotly.forecast`'s cache.
+    `analysis.axis_forecast_inputs` (FORECAST_KW, envelope basis, 80% intervals) with the
+    post's fixed horizon. The crossover figure reads only the ForecastResult
+    (slope/intercept draws) out of this, through `make_trend_plotly.forecast`'s cache.
     """
-    from multiaxis_eci.analysis import (
-        mirt_frontier_forecast,
-        mirt_human_axis_stats,
-        mirt_model_timeline_df,
-    )
-    from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
+    from multiaxis_eci.analysis import axis_forecast_inputs
 
-    out = {}
-    for name in AXES:
-        k = view.names.index(name)
-        fc = mirt_frontier_forecast(view.theta, k, data, raw,
-                                    **dict(FORECAST_KW, horizon_date=END,
-                                           backcast_floor=FORECAST_BACKCAST_FLOOR.get(name)))
-        out[name] = {
-            "fc": fc,
-            "tl": mirt_model_timeline_df(view.theta, k, data, raw,
-                                         sd_cap=FORECAST_KW["sd_cap"],
-                                         hdi_prob=HDI),
-            "hs": mirt_human_axis_stats(view.theta, k, data, hdi_prob=HDI),
-        }
-    return out
+    return {name: axis_forecast_inputs(view.theta, view.names.index(name), data, raw, name,
+                                       hdi_prob=HDI, horizon_date=END)
+            for name in AXES}
 
 
 def forecast_cache(cached: bool = False) -> dict:
@@ -126,106 +107,34 @@ def forecast_cache(cached: bool = False) -> dict:
     return per_axis
 
 
-def two_column_layout(fig, col_dom, titles, k: int = 4) -> None:
-    """Set a 2-column grid's x domains directly and recentre each panel title.
-
-    At post type scale the right column's y tick labels live in the inter-column
-    gutter and need roughly 40% of the plot area, which is more than
-    `make_subplots`' fractional spacing gives, so the domains cannot be left to
-    it. `titles` is the axis-title lookup whose values identify a panel-title
-    annotation among the figure's other annotations.
-    """
-    # Plotly numbers the first axis bare: xaxis, xaxis2, xaxis3, ...
-    for i, ax in enumerate(["xaxis"] + [f"xaxis{n}" for n in range(2, k + 1)]):
-        fig.layout[ax].domain = col_dom[i % 2]
-    panels = [a for a in fig.layout.annotations if a.text in titles.values()]
-    for i, ann in enumerate(panels):
-        ann.x = sum(col_dom[i % 2]) / 2
-
-
 # ── per-axis result figures ─────────────────────────────────────────────────
-
-def forest_candidates(view, data, k: int, sd_cap: float = FORECAST_KW["sd_cap"],
-                      drop_low_obs: bool = True, sota_exempt: bool = True) -> np.ndarray:
-    """(M,) bool: the machines a forest panel may rank on axis k.
-
-    The same gate as the trend figure's point cloud (`mirt_model_timeline_df`
-    / `mirt_frontier_forecast` with FORECAST_KW): a model needs a measured
-    ability on THIS axis (posterior SD < `sd_cap`) and enough observations
-    (not `is_low_obs`), unless it is a SOTA model, which is exempt from both.
-    One rule for the forest and the forecast, so the two figures cannot show
-    different frontiers.
-    """
-    is_h = np.asarray(data.is_human, dtype=bool)
-    sd = view.theta[:, :, k].std(0)
-    ok = ~is_h & (sd < sd_cap)
-    if drop_low_obs:
-        ok &= ~np.asarray(data.is_low_obs, dtype=bool)
-    if sota_exempt:
-        ok |= ~is_h & np.asarray(data.is_sota, dtype=bool)
-    return ok
-
-
-def forest_frames(view, data, n_top: int = 11, **gate) -> list:
-    """Per axis, the forest rows: the top `n_top` models by mean ability among
-    `forest_candidates` (the trend figure's filter: SD < FORECAST_KW["sd_cap"]
-    and not low-obs, or SOTA), the pinned frontier releases, and every human
-    tier. `gate` forwards sd_cap / drop_low_obs / sota_exempt.
-
-    Ascending by mean, so the strongest row lands at the top of the panel.
-    """
-    names = data.mlookup.sort_values("model_idx")["model"].tolist()
-    is_h = np.asarray(data.is_human, dtype=bool)
-    frames = []
-    for k in range(view.K):
-        th = view.theta[:, :, k]                        # (S, M)
-        mean = th.mean(0)
-        lo, hi = np.percentile(th, [2.5, 97.5], axis=0)
-        ok = forest_candidates(view, data, k, **gate)
-        top = [i for i in np.argsort(-mean) if ok[i]][:n_top]
-        rows = ([(i, "model") for i in top]
-                + [(i, "frontier") for i in range(len(names))
-                   if names[i] in FOREST_FRONTIER and not is_h[i] and i not in top]
-                + [(i, "human") for i in np.where(is_h)[0]])
-        rows.sort(key=lambda r: mean[r[0]])
-        full = [names[i] if is_h[i] else pretty(names[i]) for i, _ in rows]
-        # Word-boundary shortening (a mid-token cut makes two token-budget
-        # variants of one model read identically). Plotly MERGES duplicate
-        # categories into one row, so a label that collides after shortening
-        # keeps its full text instead of stacking two test-takers on one line.
-        short = [shorten(f, width=34, placeholder=" …") for f in full]
-        dup = {s for s in short if short.count(s) > 1}
-        frames.append(pd.DataFrame({
-            "name": [f if s in dup else s for s, f in zip(short, full)],
-            "kind": [kind for _, kind in rows],
-            "mean": [mean[i] for i, _ in rows],
-            "hdi_low": [lo[i] for i, _ in rows],
-            "hdi_high": [hi[i] for i, _ in rows]}))
-    return frames
-
 
 def forests(out_dir: Path) -> Path:
     """Top models, frontier releases and human tiers, one panel per axis."""
-    from multiaxis_eci.viz import forest_grid_fig
+    from multiaxis_eci.analysis import forest_frames
+    from multiaxis_eci.viz import POST, forest_grid_fig
     from multiaxis_eci.viz.core import save_print
 
-    view, data, _raw = load_flagship()
-    fig = forest_grid_fig(forest_frames(view, data),
-                          [AXIS_TITLES[n] for n in view.names])
+    view, data, raw = load_flagship()
+    frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"])
+    fig = forest_grid_fig(frames, [AXIS_TITLES[n] for n in view.names], title=None,
+                          style=POST, collapse_frontier=True,
+                          col_domains=[(0.0, 0.27), (0.73, 0.96)])
     return save_print(fig, out_dir / "forests_axes_lw_plotly")
 
 
 def loadings(out_dir: Path, top_n: int = 20) -> Path:
     """The benchmarks that define each axis, ranked by axis share."""
     from multiaxis_eci.analysis import loadings_table
-    from multiaxis_eci.viz import loadings_grid_fig
+    from multiaxis_eci.viz import POST, loadings_grid_fig
     from multiaxis_eci.viz.core import save_print
 
     view, data, _raw = load_flagship()
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
     # 2.5/97.5 to match the interval every other flagship loading figure draws.
     ldf = loadings_table(view.require_A(), bench, hdi=(2.5, 97.5))
-    fig = loadings_grid_fig(ldf, AXIS_TITLES, top_n=top_n)
+    fig = loadings_grid_fig(ldf, AXIS_TITLES, top_n=top_n, x_title="loading", style=POST,
+                            col_domains=[(0.0, 0.30), (0.70, 0.96)])
     return save_print(fig, out_dir / "loadings_axes_lw_plotly")
 
 

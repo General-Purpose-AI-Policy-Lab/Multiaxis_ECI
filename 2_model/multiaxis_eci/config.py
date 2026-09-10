@@ -292,6 +292,11 @@ AXIS_TITLES = {"axis1": "Axis 1 — Fluid Intelligence",
               "axis2": "Axis 2 — Scientific Knowledge and Reasoning",
               "axis3": "Axis 3 — Agentic Capabilities",
               "axis4": "Axis 4 — Legacy QA"}
+# Frontier releases pinned into every per-axis forest whatever their posterior SD:
+# a frontier model is the headline of the figure, so a wide interval is drawn
+# rather than the row dropped. Names of the published fit; a refit's newest
+# frontier releases are added here by hand.
+FOREST_PINNED_RELEASES = {"claude-mythos-preview-early", "claude-fable-5", "gpt-5.6-sol_max"}
 AXIS_SIGNATURES = {"axis1": {"ARC-AGI-2", "VPCT", "ARC-AGI"},
                    "axis2": {"WMDP Chemistry", "WMDP Biology"},
                    "axis3": {"GBAEval", "Remote Labor Index", "ProofBench"},

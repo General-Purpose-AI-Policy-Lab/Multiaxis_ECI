@@ -7,36 +7,61 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from multiaxis_eci.config import DENSITY_SEED
+from multiaxis_eci.viz.core import AI_COLOR
+from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 
 # ── Goodness of fit ───────────────────────────────────────────────────────
-def pit_hist_fig(pit: np.ndarray, n_bins: int = 20) -> go.Figure:
+def pit_hist_fig(pit: np.ndarray, n_bins: int = 20, *, style: FigureStyle = DASHBOARD,
+                 title: str | None = "PIT histogram", h0_band: bool = True,
+                 note: bool = True) -> go.Figure:
+    """PIT histogram against the uniform density: calibration in one panel.
+
+    u_n = P(Y_rep <= y_n) under the posterior predictive; a calibrated fit puts the bars flat on
+    the dotted density-1 line. `h0_band` shades the 95% band a uniform sample of this size would
+    stay in; `note` writes n and the PIT variance under the x title (uniform 1/12: a variance
+    below it means intervals wider than the data needs). `title=None` leaves the description to
+    the caption.
+    """
     n = len(pit)
     p = 1 / n_bins
     se = np.sqrt(p * (1 - p) / n)
+    dens, edges = np.histogram(pit, bins=n_bins, range=(0, 1), density=True)
 
     fig = go.Figure()
-    fig.add_trace(go.Histogram(
-        x=pit, nbinsx=n_bins, marker_color="#4682B4", opacity=0.85,
-        histnorm="probability density",
-        hovertemplate="PIT bin %{x}<br>density: %{y:.3f}<extra></extra>",
-    ))
-    fig.add_hrect(
-        y0=(p - 1.96 * se) * n_bins, y1=(p + 1.96 * se) * n_bins,
-        line_width=0, fillcolor="crimson", opacity=0.10,
-        annotation_text="95% band under H0",
-        annotation_position="bottom right",
-    )
-    fig.add_hline(y=1.0, line_dash="dash", line_color="crimson",
-                  annotation_text="Uniform(0,1)", annotation_position="top right")
+    fig.add_trace(go.Bar(
+        x=(edges[:-1] + edges[1:]) / 2, y=dens, width=np.diff(edges),
+        marker=dict(color=AI_COLOR, line=dict(color="white", width=max(1, style.refline))),
+        opacity=0.85, showlegend=False,
+        hovertemplate="PIT %{x:.3f}<br>density %{y:.2f}<extra></extra>"))
+    if h0_band:
+        fig.add_hrect(y0=(p - 1.96 * se) * n_bins, y1=(p + 1.96 * se) * n_bins, line_width=0,
+                      fillcolor="crimson", opacity=0.10, layer="below")
+        fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers", name="95% band under H0",
+                                 marker=dict(color="rgba(220,20,60,0.25)", size=style.marker_median,
+                                             symbol="square")))
+    # A real trace, not add_hline: the reference belongs in the legend, and it is drawn last so
+    # it stays visible over the bars.
+    fig.add_trace(go.Scatter(x=[0, 1], y=[1.0, 1.0], mode="lines",
+                             line=dict(color="#444", width=style.trend, dash="dot"),
+                             name="calibrated (uniform)", hoverinfo="skip"))
+    xtitle = "PIT  u<sub>n</sub> = P(Y<sub>rep</sub> ≤ y<sub>n</sub>)"
+    if note:
+        xtitle += (f'<br><span style="font-size:{style.font_note}px">n = {n}, '
+                   f"variance {pit.var():.3f} (uniform 1/12 ≈ 0.083)</span>")
+    fig.update_xaxes(title_text=xtitle, range=[0, 1], dtick=0.2, gridcolor="#e9e9e9")
+    fig.update_yaxes(title_text="density", rangemode="tozero", gridcolor="#e9e9e9")
     fig.update_layout(
-        title="PIT histogram",
-        xaxis_title="PIT u_n", yaxis_title="density",
-        template="plotly_white",
-        height=420, width=820,
-        margin=dict(l=55, r=20, t=55, b=45),
-    )
-    return fig
+        template="plotly_white", width=style.width, bargap=0,
+        height=int(style.height_per_row * 1.1) + (int(style.font_title * 2) if title else 0),
+        margin=dict(l=int(style.font_axis * 4), r=int(style.font_tick * 3),
+                    t=int(style.font_title * 2.2) if title else int(style.font_tick * 2),
+                    b=int(style.font_axis * 6)),
+        legend=dict(orientation="h", yanchor="top", y=-0.3, xanchor="center", x=0.5,
+                    bgcolor="rgba(0,0,0,0)", borderwidth=0))
+    if title:
+        fig.update_layout(title=dict(text=title, x=0.5))
+    return apply_fonts(fig, style)
 
 
 def pit_ecdf_fig(pit: np.ndarray) -> go.Figure:
