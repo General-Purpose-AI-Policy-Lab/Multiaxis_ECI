@@ -69,6 +69,7 @@ from multiaxis_eci.viz import (  # noqa: E402
     pred_scatter_fig,
     save_fig,
 )
+from multiaxis_eci.viz.chain_groups import build_chain_group_figures  # noqa: E402
 from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 
 # Every posterior variable any figure or the PPC here reads. Names absent from a
@@ -269,6 +270,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     # minority chains' under minority/. Both groups are put back on the fit's
     # display frame (mirt_loadings.csv), so axis k is the same axis in both.
     ref = results_dir / "mirt_loadings.csv"
+    views = {}
     for chains, sub_dir, suffix in ((split["majority"], figures_dir, "_majority"),
                                     (split["minority"], figures_dir / "minority", "_minority")):
         sub = idata.sel(chain=chains)
@@ -280,9 +282,19 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                 print(f"  WARNING: {ref} missing; chain groups rendered in their own axis "
                       "order, so axis k may differ between the two folders")
         label = suffix[1:]
+        views[label] = view
         render(sub, view, sub_dir, suffix,
                f"{label} chains {','.join(map(str, chains))} / {split['n_chains']}",
                figures_dir / "fr")
+    # Side by side: where the two groups disagree (chain_groups/).
+    if K >= 2 and views["majority"].A is not None:
+        titles = load_axis_titles(results_dir, views["majority"], data)
+        modes_doc = json.loads(modes_path(trace_path).read_text())
+        cmp_dir = figures_dir / "chain_groups"
+        for name, fig in build_chain_group_figures(views["majority"], views["minority"], data,
+                                                   raw, titles, modes_doc, split).items():
+            save_fig(fig, name, cmp_dir)
+        print(f"chain-group comparison → {cmp_dir}")
     return figures_dir
 
 
