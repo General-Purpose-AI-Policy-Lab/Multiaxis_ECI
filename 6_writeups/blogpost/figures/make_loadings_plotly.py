@@ -5,7 +5,7 @@ type scale (the constants match `make_timeline_plotly.py`), reading the
 flagship trace (`analysis.FLAGSHIP_TRACE`).
 The panels come from the dashboard's own `viz.loadings_grid_fig`, so the bar,
 whisker and share definitions are the ones the fit's CSVs use. Axis identity
-is checked against `analysis.check_axis_identity` (config.AXIS_SIGNATURES) before any label is applied.
+is checked against `analysis.require_axis_titles` (the signatures in `axis_names.json`) before any label is applied.
 
 Usage:
     python 6_writeups/blogpost/figures/make_loadings_plotly.py [--trace FILE] [--tag _draft]

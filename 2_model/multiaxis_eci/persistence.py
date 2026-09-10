@@ -23,6 +23,33 @@ def save_trace(trace, path: Path) -> None:
     trace.to_netcdf(str(path))
 
 
+def thin_trace(trace, step: int, drop_transformed: bool = True):
+    """The trace with every `step`-th draw kept, for saving.
+
+    Every figure and table in this repository is a median or an interval, which 16,000 draws
+    pin as well as 80,000, while the trace file scales with the draw count (a 10,000 x 8 K=4
+    fit writes about 11 GB unthinned). Thinning happens at save time only: convergence
+    (r-hat, ESS, divergences) and the deliverable tables are computed on the full run first.
+    `drop_transformed` also removes PyMC's unconstrained duplicates (`*__` variables such as
+    `A_z_log__`), which nothing downstream reads. The step is stamped as `mirt_save_thin` so
+    a reader knows the file's draws are a subsample. `step` 1 returns the trace unchanged.
+    """
+    if step is None or step <= 1:
+        return trace
+    groups = {}
+    for name in trace.groups():
+        ds = getattr(trace, name)
+        if "draw" in ds.dims:
+            ds = ds.isel(draw=slice(None, None, step))
+        if name == "posterior" and drop_transformed:
+            ds = ds.drop_vars([v for v in ds.data_vars if v.endswith("__")])
+        groups[name] = ds
+    out = az.InferenceData(**groups)
+    out.posterior.attrs.update(trace.posterior.attrs)
+    out.posterior.attrs["mirt_save_thin"] = int(step)
+    return out
+
+
 def load_trace(path: Path):
     return az.from_netcdf(str(path))
 

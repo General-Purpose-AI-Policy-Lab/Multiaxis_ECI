@@ -137,7 +137,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE) -> None:
               f"minority chains ({len(minority)}: "
               + ", ".join(map(str, minority)) + ")")
 
-    AXIS_TITLES = require_axis_titles(TRACE.parent)
+    AXIS_TITLES = require_axis_titles(trace.parent)
     titles = [AXIS_TITLES[f"axis{k + 1}"] for k in range(K)]
     fig = make_subplots(rows=2, cols=2, subplot_titles=titles,
                         vertical_spacing=0.10, horizontal_spacing=0.02)

@@ -11,7 +11,7 @@ post's trend and crossover figures report), with `--chains` for another
 subset — `0,1,3,8` is the minority-mode appendix variant — or `--chains all`
 for the whole posterior. A chain subset's axes are permuted back onto the
 fit-level display frame first, exactly as in `make_crossover_plotly`. Axis
-identity is checked against `analysis.check_axis_identity` (config.AXIS_SIGNATURES) before any label is
+identity is checked against `analysis.require_axis_titles` (the signatures in `axis_names.json`) before any label is
 applied.
 
 The chain subset names the output: `forests_axes_plotly_draft_majority`,

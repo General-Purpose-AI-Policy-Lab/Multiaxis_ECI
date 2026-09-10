@@ -56,9 +56,10 @@ def propose_axis_names(view, data, results_dir: Path, top_n: int = 8) -> Path:
     doc = {
         "confirmed": False,
         "how": ("Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each "
-                "axis a short title and 2-3 signature benchmarks among its top benchmarks, "
-                "then set confirmed to true. Figures title the axes 'Axis k' until then."),
-        "axes": {name: {"title": None, "signature": [], "top_benchmarks": top}
+                "axis a short title (title_fr for the French renders) and 2-3 signature benchmarks "
+                "among its top benchmarks, then set confirmed to true. Figures title the axes "
+                "'Axis k' until then."),
+        "axes": {name: {"title": None, "title_fr": None, "signature": [], "top_benchmarks": top}
                  for name, top in tops.items()},
     }
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -151,3 +152,19 @@ def align_to_reference_loadings(view, data, loadings_csv: Path):
     if isinstance(tau, np.ndarray) and tau.ndim >= 1 and tau.shape[-1] == len(perm):
         changes["tau"] = tau[..., perm]
     return dataclasses.replace(view, **changes)
+
+
+def axis_title_translations(results_dir: Path) -> list[tuple[str, str]]:
+    """(English title, French title) pairs for the French renders, from the optional
+    `title_fr` field of `axis_names.json`: `Axis 2: Domain Knowledge` -> `Axe 2 : Connaissances
+    de domaine`. Empty when the file is missing, unconfirmed or carries no French titles."""
+    doc = read_axis_names(results_dir)
+    if not doc or not doc.get("confirmed"):
+        return []
+    out = []
+    for name, entry in doc.get("axes", {}).items():
+        title, fr = entry.get("title"), entry.get("title_fr")
+        if title and fr:
+            k = name[4:] if name.startswith("axis") else name
+            out.append((f"{bare_axis_title(name)}: {title}", f"Axe {k} : {fr}"))
+    return out

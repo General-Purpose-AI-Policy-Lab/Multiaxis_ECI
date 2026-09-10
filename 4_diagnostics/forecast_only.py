@@ -47,7 +47,7 @@ CACHE_DIR, _cache_load = _bd.CACHE_DIR, _bd._cache_load
 _trace_path, all_fits = _bd._trace_path, _bd.all_fits
 from multiaxis_eci.viz.dashboard import forecast_figures  # noqa: E402
 
-DEFAULT_FIT = "k4_drop2_humanmerge_flagship"
+DEFAULT_FIT = "k4_humanmerge_flagship"
 
 
 def _theta_cache_path(trace: Path, drop_chains=None) -> Path:

@@ -74,6 +74,7 @@ from multiaxis_eci.persistence import (
     save_pit,
     save_summary,
     save_trace,
+    thin_trace,
 )
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt
 from multiaxis_eci.viz import (
@@ -131,7 +132,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
                 pooled_noise=False, shared_base_zsn=True, time_t=None,
                 theta_t_cells=False, theta_pos=False, link="linear",
-                checkpoint_path=None, stream_path=None, spec_attrs=None):
+                checkpoint_path=None, stream_path=None, spec_attrs=None,
+                save_thin: int = config.SAVE_THIN):
     """Build + sample one compensatory MIRT; print identified convergence."""
     tag = f"{loading_prior} loadings"
     if human_order:
@@ -240,7 +242,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
             # post-processing erases the whole run — it cost a finished
             # 10-hour 12x26,000 fit on 2026-08-10 (OOM while a concurrent
             # fit was saving). Overwritten by the full save on success.
-            save_trace(idata, checkpoint_path)
+            save_trace(thin_trace(idata, save_thin), checkpoint_path)
             print(f"  raw trace checkpointed to {checkpoint_path}", flush=True)
         print(f"  sampling done in {time.time()-t0:.1f}s, computing log-likelihood...",
               flush=True)
@@ -379,7 +381,8 @@ def run_canonical(args) -> None:
         # scope at unchanged abilities (rank corr 0.9988).
         censor_eps = load_boundary_eps(data) if args.censor_bounds else None
         trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
-                               human_order=human_order, censor_eps=censor_eps)
+                               human_order=human_order, censor_eps=censor_eps,
+                               save_thin=args.save_thin)
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
         if args.censor_bounds:
             trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
@@ -387,8 +390,8 @@ def run_canonical(args) -> None:
             trace.posterior.attrs["mirt_keep_isolated"] = json.dumps(True)
         if human_order:
             trace.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
-        save_trace(trace, trace_path)
-        print(f"   saved trace → {trace_path}")
+        save_trace(thin_trace(trace, args.save_thin), trace_path)
+        print(f"   saved trace → {trace_path} (every {args.save_thin}th draw)")
 
     print("\n── Convergence ──────────────────────────────────────────────────")
     summary = az.summary(trace, round_to=4)
@@ -627,10 +630,11 @@ def run_exploration(args, parser) -> None:
                                   theta_pos=spec.theta_pos,
                                   link=spec.link,
                                   checkpoint_path=spec.trace_path,
+                                  save_thin=args.save_thin,
                                   stream_path=(results_dir / "live_draws.zarr"
                                                if args.stream_draws else None),
                                   spec_attrs=attrs)
-    save_trace(idata_k, spec.trace_path)
+    save_trace(thin_trace(idata_k, args.save_thin), spec.trace_path)
 
     # ── Factors: the same identity decision every figure gets ─────────────
     # prepare_fit owns it (per-draw alignment for the signed family, the raw
@@ -753,7 +757,7 @@ def run_exploration(args, parser) -> None:
                 spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
                             "mirt_loading_prior": "normal",
                             "mirt_link": "linear"})
-            save_trace(idata_1d, baseline_path)
+            save_trace(thin_trace(idata_1d, args.save_thin), baseline_path)
             gof_report(idata_1d, "1D (K=1)", "k1")
 
     print(f"\nOutputs → {results_dir}")
@@ -838,6 +842,10 @@ def main():
     parser.add_argument("--human-prior", action="store_true",
                         help="order human tiers by config.HUMAN_ORDER (exploration, "
                              "or --preset canonical → <data generation>/canonical_humanprior/)")
+    parser.add_argument("--save-thin", type=int, default=config.SAVE_THIN,
+                        help="write every n-th draw to the trace file (default "
+                             f"config.SAVE_THIN = {config.SAVE_THIN}); convergence and the "
+                             "tables use the full run. 1 keeps everything.")
     parser.add_argument("--stream-draws", action="store_true",
                         help="[exploration] write every draw to "
                              "<fit>/live_draws.zarr as it is sampled, so a "

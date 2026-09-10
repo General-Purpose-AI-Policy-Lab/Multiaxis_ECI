@@ -14,6 +14,7 @@ The package namespace re-exports the full public API so call sites keep
 from multiaxis_eci.analysis.axes import (
     align_to_reference_loadings,
     axis_names_path,
+    axis_title_translations,
     axis_top_benchmarks,
     bare_axis_title,
     load_axis_titles,
@@ -95,7 +96,8 @@ from multiaxis_eci.analysis.timelines import (
 )
 
 __all__ = [
-    "axis_top_benchmarks", "axis_names_path", "align_to_reference_loadings", "bare_axis_title", "load_axis_titles",
+    "axis_top_benchmarks", "axis_names_path", "align_to_reference_loadings",
+    "axis_title_translations", "bare_axis_title", "load_axis_titles",
     "propose_axis_names", "require_axis_titles",
     "convergence",
     "ECITransform", "post_stats", "capability_draws", "flat_C",

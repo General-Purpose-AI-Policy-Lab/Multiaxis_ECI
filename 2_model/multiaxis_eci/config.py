@@ -210,6 +210,10 @@ NC_C_OFFSET = 1.0
 PRIOR_TAU_C = dict(mu=math.log(1.0), sigma=0.5)
 
 # ── Sampling ──────────────────────────────────────────────────────────────
+# Every `step`-th draw is written to disk (`persistence.thin_trace`): 10,000 draws x 8
+# chains keep 16,000, enough for every median and interval here, at a fifth of the file.
+# Convergence and the deliverable tables use the full run before the save.
+SAVE_THIN = 5
 SAMPLE_KW = dict(
     draws=10000,
     tune=2000,

@@ -4,6 +4,7 @@
   "axes": {
     "axis1": {
       "title": "Fluid Intelligence & Mathematics",
+      "title_fr": "Intelligence fluide et mathématiques",
       "signature": [
         "ARC-AGI-2",
         "ARC-AGI",
@@ -22,6 +23,7 @@
     },
     "axis2": {
       "title": "Domain Knowledge",
+      "title_fr": "Connaissances de domaine",
       "signature": [
         "WMDP Biology",
         "WMDP Chemistry"
@@ -39,6 +41,7 @@
     },
     "axis3": {
       "title": "Agentic Capabilities & Legacy QA",
+      "title_fr": "Capacités agentiques et QA classiques",
       "signature": [
         "OSWorld",
         "GBAEval",
@@ -58,6 +61,7 @@
     },
     "axis4": {
       "title": "World Knowledge",
+      "title_fr": "Connaissances du monde",
       "signature": [
         "SimpleQA Verified",
         "DeepResearch Bench"

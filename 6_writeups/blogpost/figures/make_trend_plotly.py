@@ -11,7 +11,7 @@ whole-posterior, never mode-restricted. The forecast itself is
 `make_all.compute` (FORECAST_KW, envelope basis, per-axis SOTA exemption), and
 its result is cached in `lw_forecast_cache_80.pkl` BESIDE the trace it came
 from — keyed by folder, so pointing --trace elsewhere can never reuse another
-fit's forecast. Axis identity is checked against `analysis.check_axis_identity` (config.AXIS_SIGNATURES)
+fit's forecast. Axis identity is checked against `analysis.require_axis_titles` (the signatures in `axis_names.json`)
 before the cache is written, so a reused cache is a checked one.
 
 Usage:

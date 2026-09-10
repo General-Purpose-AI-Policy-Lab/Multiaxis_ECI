@@ -51,6 +51,8 @@ Main project fit with K=4.
 python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm
 ```
 
+Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and 16,000 saved draws pin every median and interval the figures show.
+
 The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical/`:
 
 ```bash

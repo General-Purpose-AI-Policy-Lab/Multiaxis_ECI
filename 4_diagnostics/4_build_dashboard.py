@@ -201,7 +201,7 @@ def _mode_tag(m):
     return f"mode {m['label']} (chains {chains}; {where})"
 
 
-def _mode_figures(idata, modes, data, raw, bench):
+def _mode_figures(idata, modes, data, raw, bench, results_dir=None):
     """Mode-restricted loading + timeline figures: the same builders as the
     whole-fit card, run on the trace sliced to each basin's chains. Each mode
     gets its own rotation/alignment pass, because a basin's axes are its own."""
@@ -209,8 +209,10 @@ def _mode_figures(idata, modes, data, raw, bench):
     for m in modes:
         sub = idata.sel(chain=m["chains"])
         v = prepare_fit(sub, data)
+        titles = (load_axis_titles(results_dir, v, data)
+                  if results_dir is not None and v.A is not None and v.K >= 2 else None)
         figs.update(build_axis_figures(
-            v, data, raw, bench, signed_display_frames(v, sub),
+            v, data, raw, bench, signed_display_frames(v, sub), axis_titles=titles,
             prefix=f"mode{m['label']}_", suffix=f" · {_mode_tag(m)}"))
     return figs
 
@@ -249,7 +251,7 @@ def _modes_table_html(doc):
 # the plots survive); trace present but fit on a different data generation →
 # cached card with a "data superseded" label instead of a crash. Bump
 # RENDER_REV (or use --force) when the figure set itself changes.
-RENDER_REV = 14  # posterior summaries are median + central interval
+RENDER_REV = 15  # posterior summaries are median + central interval
 CACHE_DIR = config.OUTPUTS_DIR / "dashboard_cache"
 
 
@@ -432,7 +434,8 @@ def render_fit(fit, data, raw, bench, mod):
     if modes:
         print(f"  {len(modes['modes'])} posterior modes: "
               + " | ".join(_mode_tag(m) for m in modes["modes"]), flush=True)
-        figures.update(_mode_figures(idata, modes["modes"], data, raw, bench))
+        figures.update(_mode_figures(idata, modes["modes"], data, raw, bench,
+                                      _trace_path(fit).parent))
     pred_rhat = (mirt_identified_rhat_nc(idata, data)["logmu_max_rhat"] if is_nc
                  else mirt_identified_rhat(idata, data)["eta_max_rhat"])
     div = int(idata.sample_stats["diverging"].sum()) if "diverging" in idata.sample_stats else -1

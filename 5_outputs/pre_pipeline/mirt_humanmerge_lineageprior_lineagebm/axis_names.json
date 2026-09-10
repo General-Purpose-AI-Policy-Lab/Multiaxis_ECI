@@ -4,23 +4,66 @@
   "axes": {
     "axis1": {
       "title": "Fluid Intelligence",
-      "signature": ["ARC-AGI-2", "VPCT", "ARC-AGI"],
-      "top_benchmarks": ["ARC-AGI-2", "ARC-AGI", "VPCT", "MCP Atlas", "OTIS Mock AIME 2024-2025"]
+      "title_fr": "Intelligence fluide",
+      "signature": [
+        "ARC-AGI-2",
+        "VPCT",
+        "ARC-AGI"
+      ],
+      "top_benchmarks": [
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "VPCT",
+        "MCP Atlas",
+        "OTIS Mock AIME 2024-2025"
+      ]
     },
     "axis2": {
       "title": "Scientific Knowledge and Reasoning",
-      "signature": ["WMDP Chemistry", "WMDP Biology"],
-      "top_benchmarks": ["WMDP Biology", "WMDP Chemistry", "MMLU", "GSM8K", "CyberGym"]
+      "title_fr": "Connaissances et raisonnement scientifiques",
+      "signature": [
+        "WMDP Chemistry",
+        "WMDP Biology"
+      ],
+      "top_benchmarks": [
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "MMLU",
+        "GSM8K",
+        "CyberGym"
+      ]
     },
     "axis3": {
       "title": "Agentic Capabilities",
-      "signature": ["GBAEval", "Remote Labor Index", "ProofBench"],
-      "top_benchmarks": ["OSWorld", "GBAEval", "Remote Labor Index", "ProofBench", "MirrorCode"]
+      "title_fr": "Capacités agentiques",
+      "signature": [
+        "GBAEval",
+        "Remote Labor Index",
+        "ProofBench"
+      ],
+      "top_benchmarks": [
+        "OSWorld",
+        "GBAEval",
+        "Remote Labor Index",
+        "ProofBench",
+        "MirrorCode"
+      ]
     },
     "axis4": {
       "title": "Legacy QA",
-      "signature": ["OpenBookQA", "ARC AI2", "ANLI"],
-      "top_benchmarks": ["OpenBookQA", "ARC AI2", "ANLI", "BoolQ", "HellaSwag"]
+      "title_fr": "Questions-Réponses (obsolète)",
+      "signature": [
+        "OpenBookQA",
+        "ARC AI2",
+        "ANLI"
+      ],
+      "top_benchmarks": [
+        "OpenBookQA",
+        "ARC AI2",
+        "ANLI",
+        "BoolQ",
+        "HellaSwag"
+      ]
     }
   }
 }
