@@ -53,37 +53,62 @@ def _today(today) -> pd.Timestamp:
     return pd.Timestamp(today) if today is not None else pd.Timestamp.today().normalize()
 
 
+def _spread_labels(levels: np.ndarray, gap: float, lo: float, hi: float) -> np.ndarray:
+    """Label positions for `levels` (sorted descending): each label stays on its line unless two
+    would overlap, in which case only the crowded ones move, symmetrically, until every pair is
+    `gap` apart; the stack is then kept inside [lo, hi]."""
+    y = levels.astype(float).copy()
+    for _ in range(200):
+        moved = False
+        for a in range(len(y) - 1):
+            short = gap - (y[a] - y[a + 1])
+            if short > 1e-9:
+                y[a] += short / 2
+                y[a + 1] -= short / 2
+                moved = True
+        if not moved:
+            break
+    if len(y):
+        y += max(0.0, lo - y[-1]) - max(0.0, y[0] - hi)
+    return y
+
+
 def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, float],
                  style: FigureStyle, labels: dict, gap_frac: float | None = None) -> None:
     """Dashed tier lines in Blues (strongest darkest) plus their names in the right margin.
 
-    Names are nudged apart top-down against the row's own y range, then the stack is centred
-    on the tier block and kept inside the row, so a name can sit a little off its line where
-    tiers crowd.
+    A name sits level with its line whenever the neighbours leave room; where tiers crowd, the
+    crowded names spread just enough to stay legible and a thin leader joins each displaced
+    name to its line.
     """
     rows = hs.sort_values("mean", ascending=False).reset_index(drop=True)
     colors = human_tier_palette(len(rows))
     span = ylim[1] - ylim[0]
+    plot_px = 0.8 * style.height_per_row                   # the panel's plotting height
     if gap_frac is None:
-        # Just the type height plus a little air, in axis units: names sit as close to
-        # their line as legibility allows, whatever the style's scale.
-        gap_frac = 1.3 * style.font_tier / (0.8 * style.height_per_row)
-    gap = gap_frac * span
-    ys, prev = [], np.inf
-    for lvl in rows["mean"]:
-        y = min(float(lvl), prev - gap)
-        ys.append(y)
-        prev = y
-    shift = float(np.mean(rows["mean"])) - float(np.mean(ys))
-    shift = min(shift, (ylim[1] - 0.02 * span) - ys[0])
-    shift = max(shift, (ylim[0] + 0.02 * span) - ys[-1])
-    ys = [y + shift for y in ys]
+        # The type height plus a little air, in axis units, whatever the style's scale.
+        gap_frac = 1.15 * style.font_tier / plot_px
+    levels = rows["mean"].to_numpy(dtype=float)
+    ys = _spread_labels(levels, gap_frac * span, ylim[0] + 0.02 * span, ylim[1] - 0.02 * span)
+    px_per_unit = plot_px / span
     for (_, r), y, col in zip(rows.iterrows(), ys, colors):
-        fig.add_hline(y=float(r["mean"]), row=row, col=1,
+        level = float(r["mean"])
+        fig.add_hline(y=level, row=row, col=1,
                       line=dict(color=col, width=style.refline, dash="dash"), opacity=0.75)
-        fig.add_annotation(x=1.005, y=y, xref="paper", yref=yref,
-                           text=labels.get(r["name"], r["name"]), showarrow=False,
-                           xanchor="left", font=dict(size=style.font_tier, color=col))
+        dy_px = (y - level) * px_per_unit
+        text = labels.get(r["name"], r["name"])
+        if abs(dy_px) < 0.3 * style.font_tier:
+            fig.add_annotation(x=1.005, y=level, xref="paper", yref=yref, text=text,
+                               showarrow=False, xanchor="left",
+                               font=dict(size=style.font_tier, color=col))
+        else:
+            # Anchored on the line at the plot's right edge, text offset to its slot in pixels;
+            # the arrow shaft (no head) is the leader from the name back to its line.
+            fig.add_annotation(x=1.0, y=level, xref="paper", yref=yref, text=text,
+                               showarrow=True, arrowhead=0, arrowwidth=max(1, style.refline / 2),
+                               arrowcolor=col, standoff=0, ax=int(style.font_tier * 0.9),
+                               ay=-dy_px, xanchor="left",
+                               font=dict(size=style.font_tier, color=col))
 
 
 def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = None, *,
@@ -94,7 +119,7 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
 
     `per_axis[name]` holds `fc` (a ForecastResult: grid_dates, lo, median, hi, slope), `tl`
     (the candidates' timeline frame: release_date, mean, hdi_low, hdi_high, name) and `hs` (the
-    human tiers: name, mean). Each panel draws the dated models with their intervals, the
+    human tiers: name, mean, and hdi_low / hdi_high, which band the bottom and top tiers). Each panel draws the dated models with their intervals, the
     forecast band (fc.lo to fc.hi) and its median, the tiers as dashed lines named in the
     right margin, and the today line; no legend, the caption names the series. `window` fixes
     the x-range on every panel (the post uses 2023 to 2030); None starts at the first candidate
@@ -132,10 +157,24 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
                                  line=dict(color=FORECAST_COLOR, width=style.trend, dash="dash"),
                                  hovertemplate="%{x|%Y-%m}: %{y:.2f}<extra></extra>"),
                       row=i, col=1)
-        lo = min(float(tl["hdi_low"].min()), float(np.min(fc.lo)), float(hs["mean"].min()))
-        hi = max(float(tl["hdi_high"].max()), float(np.max(fc.hi)), float(hs["mean"].max()))
+        # The y-range follows the data, not the projection: the models' intervals and the
+        # human tier medians. A band or trend that climbs past the top tier by 2030 runs
+        # off the panel rather than flattening everything else into the bottom half.
+        # Tier intervals are wide on a K-axis fit (a tier is scored on a handful of
+        # benchmarks); they are drawn, but they do not set the range either.
+        has_hdi = {"hdi_low", "hdi_high"} <= set(hs.columns)
+        lo = min(float(tl["hdi_low"].min()), float(hs["mean"].min()))
+        hi = max(float(tl["hdi_high"].max()), float(hs["mean"].max()))
         pad = 0.06 * (hi - lo)
         ylim = (lo - pad, hi + pad)
+        if has_hdi and len(hs):
+            # The bottom and top tiers of the axis carry their interval as a faint band, so
+            # the ladder's bounds read as the uncertain quantities they are.
+            ranked = hs.sort_values("mean")
+            pal = human_tier_palette(len(hs))
+            for r_, col_ in ((ranked.iloc[0], pal[-1]), (ranked.iloc[-1], pal[0])):
+                fig.add_hrect(y0=float(r_["hdi_low"]), y1=float(r_["hdi_high"]), row=i, col=1,
+                              fillcolor=_rgba(col_, 0.06), line_width=0, layer="below")
         fig.add_vline(x=today_s, row=i, col=1,
                       line=dict(color=TODAY_COLOR, width=style.refline, dash="dot"))
         _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels)
