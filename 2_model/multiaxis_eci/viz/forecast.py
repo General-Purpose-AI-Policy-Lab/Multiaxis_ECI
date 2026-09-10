@@ -87,28 +87,22 @@ def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, 
     plot_px = 0.8 * style.height_per_row                   # the panel's plotting height
     if gap_frac is None:
         # The type height plus a little air, in axis units, whatever the style's scale.
-        gap_frac = 1.15 * style.font_tier / plot_px
+        gap_frac = 1.3 * style.font_tier / plot_px
+    gap = gap_frac * span
     levels = rows["mean"].to_numpy(dtype=float)
-    ys = _spread_labels(levels, gap_frac * span, ylim[0] + 0.02 * span, ylim[1] - 0.02 * span)
-    px_per_unit = plot_px / span
+    ys = _spread_labels(levels, gap, ylim[0] + 0.02 * span, ylim[1] - 0.02 * span)
     for (_, r), y, col in zip(rows.iterrows(), ys, colors):
         level = float(r["mean"])
         fig.add_hline(y=level, row=row, col=1,
                       line=dict(color=col, width=style.refline, dash="dash"), opacity=0.75)
-        dy_px = (y - level) * px_per_unit
         text = labels.get(r["name"], r["name"])
-        if abs(dy_px) < 0.3 * style.font_tier:
-            fig.add_annotation(x=1.005, y=level, xref="paper", yref=yref, text=text,
-                               showarrow=False, xanchor="left",
-                               font=dict(size=style.font_tier, color=col))
-        else:
-            # Anchored on the line at the plot's right edge, text offset to its slot in pixels;
-            # the arrow shaft (no head) is the leader from the name back to its line.
-            fig.add_annotation(x=1.0, y=level, xref="paper", yref=yref, text=text,
-                               showarrow=True, arrowhead=0, arrowwidth=max(1, style.refline / 2),
-                               arrowcolor=col, standoff=0, ax=int(style.font_tier * 0.9),
-                               ay=-dy_px, xanchor="left",
-                               font=dict(size=style.font_tier, color=col))
+        fig.add_annotation(x=1.008, y=y, xref="paper", yref=yref, text=text, showarrow=False,
+                           xanchor="left", font=dict(size=style.font_tier, color=col))
+        if abs(y - level) > 0.25 * gap:
+            # A thin leader from the line's end to the displaced name, drawn in the margin.
+            fig.add_shape(type="line", xref="paper", yref=yref, x0=1.0, y0=level, x1=1.007,
+                          y1=y, line=dict(color=col, width=max(1, style.refline / 2)),
+                          opacity=0.8)
 
 
 def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = None, *,
@@ -166,15 +160,33 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         lo = min(float(tl["hdi_low"].min()), float(hs["mean"].min()))
         hi = max(float(tl["hdi_high"].max()), float(hs["mean"].max()))
         pad = 0.06 * (hi - lo)
-        ylim = (lo - pad, hi + pad)
+        # More air above than below: the trend and its band leave the panel through the top,
+        # and the topmost tier name needs room.
+        ylim = (lo - pad, hi + 3 * pad)
         if has_hdi and len(hs):
-            # The bottom and top tiers of the axis carry their interval as a faint band, so
-            # the ladder's bounds read as the uncertain quantities they are.
+            # The bottom and top tiers of the axis carry their 80% interval, so the ladder's
+            # bounds read as the uncertain quantities they are: a faint band when it is
+            # narrower than a quarter of the panel, otherwise (a tier scored on a handful of
+            # benchmarks, on a K-axis fit) a whisker with caps near the panel's right edge,
+            # since a band that wide would only tint the whole panel.
             ranked = hs.sort_values("mean")
             pal = human_tier_palette(len(hs))
-            for r_, col_ in ((ranked.iloc[0], pal[-1]), (ranked.iloc[-1], pal[0])):
-                fig.add_hrect(y0=float(r_["hdi_low"]), y1=float(r_["hdi_high"]), row=i, col=1,
-                              fillcolor=_rgba(col_, 0.06), line_width=0, layer="below")
+            x_end = pd.Timestamp(window[1] if window else TREND_WINDOW_END)
+            for r_, col_, back in ((ranked.iloc[-1], pal[0], 100), (ranked.iloc[0], pal[-1], 220)):
+                y0, y1, m = float(r_["hdi_low"]), float(r_["hdi_high"]), float(r_["mean"])
+                name_ = labels.get(r_["name"], r_["name"])
+                if y1 - y0 <= 0.25 * (ylim[1] - ylim[0]):
+                    fig.add_hrect(y0=y0, y1=y1, row=i, col=1, fillcolor=_rgba(col_, 0.08),
+                                  line_width=0, layer="below")
+                else:
+                    fig.add_trace(go.Scatter(
+                        x=[x_end - pd.Timedelta(days=back)], y=[m], mode="markers",
+                        marker=dict(color=col_, size=style.marker - 1, symbol="square"),
+                        error_y=dict(type="data", symmetric=False, array=[y1 - m],
+                                     arrayminus=[m - y0], color=col_, thickness=style.errbar,
+                                     width=style.marker), showlegend=False, opacity=0.8,
+                        hovertemplate=f"{name_}: 80% interval [{y0:.2f}, {y1:.2f}]"
+                                      "<extra></extra>"), row=i, col=1)
         fig.add_vline(x=today_s, row=i, col=1,
                       line=dict(color=TODAY_COLOR, width=style.refline, dash="dot"))
         _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels)
