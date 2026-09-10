@@ -73,6 +73,8 @@ def rescale_forecast(fc, k: int, affine):
     for extra in ("slope_early",):
         if getattr(fc, extra, None) is not None:
             changes[extra] = np.asarray(getattr(fc, extra)) / unit[k]
+    if getattr(fc, "other", None) is not None:
+        changes["other"] = rescale_forecast(fc.other, k, affine)
     return dataclasses.replace(fc, **changes)
 
 

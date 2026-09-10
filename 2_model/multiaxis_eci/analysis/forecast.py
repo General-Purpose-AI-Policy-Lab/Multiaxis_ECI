@@ -64,6 +64,10 @@ class ForecastResult:
     env_E: np.ndarray | None = None
     slope_early: np.ndarray | None = None
     backcast_floor: float | None = None
+    # Two-regime extras (fit_basis == "regimes", analysis.regimes): the others' line as a
+    # ForecastResult drawn over its own span, and the switch year (first reasoning release).
+    other: object | None = None
+    switch_year: float | None = None
 
 
 def _weighted_median_rows(v: np.ndarray, w: np.ndarray) -> np.ndarray:
@@ -438,8 +442,9 @@ def axis_forecast_inputs(theta_draws: np.ndarray, k: int, data: ECIData, raw_df:
                          axis_name: str, *, hdi_prob: float = 0.8, A_draws: np.ndarray | None = None,
                          **forecast_kw) -> dict:
     """Everything the frontier-trend panel of one axis draws: `fc` (the frontier forecast of
-    `config.FORECAST_KW`, envelope basis, back_start at the first candidate), `tl` (the
-    candidates' timeline frame) and `hs` (the human tiers), the last two at `hdi_prob`.
+    `config.FORECAST_KW`: the two-regime lines of `analysis.regimes` by default, or one of
+    `mirt_frontier_forecast`'s bases), `tl` (the candidates' timeline frame) and `hs` (the
+    human tiers), the last two at `hdi_prob`.
 
     One definition for the dashboard, the per-fit figure folders and the blog post, so a
     figure can never show a cloud the forecast was not fitted on. `forecast_kw` overrides
@@ -450,13 +455,20 @@ def axis_forecast_inputs(theta_draws: np.ndarray, k: int, data: ECIData, raw_df:
     from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
 
     tl = mirt_model_timeline_df(theta_draws, k, data, raw_df, sd_cap=FORECAST_KW["sd_cap"],
-                                A_draws=A_draws,
-                                hdi_prob=hdi_prob)
+                                A_draws=A_draws, hdi_prob=hdi_prob)
     if tl.empty:
         raise ValueError(f"{axis_name}: no dated candidate to forecast on")
-    kw = dict(FORECAST_KW, back_start=pd.to_datetime(tl["release_date"]).min(), A_draws=A_draws,
-              backcast_floor=FORECAST_BACKCAST_FLOOR.get(axis_name), **forecast_kw)
-    fc = mirt_frontier_forecast(theta_draws, k, data, raw_df, **kw)
+    kw = dict(FORECAST_KW, **forecast_kw)
+    if kw.get("fit_basis") == "regimes":
+        from multiaxis_eci.analysis.regimes import two_regime_forecast
+        fc = two_regime_forecast(theta_draws, k, data, tl, top_k=kw.get("top_k", 2),
+                                 hdi_prob=kw.get("hdi_prob", 0.8),
+                                 horizon_date=kw.get("horizon_date", "2030-01-01"))
+    else:
+        kw.pop("top_k", None)
+        kw.update(back_start=pd.to_datetime(tl["release_date"]).min(),
+                  backcast_floor=FORECAST_BACKCAST_FLOOR.get(axis_name), A_draws=A_draws)
+        fc = mirt_frontier_forecast(theta_draws, k, data, raw_df, **kw)
     hs = mirt_human_axis_stats(theta_draws, k, data, hdi_prob=hdi_prob)
     return {"fc": fc, "tl": tl, "hs": hs}
 
@@ -466,10 +478,14 @@ def crossover_table(fc: ForecastResult, theta_draws: np.ndarray, k: int, data: E
     """`mirt_crossover_df` at `probs[0]`, plus `hdi80_low` / `hdi80_high` holding the second
     mass when two are asked for: the crossover panel draws the first as its thick bar and the
     second as its thin one. Both come from the same per-draw crossing distribution."""
-    cx = mirt_crossover_df(fc, theta_draws, k, data, axis_name=axis_name, hdi_prob=probs[0])
+    if fc.fit_basis == "regimes":
+        from multiaxis_eci.analysis.regimes import regime_crossover_df as cross_fn
+    else:
+        cross_fn = mirt_crossover_df
+    cx = cross_fn(fc, theta_draws, k, data, axis_name=axis_name, hdi_prob=probs[0])
     if len(probs) > 1:
-        wide = mirt_crossover_df(fc, theta_draws, k, data, axis_name=axis_name,
-                                 hdi_prob=probs[1]).set_index("tier")
+        wide = cross_fn(fc, theta_draws, k, data, axis_name=axis_name,
+                        hdi_prob=probs[1]).set_index("tier")
         cx["hdi80_low"] = cx["tier"].map(wide["crossover_hdi_low"]).values
         cx["hdi80_high"] = cx["tier"].map(wide["crossover_hdi_high"]).values
     return cx

@@ -487,8 +487,10 @@ class TestAnalysis:
         from multiaxis_eci.analysis import mirt_frontier_forecast
         from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
         params = set(inspect.signature(mirt_frontier_forecast).parameters)
-        assert set(FORECAST_KW) <= params
-        assert FORECAST_KW["fit_basis"] == "envelope"      # flagship identity
+        # `top_k` is the two-regime frontier's own key, consumed by axis_forecast_inputs.
+        assert set(FORECAST_KW) - {"top_k"} <= params
+        assert FORECAST_KW["fit_basis"] == "regimes"       # two-regime lines on medians
+        assert FORECAST_KW["top_k"] == 2
         assert FORECAST_KW["hdi_prob"] == 0.8              # the figures' mass
         assert FORECAST_KW["sd_cap"] == 0.33               # the measured cloud
         # Raw backcast dates on every axis: no clamp configured. Any entry
@@ -1971,6 +1973,7 @@ class TestMIRT:
 
         # axis_forecast_inputs bundles the same three objects the dashboard draws.
         inputs = axis_forecast_inputs(theta, 0, d, raw, "axis1", hdi_prob=0.8, sd_cap=None,
+                                      fit_basis="envelope",
                                       drop_low_obs=False)
         assert set(inputs) == {"fc", "tl", "hs"} and len(inputs["hs"]) == len(hs)
 

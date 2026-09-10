@@ -12,6 +12,7 @@ import plotly.graph_objects as go
 FR_TABLE: list[tuple[str, str]] = [
     # Dashboard and per-fit figure titles
     ("Forecast:", "Prévision :"),
+    ("non-reasoning models", "modèles sans raisonnement"),
     ("ability (Average Human = 0, Top Performer = 1)", "capacité (Humain moyen = 0, Meilleur performeur = 1)"),
     ("(80% intervals)", "(intervalles à 80 %)"),
     ("(50% intervals)", "(intervalles à 50 %)"),

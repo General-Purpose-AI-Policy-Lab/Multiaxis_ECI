@@ -88,8 +88,7 @@ def crossovers(trace: Path, cached: bool = False,
     from make_all import END
     from make_trend_plotly import forecast
 
-    from multiaxis_eci.analysis import crossover_table, mirt_frontier_forecast
-    from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
+    from multiaxis_eci.analysis import axis_forecast_inputs, crossover_table
     from multiaxis_eci.data import PROCESSED_FILE
 
     idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
@@ -105,12 +104,9 @@ def crossovers(trace: Path, cached: bool = False,
         per_axis = forecast(trace)
     else:
         raw = pd.read_csv(PROCESSED_FILE)
-        per_axis = {
-            n: {"fc": mirt_frontier_forecast(
-                    view.theta, view.names.index(n), data, raw,
-                    **dict(FORECAST_KW, horizon_date=END,
-                           backcast_floor=FORECAST_BACKCAST_FLOOR.get(n)))}
-            for n in AXES}
+        per_axis = {n: axis_forecast_inputs(view.theta, view.names.index(n), data, raw, n,
+                                             A_draws=view.A, horizon_date=END)
+                    for n in AXES}
 
     parts = [crossover_table(per_axis[name]["fc"], view.theta, view.names.index(name), data,
                              name, probs=probs) for name in AXES]

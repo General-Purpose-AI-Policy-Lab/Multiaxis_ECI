@@ -119,13 +119,16 @@ Computed on the **whole** fit, never on a plot-side subset.
 
 ### Forecast pair
 
+The forecast (`config.FORECAST_KW`, `analysis.regimes`, user decision 2026-09-10) reads the axis's frontier as the running top-2 of posterior-median abilities by release date, splits it into reasoning models and the others (a family with a reasoning level, a thinking budget or a thinking variant in the models table, or a name matching `config.REASONING_FAMILY_PATTERNS`), and fits one straight line per regime on the posterior medians, each point weighted by its posterior SD plus a common dispersion integrated out. The reasoning line is projected from the first reasoning release to 2030; the others' line stops at its last point. Fitting medians conditions on the fitted axis: the posterior correlation between points is not propagated into the band, consistently with a cloud drawn at its medians. Crossing dates read the piecewise frontier: a tier still below the reasoning line at the switch is crossed on the reasoning line (its posterior draws paired with the line's samples; no crossing when the slope is not positive); a tier already above it at the switch was passed earlier and is dated on the others' line, backcast when it was above at that line's first point too. `p_passed_now` is the probability the reasoning line exceeds the tier today. The per-draw record envelope and the regression bases of `mirt_frontier_forecast` remain available as `fit_basis` alternatives.
+
+
 Two figures per axis, added by `--forecast` on the CLI and by
 `"forecast": True` on a dashboard entry. Gated on K > 1, the compensatory
 family, and human tiers being in the fit.
 
 | key | what it shows |
 |---|---|
-| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the per-draw record envelope extended at its recent rate with its 80% band, the human tiers as dashed lines named in the right margin, and a today line; the x-axis stops at 2030 like the crossover figures |
+| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the two-regime forecast of `analysis.regimes` (the reasoning models' line and 80% band projected from their first release in orange, the non-reasoning models' line and band in grey over their own span), the human tiers as dashed lines named in the right margin, and a today line; the x-axis stops at 2030 like the crossover figures |
 | `forecast_{k}_{axis}_when` | the post's crossover panel (`crossover_panels_fig`): per tier the median crossing date, a thick 50% bar over a thin 80% bar, both split at today (green behind us, red ahead); whatever runs past the window is clipped at the edge and dated |
 
 ### K against K=1

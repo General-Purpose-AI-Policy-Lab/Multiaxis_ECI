@@ -57,6 +57,14 @@ from multiaxis_eci.analysis.forecast import (
     mirt_frontier_forecast,
 )
 from multiaxis_eci.analysis.forests import forest_frames
+from multiaxis_eci.analysis.regimes import (
+    frontier_topk,
+    is_reasoning,
+    reasoning_mask,
+    regime_crossover_df,
+    two_regime_forecast,
+    weighted_line_fit,
+)
 from multiaxis_eci.analysis.rotation import (
     AlignResult,
     _aligned_reproducibility,
@@ -129,6 +137,8 @@ __all__ = [
     "ForecastResult", "mirt_frontier_forecast", "mirt_crossover_df",
     "axis_forecast_inputs", "crossover_table", "forest_frames",
     "human_unit_affine", "rescale_frame", "rescale_forecast", "rescale_theta", "ability_label",
+    "frontier_topk", "is_reasoning", "reasoning_mask", "regime_crossover_df",
+    "two_regime_forecast", "weighted_line_fit",
     "FitView", "prepare_fit",
     "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS",
     "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship",

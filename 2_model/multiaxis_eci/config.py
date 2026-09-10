@@ -274,15 +274,28 @@ SOTA_MIN_AXIS_COVERAGE = 1.0
 ABILITY_SCALE = "human"
 HUMAN_UNIT_ANCHORS = ("Average Human", "Top Performer")
 
-# The frontier-forecast fit shared by the dashboard, the memo and the blog post:
-# the per-draw running-max ENVELOPE over the informed cloud (non-decreasing by
-# definition, so no draw can carry a negative trend — the record regression it
-# replaces left a third of the Agentic axis's draws with negative slopes),
-# extended forward at its recent rate; 80% HDIs. `fit_start` only matters to
-# the regression bases kept for sensitivity runs (records/frontier/informed).
-# Each caller still supplies its own sota_exempt/backcast_floor/horizon_date.
-FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=INFORMED_SD_CAP,
-                   hdi_prob=0.8)
+# The frontier-forecast fit shared by the dashboard, the memo and the blog post
+# (analysis.regimes, user decision 2026-09-10): the running top-`top_k` frontier of
+# posterior MEDIANS split into reasoning models and the others, one weighted
+# straight line per regime (noise = each point's posterior SD plus a common
+# dispersion), the reasoning line projected from its first release, the others'
+# drawn over their own span; 80% intervals. `sd_cap` is the candidates' informed
+# filter. The per-draw ENVELOPE and the regression bases of `mirt_frontier_forecast`
+# remain available as `fit_basis` alternatives (`fit_start` only matters to them).
+FORECAST_KW = dict(fit_basis="regimes", top_k=2, fit_start="2024-10-01",
+                   sd_cap=INFORMED_SD_CAP, hdi_prob=0.8)
+
+# A release is a reasoning model when its family carries a reasoning level, a
+# thinking budget or a thinking variant in the models table, or when its name
+# matches one of these patterns (case-insensitive; families whose default mode
+# reasons without an effort suffix in the data). Edit here when a new family lands.
+REASONING_FAMILY_PATTERNS = [
+    r"(^|[^a-z0-9])(o1|o3|o4)[-_]", r"DeepSeek-R1", r"deepseek-reasoner", r"QwQ",
+    r"gemini-2\.5", r"gemini-3", r"grok-4", r"grok-3-mini", r"kimi-k2\.[5-9]", r"kimi-k3",
+    r"glm-5", r"qwen3", r"MiniMax-M2", r"deepseek-v3\.[12]", r"deepseek-v4",
+    r"claude-opus-4", r"claude-sonnet-4", r"claude-mythos", r"claude-fable", r"gpt-5", r"gpt-6",
+    r"magistral", r"gpt-oss",
+]
 
 # Optional backcast clamp per axis (envelope basis): a tier already passed at
 # the window start is backcast at the envelope's early rate, and an entry here

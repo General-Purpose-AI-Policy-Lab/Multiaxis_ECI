@@ -25,7 +25,8 @@ from multiaxis_eci.viz.core import (
 )
 from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
-FORECAST_COLOR = "#ff9500"        # frontier extrapolation
+FORECAST_COLOR = "#ff9500"        # frontier extrapolation (the reasoning regime)
+OTHER_COLOR = "#6e6e6e"           # the non-reasoning regime's line
 # Every crossover figure shares this x-range, so panels from different fits, chain groups
 # and scopes read against the same years.
 CROSSOVER_WINDOW = ("2015-01-01", "2030-01-01")
@@ -36,12 +37,14 @@ TODAY_COLOR = "#444"
 # Every string these figures draw, per language (English default, French for the
 # `fr/` renders); tier names come from core.HUMAN_LEVEL_LABELS.
 FORECAST_TEXT = {
-    "en": {"trend": "Projected frontier", "release": "Release date", "ability": "ability",
+    "en": {"trend": "Projected frontier", "others": "non-reasoning models", "release": "Release date",
+           "ability": "ability",
            "crossing_axis": "Crossing date", "behind": "already behind us",
            "ahead": "still ahead", "median": "median", "interval": "{p:.0%} interval",
            "thick": "{p:.0%} interval (thick)", "thin": "{p:.0%} interval (thin)",
            "today": "today", "clipped": "continues past the window (date shown)"},
-    "fr": {"trend": "Frontière projetée", "release": "Date de sortie", "ability": "capacité",
+    "fr": {"trend": "Frontière projetée", "others": "modèles sans raisonnement",
+           "release": "Date de sortie", "ability": "capacité",
            "crossing_axis": "Date de croisement", "behind": "déjà derrière nous",
            "ahead": "encore à venir", "median": "médiane", "interval": "intervalle à {p:.0%}",
            "thick": "intervalle à {p:.0%} (épais)", "thin": "intervalle à {p:.0%} (fin)",
@@ -114,7 +117,8 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
     `per_axis[name]` holds `fc` (a ForecastResult: grid_dates, lo, median, hi, slope), `tl`
     (the candidates' timeline frame: release_date, mean, hdi_low, hdi_high, name) and `hs` (the
     human tiers: name, mean, and hdi_low / hdi_high, which band the bottom and top tiers). Each panel draws the dated models with their intervals, the
-    forecast band (fc.lo to fc.hi) and its median, the tiers as dashed lines named in the
+    forecast band (fc.lo to fc.hi) and its median, the non-reasoning regime's line and band in
+    grey over its own span when `fc.other` is set, the tiers as dashed lines named in the
     right margin, and the today line; no legend, the caption names the series. `window` fixes
     the x-range on every panel (the post uses 2023 to 2030); None starts at the first candidate
     and stops at `TREND_WINDOW_END` (2030), the crossover figures' right edge.
@@ -137,6 +141,21 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         fig.add_trace(go.Scatter(x=gx, y=fc.hi, mode="lines", fill="tonexty",
                                  fillcolor=_rgba("rgb(255,149,0)", 0.18), showlegend=False,
                                  line=dict(width=0), hoverinfo="skip"), row=i, col=1)
+        other = getattr(fc, "other", None)
+        if other is not None:
+            # The non-reasoning regime: its own line and band, over its own span only.
+            gxo = pd.to_datetime(other.grid_dates)
+            fig.add_trace(go.Scatter(x=gxo, y=other.lo, mode="lines", showlegend=False,
+                                     line=dict(width=0), hoverinfo="skip"), row=i, col=1)
+            fig.add_trace(go.Scatter(x=gxo, y=other.hi, mode="lines", fill="tonexty",
+                                     fillcolor=_rgba("rgb(110,110,110)", 0.15), showlegend=False,
+                                     line=dict(width=0), hoverinfo="skip"), row=i, col=1)
+            fig.add_trace(go.Scatter(x=gxo, y=other.median, mode="lines", showlegend=False,
+                                     name=text["others"],
+                                     line=dict(color=OTHER_COLOR, width=style.trend * 0.8,
+                                               dash="dot"),
+                                     hovertemplate="%{x|%Y-%m}: %{y:.2f}<extra>"
+                                                   + text["others"] + "</extra>"), row=i, col=1)
         dates = pd.to_datetime(tl["release_date"])
         fig.add_trace(go.Scatter(
             x=dates, y=tl["mean"], mode="markers",
