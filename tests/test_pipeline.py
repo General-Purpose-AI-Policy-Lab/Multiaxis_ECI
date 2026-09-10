@@ -2796,10 +2796,10 @@ def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
     a dated, non-human test-taker passes when measured on the axis (SD below the cap, not
     low-observation) or when its family is SOTA; `sota_exempt=False` withdraws the exemption."""
     from multiaxis_eci.analysis.timelines import candidate_mask
-    names = ["measured", "wide", "sparse", "sota_wide", "human", "undated"]
+    names = ["measured", "wide", "sparse", "sota_wide", "human", "undated", "sota_ghost"]
     n = len(names)
     rng = np.random.default_rng(0)
-    sd = np.array([0.05, 0.9, 0.05, 0.9, 0.05, 0.05])
+    sd = np.array([0.05, 0.9, 0.05, 0.6, 0.05, 0.05, 1.2])
     theta = rng.normal(0, 1, (400, n, 1)) * sd[None, :, None]
     data = ECIData(
         scores=np.zeros(1), zero_score_mask=np.zeros(1, bool), model_idx=np.zeros(1, int),
@@ -2807,14 +2807,20 @@ def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
         mlookup=pd.DataFrame({"model": names, "model_idx": np.arange(1, n + 1)}),
         blookup=pd.DataFrame({"benchmark": ["b"], "benchmark_idx": [1]}),
         n_models=n, n_benchmarks=1, n_obs=1, zero_diag_threshold=0.01,
-        n_obs_per_model=np.array([10, 10, 2, 2, 10, 10]),
-        is_low_obs=np.array([False, False, True, True, False, False]),
-        excluded_benchmarks=set(), is_human=np.array([False] * 4 + [True, False]),
-        bench_category=None, is_sota=np.array([False, False, False, True, False, False]))
-    dates = pd.Series(pd.to_datetime(["2025-01-01"] * 5), index=names[:5])
+        n_obs_per_model=np.array([10, 10, 2, 2, 10, 10, 2]),
+        is_low_obs=np.array([False, False, True, True, False, False, True]),
+        excluded_benchmarks=set(), is_human=np.array([False] * 4 + [True, False, False]),
+        bench_category=None,
+        is_sota=np.array([False, False, False, True, False, False, True]))
+    dates = pd.Series(pd.to_datetime(["2025-01-01"] * 5 + ["2025-06-01"]),
+                      index=names[:5] + [names[6]])
+    # The wide SOTA member is admitted (SD 0.6 < SOTA_EXEMPT_SD_CAP); the prior-only
+    # one (SD 1.2) is not, whatever its family.
     keep = candidate_mask(theta, 0, data, dates)
-    assert keep.tolist() == [True, False, False, True, False, False]
+    assert keep.tolist() == [True, False, False, True, False, False, False]
     strict = candidate_mask(theta, 0, data, dates, sota_exempt=False)
-    assert strict.tolist() == [True, False, False, False, False, False]
+    assert strict.tolist() == [True, False, False, False, False, False, False]
     loose = candidate_mask(theta, 0, data, dates, sd_cap=None, drop_low_obs=False)
-    assert loose.tolist() == [True, True, True, True, False, False]
+    assert loose.tolist() == [True, True, True, True, False, False, True]
+    every_sota = candidate_mask(theta, 0, data, dates, sota_sd_cap=None)
+    assert every_sota.tolist() == [True, False, False, True, False, False, True]

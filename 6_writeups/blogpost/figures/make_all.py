@@ -46,10 +46,11 @@ from figbase import FOREST_FRONTIER, pretty  # noqa: E402
 from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
     FLAGSHIP_TRACE,
+    check_axis_identity,
     open_flagship,
     prepare_fit,
 )
-from multiaxis_eci.config import AXIS_TITLES, FORECAST_KW, FORECAST_NO_SOTA_AXES  # noqa: E402
+from multiaxis_eci.config import AXIS_TITLES, FORECAST_KW  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 
 AXES = ["axis1", "axis2", "axis3"]      # Legacy QA is out of the forecast scope
@@ -59,31 +60,10 @@ END = pd.Timestamp("2030-01-01")        # right edge of the trend figure
 # derive, so it is read off `FLAGSHIP_TRACE` and never off `results_dir`.
 CACHE = FLAGSHIP_TRACE.parent / "lw_forecast_cache_80.pkl"
 
-# Defining benchmarks per axis. The prose titles in AXIS_TITLES are keyed
-# `axis1..4` by position, so they are valid only while the axes keep these
-# identities; a re-fit that reorders them must fail loudly rather than mislabel.
-EXPECTED_TOPS = {
-    "axis1": {"ARC-AGI-2", "VPCT", "ARC-AGI"},
-    "axis2": {"WMDP Chemistry", "WMDP Biology"},
-    "axis3": {"GBAEval", "Remote Labor Index", "ProofBench"},
-    "axis4": {"OpenBookQA", "ARC (AI2)", "Adversarial NLI"},
-}
-
-
-def check_axis_identity(view, data, top_n: int = 5) -> None:
-    """Raise if an axis's highest-share benchmarks are not the expected ones."""
-    A = view.require_A()
-    bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
-    med = np.median(A, axis=0)
-    share = med ** 2 / np.maximum((med ** 2).sum(axis=1, keepdims=True), 1e-12)
-    for k, name in enumerate(view.names):
-        tops = [bench[b] for b in np.argsort(-share[:, k])[:top_n]]
-        print(f"  {name} ({AXIS_TITLES[name]}): {tops}")
-        want = EXPECTED_TOPS[name]
-        if not want & set(tops):
-            raise SystemExit(
-                f"axis identity check failed for {name}: top-{top_n} by share "
-                f"{tops} contains none of {sorted(want)}. Refusing to label.")
+# The prose titles in AXIS_TITLES are keyed `axis1..4` by position, so they are
+# valid only while the axes keep the identities of config.AXIS_SIGNATURES; a
+# re-fit that reorders them must fail loudly rather than mislabel
+# (`analysis.check_axis_identity`, imported below for the sibling scripts).
 
 
 @lru_cache(maxsize=1)
@@ -121,7 +101,6 @@ def compute(view, data, raw) -> dict:
         k = view.names.index(name)
         fc = mirt_frontier_forecast(view.theta, k, data, raw,
                                     **dict(FORECAST_KW, horizon_date=END,
-                                           sota_exempt=k not in FORECAST_NO_SOTA_AXES,
                                            backcast_floor=FORECAST_BACKCAST_FLOOR.get(name)))
         out[name] = {
             "fc": fc,

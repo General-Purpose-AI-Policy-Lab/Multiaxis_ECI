@@ -6,7 +6,7 @@ import pandas as pd
 
 from multiaxis_eci.analysis.convergence import nc_difficulty_draws
 from multiaxis_eci.analysis.stats import _release_dates, forest_stats_from_draws, post_stats
-from multiaxis_eci.config import INFORMED_SD_CAP
+from multiaxis_eci.config import INFORMED_SD_CAP, SOTA_EXEMPT_SD_CAP
 from multiaxis_eci.data import ECIData
 
 
@@ -30,14 +30,18 @@ def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = INFORMED_SD_CAP)
 
 def candidate_mask(theta_canon: np.ndarray, k: int, data: ECIData, model_dates: pd.Series, *,
                    sd_cap: float | None = INFORMED_SD_CAP, drop_low_obs: bool = True,
-                   sota_exempt: bool = True) -> np.ndarray:
+                   sota_exempt: bool = True,
+                   sota_sd_cap: float | None = SOTA_EXEMPT_SD_CAP) -> np.ndarray:
     """(M,) bool: the test-takers a timeline, a forecast or a frontier may draw on for axis k.
 
     The one guard shared by the measured timelines, the forecast candidates, the country
     frontier and the post's forests: dated, not a human tier, and either measured on the axis
     (posterior SD < sd_cap, and not flagged is_low_obs when drop_low_obs) or a SOTA family
     member when sota_exempt (a frontier release is shown with its wide interval rather than
-    dropped). `sd_cap=None` disables the SD test; `drop_low_obs=False` the observation count.
+    dropped), provided its ability on the axis is at least weakly measured (SD below
+    `sota_sd_cap`, config.SOTA_EXEMPT_SD_CAP; a prior-only position is no evidence, on any
+    axis). `sd_cap=None` disables the SD test, `drop_low_obs=False` the observation count,
+    `sota_sd_cap=None` admits every SOTA member.
     """
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     theta_k = theta_canon[..., k] if theta_canon.ndim == 3 else theta_canon
@@ -45,8 +49,10 @@ def candidate_mask(theta_canon: np.ndarray, k: int, data: ECIData, model_dates: 
                 else np.ones(data.n_models, dtype=bool))
     low_obs = (data.is_low_obs if drop_low_obs and data.is_low_obs is not None
                else np.zeros(data.n_models, dtype=bool))
-    sota = (data.is_sota if sota_exempt and data.is_sota is not None
+    sota = (np.asarray(data.is_sota, dtype=bool) if sota_exempt and data.is_sota is not None
             else np.zeros(data.n_models, dtype=bool))
+    if sota_sd_cap is not None:
+        sota = sota & (theta_k.std(axis=0) < sota_sd_cap)
     dated = np.array([m in model_dates.index for m in names], dtype=bool)
     measured = informed & ~low_obs
     return dated & ~np.asarray(data.is_human, dtype=bool) & (measured | sota)

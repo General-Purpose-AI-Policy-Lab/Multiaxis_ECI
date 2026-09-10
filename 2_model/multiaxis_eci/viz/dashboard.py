@@ -185,7 +185,7 @@ def forecast_figures(view, data, raw, names, th_fc,
         mirt_human_axis_stats,
         mirt_model_timeline_df,
     )
-    from multiaxis_eci.config import FORECAST_KW, FORECAST_NO_SOTA_AXES
+    from multiaxis_eci.config import FORECAST_KW
     for k in range(K):
         disp = titles.get(names[k], names[k])
         # The measured cloud (config.INFORMED_SD_CAP, low-obs dropped, SOTA
@@ -201,12 +201,12 @@ def forecast_figures(view, data, raw, names, th_fc,
             continue
         try:
             # The frontier forecast of config.FORECAST_KW (envelope basis
-            # over the same measured cloud, 80% HDIs), SOTA exempt except
-            # on the axes of FORECAST_NO_SOTA_AXES. On a thin axis the
-            # exempted frontier releases carry SD ~1.0-1.5 and means that
-            # are mostly the lineage prior, so the slope is part evidence
-            # and part prior: the accepted cost of a line that tracks the
-            # visible frontier. back_start only matters to the regression
+            # over the same measured cloud, 80% HDIs). SOTA releases are
+            # exempt from the informed filter while their ability on the
+            # axis is at least weakly measured (config.SOTA_EXEMPT_SD_CAP);
+            # a prior-only position never enters the record set, so the
+            # trend cannot sit under the drawn cloud or be held by ghosts.
+            # back_start only matters to the regression
             # bases; the envelope draws the observed record steps from its
             # own window start, the forward rate measured over the last
             # rate_window years.
@@ -214,7 +214,6 @@ def forecast_figures(view, data, raw, names, th_fc,
             from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR
             fc = mirt_frontier_forecast(th_fc, k, data, raw,
                                         **dict(FORECAST_KW,
-                                              sota_exempt=k not in FORECAST_NO_SOTA_AXES,
                                               back_start=back,
                                               backcast_floor=FORECAST_BACKCAST_FLOOR.get(f"axis{k + 1}")))
         except ValueError:
@@ -295,7 +294,9 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     # a card whose trace is on a superseded data generation can never be
     # re-rendered, so a reordering here would leave the dashboard permanently
     # inconsistent between those cards and fresh ones.
-    axis_figs = build_axis_figures(view, data, raw, bench, signed_frames)
+    from multiaxis_eci.analysis.axes import axis_titles_for
+    titles = axis_titles_for(view, data) if view.A is not None else None
+    axis_figs = build_axis_figures(view, data, raw, bench, signed_frames, axis_titles=titles)
     load_figs = {k: axis_figs.pop(k) for k in list(axis_figs)
                  if k.startswith("loadings")}
     figs.update(axis_figs)
@@ -312,7 +313,7 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     # timelines above; gated on humans being in the fit (nothing to cross otherwise).
     if forecast and not view.is_nc and K > 1 and data.is_human.any():
         th_fc = signed_frames["oblique"].theta if is_signed else view.theta
-        figs.update(forecast_figures(view, data, raw, names, th_fc))
+        figs.update(forecast_figures(view, data, raw, names, th_fc, axis_titles=titles))
 
     figs.update(load_figs)          # held back above — legacy page position
 

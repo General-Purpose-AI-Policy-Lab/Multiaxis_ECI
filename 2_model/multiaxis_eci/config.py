@@ -252,19 +252,18 @@ def _load_sota_families() -> list[str]:
 
 SOTA_FAMILIES: list[str] = _load_sota_families()
 
-# Axes (0-based) where the frontier forecast does NOT grant SOTA the exemption
-# from the informed filter (SD < INFORMED_SD_CAP). Axis 4 is the legacy knowledge/NLP axis:
-# its defining benchmarks (OpenBookQA 0.89 axis share, ARC (AI2) 0.84,
-# Adversarial NLI 0.82, BoolQ, CSQA2, BBH, SuperGLUE, HellaSwag, PIQA) have no
-# observation on any model released after 2025-06, so every SOTA candidate
-# there carries SD ~1.0 and its position is the lineage prior, not a
-# measurement. Exempted, those ghosts hold the running max and suppress every
-# measured record: the fit collapsed to 2 points 77 days apart and the slope
-# flipped sign between the posterior mean and median. The other axes keep the
-# exemption because their measured models already outrank the ghosts. Drop
-# this entry once the axis has live coverage (BALROG, SimpleQA Verified and
-# SimpleBench all load on it and are still being run).
-FORECAST_NO_SOTA_AXES: set[int] = {3}
+# The SOTA exemption of the informed filter is not unconditional: a SOTA release
+# is admitted on an axis with a wide interval only while its ability there is
+# at least weakly measured, posterior SD below this cap. Above it the position
+# is the lineage prior alone (SD ~1 on this scale): on the published fit's
+# Legacy QA axis, whose benchmarks carry no observation on any model released
+# after 2025-06, such prior-only frontier releases held the running max and
+# suppressed every measured record (the fit collapsed to 2 points 77 days
+# apart and the slope flipped sign between the posterior mean and median).
+# The rule replaced an axis INDEX (`FORECAST_NO_SOTA_AXES = {3}`) on 2026-09-10:
+# the index named the published fit's fourth axis and, applied to a refit whose
+# fourth axis was another one, fitted a trend on 2 points under a cloud of 123.
+SOTA_EXEMPT_SD_CAP = 0.8
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
 # the per-draw running-max ENVELOPE over the informed cloud (non-decreasing by
@@ -285,10 +284,18 @@ FORECAST_BACKCAST_FLOOR: dict[str, str] = {}
 
 # Display strings for the flagship's 4 axes, opt-in per fit (figure dict keys
 # stay axis{k} so cache/anchor ids don't churn when a caller passes these).
+# They are valid only while the axes keep the identities of AXIS_SIGNATURES:
+# `analysis.axis_titles_for` applies a title only when the axis's highest-share
+# benchmarks contain one of its signature benchmarks, and the post's scripts
+# refuse to label otherwise (`analysis.check_axis_identity`).
 AXIS_TITLES = {"axis1": "Axis 1 — Fluid Intelligence",
               "axis2": "Axis 2 — Scientific Knowledge and Reasoning",
               "axis3": "Axis 3 — Agentic Capabilities",
               "axis4": "Axis 4 — Legacy QA"}
+AXIS_SIGNATURES = {"axis1": {"ARC-AGI-2", "VPCT", "ARC-AGI"},
+                   "axis2": {"WMDP Chemistry", "WMDP Biology"},
+                   "axis3": {"GBAEval", "Remote Labor Index", "ProofBench"},
+                   "axis4": {"OpenBookQA", "ARC AI2", "ANLI"}}
 
 # Release dates of the "pretty" model names of Epoch's reference ECI table, which
 # --eci-data-only fits instead of the pipeline's view. The view itself carries a date
