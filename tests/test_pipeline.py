@@ -2881,13 +2881,11 @@ def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
         is_sota=np.array([False, False, False, True, False, False, True]))
     dates = pd.Series(pd.to_datetime(["2025-01-01"] * 5 + ["2025-06-01"]),
                       index=names[:5] + [names[6]])
-    # The wide SOTA member is admitted (SD 0.6 < SOTA_EXEMPT_SD_CAP); the prior-only
-    # one (SD 1.2) is not, whatever its family.
+    # Every SOTA member is admitted, however wide its interval (the prior-only one at
+    # SD 1.2 included): the exemption is unconditional.
     keep = candidate_mask(theta, 0, data, dates)
-    assert keep.tolist() == [True, False, False, True, False, False, False]
+    assert keep.tolist() == [True, False, False, True, False, False, True]
     strict = candidate_mask(theta, 0, data, dates, sota_exempt=False)
     assert strict.tolist() == [True, False, False, False, False, False, False]
     loose = candidate_mask(theta, 0, data, dates, sd_cap=None, drop_low_obs=False)
     assert loose.tolist() == [True, True, True, True, False, False, True]
-    every_sota = candidate_mask(theta, 0, data, dates, sota_sd_cap=None)
-    assert every_sota.tolist() == [True, False, False, True, False, False, True]

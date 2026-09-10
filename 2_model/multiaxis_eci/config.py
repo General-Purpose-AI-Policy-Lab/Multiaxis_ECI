@@ -257,18 +257,11 @@ def _load_sota_families() -> list[str]:
 
 SOTA_FAMILIES: list[str] = _load_sota_families()
 
-# The SOTA exemption of the informed filter is not unconditional: a SOTA release
-# is admitted on an axis with a wide interval only while its ability there is
-# at least weakly measured, posterior SD below this cap. Above it the position
-# is the lineage prior alone (SD ~1 on this scale): on the published fit's
-# Legacy QA axis, whose benchmarks carry no observation on any model released
-# after 2025-06, such prior-only frontier releases held the running max and
-# suppressed every measured record (the fit collapsed to 2 points 77 days
-# apart and the slope flipped sign between the posterior mean and median).
-# The rule replaced an axis INDEX (`FORECAST_NO_SOTA_AXES = {3}`) on 2026-09-10:
-# the index named the published fit's fourth axis and, applied to a refit whose
-# fourth axis was another one, fitted a trend on 2 points under a cloud of 123.
-SOTA_EXEMPT_SD_CAP = 0.8
+# The SOTA exemption of `candidate_mask` is unconditional: a SOTA family member is drawn
+# and fitted on every axis, with its interval, however wide (user decision 2026-09-10;
+# a per-axis uncertainty cap on the exemption was tried and dropped the same day: the
+# axis-4 trend that once sat under its cloud came from the cloud and the fit using
+# different candidate sets, not from the exemption itself).
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post:
 # the per-draw running-max ENVELOPE over the informed cloud (non-decreasing by

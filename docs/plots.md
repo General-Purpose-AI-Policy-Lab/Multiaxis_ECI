@@ -172,17 +172,16 @@ the two cannot drift apart on the basis, the cap or the interval width. The
 cloud and the trend fit share the one cap, which is what makes every fitted
 record also a plotted point.
 
-**The SOTA exemption stops at prior-only positions.** A SOTA release is admitted
-with a wide interval only while its ability on the axis is at least weakly
-measured (posterior SD below `config.SOTA_EXEMPT_SD_CAP`, 0.8). On the published
-fit's Legacy QA axis, whose defining benchmarks carry no observation on any
-model released after 2025-06, every SOTA candidate sat at SD ~1.0 on the lineage
-prior alone; exempted, those points held the running max and suppressed every
-measured record (the record set collapsed to 2 points 77 days apart and the
-slope flipped sign between the posterior mean and median). Until 2026-09-10 the
-remedy was an axis index (`FORECAST_NO_SOTA_AXES = {3}`), which a refit with
-another fourth axis turned into a trend fitted on 2 points under a cloud of 123;
-the uncertainty rule needs no axis identity. Titles, too, follow identity:
+**The SOTA exemption is unconditional.** A SOTA release is admitted on every axis
+with its interval, however wide, even where none of its scores loads on the axis
+and its position comes from the prior and the lineage link alone (user decision
+2026-09-10). Such points lift the running-max envelope a little through their
+right tails (about half an ability point at the present on the axes concerned of
+the 2026-09-08 K=4 fit), which is accepted. An uncertainty cap on the exemption
+was tried and dropped the same day; the axis-4 trend that once sat under its cloud
+came from the cloud and the fit using different candidate sets (an axis index,
+`FORECAST_NO_SOTA_AXES`, named the published fit's fourth axis), which the shared
+`candidate_mask` rules out. Titles, too, follow identity:
 `analysis.load_axis_titles` applies a hand-confirmed title only to an axis whose
 top benchmarks still contain one of its signature benchmarks (`axis_names.json`).
 
