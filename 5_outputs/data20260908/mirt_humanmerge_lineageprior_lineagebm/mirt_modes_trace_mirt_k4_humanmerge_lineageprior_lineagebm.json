@@ -1,0 +1,53 @@
+{
+ "trace": "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc",
+ "n_chains": 8,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.6) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -18.0,
+  -9.6,
+  -8.9,
+  -10.3,
+  0.0,
+  -9.6,
+  -20.9,
+  -7.5
+ ],
+ "modes": [
+  {
+   "chains": [
+    2,
+    4,
+    5,
+    7
+   ],
+   "mean_logp": 3178.0636793127483,
+   "min_matched_corr": 0.901,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    3
+   ],
+   "mean_logp": 3174.27186261586,
+   "min_matched_corr": 1.0,
+   "label": "B",
+   "delta_logp": -3.8,
+   "matched_corr_to_best": 0.221
+  },
+  {
+   "chains": [
+    0,
+    1,
+    6
+   ],
+   "mean_logp": 3168.416890827915,
+   "min_matched_corr": 0.814,
+   "label": "C",
+   "delta_logp": -9.6,
+   "matched_corr_to_best": 0.432
+  }
+ ]
+}

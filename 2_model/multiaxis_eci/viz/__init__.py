@@ -62,6 +62,7 @@ from multiaxis_eci.viz.gof import (
     pred_vs_obs_fig,
     residuals_per_benchmark_fig,
 )
+from multiaxis_eci.viz.i18n import FR_TABLE, translate_fig
 from multiaxis_eci.viz.mirt import (
     axes_frontier_fig,
     axes_scatter_matrix_fig,
@@ -82,7 +83,7 @@ __all__ = [
     "TIMELINE_TEXT", "human_tier_palette", "trace_posterior_grid", "hyperparams_fig", "forest_fig",
     "all_models_forest_fig", "sota_forest_fig", "capability_timeline_fig", "raw_scores_by_date_fig",
     "frontier_trend_fig", "crossover_panels_fig", "exceedance_prob_fig",
-    "FigureStyle", "DASHBOARD", "POST",
+    "FigureStyle", "DASHBOARD", "POST", "FR_TABLE", "translate_fig",
     "pit_hist_fig", "pit_ecdf_fig", "density_overlay_fig", "pred_vs_obs_fig",
     "benchmark_obs_vs_pred_fig", "benchmark_icc_fig",
     "residuals_per_benchmark_fig",

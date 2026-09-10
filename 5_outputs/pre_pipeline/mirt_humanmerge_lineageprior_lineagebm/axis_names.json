@@ -1,0 +1,26 @@
+{
+  "confirmed": true,
+  "how": "Hand-named from the loadings of the published K=4 fit (blog post, 2026). A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
+  "axes": {
+    "axis1": {
+      "title": "Fluid Intelligence",
+      "signature": ["ARC-AGI-2", "VPCT", "ARC-AGI"],
+      "top_benchmarks": ["ARC-AGI-2", "ARC-AGI", "VPCT", "MCP Atlas", "OTIS Mock AIME 2024-2025"]
+    },
+    "axis2": {
+      "title": "Scientific Knowledge and Reasoning",
+      "signature": ["WMDP Chemistry", "WMDP Biology"],
+      "top_benchmarks": ["WMDP Biology", "WMDP Chemistry", "MMLU", "GSM8K", "CyberGym"]
+    },
+    "axis3": {
+      "title": "Agentic Capabilities",
+      "signature": ["GBAEval", "Remote Labor Index", "ProofBench"],
+      "top_benchmarks": ["OSWorld", "GBAEval", "Remote Labor Index", "ProofBench", "MirrorCode"]
+    },
+    "axis4": {
+      "title": "Legacy QA",
+      "signature": ["OpenBookQA", "ARC AI2", "ANLI"],
+      "top_benchmarks": ["OpenBookQA", "ARC AI2", "ANLI", "BoolQ", "HellaSwag"]
+    }
+  }
+}

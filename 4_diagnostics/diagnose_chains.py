@@ -285,7 +285,7 @@ def _figure(name, below, majority_mask, dspread, benches, chain_dist, out_path):
     colors = ["tab:blue" if m else "tab:red" for m in majority_mask]
     ax[0].bar(range(len(below)), below, color=colors)
     ax[0].axhline(-BASIN_NATS, ls="--", c="k", lw=1)
-    ax[0].set(title="chain mean logp (nats below best) — red = island basin",
+    ax[0].set(title="chain mean logp (nats below best): red = island basin",
               xlabel="chain", ylabel="nats below best")
     order = np.argsort(dspread)[::-1][:8]
     ax[1].barh([str(benches[i])[:26] for i in order][::-1],
@@ -413,7 +413,7 @@ def main():
 
     if args.fig:
         fig_path = config.DIAGNOSTICS_DIR / f"chains_{args.name}.pdf"
-        _figure(f"{args.name} — {verdict} (logp spread {logp_spread:.0f} nats, "
+        _figure(f"{args.name}: {verdict} (logp spread {logp_spread:.0f} nats, "
                 f"div {divergences})",
                 below, ~island_mask, dspread,
                 list(post["bench"].values), chain_dist, fig_path)

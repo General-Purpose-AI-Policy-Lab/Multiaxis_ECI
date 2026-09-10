@@ -41,6 +41,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
     _aligned_reproducibility,
     crosschain_axis_reproducibility,
+    load_axis_titles,
     mirt_identified_ess,
     mirt_identified_rhat,
     mirt_identified_rhat_nc,
@@ -105,7 +106,7 @@ FITS = [
      # one basin, R² 0.9643), now under 5_outputs/pre_pipeline/.
      "label": "K=4 · full exploration scope · positive loadings · "
               "raw rank-tracked axes (no rotation) · "
-              "human-merge+lineage(BM) priors · 3PL floors · pooled noise — "
+              "human-merge+lineage(BM) priors · 3PL floors · pooled noise; "
               "THE forecasting base (the blog post's fit)",
      "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
@@ -228,10 +229,10 @@ def _modes_table_html(doc):
                         "min matched loading corr, within mode":
                             m["min_matched_corr"],
                         "min matched loading corr, vs best mode":
-                            ("—" if m.get("matched_corr_to_best") is None
+                            ("n/a" if m.get("matched_corr_to_best") is None
                              else m["matched_corr_to_best"])}
                        for m in doc["modes"]])
-    return (f"<h3>posterior modes — {len(df)} solutions across "
+    return (f"<h3>posterior modes: {len(df)} solutions across "
             f"{doc['n_chains']} chains; loading and timeline figures repeat per "
             "mode below, every metric above is whole-fit</h3>"
             + df.to_html(classes="cmp", index=False, border=0)
@@ -424,7 +425,9 @@ def render_fit(fit, data, raw, bench, mod):
                                          n_eff=n_eff, return_mean=True))
     gof = compute_gof(yrep, data, mu)
     figures = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
-                                forecast=fit.get("forecast", False))
+                                forecast=fit.get("forecast", False),
+                                axis_titles=(load_axis_titles(_trace_path(fit).parent, view, data)
+                                             if view.A is not None and view.K >= 2 else None))
     modes = _fit_modes(fit)
     if modes:
         print(f"  {len(modes['modes'])} posterior modes: "
@@ -459,7 +462,7 @@ def render_fit(fit, data, raw, bench, mod):
     # plain aligned-ability correlation and would flip a signed card's number
     # (the 0.71-promax vs 0.05-raw gap) between cached and fresh renders.
     max_phi = (round(float(np.abs(view.Phi[np.triu_indices(view.K, 1)]).max()), 3)
-               if view.K > 1 else "—")
+               if view.K > 1 else "n/a")
     loo, min_ess, tau = _loo_min_ess_tau(idata)
     if lp == "signed" and view.A is not None and view.K > 1:
         # Shared scalar tau is flat by construction — the spectrum lives in the

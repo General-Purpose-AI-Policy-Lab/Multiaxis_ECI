@@ -96,7 +96,7 @@ def main():
                      ticktext=order, range=[-0.6, len(order) - 0.4])
     fig.update_layout(
         template="plotly_white",
-        title=dict(text="Frontier crossover of human tiers — "
+        title=dict(text="Frontier crossover of human tiers: "
                        "median, 95% HDI", x=0.5),
         legend=dict(orientation="h", yanchor="bottom", y=-0.12,
                    xanchor="center", x=0.5),

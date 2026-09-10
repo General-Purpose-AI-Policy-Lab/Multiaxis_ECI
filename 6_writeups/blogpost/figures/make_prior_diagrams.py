@@ -49,7 +49,7 @@ FR = [
     ("Skilled Generalist", "Généraliste Qualifié"),
     ("Domain Expert", "Expert du Domaine"),
     ("Top Performer", "Meilleur Performeur"),
-    ("dashed: second parent —", "tirets = second parent"),
+    ("dashed: second parent,", "tirets : second parent,"),
     ("one illustrative family", "une famille illustrative"),
     ("expected gain grows with the gap", "le gain attendu croît avec l'écart"),
     ("small offsets, unordered", "petits écarts, non ordonnés"),
@@ -182,7 +182,7 @@ def make_human_arrangement():
     for a, b in merges:
         edge(ax, rpt(a), tpt(b, "b"), color=HUM, rA=0.0, rB=0.06,
              ls=(0, (3, 2)), lw=1.1)
-    ax.text(8.2, 1.35, "dashed: second parent —\n"
+    ax.text(8.2, 1.35, "dashed: second parent,\n"
             r"$\theta_t=\max(\mathrm{parents})+\delta$",
             ha="left", va="center", fontsize=9.2, color=HUM)
 

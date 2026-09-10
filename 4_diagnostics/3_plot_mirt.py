@@ -26,6 +26,7 @@ memory between fits and one failure does not end the sweep.
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -38,12 +39,19 @@ import xarray as xr
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # diagnose_chains, a sibling
+
+from diagnose_chains import modes_path  # noqa: E402
+
 from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
+    align_to_reference_loadings,
+    load_axis_titles,
     mirt_factors_from_trace,
     mirt_informed_mask,
     mirt_model_timeline_df,
     prepare_fit,
+    propose_axis_names,
     trace_loading_prior,
 )
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
@@ -60,11 +68,36 @@ from multiaxis_eci.viz import (  # noqa: E402
     pred_scatter_fig,
     save_fig,
 )
+from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 
 # Every posterior variable any figure or the PPC here reads. Names absent from a
 # given trace are skipped, so this one list covers the linear and log-logistic
 # links, the softplus-theta variant and the estimated ceiling.
 PLOT_VARS = ("A", "theta", "theta_pos", "tau_A", "D", "phi_b", "alpha", "ceiling_d")
+
+# The figures a write-up would embed, rendered in French too (`fr/`): the
+# per-axis timelines and forecasts, the forests, the loadings, the PIT.
+MAIN_FIGURE_PREFIXES = {"timeline", "forecast"}
+MAIN_FIGURES = {"forests_per_axis", "loadings_per_axis", "gof_pit", "axes_timeline_compare"}
+
+
+def chain_split(trace_path, n_chains: int) -> dict | None:
+    """Majority and minority chains of a multimodal trace, from the modes file
+    `diagnose_chains.py --write-modes` wrote beside it; None when the file is
+    missing or reports a single mode. The majority is the largest mode (ties go
+    to the best log-density); the minority is every other chain, so the two
+    groups partition the trace."""
+    p = modes_path(trace_path)
+    if not p.exists():
+        return None
+    doc = json.loads(p.read_text())
+    modes = doc.get("modes", [])
+    if doc.get("trace") != Path(trace_path).name or len(modes) < 2:
+        return None
+    best = max(modes, key=lambda m: (len(m["chains"]), m.get("delta_logp") or 0.0))
+    majority = sorted(best["chains"])
+    minority = sorted(set(range(n_chains)) - set(majority))
+    return {"majority": majority, "minority": minority, "n_chains": n_chains}
 
 
 def _spec_of(trace_path) -> FitSpec:
@@ -105,94 +138,133 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
     raw = pd.read_csv(PROCESSED_FILE)
     data, floor_c, n_eff = spec.load_data(idata)
-
-    view = prepare_fit(idata, data)
-    K = view.K
+    view_all = prepare_fit(idata, data)
+    K = view_all.K
     n_axes = min(axes or K, K)
-    names = view.names
-    bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
-    mod = data.mlookup.sort_values("model_idx")["model"].tolist()
-    # ── canonical per-fit figure set (shared with the dashboard) ──────────────
-    yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff)
-    mu = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff,
-                                   return_mean=True)
-    gof = compute_gof(yrep, data, mu)
-    figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
-                             forecast=forecast)
-    figs["pit_ecdf"] = pit_ecdf_fig(gof.pit)
-
-    # ── signed extras: the rotation-method comparison (four independent
-    # post-hoc identifications of the same trace), read from the CSV
-    # `4_diagnostics/align_mirt.py` wrote — no recompute. K-tagged name first
-    # (K=2 and K=3 share a results dir), untagged as fallback.
-    if trace_loading_prior(idata) == "signed":
-        for cand in (results_dir / f"mirt_alignment_loadings_k{K}.csv",
-                     results_dir / "mirt_alignment_loadings.csv"):
-            if cand.exists():
-                figs["rotation_methods"] = alignment_methods_fig(pd.read_csv(cand))
-                break
-
-    # ── single-fit comparative views (informed timelines) ────────────────────
-    if n_axes >= 2:
-        axis_tl = {k: mirt_model_timeline_df(view.theta, k, data, raw) for k in range(n_axes)}
-        figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, names, n_axes)
-        keep = (mirt_informed_mask(view.theta)[:, :n_axes].all(axis=1)
-                & ~data.is_human & ~data.is_low_obs)
-        idx = np.where(keep)[0]
-        if len(idx) > 5:
-            org_by_model = (raw.dropna(subset=["organization"])
-                            .groupby("model_version")["organization"].first())
-            orgs = np.array([org_by_model.get(mod[i], "other") for i in idx])
-            top = pd.Series(orgs).value_counts().head(7).index.tolist()
-            tmean = view.theta.mean(axis=0)
-            dfm = pd.DataFrame({names[k]: tmean[idx, k] for k in range(n_axes)})
-            dfm["model"] = [mod[i] for i in idx]
-            dfm["org"] = np.where(np.isin(orgs, top), orgs, "other")
-            figs["axes_scatter_matrix"] = axes_scatter_matrix_fig(
-                dfm, [names[k] for k in range(n_axes)])
-
-    # ── K vs 1D block (reuses the cached K=1 baseline; no extra fit) ──────────
+    # Axis titles come from the hand-filled axis_names.json beside the trace; a
+    # missing file gets its template here and the figures say `Axis k`.
+    if K >= 2 and view_all.A is not None:
+        propose_axis_names(view_all, data, results_dir)
+    # The K=1 baseline beside the trace feeds the K-vs-1D block of every render.
     base = results_dir / "trace_mirt_k1.nc"
-    if base.exists() and base != trace_path:
-        idata_1d = spec.open_posterior(keep=PLOT_VARS, thin=thin, path=base)
-        if idata_1d.posterior.sizes.get("model") != data.n_models:
-            print(f"  skipping 1D comparison: K=1 baseline has "
-                  f"{idata_1d.posterior.sizes.get('model')} models vs {data.n_models}.")
-        else:
-            _, tb_theta, _ = mirt_factors_from_trace(idata_1d)
-            tb = tb_theta.mean(axis=0)[:, 0]
-            a1 = view.theta.mean(axis=0)[:, 0]
-            if np.corrcoef(a1, tb)[0, 1] < 0:
-                tb = -tb
-            r = float(np.corrcoef(a1, tb)[0, 1])
-            figs["factor1_vs_1d"] = factor_vs_1d_fig(tb, a1, mod, r)
+    idata_1d = (spec.open_posterior(keep=PLOT_VARS, thin=thin, path=base)
+                if base.exists() and base != trace_path else None)
 
-            # 3_fit/fit.py fits the K=1 baseline with the same likelihood options.
-            pred_1d = posterior_predictive_mirt(idata_1d, data, floor_c=floor_c,
-                                                n_eff=n_eff).mean(axis=0)
-            resid_kd = data.scores - gof.y_pred_mean
-            resid_1d = data.scores - pred_1d
-            hover = [f"{mod[m]} · {bench[b]}" for m, b in zip(data.model_idx, data.bench_idx)]
-            figs["pred_k_vs_k1"] = pred_scatter_fig(
-                pred_1d, gof.y_pred_mean, np.abs(resid_1d) - np.abs(resid_kd), hover)
+    def render(idata, view, figures_dir: Path, suffix: str, note: str) -> dict:
+        """The whole figure set for one posterior (the fit, or one chain group),
+        saved under `figures_dir` with `suffix` in every file name, the main
+        figures also in French under `figures_dir/fr/`."""
+        figures_dir.mkdir(parents=True, exist_ok=True)
+        axis_titles = (load_axis_titles(results_dir, view, data)
+                       if K >= 2 and view.A is not None else None)
+        names = view.names
+        bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
+        mod = data.mlookup.sort_values("model_idx")["model"].tolist()
+        # ── canonical per-fit figure set (shared with the dashboard) ──────────────
+        yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff)
+        mu = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff,
+                                       return_mean=True)
+        gof = compute_gof(yrep, data, mu)
+        figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
+                                 forecast=forecast, axis_titles=axis_titles)
+        figs["pit_ecdf"] = pit_ecdf_fig(gof.pit)
 
-            # ddof=0 so var*n is exactly the total sum of squares (R² denominator).
-            var_y = pd.Series(data.scores).groupby(data.bench_idx).var(ddof=0)
-            n_per = pd.Series(np.ones_like(data.scores)).groupby(data.bench_idx).sum()
-            r2_1d = 1 - pd.Series(resid_1d ** 2).groupby(data.bench_idx).sum() / (var_y * n_per)
-            r2_kd = 1 - pd.Series(resid_kd ** 2).groupby(data.bench_idx).sum() / (var_y * n_per)
-            delta = (r2_kd - r2_1d)
-            bench_df = pd.DataFrame({
-                "name": [bench[i] for i in delta.index],
-                "delta_r2": delta.values, "n_obs": n_per.values.astype(int),
-            }).sort_values("delta_r2")
-            figs["r2_delta_per_bench"] = per_bench_r2_delta_fig(bench_df)
+        # ── signed extras: the rotation-method comparison (four independent
+        # post-hoc identifications of the same trace), read from the CSV
+        # `4_diagnostics/align_mirt.py` wrote — no recompute. K-tagged name first
+        # (K=2 and K=3 share a results dir), untagged as fallback.
+        if trace_loading_prior(idata) == "signed":
+            for cand in (results_dir / f"mirt_alignment_loadings_k{K}.csv",
+                         results_dir / "mirt_alignment_loadings.csv"):
+                if cand.exists():
+                    figs["rotation_methods"] = alignment_methods_fig(pd.read_csv(cand))
+                    break
 
-    for name, fig in figs.items():
-        save_fig(fig, figure_filename(name), figures_dir)
-    print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
-          f"MAE={gof.metrics['mae']:.3f}")
-    print(f"figures → {figures_dir}")
+        # ── single-fit comparative views (informed timelines) ────────────────────
+        if n_axes >= 2:
+            axis_tl = {k: mirt_model_timeline_df(view.theta, k, data, raw) for k in range(n_axes)}
+            figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, names, n_axes)
+            keep = (mirt_informed_mask(view.theta)[:, :n_axes].all(axis=1)
+                    & ~data.is_human & ~data.is_low_obs)
+            idx = np.where(keep)[0]
+            if len(idx) > 5:
+                org_by_model = (raw.dropna(subset=["organization"])
+                                .groupby("model_version")["organization"].first())
+                orgs = np.array([org_by_model.get(mod[i], "other") for i in idx])
+                top = pd.Series(orgs).value_counts().head(7).index.tolist()
+                tmean = view.theta.mean(axis=0)
+                dfm = pd.DataFrame({names[k]: tmean[idx, k] for k in range(n_axes)})
+                dfm["model"] = [mod[i] for i in idx]
+                dfm["org"] = np.where(np.isin(orgs, top), orgs, "other")
+                figs["axes_scatter_matrix"] = axes_scatter_matrix_fig(
+                    dfm, [names[k] for k in range(n_axes)])
+
+        # ── K vs 1D block (reuses the cached K=1 baseline; no extra fit) ──────────
+        if idata_1d is not None:
+            if idata_1d.posterior.sizes.get("model") != data.n_models:
+                print(f"  skipping 1D comparison: K=1 baseline has "
+                      f"{idata_1d.posterior.sizes.get('model')} models vs {data.n_models}.")
+            else:
+                _, tb_theta, _ = mirt_factors_from_trace(idata_1d)
+                tb = tb_theta.mean(axis=0)[:, 0]
+                a1 = view.theta.mean(axis=0)[:, 0]
+                if np.corrcoef(a1, tb)[0, 1] < 0:
+                    tb = -tb
+                r = float(np.corrcoef(a1, tb)[0, 1])
+                figs["factor1_vs_1d"] = factor_vs_1d_fig(tb, a1, mod, r)
+
+                # 3_fit/fit.py fits the K=1 baseline with the same likelihood options.
+                pred_1d = posterior_predictive_mirt(idata_1d, data, floor_c=floor_c,
+                                                    n_eff=n_eff).mean(axis=0)
+                resid_kd = data.scores - gof.y_pred_mean
+                resid_1d = data.scores - pred_1d
+                hover = [f"{mod[m]} · {bench[b]}" for m, b in zip(data.model_idx, data.bench_idx)]
+                figs["pred_k_vs_k1"] = pred_scatter_fig(
+                    pred_1d, gof.y_pred_mean, np.abs(resid_1d) - np.abs(resid_kd), hover)
+
+                # ddof=0 so var*n is exactly the total sum of squares (R² denominator).
+                var_y = pd.Series(data.scores).groupby(data.bench_idx).var(ddof=0)
+                n_per = pd.Series(np.ones_like(data.scores)).groupby(data.bench_idx).sum()
+                r2_1d = 1 - pd.Series(resid_1d ** 2).groupby(data.bench_idx).sum() / (var_y * n_per)
+                r2_kd = 1 - pd.Series(resid_kd ** 2).groupby(data.bench_idx).sum() / (var_y * n_per)
+                delta = (r2_kd - r2_1d)
+                bench_df = pd.DataFrame({
+                    "name": [bench[i] for i in delta.index],
+                    "delta_r2": delta.values, "n_obs": n_per.values.astype(int),
+                }).sort_values("delta_r2")
+                figs["r2_delta_per_bench"] = per_bench_r2_delta_fig(bench_df)
+
+        if note:
+            for fig in figs.values():
+                t = fig.layout.title.text
+                fig.update_layout(title_text=f"{t} · {note}" if t else note)
+        for name, fig in figs.items():
+            save_fig(fig, figure_filename(name) + suffix, figures_dir)
+            if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES:
+                save_fig(translate_fig(fig), figure_filename(name) + suffix + "_fr",
+                         figures_dir / "fr")
+        print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
+              f"MAE={gof.metrics['mae']:.3f}")
+        print(f"figures → {figures_dir}")
+        return figs
+
+    split = chain_split(trace_path, int(idata.posterior.sizes["chain"]))
+    if split is None:
+        render(idata, view_all, figures_dir, "", "")
+        return figures_dir
+    # A multimodal posterior: the folder holds the majority chains' figures, the
+    # minority chains' under minority/. Both groups are put back on the fit's
+    # display frame (mirt_loadings.csv), so axis k is the same axis in both.
+    ref = results_dir / "mirt_loadings.csv"
+    for chains, sub_dir, suffix in ((split["majority"], figures_dir, "_majority"),
+                                    (split["minority"], figures_dir / "minority", "_minority")):
+        sub = idata.sel(chain=chains)
+        view = prepare_fit(sub, data)
+        if K >= 2 and view.A is not None and ref.exists():
+            view = align_to_reference_loadings(view, data, ref)
+        label = suffix[1:]
+        render(sub, view, sub_dir, suffix,
+               f"{label} chains {','.join(map(str, chains))} / {split['n_chains']}")
     return figures_dir
 
 

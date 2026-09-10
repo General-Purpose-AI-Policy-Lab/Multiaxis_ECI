@@ -29,16 +29,20 @@ import argparse
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
-from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import (  # noqa: E402
+    FLAGSHIP,
+    FLAGSHIP_THIN,
+    align_to_reference_loadings,
+    prepare_fit,
+    require_axis_titles,
+)
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
-from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
 from multiaxis_eci.viz import POST, crossover_panels_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
@@ -61,33 +65,6 @@ _DATE_COLS = ["crossover_date_median", "crossover_hdi_low", "crossover_hdi_high"
               "hdi80_low", "hdi80_high"]
 
 
-def _display_frame(view, data, trace: Path):
-    """Permute a chain subset's axes onto the whole fit's display frame.
-
-    `prepare_fit` ranks the axes by loading energy WITHIN whatever draws it is
-    given, and a chain group ranks them in its own order — on this fit the
-    minority group puts Legacy QA above Agentic. Matching each column to the
-    fit-level `mirt_loadings.csv` medians by correlation puts panel k back on
-    the axis panel k carries everywhere else.
-    """
-    import dataclasses
-
-    pooled = (pd.read_csv(trace.parent / "mirt_loadings.csv")
-              .pivot(index="benchmark", columns="axis", values="loading_median"))
-    bench = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
-    P = pooled.loc[bench].values
-    M = np.median(view.require_A(), axis=0)
-    corr = np.corrcoef(P.T, M.T)[:P.shape[1], P.shape[1]:]
-    perm = corr.argmax(axis=1)
-    if sorted(perm) != list(range(P.shape[1])):
-        raise SystemExit(f"axis match is not a permutation: {perm}\n{corr.round(3)}")
-    print("  display axis -> subset column: "
-          + ", ".join(f"{k+1}->{s+1} (r {corr[k, s]:+.2f})"
-                      for k, s in enumerate(perm)))
-    return dataclasses.replace(view, theta=view.theta[:, :, perm],
-                               A=view.A[:, :, perm])
-
-
 def crossovers(trace: Path, cached: bool = False,
                chains: list[int] | None = None,
                probs: tuple = PROBS) -> pd.DataFrame:
@@ -107,7 +84,7 @@ def crossovers(trace: Path, cached: bool = False,
     if cached:
         raise SystemExit(f"--cached but {cache} is missing — run without "
                          "--cached once to rebuild it from the trace.")
-    from make_all import END, check_axis_identity
+    from make_all import END
     from make_trend_plotly import forecast
 
     from multiaxis_eci.analysis import crossover_table, mirt_frontier_forecast
@@ -119,8 +96,8 @@ def crossovers(trace: Path, cached: bool = False,
     data, *_ = FLAGSHIP.load_data(idata)
     view = prepare_fit(idata, data)
     if chains is not None:
-        view = _display_frame(view, data, trace)
-    check_axis_identity(view, data)
+        view = align_to_reference_loadings(view, data, trace.parent / "mirt_loadings.csv")
+    require_axis_titles(trace.parent, view, data)
     # The cached pickle holds the whole fit's slope/intercept draws, so a chain
     # subset has to run its own forecast; the settings are the same ones.
     if chains is None:
@@ -165,7 +142,8 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
                  if len(probs) > 1 else ""))
     # Fixed 2015-2030 window, shared by every variant of the figure so they are
     # all directly comparable; the builder clips and dates whatever runs past it.
-    fig = crossover_panels_fig(cx, AXES, TITLES, probs=probs, style=POST,
+    titles = require_axis_titles(trace.parent)      # confirmed names, checked at cache time
+    fig = crossover_panels_fig(cx, AXES, titles, probs=probs, style=POST,
                                window=(X0, X1), title=TITLE)
     out.parent.mkdir(parents=True, exist_ok=True)
     save_html(fig, out)

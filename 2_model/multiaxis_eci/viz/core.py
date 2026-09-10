@@ -220,7 +220,7 @@ def trace_posterior_grid(items: list[tuple[str, np.ndarray]],
         rows=n, cols=2, column_widths=[0.62, 0.38],
         horizontal_spacing=0.09, vertical_spacing=0.18,
         subplot_titles=[s for t, _ in items
-                        for s in (f"{t} — trace", f"{t} — posterior")],
+                        for s in (f"{t}: trace", f"{t}: posterior")],
     )
     for r, (_name, samples) in enumerate(items, start=1):
         for ch in range(samples.shape[0]):
@@ -388,7 +388,7 @@ def all_models_forest_fig(stats_df: pd.DataFrame,
         ))
 
     n = len(stats_df)
-    title = f"All {n} models — posterior median {metric} with 95% interval"
+    title = f"All {n} models: posterior median {metric} with 95% interval"
     if anchors:
         anchor_str = ", ".join(label for _, label in anchors)
         title = f"{title}<br><sub>anchored: {anchor_str}</sub>"

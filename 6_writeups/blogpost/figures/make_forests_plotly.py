@@ -38,13 +38,13 @@ sys.path.insert(0, str(HERE))
 from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
     FLAGSHIP_THIN,
-    check_axis_identity,
+    align_to_reference_loadings,
     forest_frames,
     prepare_fit,
+    require_axis_titles,
 )
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
 from multiaxis_eci.config import (
-    AXIS_TITLES,  # noqa: E402
     FORECAST_KW,  # noqa: E402
 )
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
@@ -88,9 +88,8 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
     if chains is not None:
         # A chain subset ranks the axes in its own order; put panel k back on
         # the axis panel k carries everywhere else before any label is applied.
-        from make_crossover_plotly import _display_frame
-        view = _display_frame(view, data, trace)
-    check_axis_identity(view, data)     # SystemExit before any mislabeled axis
+        view = align_to_reference_loadings(view, data, trace.parent / "mirt_loadings.csv")
+    titles = require_axis_titles(trace.parent, view, data)   # SystemExit before any mislabel
 
     # Same rows as the dashboard's per-axis forest: `analysis.forest_frames`
     # (the forecast's candidates, the pinned frontier releases, every human
@@ -98,7 +97,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
     # marker class for machines, no "shown even when wide" legend entry.
     frames = forest_frames(view, data, pd.read_csv(PROCESSED_FILE),
                            sd_cap=FORECAST_KW["sd_cap"])
-    fig = forest_grid_fig(frames, [AXIS_TITLES[n] for n in view.names], title=TITLE,
+    fig = forest_grid_fig(frames, [titles[n] for n in view.names], title=TITLE,
                           style=POST, collapse_frontier=True, col_domains=COL_DOMAINS)
 
     out = out_dir / f"forests_axes_plotly{tag}{chain_suffix(chains)}"

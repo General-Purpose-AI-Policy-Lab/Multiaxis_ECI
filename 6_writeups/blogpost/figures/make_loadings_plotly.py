@@ -25,12 +25,11 @@ sys.path.insert(0, str(HERE))
 from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
     FLAGSHIP_THIN,
-    check_axis_identity,
     loadings_table,
     prepare_fit,
+    require_axis_titles,
 )
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
-from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
 from multiaxis_eci.viz import POST, loadings_grid_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
 
@@ -53,7 +52,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE) -> None
                                     thin=FLAGSHIP_THIN, chains=None, path=trace)
     data, *_ = FLAGSHIP.load_data(idata)
     view = prepare_fit(idata, data)
-    check_axis_identity(view, data)     # SystemExit before any mislabeled axis
+    titles = require_axis_titles(trace.parent, view, data)   # SystemExit before any mislabel
 
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
     # 2.5/97.5 to match the interval every other flagship loading figure draws.
@@ -62,7 +61,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE) -> None
     # The x caption repeats on all four panels beside the colorbar, so it drops
     # the interval note: the post's caption carries "median, 95% interval", and
     # the long French form ran into the colorbar.
-    fig = loadings_grid_fig(ldf, AXIS_TITLES, ncols=2, top_n=TOP_N, title=TITLE,
+    fig = loadings_grid_fig(ldf, titles, ncols=2, top_n=TOP_N, title=TITLE,
                             x_title="loading", style=POST, col_domains=COL_DOMAINS)
 
     out = out_dir / f"loadings_axes_plotly{tag}"

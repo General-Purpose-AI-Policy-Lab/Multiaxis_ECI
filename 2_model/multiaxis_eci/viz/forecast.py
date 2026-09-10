@@ -322,7 +322,7 @@ def exceedance_prob_fig(fc, theta_draws, k: int, data, *, axis_name: str,
         fig.add_hline(y=yv, line=dict(color="#888", dash="dot", width=style.refline),
                       annotation_text=lab, annotation_position="right")
     fig.update_layout(
-        title=dict(text=f"Forecast — {axis_name} (P exceed human)", x=0.5),
+        title=dict(text=f"Forecast: {axis_name} (P exceed human)", x=0.5),
         xaxis=dict(type="date", title="Date", showgrid=True, gridcolor="rgba(0,0,0,0.06)"),
         yaxis=dict(title=text["p_axis"], range=[0, 1],
                    showgrid=True, gridcolor="rgba(0,0,0,0.06)"),

@@ -282,26 +282,13 @@ FORECAST_KW = dict(fit_basis="envelope", fit_start="2024-10-01", sd_cap=INFORMED
 # drawing at 2015, with the true year printed at the edge).
 FORECAST_BACKCAST_FLOOR: dict[str, str] = {}
 
-# Display strings for the flagship's 4 axes, opt-in per fit (figure dict keys
-# stay axis{k} so cache/anchor ids don't churn when a caller passes these).
-# They are valid only while the axes keep the identities of AXIS_SIGNATURES:
-# `analysis.axis_titles_for` applies a title only when the axis's highest-share
-# benchmarks contain one of its signature benchmarks, and the post's scripts
-# refuse to label otherwise (`analysis.check_axis_identity`).
-AXIS_TITLES = {"axis1": "Axis 1 — Fluid Intelligence",
-              "axis2": "Axis 2 — Scientific Knowledge and Reasoning",
-              "axis3": "Axis 3 — Agentic Capabilities",
-              "axis4": "Axis 4 — Legacy QA"}
+# Axis titles are never hard-coded: each fit folder carries an axis_names.json
+# written as a template by the fit and filled in by hand (analysis.axes).
 # Frontier releases pinned into every per-axis forest whatever their posterior SD:
 # a frontier model is the headline of the figure, so a wide interval is drawn
 # rather than the row dropped. Names of the published fit; a refit's newest
 # frontier releases are added here by hand.
 FOREST_PINNED_RELEASES = {"claude-mythos-preview-early", "claude-fable-5", "gpt-5.6-sol_max"}
-AXIS_SIGNATURES = {"axis1": {"ARC-AGI-2", "VPCT", "ARC-AGI"},
-                   "axis2": {"WMDP Chemistry", "WMDP Biology"},
-                   "axis3": {"GBAEval", "Remote Labor Index", "ProofBench"},
-                   "axis4": {"OpenBookQA", "ARC AI2", "ANLI"}}
-
 # Release dates of the "pretty" model names of Epoch's reference ECI table, which
 # --eci-data-only fits instead of the pipeline's view. The view itself carries a date
 # on every row the pipeline could date (release_dates.csv there); this map is only

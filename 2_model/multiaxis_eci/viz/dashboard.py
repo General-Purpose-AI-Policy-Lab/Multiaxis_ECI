@@ -108,7 +108,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     basin's chains) share these builders through this function. `prefix` keys
     the mode's figures apart from the whole-fit ones on the same card; `suffix`
     names the mode in every title, so each figure reads on its own. `axis_titles`
-    (e.g. config.AXIS_TITLES) swaps the display text only — figure dict keys and
+    (`analysis.load_axis_titles`) swaps the display text only; figure dict keys and
     axis widget titles keep `names[k]` so cache/anchor ids don't churn.
     `human_labels` reaches `capability_timeline_fig` unchanged (None = the
     English tier names; a dict overrides them)."""
@@ -133,7 +133,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
         if not tl.empty:
             fig = capability_timeline_fig(tl, human_stats=hstat,
                                           human_labels=human_labels)
-            fig.update_layout(title=dict(text=f"{disp} — measured (50% intervals){suffix}", x=0.5),
+            fig.update_layout(title=dict(text=f"{disp}: measured (50% intervals){suffix}", x=0.5),
                               yaxis=dict(title=disp))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}"] = fig
         # ALL-models companion — every dated model, incl. sparse/extrapolated (wide CI).
@@ -143,7 +143,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
             fig_all = capability_timeline_fig(tl_all, human_stats=hstat,
                                               human_labels=human_labels)
             fig_all.update_layout(
-                title=dict(text=f"{disp} — all models (50% intervals){suffix}", x=0.5),
+                title=dict(text=f"{disp}: all models (50% intervals){suffix}", x=0.5),
                 yaxis=dict(title=disp))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}_all"] = fig_all
     if A is not None and K >= 2:
@@ -201,17 +201,17 @@ def forecast_figures(view, data, raw, names, th_fc,
         slug = _slug(names[k])
         figs[f"forecast_{k+1}_{slug}"] = frontier_trend_fig(
             {names[k]: inputs}, [names[k]], {names[k]: disp},
-            title=f"Forecast — {disp} (80% intervals)")
+            title=f"Forecast: {disp} (80% intervals)")
         figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
             cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
-            title=f"Forecast — {disp} (crossing dates)")
+            title=f"Forecast: {disp} (crossing dates)")
         figs[f"forecast_{k+1}_{slug}_prob"] = exceedance_prob_fig(
             inputs["fc"], th_fc, k, data, axis_name=disp)
     return figs
 
 
 def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
-                      forecast: bool = False) -> dict:
+                      forecast: bool = False, axis_titles: dict | None = None) -> dict:
     """Canonical per-fit MIRT figure set, gated by fit family (comp / nc).
 
     Returns a name→go.Figure dict instead of writing files, so the dashboard
@@ -269,8 +269,10 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     # a card whose trace is on a superseded data generation can never be
     # re-rendered, so a reordering here would leave the dashboard permanently
     # inconsistent between those cards and fresh ones.
-    from multiaxis_eci.analysis.axes import axis_titles_for
-    titles = axis_titles_for(view, data) if view.A is not None else None
+    # Display titles come from the fit's hand-filled axis_names.json
+    # (`analysis.load_axis_titles`); None titles every axis `Axis k`.
+    from multiaxis_eci.analysis.axes import bare_axis_title
+    titles = axis_titles or {n: bare_axis_title(n) for n in names}
     axis_figs = build_axis_figures(view, data, raw, bench, signed_frames, axis_titles=titles)
     load_figs = {k: axis_figs.pop(k) for k in list(axis_figs)
                  if k.startswith("loadings")}

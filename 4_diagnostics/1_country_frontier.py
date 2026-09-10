@@ -426,7 +426,7 @@ def main():
     fit_label = f"records since {pd.Timestamp(args.fit_start):%b %Y}"
     fig = build_figure(theta0, mini, transform, model_dates, country_map,
                        records, forecasts, args.horizon,
-                       title=f"US vs China frontier (ECI-H) — {scope_label}",
+                       title=f"US vs China frontier (ECI-H): {scope_label}",
                        fit_label=fit_label,
                        y_range=(tuple(float(v) for v in args.y_range.split(","))
                                 if args.y_range else None))
@@ -502,7 +502,7 @@ def main():
     for _, r in xover.iterrows():
         dm = r.crossover_date_median
         dtxt = (f"{dm:%Y-%m} [{r.crossover_hdi_low:%Y-%m}, "
-                f"{r.crossover_hdi_high:%Y-%m}]" if pd.notna(dm) else "—")
+                f"{r.crossover_hdi_high:%Y-%m}]" if pd.notna(dm) else "n/a")
         print(f"  {r.country} x {r.tier:<32s} ECI {r.human_eci_median:6.1f}  "
               f"{r.status:<11s} {dtxt}  P(passed now)={r.p_passed_now:.2f}")
 

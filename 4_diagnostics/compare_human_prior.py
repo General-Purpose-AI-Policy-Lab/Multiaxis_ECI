@@ -158,7 +158,7 @@ def fig_tier_ability(orig, ordd):
         fig.update_xaxes(tickvals=x, ticktext=[t.replace(" ", "<br>") for t in tiers],
                          row=1, col=k + 1)
     fig.update_layout(
-        title=dict(text="Human-tier ability per axis — independent (dotted) vs ordered (solid)", x=0.5),
+        title=dict(text="Human-tier ability per axis: independent (dotted) vs ordered (solid)", x=0.5),
         template="plotly_white", height=460, width=max(560, 320 * K), yaxis_title="θ (ability)")
     return fig
 
@@ -216,7 +216,7 @@ def fig_gof(orig, ordd):
         vals = [fit["r2"], fit["rmse_all"], fit["rmse_human"]]
         fig.add_trace(go.Bar(name=name, x=cats, y=vals, marker_color=color,
                              text=[f"{v:.3f}" for v in vals], textposition="outside"))
-    fig.update_layout(title=dict(text="Cost of enforcing the order — fit should be ≈unchanged", x=0.5),
+    fig.update_layout(title=dict(text="Cost of enforcing the order: fit should be about unchanged", x=0.5),
                       barmode="group", template="plotly_white", height=460, width=720,
                       yaxis_rangemode="tozero")
     return fig
@@ -235,7 +235,7 @@ def fig_div_loo(rows):
                                  marker_color=color, error_y=ey, showlegend=(col == 1)),
                           row=1, col=col)
     fig.update_layout(barmode="group", template="plotly_white", height=440, width=900,
-                      title=dict(text="Ordered human prior — effect on convergence & prediction", x=0.5))
+                      title=dict(text="Ordered human prior: effect on convergence and prediction", x=0.5))
     return fig
 
 

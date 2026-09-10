@@ -41,9 +41,13 @@ sys.path.insert(0, str(HERE))
 
 from theta_bimodality import PERM_STRIDE, axis_permutations, residual_groups  # noqa: E402
 
-from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import (  # noqa: E402
+    FLAGSHIP,
+    FLAGSHIP_THIN,
+    prepare_fit,
+    require_axis_titles,
+)
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
-from multiaxis_eci.config import AXIS_TITLES  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print, two_column_layout  # noqa: E402
 
 # None drops the in-figure title: the post's caption carries the
@@ -133,6 +137,7 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE) -> None:
               f"minority chains ({len(minority)}: "
               + ", ".join(map(str, minority)) + ")")
 
+    AXIS_TITLES = require_axis_titles(TRACE.parent)
     titles = [AXIS_TITLES[f"axis{k + 1}"] for k in range(K)]
     fig = make_subplots(rows=2, cols=2, subplot_titles=titles,
                         vertical_spacing=0.10, horizontal_spacing=0.02)

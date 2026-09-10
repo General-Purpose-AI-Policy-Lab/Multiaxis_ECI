@@ -12,9 +12,13 @@ The package namespace re-exports the full public API so call sites keep
 `from analysis import ...`.
 """
 from multiaxis_eci.analysis.axes import (
-    axis_titles_for,
+    align_to_reference_loadings,
+    axis_names_path,
     axis_top_benchmarks,
-    check_axis_identity,
+    bare_axis_title,
+    load_axis_titles,
+    propose_axis_names,
+    require_axis_titles,
 )
 from multiaxis_eci.analysis.convergence import (
     convergence,
@@ -91,7 +95,8 @@ from multiaxis_eci.analysis.timelines import (
 )
 
 __all__ = [
-    "axis_titles_for", "axis_top_benchmarks", "check_axis_identity",
+    "axis_top_benchmarks", "axis_names_path", "align_to_reference_loadings", "bare_axis_title", "load_axis_titles",
+    "propose_axis_names", "require_axis_titles",
     "convergence",
     "ECITransform", "post_stats", "capability_draws", "flat_C",
     "eci_transform", "eci_affine", "_release_dates",

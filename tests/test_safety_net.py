@@ -1141,7 +1141,7 @@ class TestPublicAPISurface:
             "ppca_spectrum_fig", "write_dashboard", "frontier_trend_fig",
             "forest_grid_fig", "loadings_grid_fig", "subplot_grid",
             "crossover_panels_fig", "exceedance_prob_fig",
-            "FigureStyle", "DASHBOARD", "POST",
+            "FigureStyle", "DASHBOARD", "POST", "FR_TABLE", "translate_fig",
         ],
         "multiaxis_eci.ppc": [
             "compute_gof", "posterior_predictive_mirt",

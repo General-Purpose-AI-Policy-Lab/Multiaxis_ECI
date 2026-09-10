@@ -32,7 +32,6 @@ import argparse
 import sys
 from pathlib import Path
 
-import numpy as np
 import plotly.graph_objects as go
 
 HERE = Path(__file__).resolve().parent
@@ -41,6 +40,7 @@ sys.path.insert(0, str(REPO / "2_model"))
 sys.path.insert(0, str(HERE))
 
 from multiaxis_eci.viz.core import save_html, save_print, save_svg  # noqa: E402
+from multiaxis_eci.viz.i18n import FR_TABLE, translate_fig  # noqa: E402
 
 FR_DIR = HERE / "fr"
 
@@ -56,111 +56,11 @@ POST = {"timeline", "timeline_humanmerge", "trend_majority",
 # words inside them. Applied to every string in the figure, including data
 # arrays (the crossover y categories ARE the tier names); the tokens are
 # alphabetic phrases, so date strings and numbers pass through untouched.
-FR = [
-    # Figure titles and long captions
-    ("AI capability, human baselines and benchmark difficulty on the ECI-H scale",
-     "Capacités des IA, références humaines et difficulté des benchmarks sur l'échelle ECI-H"),
-    ("continues past the window (date shown)",
-     "dépasse la fenêtre (date indiquée)"),
-    ("ability on the agentic axis (median, 95% interval)",
-     "capacité sur l'axe agentique (médiane, intervalle à 95 %)"),
-    ("theta (median, 95% interval)", "theta (médiane, intervalle à 95 %)"),
-    ("ability (median, 95% interval)", "capacité (médiane, intervalle à 95 %)"),
-    ("(median, 95% interval)", "(médiane, intervalle à 95 %)"),
-    ("Per-axis abilities over time", "Capacités par axe au fil du temps"),
-    ("(measured models, 50% intervals)", "(modèles mesurés, intervalles à 50 %)"),
-    # Axis titles
-    ("Axis 1 — Fluid Intelligence", "Axe 1 : Intelligence fluide"),
-    ("Axis 2 — Scientific Knowledge and Reasoning",
-     "Axe 2 : Connaissances et raisonnement scientifiques"),
-    ("Axis 3 — Agentic Capabilities", "Axe 3 : Capacités agentiques"),
-    ("Axis 4 — Legacy QA", "Axe 4 : Questions-Réponses (obsolète)"),
-    # Human tiers, in the post's capitalized style (the dashboard's
-    # HUMAN_LEVEL_LABELS_FR keeps its own lowercase labels)
-    ("Committee of Average Humans", "Comité d'Humains Moyens"),
-    ("Committee of Skilled Generalists", "Comité de Généralistes Qualifiés"),
-    ("Committee of Domain Experts", "Comité d'Experts du Domaine"),
-    ("High School Top Performer", "Lycéen Meilleur Performeur"),
-    ("High School Qualifier", "Lycéen Qualifié"),
-    ("Average Human", "Humain Moyen"),
-    ("Skilled Generalist", "Généraliste Qualifié"),
-    ("Domain Expert", "Expert du Domaine"),
-    ("Top Performer", "Meilleur Performeur"),
-    # Crossover legend
-    ("already behind us", "déjà derrière nous"),
-    ("still ahead", "encore à venir"),
-    ("50% interval (thick)", "intervalle 50 % (épais)"),
-    ("80% interval (thin)", "intervalle 80 % (fin)"),
-    ("95% interval", "intervalle 95 %"),
-    ("50% interval", "intervalle 50 %"),
-    # Chain-mode figures
-    ("majority chains", "chaînes majoritaires"),
-    ("minority chains", "chaînes minoritaires"),
-    # PIT
-    ("calibrated (uniform)", "calibré (uniforme)"),
-    ("density", "densité"),
-    # Axis captions, legend entries, small words — last
-    ("Release date", "Date de sortie"),
-    ("Crossing date", "Date de croisement"),
-    ("Human tiers", "Niveaux humains"),
-    ("human tiers", "niveaux humains"),
-    ("AI models", "Modèles d'IA"),
-    ("Benchmark difficulty", "Difficulté des benchmarks"),
-    ("Benchmarks", "Benchmarks"),
-    ("frontier trend", "tendance de la frontière"),
-    ("median", "médiane"),
-    ("models", "modèles"),
-    ("probability", "probabilité"),   # BEFORE "ability", its substring
-    ("ability", "capacité"),
-    ("today", "aujourd'hui"),
-]
-
-
-def _tr(s: str) -> str:
-    for en, fr in FR:
-        s = s.replace(en, fr)
-    return s
-
-
-def _walk(node):
-    if isinstance(node, str):
-        return _tr(node)
-    if isinstance(node, dict):
-        return {k: _walk(v) for k, v in node.items()}
-    if isinstance(node, (list, tuple)):
-        return [_walk(v) for v in node]
-    if isinstance(node, np.ndarray):
-        # String/object data arrays (e.g. the forest figures' y categories)
-        # must translate WITH the layout's categoryarray, or the categories
-        # split in two and every row loses its label. Numeric arrays pass.
-        if node.dtype.kind in ("U", "S", "O"):
-            return [_walk(v) for v in node.tolist()]
-        return node
-    return node
+FR = FR_TABLE          # the library's table, shared with the per-fit fr/ folders
 
 
 def translate(fig: go.Figure, extra: list[tuple[str, str]] | None = None) -> go.Figure:
-    """A COPY of `fig` with every string field passed through the FR table,
-    then through `extra` (figure-specific replacements applied after it)."""
-    out = go.Figure(_walk(fig.to_plotly_json()))
-    if extra:
-        def _fix(node):
-            if isinstance(node, str):
-                for a, b in extra:
-                    node = node.replace(a, b)
-            return node
-        out = go.Figure(_map_strings(out.to_plotly_json(), _fix))
-    return out
-
-
-def _map_strings(node, fn):
-    if isinstance(node, str):
-        return fn(node)
-    if isinstance(node, dict):
-        return {k: _map_strings(v, fn) for k, v in node.items()}
-    if isinstance(node, (list, tuple)):
-        return [_map_strings(v, fn) for v in node]
-    return node
+    return translate_fig(fig, extra)
 
 
 def _patched(module, extra: list[tuple[str, str]] | None = None):

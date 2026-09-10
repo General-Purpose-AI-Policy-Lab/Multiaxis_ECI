@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -484,7 +485,7 @@ class TestAnalysis:
         import inspect
 
         from multiaxis_eci.analysis import mirt_frontier_forecast
-        from multiaxis_eci.config import AXIS_TITLES, FORECAST_BACKCAST_FLOOR, FORECAST_KW
+        from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
         params = set(inspect.signature(mirt_frontier_forecast).parameters)
         assert set(FORECAST_KW) <= params
         assert FORECAST_KW["fit_basis"] == "envelope"      # flagship identity
@@ -492,7 +493,7 @@ class TestAnalysis:
         assert FORECAST_KW["sd_cap"] == 0.33               # the measured cloud
         # Raw backcast dates on every axis: no clamp configured. Any entry
         # must at least name a real axis and parse as a date.
-        assert set(FORECAST_BACKCAST_FLOOR) <= set(AXIS_TITLES)
+        assert all(re.fullmatch(r"axis\d+", k) for k in FORECAST_BACKCAST_FLOOR)
         for v in FORECAST_BACKCAST_FLOOR.values():
             pd.Timestamp(v)
         assert FORECAST_BACKCAST_FLOOR == {}               # flagship identity

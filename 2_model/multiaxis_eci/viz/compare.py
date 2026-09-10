@@ -12,7 +12,7 @@ _CMP_TYPE_COLOR = {"baseline": "#888780", "exploratory": "#D85A30", "confirmed":
 
 
 def cmp_per_benchmark_rmse_fig(df: pd.DataFrame,
-                               title: str = "Per-benchmark fit (RMSE) — where fits differ") -> go.Figure:
+                               title: str = "Per-benchmark fit (RMSE): where fits differ") -> go.Figure:
     """Benchmark × fit RMSE heatmap. `df`: index=benchmark, columns=fit label."""
     df = df.loc[df.mean(axis=1).sort_values().index]
     fig = go.Figure(go.Heatmap(z=df.values, x=df.columns.tolist(), y=df.index.tolist(),
@@ -40,7 +40,7 @@ def cmp_gof_fig(tab: pd.DataFrame, title: str = "Goodness of fit") -> go.Figure:
 
 
 def cmp_convergence_fig(tab: pd.DataFrame,
-                        title: str = "Convergence — identified r̂ (lower = better mixed)") -> go.Figure:
+                        title: str = "Convergence: identified r̂ (lower = better mixed)") -> go.Figure:
     """Identified r̂ per fit with the 1.01 line; divergence count on each bar."""
     fig = go.Figure(go.Bar(
         x=tab["fit"], y=tab["eta_rhat"],
@@ -55,7 +55,7 @@ def cmp_convergence_fig(tab: pd.DataFrame,
 
 
 def cmp_pit_ecdf_fig(results: list,
-                     title: str = "Calibration — PIT ECDF vs perfect (hugs diagonal = calibrated)") -> go.Figure:
+                     title: str = "Calibration: PIT ECDF vs perfect (hugs diagonal = calibrated)") -> go.Figure:
     """PIT ECDF overlay vs the diagonal. `results`: list of dicts with 'fit' + 'pit'."""
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="perfect",
@@ -129,7 +129,7 @@ def cmp_loo_waic_fig(results: list,
 
 
 def cmp_pareto_k_fig(results: list,
-                     title: str = "LOO reliability — Pareto-k per observation") -> go.Figure:
+                     title: str = "LOO reliability: Pareto-k per observation") -> go.Figure:
     """Stacked bar of Pareto-k categories per fit."""
     names = [r["name"] for r in results]
     fig = go.Figure()
@@ -149,7 +149,7 @@ def cmp_pareto_k_fig(results: list,
 
 
 def cmp_loo_vs_trust_fig(df: pd.DataFrame,
-                         title: str = "Fit vs trust — best ELPD/R² ⇒ worst r̂/ESS") -> go.Figure:
+                         title: str = "Fit vs trust: best ELPD/R² vs worst r̂/ESS") -> go.Figure:
     """Four panels (LOO ΔELPD, R², eta r̂, eta ESS) per fit. `df` sorted by
     loo_elpd ascending; columns: fit, type, loo_elpd, R2, eta_rhat, ess_min,
     ess_med, n_draws.
@@ -211,7 +211,7 @@ _ALIGN_METHOD_COLORS = {"varimax": "#0C447C", "wop": "#e67e22",
 
 
 def alignment_methods_fig(load_df: pd.DataFrame, top_n: int = 10,
-                          title: str = "Rotation methods compared — same trace, four "
+                          title: str = "Rotation methods compared: same trace, four "
                                        "independent post-hoc identifications") -> go.Figure:
     """WHERE the different rotations live for a signed fit: per axis, the mean
     aligned loading of the top benchmarks under each alignment method

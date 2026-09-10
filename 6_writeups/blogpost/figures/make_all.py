@@ -42,11 +42,11 @@ sys.path.insert(0, str(HERE))
 from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
     FLAGSHIP_TRACE,
-    check_axis_identity,
     open_flagship,
     prepare_fit,
+    require_axis_titles,
 )
-from multiaxis_eci.config import AXIS_TITLES, FORECAST_KW  # noqa: E402
+from multiaxis_eci.config import FORECAST_KW  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 
 AXES = ["axis1", "axis2", "axis3"]      # Legacy QA is out of the forecast scope
@@ -56,10 +56,10 @@ END = pd.Timestamp("2030-01-01")        # right edge of the trend figure
 # derive, so it is read off `FLAGSHIP_TRACE` and never off `results_dir`.
 CACHE = FLAGSHIP_TRACE.parent / "lw_forecast_cache_80.pkl"
 
-# The prose titles in AXIS_TITLES are keyed `axis1..4` by position, so they are
-# valid only while the axes keep the identities of config.AXIS_SIGNATURES; a
-# re-fit that reorders them must fail loudly rather than mislabel
-# (`analysis.check_axis_identity`, imported below for the sibling scripts).
+# Axis titles are read from the hand-filled axis_names.json beside the flagship
+# trace (`analysis.require_axis_titles`): the scripts refuse to run until the
+# names are confirmed and each axis still carries its signature benchmarks.
+AXIS_TITLES: dict[str, str] = {}
 
 
 @lru_cache(maxsize=1)
@@ -72,7 +72,7 @@ def load_flagship():
     idata = open_flagship(keep=["A", "theta", "tau_A"])
     data, *_ = FLAGSHIP.load_data(idata)
     view = prepare_fit(idata, data)
-    check_axis_identity(view, data)
+    AXIS_TITLES.update(require_axis_titles(FLAGSHIP_TRACE.parent, view, data))
     missing = [a for a in AXES if a not in view.names]
     if missing:
         raise SystemExit(f"axes {missing} not in the fit: {view.names}")

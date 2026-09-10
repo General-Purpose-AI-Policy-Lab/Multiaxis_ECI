@@ -174,7 +174,7 @@ def chain_page(nd, chain):
     ax.set_xlim(-1.15, 4.2)
     ax.set_ylim(y - 0.5, 1.0)
     ax.axis("off")
-    ax.set_title(f"chain '{chain}' ({sub.vendor.iloc[0]}) — {len(sub)} nodes, "
+    ax.set_title(f"chain '{chain}' ({sub.vendor.iloc[0]}): {len(sub)} nodes, "
                  f"{len(sub) - 1} steps, {sub.n_models.sum()} test-takers\n"
                  f"psi[node] = founder + Σ steps; theta = psi[node] + offset[group]",
                  fontsize=8.5, loc="left")

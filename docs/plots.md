@@ -27,6 +27,10 @@ Every `figures/` folder holds the PNGs, with the interactive Plotly twins under 
 
 One fit writes one PNG (and one HTML) per figure into its own `figures/k{K}/`. K is in that folder name, so a K=3 and a K=4 run of one flag set share their tables and traces but never their figures.
 
+When `diagnose_chains.py --write-modes` has found more than one posterior mode for the trace, the folder holds the **majority chains'** figures (file names end in `_majority`, titles name the chains) and a `minority/` subfolder holds the same set on every other chain (`_minority`); both groups are put back on the fit's display frame through `mirt_loadings.csv`, so axis k is the same axis in both. The figures a write-up would embed (per-axis timelines and forecasts, `forests_per_axis`, `loadings_per_axis`, `gof_pit`, `axes_timeline_compare`) are also rendered in French under `fr/` (`_fr` suffix) through the shared string table of `viz/i18n.py`, the same table the blog post's French renders use.
+
+**Axis names are given by hand.** Nothing in the code names an axis. The fit and the plotting CLI write an `axis_names.json` template beside the trace when none exists (each axis's top benchmarks by share, empty titles, `confirmed: false`), and every figure calls the axes `Axis 1`, `Axis 2`, ... until a person fills in the titles and two or three signature benchmarks and sets `confirmed: true`. A confirmed title is applied only while one of its signature benchmarks stays among the axis's top benchmarks (`analysis.load_axis_titles`); the blog post's scripts refuse to run on unconfirmed or drifted names (`analysis.require_axis_titles`). The published fit's names live in `5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`.
+
 Every figure is English by default; builders that carry text take `lang="fr"`, and the canonical fit writes that render of its `capability_timeline` under `figures/fr/`. That figure is the post's figure 1 drawn by the same `capability_timeline_fig`: anchored ECI-H scale, 80% intervals, and the interval of the bottom and top human tiers (Average Human, Top Performer) as a faint band, so the human ladder's bounds read as uncertain. The country-frontier figure draws the same two bands.
 
 ## The commands
@@ -177,8 +181,8 @@ slope flipped sign between the posterior mean and median). Until 2026-09-10 the
 remedy was an axis index (`FORECAST_NO_SOTA_AXES = {3}`), which a refit with
 another fourth axis turned into a trend fitted on 2 points under a cloud of 123;
 the uncertainty rule needs no axis identity. Titles, too, follow identity:
-`analysis.axis_titles_for` applies `config.AXIS_TITLES` only to axes whose
-top benchmarks match `config.AXIS_SIGNATURES`.
+`analysis.load_axis_titles` applies a hand-confirmed title only to an axis whose
+top benchmarks still contain one of its signature benchmarks (`axis_names.json`).
 
 ## Memory
 

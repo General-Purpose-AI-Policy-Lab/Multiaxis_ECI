@@ -48,6 +48,7 @@ from multiaxis_eci.analysis import (
     loadings_table,
     mirt_identified_rhat,
     prepare_fit,
+    propose_axis_names,
     sota_stats_df,
     spec_json,
     tau_spectrum_df,
@@ -636,6 +637,9 @@ def run_exploration(args, parser) -> None:
     # frame otherwise), so these CSVs and the dashboard cannot read the fit in
     # different frames.
     view = prepare_fit(idata_k, data)
+    if view.K >= 2:
+        # Names are given by hand: write the template beside the trace if it is missing.
+        propose_axis_names(view, data, results_dir)
 
     # tau spectrum is a PRE-rotation quantity: rotation mixes axes and would
     # scramble the per-axis scales, so dimensionality is read here, first.

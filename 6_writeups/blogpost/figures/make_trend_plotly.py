@@ -31,9 +31,13 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 sys.path.insert(0, str(REPO / "2_model"))   # the pickle holds analysis.ForecastResult
 sys.path.insert(0, str(HERE))
-from multiaxis_eci.analysis import FLAGSHIP, FLAGSHIP_THIN, prepare_fit  # noqa: E402
+from multiaxis_eci.analysis import (  # noqa: E402
+    FLAGSHIP,
+    FLAGSHIP_THIN,
+    prepare_fit,
+    require_axis_titles,
+)
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
-from multiaxis_eci.config import AXIS_TITLES as TITLES  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.viz import POST, frontier_trend_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
@@ -63,16 +67,17 @@ def forecast(trace: Path, cached: bool = False,
     display frame first, exactly as in `make_crossover_plotly`.
     """
     if chains is not None:
-        from make_all import check_axis_identity, compute
-        from make_crossover_plotly import _display_frame
+        from make_all import compute
+
+        from multiaxis_eci.analysis import align_to_reference_loadings
 
         idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
                                         thin=FLAGSHIP_THIN, chains=chains,
                                         path=trace)
         data, *_ = FLAGSHIP.load_data(idata)
         view = prepare_fit(idata, data)
-        view = _display_frame(view, data, trace)
-        check_axis_identity(view, data)
+        view = align_to_reference_loadings(view, data, trace.parent / "mirt_loadings.csv")
+        require_axis_titles(trace.parent, view, data)
         return compute(view, data, pd.read_csv(PROCESSED_FILE))
     cache = trace.parent / "lw_forecast_cache_80.pkl"
     if cache.exists():
@@ -88,13 +93,13 @@ def forecast(trace: Path, cached: bool = False,
     if cached:
         raise SystemExit(f"--cached but {cache} is missing — run without "
                          "--cached once to rebuild it from the trace.")
-    from make_all import check_axis_identity, compute
+    from make_all import compute
 
     idata = FLAGSHIP.open_posterior(keep=["A", "theta", "tau_A"],
                                     thin=FLAGSHIP_THIN, chains=None, path=trace)
     data, *_ = FLAGSHIP.load_data(idata)
     view = prepare_fit(idata, data)
-    check_axis_identity(view, data)
+    require_axis_titles(trace.parent, view, data)
     per_axis = compute(view, data, pd.read_csv(PROCESSED_FILE))
     cache.write_bytes(pickle.dumps(per_axis))
     print(f"  wrote {cache}")
@@ -105,7 +110,8 @@ def main(trace: Path = TRACE, tag: str = "", out_dir: Path = HERE,
          cached: bool = False, chains: list[int] | None = None) -> None:
     out = out_dir / f"forecast_trend_plotly{tag}"
     per_axis = forecast(trace, cached=cached, chains=chains)
-    fig = frontier_trend_fig(per_axis, AXES, TITLES, style=POST, window=(X0, X1), title=TITLE)
+    titles = require_axis_titles(trace.parent)      # confirmed names, checked at cache time
+    fig = frontier_trend_fig(per_axis, AXES, titles, style=POST, window=(X0, X1), title=TITLE)
     for name in AXES:
         d = per_axis[name]
         print(f"  {name}: {len(d['tl'])} models, slope median "

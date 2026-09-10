@@ -247,7 +247,7 @@ def make_loadings_pdf(loadings, agree, df, prep, out_pdf, n_load_axes=3, top=12)
             ax.axvline(0, color="k", lw=0.8)
             pct = df["expl_var_pct_total"].iloc[r]
             ax.set_xlabel("Loading   (sign of benchmark's contribution to the axis)")
-            ax.set_title(f"Axis {r+1} — {pct:.0f}% of total variance\n"
+            ax.set_title(f"Axis {r+1}: {pct:.0f}% of total variance\n"
                          f"top {top} benchmarks by |loading|   "
                          f"(% = sign agreement across posterior draws)", fontsize=10)
             ax.grid(axis="x", ls=":", alpha=0.5, zorder=0)

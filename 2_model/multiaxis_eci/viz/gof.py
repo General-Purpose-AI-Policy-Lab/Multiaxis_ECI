@@ -210,10 +210,10 @@ def benchmark_obs_vs_pred_fig(scores: np.ndarray,
         buttons.append(dict(
             label=f"{b} ({len(obs_of_bench[b])})", method="update",
             args=[{"visible": vis},
-                  {"title.text": f"Raw scores vs predictions — {b}"}],
+                  {"title.text": f"Raw scores vs predictions: {b}"}],
         ))
     fig.update_layout(
-        title=f"Raw scores vs predictions — {benches[default]}",
+        title=f"Raw scores vs predictions: {benches[default]}",
         updatemenus=[dict(buttons=buttons, active=default,
                           x=1.0, xanchor="right", y=1.18, yanchor="top")],
         xaxis_title="models, ranked by observed score",
@@ -276,10 +276,10 @@ def benchmark_icc_fig(eta_of_obs: np.ndarray,
         buttons.append(dict(
             label=f"{b} ({len(obs_of_bench[b])})", method="update",
             args=[{"visible": vis},
-                  {"title.text": f"Item characteristic curve — {b}"}],
+                  {"title.text": f"Item characteristic curve: {b}"}],
         ))
     fig.update_layout(
-        title=f"Item characteristic curve — {benches[default]}",
+        title=f"Item characteristic curve: {benches[default]}",
         updatemenus=[dict(buttons=buttons, active=default,
                           x=1.0, xanchor="right", y=1.18, yanchor="top")],
         xaxis=dict(title="ability − difficulty  (A·θ − D, logits)"),

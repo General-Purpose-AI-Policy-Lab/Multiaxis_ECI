@@ -1,0 +1,62 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "signature": [],
+      "top_benchmarks": [
+        "DeepSWE",
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "MCP Atlas",
+        "OTIS Mock AIME 2024-2025",
+        "CritPt",
+        "MATH Level 5",
+        "AudioMultiChallenge"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "signature": [],
+      "top_benchmarks": [
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "MMLU",
+        "GSM8K",
+        "CyberGym",
+        "Chess Puzzles",
+        "MMLU Pro Biology",
+        "GDPval"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OSWorld",
+        "CyScenarioBench",
+        "MirrorCode",
+        "GBAEval",
+        "CTI-REALM",
+        "FrontierSWE v2",
+        "PostTrainBench v1.1",
+        "OSWorld 2.0"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "signature": [],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "DeepResearch Bench",
+        "Balrog",
+        "EBR-bench",
+        "HellaSwag",
+        "SimpleBench",
+        "TriviaQA",
+        "OpenBookQA"
+      ]
+    }
+  }
+}
