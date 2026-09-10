@@ -78,7 +78,7 @@ The post's figures are the same builders as the outputs at another scale: each b
 Names below are the figure keys; on the dashboard each is one panel. On disk the
 name is the explicit form of the key (`viz.figure_filename`): `timeline_2_reasoning`
 becomes `timeline_axis2_reasoning.png`, `forecast_1_math_when` becomes
-`forecast_axis1_math_crossover_dates.png`; other keys are unchanged.
+`forecast_axis1_math_crossover_dates.png`; a slug that only repeats the axis (`timeline_1_axis1`) is dropped, giving `timeline_axis1.png`; other keys are unchanged.
 
 ### Goodness of fit
 

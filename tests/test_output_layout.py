@@ -40,6 +40,10 @@ def test_figure_filenames_are_explicit():
     assert figure_filename("timeline_1_math_all") == "timeline_axis1_math_all"
     assert figure_filename("loadings_3_agentic") == "loadings_axis3_agentic"
     assert figure_filename("forecast_1_math_when") == "forecast_axis1_math_crossover_dates"
+    # Unnamed axes: the slug repeats the axis and is dropped rather than doubled.
+    assert figure_filename("timeline_1_axis1") == "timeline_axis1"
+    assert figure_filename("timeline_1_axis1_all") == "timeline_axis1_all"
+    assert figure_filename("forecast_3_axis3_when") == "forecast_axis3_crossover_dates"
     for unchanged in ("gof_pit", "timeline_difficulty", "loadings_heatmap", "hyperparameters"):
         assert figure_filename(unchanged) == unchanged
 

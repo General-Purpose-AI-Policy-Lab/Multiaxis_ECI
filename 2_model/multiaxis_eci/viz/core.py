@@ -34,7 +34,9 @@ def figure_filename(key: str) -> str:
     Figure keys stay short because the dashboard and the blog post address panels
     by them; files get the explicit form: `timeline_2_reasoning` ->
     `timeline_axis2_reasoning`, `forecast_1_math_when` ->
-    `forecast_axis1_math_crossover_dates`. Other keys are unchanged.
+    `forecast_axis1_math_crossover_dates`. A slug that merely repeats the axis
+    (`forecast_1_axis1_when`, the unnamed-axis case) is dropped rather than
+    doubled: `forecast_axis1_crossover_dates`. Other keys are unchanged.
     """
     m = _AXIS_KEY.match(key)
     if m is None:
@@ -44,6 +46,10 @@ def figure_filename(key: str) -> str:
         if rest.endswith(short):
             rest = rest[: -len(short)] + long
             break
+    if rest == f"axis{k}":
+        return f"{kind}_axis{k}"
+    if rest.startswith(f"axis{k}_"):
+        rest = rest[len(f"axis{k}_"):]
     return f"{kind}_axis{k}_{rest}"
 
 
