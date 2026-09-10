@@ -45,10 +45,10 @@ Every output goes under `5_outputs/<data generation>/`: `5_outputs/data20260908/
 
 ## Run
 
-Main project fit with K=4.
+Main project fit with K=4, at full length (an exploration fit without `--draws` samples 2,000 x 2,000 per chain, a quarter of the run):
 
 ```bash
-python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm
+python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --draws 10000 --tune 2000
 ```
 
 Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and 16,000 saved draws pin every median and interval the figures show.

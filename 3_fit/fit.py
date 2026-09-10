@@ -782,8 +782,10 @@ def main():
                              "humans in, full ECI deliverables → <data generation>/canonical/")
     # Shared sampling controls.
     parser.add_argument("--draws", type=int, default=None,
-                        help="posterior draws per chain (default: config.SAMPLE_KW "
-                             "for canonical, 2000 for exploration)")
+                        help="posterior draws per chain (default: config.SAMPLE_KW, "
+                             "10000 draws, with --preset canonical; 2000 for an "
+                             "exploration fit, so pass --draws 10000 --tune 2000 for a "
+                             "full-length K-axis fit)")
     parser.add_argument("--tune", type=int, default=None,
                         help="tuning steps per chain (same defaults as --draws)")
     parser.add_argument("--chains", type=int, default=None,
