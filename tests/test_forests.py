@@ -45,6 +45,12 @@ def test_forest_rows_and_family_collapse():
     # release is a frontier row even outside the top n; the tier is a human row.
     assert list(df["kind"]) == ["frontier", "human", "model", "model", "model", "model"]
     assert df["mean"].is_monotonic_increasing
+    # Pinned releases are families too: a pinned effort whose family already has a row
+    # adds nothing; a pinned family outside the top rows joins as its best effort.
+    (fam,) = forest_frames(view, data, n_top=2, pinned={"gpt-5-2025-08-07", "llama-3-70b"},
+                           by_family=True, **gate)
+    assert list(fam["kind"]) == ["frontier", "human", "model", "model"]
+    assert fam.loc[fam["kind"] == "frontier", "name"].item() == "Llama 3 70b"
     (fam,) = forest_frames(view, data, n_top=4, pinned=set(), by_family=True, **gate)
     models = fam[fam["kind"] == "model"]
     # One row per release, its best effort: gpt-5 high, claude opus 4.7 max, llama.

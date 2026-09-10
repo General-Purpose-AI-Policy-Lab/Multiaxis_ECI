@@ -49,9 +49,22 @@ def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top
             ranked = [i for i in ranked
                       if not (model_family(names[i]) in seen or seen.add(model_family(names[i])))]
         top = ranked[:n_top]
+        if by_family:
+            # A pinned release is a family here too: it joins as its best effort, and only
+            # when no effort of that family is already among the top rows.
+            shown = {model_family(names[i]) for i in top}
+            pinned_fams = {model_family(p) for p in pinned} - shown
+            frontier = []
+            for fam_name in sorted(pinned_fams):
+                members = [i for i in range(len(names))
+                           if not is_h[i] and model_family(names[i]) == fam_name]
+                if members:
+                    frontier.append(max(members, key=lambda i: med[i]))
+        else:
+            frontier = [i for i in range(len(names))
+                        if names[i] in pinned and not is_h[i] and i not in top]
         rows = ([(i, "model") for i in top]
-                + [(i, "frontier") for i in range(len(names))
-                   if names[i] in pinned and not is_h[i] and i not in top]
+                + [(i, "frontier") for i in frontier]
                 + [(i, "human") for i in np.where(is_h)[0]])
         rows.sort(key=lambda r: med[r[0]])
         full = [names[i] if is_h[i] else pretty_model_name(names[i]) for i, _ in rows]
