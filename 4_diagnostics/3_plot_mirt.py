@@ -80,14 +80,6 @@ PLOT_VARS = ("A", "theta", "theta_pos", "tau_A", "D", "phi_b", "alpha", "ceiling
 # per-axis timelines and forecasts, the forests, the loadings, the PIT.
 MAIN_FIGURE_PREFIXES = {"timeline", "forecast"}
 MAIN_FIGURES = {"forests_per_axis", "loadings_per_axis", "gof_pit", "axes_timeline_compare"}
-# Figures that describe the WHOLE fit (posterior predictive, calibration, the K-vs-1D
-# block): computed once on every chain, written to the fit's folder only, never titled
-# with a chain group. A mode view is an ability-side statement.
-WHOLE_FIT_KEYS = {"pit_ecdf", "factor1_vs_1d", "pred_k_vs_k1", "r2_delta_per_bench"}
-
-
-def is_whole_fit(name: str) -> bool:
-    return name.startswith("gof_") or name in WHOLE_FIT_KEYS
 
 
 def chain_split(trace_path, n_chains: int) -> dict | None:
@@ -159,18 +151,16 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     idata_1d = (spec.open_posterior(keep=PLOT_VARS, thin=thin, path=base)
                 if base.exists() and base != trace_path else None)
 
-    # The posterior predictive and its GoF are whole-fit numbers (docs/plots.md):
-    # computed once here, on every chain, and shared by every render below.
-    yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff)
-    mu = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff, return_mean=True)
-    gof = compute_gof(yrep, data, mu)
     fr_extra = axis_title_translations(results_dir)
 
     def render(idata, view, figures_dir: Path, suffix: str, note: str, fr_dir: Path) -> dict:
         """The figure set for one posterior (the fit, or one chain group), saved
         under `figures_dir` with `suffix` in every file name, the main figures
-        also in French under `fr_dir` (one `fr/` for the whole fit). Whole-fit
-        figures (`is_whole_fit`) are written only into the fit's own folder."""
+        also in French under `fr_dir` (one `fr/` for the whole fit). Every figure,
+        the posterior predictive and its calibration included, follows the
+        posterior it is given: a chain group is a mode of its own, and its
+        predictive is that mode's, where the pooled predictive would mix two
+        incompatible solutions. Whole-fit metrics live in the fit's tables."""
         figures_dir.mkdir(parents=True, exist_ok=True)
         axis_titles = (load_axis_titles(results_dir, view, data)
                        if K >= 2 and view.A is not None else None)
@@ -178,6 +168,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
         mod = data.mlookup.sort_values("model_idx")["model"].tolist()
         # ── canonical per-fit figure set (shared with the dashboard) ──────────────
+        yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff)
+        mu = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff,
+                                       return_mean=True)
+        gof = compute_gof(yrep, data, mu)
         figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                  forecast=forecast, axis_titles=axis_titles)
         figs["pit_ecdf"] = pit_ecdf_fig(gof.pit)
@@ -248,9 +242,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                 figs["r2_delta_per_bench"] = per_bench_r2_delta_fig(bench_df)
 
         if note:
-            for name, fig in figs.items():
-                if is_whole_fit(name):
-                    continue
+            for fig in figs.values():
                 t = fig.layout.title.text
                 if t:
                     fig.update_layout(title_text=f"{t} · {note}")
@@ -260,20 +252,15 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                     fig.update_layout(title=dict(text=note, x=0.5),
                                       margin_t=max(fig.layout.margin.t or 0, 110))
         for name, fig in figs.items():
-            whole = is_whole_fit(name)
-            if whole and figures_dir != root_dir:
-                continue                      # whole-fit figures live in the fit's folder
-            tag = "" if whole else suffix
-            save_fig(fig, figure_filename(name) + tag, figures_dir)
+            save_fig(fig, figure_filename(name) + suffix, figures_dir)
             if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES:
-                save_fig(translate_fig(fig, fr_extra), figure_filename(name) + tag + "_fr",
+                save_fig(translate_fig(fig, fr_extra), figure_filename(name) + suffix + "_fr",
                          fr_dir)
         print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
               f"MAE={gof.metrics['mae']:.3f}")
         print(f"figures → {figures_dir}")
         return figs
 
-    root_dir = figures_dir
     split = chain_split(trace_path, int(idata.posterior.sizes["chain"]))
     if split is None:
         render(idata, view_all, figures_dir, "", "", figures_dir / "fr")

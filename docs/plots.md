@@ -27,7 +27,7 @@ Every `figures/` folder holds the PNGs, with the interactive Plotly twins under 
 
 One fit writes one PNG (and one HTML) per figure into its own `figures/k{K}/`. K is in that folder name, so a K=3 and a K=4 run of one flag set share their tables and traces but never their figures.
 
-When `diagnose_chains.py --write-modes` has found more than one posterior mode for the trace, the folder holds the **majority chains'** figures (file names end in `_majority`, titles name the chains) and a `minority/` subfolder holds the same set on every other chain (`_minority`); both groups are put back on the fit's display frame through `mirt_loadings.csv`, so axis k is the same axis in both. The figures a write-up would embed (per-axis timelines and forecasts, `forests_per_axis`, `loadings_per_axis`, `gof_pit`, `axes_timeline_compare`) are also rendered in French under one `fr/` folder for both chain groups (`_majority_fr`, `_minority_fr`) through the shared string table of `viz/i18n.py`, the same table the blog post's French renders use.
+When `diagnose_chains.py --write-modes` has found more than one posterior mode for the trace, the folder holds the **majority chains'** figures (file names end in `_majority`, titles name the chains) and a `minority/` subfolder holds the same set on every other chain (`_minority`); both groups are put back on the fit's display frame through `mirt_loadings.csv`, so axis k is the same axis in both. Every figure in a group's folder, the posterior predictive and the PIT included, is computed on that group's draws: a chain group is a posterior mode of its own, and its predictive distribution is that mode's, where the pooled predictive would mix two incompatible solutions. The whole-fit numbers stay in the fit's tables (`gof.json`, `summary.csv`) and on the dashboard card. The figures a write-up would embed (per-axis timelines and forecasts, `forests_per_axis`, `loadings_per_axis`, `gof_pit`, `axes_timeline_compare`) are also rendered in French under one `fr/` folder for both chain groups (`_majority_fr`, `_minority_fr`) through the shared string table of `viz/i18n.py`, the same table the blog post's French renders use.
 
 **Axis names are given by hand.** Nothing in the code names an axis. The fit and the plotting CLI write an `axis_names.json` template beside the trace when none exists (each axis's top benchmarks by share, empty titles, `confirmed: false`), and every figure calls the axes `Axis 1`, `Axis 2`, ... until a person fills in the titles (and `title_fr` for the French renders) and two or three signature benchmarks and sets `confirmed: true`. A confirmed title is applied only while one of its signature benchmarks stays among the axis's top benchmarks (`analysis.load_axis_titles`); the blog post's scripts refuse to run on unconfirmed or drifted names (`analysis.require_axis_titles`). The published fit's names live in `5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`.
 
@@ -144,10 +144,13 @@ same results folder.
 model's axis ability from a figure when its posterior SD is at or above
 `config.INFORMED_SD_CAP` (0.33, a 95% interval width of about 1.3) or when the
 model is flagged low-observation, SOTA families excepted. It never touches the
-fit and never touches a diagnostic: convergence, PPC, PIT, GoF and LOO always
-describe the whole fit. The same holds for a mode-restricted dashboard card,
-which is an addition to the whole-fit figures, not a replacement. The K=1 ECI-H
-timeline of the canonical fit draws every dated model.
+fit and never touches a diagnostic: convergence, PPC, PIT, GoF and LOO are
+computed on every draw of the posterior they describe, never on a plot-side
+subset of models. On the dashboard that posterior is the whole fit, and a
+mode-restricted card is an addition to the whole-fit figures, not a replacement;
+in a fit's own figure folder it is the chain group the folder shows (see
+"Where figures go"). The K=1 ECI-H timeline of the canonical fit draws every
+dated model.
 
 **SOTA models are exempt from that drop.** Models of the `config.SOTA_FAMILIES` releases
 stay on every timeline even when sparse and wide, because a frontier release
