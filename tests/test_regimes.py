@@ -8,8 +8,10 @@ import pandas as pd
 import pytest
 
 from multiaxis_eci.analysis import (
+    family_best,
     frontier_topk,
     is_reasoning,
+    one_per_org_day,
     regime_crossover_df,
     two_regime_forecast,
     weighted_line_fit,
@@ -66,6 +68,7 @@ def test_two_regime_forecast_and_crossings():
                        "mean": np.median(theta[:, :16, 0], 0)})
     fc = two_regime_forecast(theta, 0, data, tl, top_k=2, hdi_prob=0.8, horizon_date="2030-01-01")
     assert fc.fit_basis == "regimes" and fc.other is not None
+    assert set(fc.frontier_names) == set(fc.fit_names) | set(fc.other.fit_names)
     assert abs(np.median(fc.slope) - 0.9) < 0.2 and abs(np.median(fc.other.slope) - 0.3) < 0.15
     assert pd.Timestamp(fc.grid_dates[0]) == pd.Timestamp("2024-09-01")          # from the switch
     assert pd.Timestamp(fc.other.grid_dates[-1]) <= pd.Timestamp("2024-06-01")   # to its last point
@@ -81,6 +84,62 @@ def test_two_regime_forecast_and_crossings():
     assert pd.Timestamp("2024-08-01") < avg.crossover_date_median <= pd.Timestamp("2024-09-02")
     with pytest.raises(ValueError):
         two_regime_forecast(theta, 0, data, tl[tl["name"].str.startswith("llama")], top_k=2)
+
+
+def test_family_best_keeps_one_effort_per_release():
+    tl = pd.DataFrame({"name": ["gpt-5-2025-08-07_high", "gpt-5-2025-08-07", "gpt-5-2025-08-07_low",
+                                "claude-opus-4-7_max", "llama-3-70b"],
+                       "release_date": pd.to_datetime(["2025-08-07"] * 3 + ["2026-01-01", "2024-04-18"]),
+                       "mean": [1.0, 0.7, 0.4, 1.2, -0.3]})
+    best = family_best(tl)
+    assert sorted(best["name"]) == ["claude-opus-4-7_max", "gpt-5-2025-08-07_high", "llama-3-70b"]
+    assert best.set_index("name").loc["gpt-5-2025-08-07_high", "mean"] == 1.0
+
+
+def test_one_per_org_day_pools_simultaneous_siblings():
+    """o1-mini and o1-preview (OpenAI, 2024-09-12) count as one frontier point, the better one;
+    a different organization the same day, or a name outside the models table, is kept."""
+    tl = pd.DataFrame({"name": ["o1-mini-2024-09-12_high", "o1-preview-2024-09-12",
+                                "claude-3-5-sonnet-20240620", "synthetic-x"],
+                       "release_date": pd.to_datetime(["2024-09-12", "2024-09-12", "2024-09-12",
+                                                       "2024-09-12"]),
+                       "mean": [0.4, 0.6, 0.5, 0.1]})
+    kept = one_per_org_day(tl)
+    assert sorted(kept["name"]) == ["claude-3-5-sonnet-20240620", "o1-preview-2024-09-12",
+                                    "synthetic-x"]
+
+
+def test_reasoning_frontier_starts_below_the_non_reasoning_records():
+    """The reasoning fit set is the top-2 frontier AMONG reasoning families: early reasoning
+    releases below the non-reasoning records still anchor the reasoning line, and a family's
+    lesser efforts never join the fit. The others' set is the non-reasoning part of the
+    frontier over every family, so it stops when reasoning models take over."""
+    rng = np.random.default_rng(2)
+    others = [(f"llama-{i}", pd.Timestamp("2023-01-01") + pd.DateOffset(months=4 * i), 0.5 + 0.1 * i)
+              for i in range(8)]                                        # up to 1.2 by 2025-05
+    # Reasoning: starts at 0.0 in 2024-09, well under the llamas, climbs to 2.1 by 2026-06;
+    # each release also has a weaker "_low" effort that must not enter the fit.
+    reason, low = [], []
+    for i in range(8):
+        d = pd.Timestamp("2024-09-01") + pd.DateOffset(months=3 * i)
+        reason.append((f"o3-2025-01-01_v{i}_high", d, 0.0 + 0.3 * i))
+        low.append((f"o3-2025-01-01_v{i}_low", d, -0.5 + 0.3 * i))
+    rows = others + reason + low
+    names = [n for n, _, _ in rows] + ["Average Human", "Top Performer"]
+    level = np.array([m for _, _, m in rows] + [0.0, 2.5])
+    theta = level[None, :, None] + rng.normal(0, 0.1, (300, len(names), 1))
+    data = _Data(pd.DataFrame({"model": names, "model_idx": np.arange(1, len(names) + 1)}),
+                 np.array([False] * len(rows) + [True, True]))
+    tl = pd.DataFrame({"name": names[:len(rows)], "release_date": [d for _, d, _ in rows],
+                       "mean": np.median(theta[:, :len(rows), 0], 0)})
+    fc = two_regime_forecast(theta, 0, data, tl, top_k=2)
+    assert pd.Timestamp(fc.grid_dates[0]) == pd.Timestamp("2024-09-01")   # first reasoning release
+    assert all(n.endswith("_high") for n in fc.fit_names) and len(fc.fit_names) == 8
+    assert abs(np.median(fc.slope) - 1.2) < 0.25                           # 0.3 per quarter
+    # The llamas held the frontier until the reasoning line passed 1.2 (~2025-09); the
+    # others' fit set is exactly those frontier llamas and their line ends there.
+    assert set(fc.other.fit_names) <= {n for n, _, _ in others}
+    assert pd.Timestamp(fc.other.grid_dates[-1]) <= pd.Timestamp("2025-06-01")
 
 
 def test_rgba_accepts_hex_and_rgb():

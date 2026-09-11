@@ -46,7 +46,6 @@ from multiaxis_eci.analysis import (  # noqa: E402
     prepare_fit,
     require_axis_titles,
 )
-from multiaxis_eci.config import FORECAST_KW  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 
 AXES = ["axis1", "axis2", "axis3"]      # Legacy QA is out of the forecast scope
@@ -117,7 +116,7 @@ def forests(out_dir: Path) -> Path:
     from multiaxis_eci.viz.core import save_print
 
     view, data, raw = load_flagship()
-    frames = forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A)
+    frames = forest_frames(view, data, raw, A_draws=view.A)
     fig = forest_grid_fig(frames, [AXIS_TITLES[n] for n in view.names], title=None,
                           style=POST, collapse_frontier=True,
                           col_domains=[(0.0, 0.27), (0.73, 0.96)])
@@ -140,7 +139,8 @@ def loadings(out_dir: Path, top_n: int = 20) -> Path:
 
 
 def axis_timelines(out_dir: Path) -> Path:
-    """Per-axis ability over release date, the measured cloud (config.INFORMED_SD_CAP).
+    """Per-axis ability over release date, the candidates evaluated on the axis
+    (`candidate_mask`, config.MIN_AXIS_COVERAGE).
 
     The panels come from `viz.dashboard.build_axis_figures`, the same builder the
     dashboard cards use, so the post cannot drift from the card.

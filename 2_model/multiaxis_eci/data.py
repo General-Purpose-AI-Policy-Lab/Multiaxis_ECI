@@ -325,7 +325,7 @@ def _identity() -> pd.DataFrame:
     global _IDENTITY
     if _IDENTITY is None:
         cols = ["model_version", "base_model", "snapshot", "reasoning_level", "reasoning_tokens",
-                "variant"]
+                "variant", "organization"]
         table = pd.read_csv(MODELS_FILE, dtype=str).fillna("")[cols]
         _IDENTITY = table.drop_duplicates("model_version").set_index("model_version")
     return _IDENTITY
@@ -344,6 +344,12 @@ def model_family(model_version: str) -> str:
         row = ident.loc[model_version]
         return row["base_model"] + (f"@{row['snapshot']}" if row["snapshot"] else "")
     return _effort_base(model_version)
+
+
+def model_organization(model_version: str) -> str:
+    """The organization of a test-taker per the models table; "" when the name is not in it."""
+    ident = _identity()
+    return str(ident.loc[model_version, "organization"]) if model_version in ident.index else ""
 
 
 def is_bare(model_version: str) -> bool:
@@ -546,12 +552,10 @@ class ECIData:
     # likelihood split (models/mirt.py); see load_eci_data for the conversion.
     # None on a hand-built ECIData, which is what known_se=True rejects.
     n_eff: np.ndarray | None = None
-    # (n_models,) bool — True for models of a config.SOTA_FAMILIES release. Parallels
-    # is_low_obs / is_human: the MIRT axis timelines, the forecast candidates and the
-    # country frontier keep SOTA models (e.g. sparse new frontier releases) even when
-    # their posterior is wide (analysis.timelines.candidate_mask); the K=1 ECI-H
-    # timeline draws every dated model anyway. Defaults to None so existing
-    # constructors (tests, replace()) don't have to supply it.
+    # (n_models,) bool — True for models of a config.SOTA_FAMILIES release. Since
+    # 2026-09-11 it no longer gates any figure (analysis.timelines.candidate_mask has no
+    # SOTA exemption); the SOTA tables and the legacy forecast bases still read it.
+    # Defaults to None so existing constructors (tests, replace()) don't have to supply it.
     is_sota: np.ndarray | None = None
 
 

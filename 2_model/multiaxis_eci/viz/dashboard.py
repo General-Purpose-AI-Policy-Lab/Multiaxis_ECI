@@ -140,9 +140,10 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
             fig.update_layout(title=dict(text=f"{disp}: measured (50% intervals){suffix}", x=0.5),
                               yaxis=dict(title=y_label))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}"] = fig
-        # ALL-models companion — every dated model, incl. sparse/extrapolated (wide CI).
-        tl_all = rescale_frame(mirt_model_timeline_df(theta, k, data, raw, sd_cap=None,
-                                                      drop_low_obs=False), k, affine)
+        # ALL-models companion: every dated model, the ones not evaluated on the axis
+        # included, with their prior-wide intervals.
+        tl_all = rescale_frame(mirt_model_timeline_df(theta, k, data, raw, A_draws=A,
+                                                      min_coverage=0.0), k, affine)
         if not tl_all.empty:
             fig_all = capability_timeline_fig(tl_all, human_stats=hstat,
                                               human_labels=human_labels)
@@ -182,7 +183,7 @@ def forecast_figures(view, data, raw, names, th_fc,
 
     ONE definition for both the dashboard card and the forecast-only re-render
     (`4_diagnostics/forecast_only.py`), so the two cannot drift apart on
-    fit_basis, sd_cap or the SOTA rule. `th_fc` is the ability array to forecast on, in the frame the
+    fit_basis or the candidate gate. `th_fc` is the ability array to forecast on, in the frame the
     caller's timelines already use. `axis_titles` swaps display text only,
     same convention as `build_axis_figures`.
     """
@@ -200,11 +201,11 @@ def forecast_figures(view, data, raw, names, th_fc,
     y_label = ability_label(affine)
     for k in range(K):
         disp = titles.get(names[k], names[k])
-        # The measured cloud (config.INFORMED_SD_CAP, low-obs dropped, SOTA
-        # families exempt: `candidate_mask`) and the frontier forecast of
-        # config.FORECAST_KW (envelope basis) fitted on that same cloud, so
-        # every fitted point is a plotted point. Whiskers, human tiers and the
-        # forecast band are all 80% HDIs, the post's convention.
+        # The candidates evaluated on the axis (`candidate_mask`,
+        # config.MIN_AXIS_COVERAGE) and the two-regime forecast of
+        # config.FORECAST_KW fitted on that same cloud, so every fitted point is
+        # a plotted point. Whiskers, human tiers and the forecast band are all
+        # 80% HDIs, the post's convention.
         try:
             inputs = axis_forecast_inputs(th_fc, k, data, raw, names[k], hdi_prob=0.8,
                                           A_draws=view.A)
@@ -315,17 +316,15 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         # forecast (`candidate_mask`), 95% intervals.
         from multiaxis_eci.analysis import forest_frames
         from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
-        from multiaxis_eci.config import FORECAST_KW
         affine = human_unit_affine(view.theta, data)
         x_title = f"{ability_label(affine)} (median, 95% interval)"
         frames = [rescale_frame(f, k, affine) for k, f in enumerate(
-            forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A))]
+            forest_frames(view, data, raw, A_draws=view.A))]
         figs["forests_per_axis"] = forest_grid_fig(
             frames, [(titles or {}).get(n, n) for n in names], x_title=x_title)
         # The same forest at the level of releases: one row per family, its best effort.
         fam = [rescale_frame(f, k, affine) for k, f in enumerate(
-            forest_frames(view, data, raw, sd_cap=FORECAST_KW["sd_cap"], by_family=True,
-                          A_draws=view.A))]
+            forest_frames(view, data, raw, by_family=True, A_draws=view.A))]
         figs["forests_per_family"] = forest_grid_fig(
             fam, [(titles or {}).get(n, n) for n in names], x_title=x_title,
             title="Top releases (best effort), frontier releases and human tiers per axis")

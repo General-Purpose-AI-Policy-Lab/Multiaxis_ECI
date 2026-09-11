@@ -113,10 +113,12 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
                            hdi_prob: float = 0.5) -> ForecastResult:
     """Extrapolate axis-k's capability trend linearly in time.
 
-    Candidate models use the same guard as `mirt_model_timeline_df` (dated,
-    non-human, informed/low-obs filters with the SOTA exemption). The frontier
-    ENVELOPE is the record-setters of the posterior-MEDIAN trajectory (kept
-    stable across draws) UNION the SOTA models.
+    Candidate models use the same guard as `mirt_model_timeline_df`
+    (`candidate_mask`: dated, non-human, evaluated on the axis; `sd_cap` and
+    `drop_low_obs` tighten it further, `sota_exempt` is accepted for older callers
+    and no longer changes the candidates). The frontier ENVELOPE is the
+    record-setters of the posterior-MEDIAN trajectory (kept stable across draws)
+    UNION the SOTA models.
 
     `fit_basis` picks what the per-draw OLS is regressed on:
       - "frontier" (default): the frontier envelope only — a running-best
@@ -186,13 +188,10 @@ def mirt_frontier_forecast(theta_draws: np.ndarray, k: int, data: ECIData,
         if fit_basis != "envelope":
             fit_basis = "frozen"
     else:
-        # The timelines' guard (`candidate_mask`). SOTA models are exempt from the
-        # informed/low-obs filter UNLESS sota_exempt=False, which requires every
-        # model, SOTA included, to be measured on THIS axis: the informed-only
-        # frontier, never bent by a sparse SOTA point (e.g. an n=1 release with
-        # SD > 0.5). Such releases still appear on the timeline plot.
-        keep = candidate_mask(theta_draws, k, data, model_dates, sd_cap=sd_cap, A_draws=A_draws,
-                              drop_low_obs=drop_low_obs, sota_exempt=sota_exempt)
+        # The timelines' guard (`candidate_mask`), tightened by this basis's own
+        # `sd_cap` / `drop_low_obs` when given.
+        keep = candidate_mask(theta_draws, k, data, model_dates, A_draws=A_draws, sd_cap=sd_cap,
+                              drop_low_obs=drop_low_obs)
         sota = (data.is_sota if data.is_sota is not None
                 else np.zeros(data.n_models, dtype=bool))
         idx, dates = [], []
@@ -454,8 +453,8 @@ def axis_forecast_inputs(theta_draws: np.ndarray, k: int, data: ECIData, raw_df:
     from multiaxis_eci.analysis.timelines import mirt_human_axis_stats, mirt_model_timeline_df
     from multiaxis_eci.config import FORECAST_BACKCAST_FLOOR, FORECAST_KW
 
-    tl = mirt_model_timeline_df(theta_draws, k, data, raw_df, sd_cap=FORECAST_KW["sd_cap"],
-                                A_draws=A_draws, hdi_prob=hdi_prob)
+    tl = mirt_model_timeline_df(theta_draws, k, data, raw_df, A_draws=A_draws,
+                                hdi_prob=hdi_prob)
     if tl.empty:
         raise ValueError(f"{axis_name}: no dated candidate to forecast on")
     kw = dict(FORECAST_KW, **forecast_kw)

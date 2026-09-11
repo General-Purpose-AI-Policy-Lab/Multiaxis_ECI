@@ -16,7 +16,7 @@ def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top
                   pinned: set[str] = FOREST_PINNED_RELEASES, hdi_prob: float = 0.95,
                   by_family: bool = False, **gate) -> list[pd.DataFrame]:
     """Per axis, the forest rows: the top `n_top` models by median ability among the timeline
-    candidates (`candidate_mask` with the forecast's gate, so the forest and the forecast can
+    candidates (`candidate_mask`, the forecast's gate, so the forest and the forecast can
     never show different frontiers), the `pinned` frontier releases, and every human tier.
 
     `by_family` collapses the candidates to one row per release (`data.model_family`: base

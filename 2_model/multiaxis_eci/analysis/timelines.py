@@ -6,7 +6,7 @@ import pandas as pd
 
 from multiaxis_eci.analysis.convergence import nc_difficulty_draws
 from multiaxis_eci.analysis.stats import _release_dates, forest_stats_from_draws, post_stats
-from multiaxis_eci.config import INFORMED_SD_CAP, SOTA_MIN_AXIS_COVERAGE
+from multiaxis_eci.config import INFORMED_SD_CAP, MIN_AXIS_COVERAGE
 from multiaxis_eci.data import ECIData
 
 
@@ -29,84 +29,68 @@ def mirt_informed_mask(theta_canon: np.ndarray, sd_cap: float = INFORMED_SD_CAP)
 
 
 def axis_coverage(A_draws: np.ndarray, k: int, data: ECIData) -> np.ndarray:
-    """(M,) how much the release's evaluations say about axis k: the sum of the axis-k shares
-    (median loadings) of every benchmark any effort of the model's family was scored on.
+    """(M,) how much a test-taker's own evaluations say about axis k: the sum of the axis-k
+    shares (median loadings) of every benchmark it was scored on.
 
     A benchmark's share is the fraction of its squared loading row pointing along k, so a
     release scored on one pure axis-k benchmark has coverage 1, and one scored only on
-    benchmarks of other axes has coverage near 0 whatever its number of observations.
+    benchmarks of other axes has coverage near 0 whatever its number of observations. The
+    count is per test-taker, not per family (user decision 2026-09-11): a reasoning effort
+    that was never run on the axis does not inherit its siblings' evidence.
     """
-    from multiaxis_eci.data import model_family
-
     med = np.median(A_draws, axis=0)                                    # (B, K)
     share = med ** 2 / np.maximum((med ** 2).sum(axis=1, keepdims=True), 1e-12)
     obs = np.zeros((data.n_models, data.n_benchmarks), dtype=bool)
     obs[np.asarray(data.model_idx), np.asarray(data.bench_idx)] = True
-    names = data.mlookup.sort_values("model_idx")["model"].tolist()
-    fams = np.array([model_family(m) for m in names])
-    for f in np.unique(fams):
-        rows = fams == f
-        obs[rows] = obs[rows].any(axis=0)[None, :]
     return obs @ share[:, k]
 
 
 def candidate_mask(theta_canon: np.ndarray, k: int, data: ECIData, model_dates: pd.Series, *,
-                   sd_cap: float | None = INFORMED_SD_CAP, drop_low_obs: bool = True,
-                   sota_exempt: bool = True, A_draws: np.ndarray | None = None,
-                   min_coverage: float = SOTA_MIN_AXIS_COVERAGE) -> np.ndarray:
+                   A_draws: np.ndarray | None = None, min_coverage: float = MIN_AXIS_COVERAGE,
+                   sd_cap: float | None = None, drop_low_obs: bool = False) -> np.ndarray:
     """(M,) bool: the test-takers a timeline, a forecast or a frontier may draw on for axis k.
 
-    The one guard shared by the measured timelines, the forecast candidates, the country
-    frontier and the post's forests: dated, not a human tier, and either measured on the axis
-    (posterior SD < sd_cap, and not flagged is_low_obs when drop_low_obs) or a SOTA family
-    member when sota_exempt (a frontier release is shown with its wide interval rather than
-    dropped), provided the release was evaluated on the axis: with `A_draws` (the loadings), the
-    exemption needs `axis_coverage` of at least `min_coverage` (config.SOTA_MIN_AXIS_COVERAGE),
-    so a position that comes from the prior alone never holds a record; without `A_draws`
-    (a K=1 fit) every SOTA member passes. `sd_cap=None` disables the SD test,
-    `drop_low_obs=False` the observation count.
+    The one guard shared by the measured timelines, the forecast candidates, the frontier gap
+    and the post's forests: dated, not a human tier, and evaluated on the axis, i.e. its own
+    `axis_coverage` (the axis shares of the benchmarks it was scored on) reaches
+    `min_coverage` (config.MIN_AXIS_COVERAGE). Without `A_draws` (a K=1 fit) every scored
+    release passes. That is the whole rule (user decision 2026-09-11): no posterior-SD cap, no
+    low-observation flag, no SOTA exemption; the thinly-measured releases it admits carry
+    their wide intervals on the figures and weigh little in the trend fits. `sd_cap` (drop
+    when the axis posterior SD reaches it) and `drop_low_obs` (drop `is_low_obs` models)
+    remain as optional tightenings for the K=1 tools that still want them.
     """
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     theta_k = theta_canon[..., k] if theta_canon.ndim == 3 else theta_canon
-    informed = (theta_k.std(axis=0) < sd_cap if sd_cap is not None
-                else np.ones(data.n_models, dtype=bool))
-    low_obs = (data.is_low_obs if drop_low_obs and data.is_low_obs is not None
-               else np.zeros(data.n_models, dtype=bool))
-    sota = (np.asarray(data.is_sota, dtype=bool) if sota_exempt and data.is_sota is not None
-            else np.zeros(data.n_models, dtype=bool))
-    if A_draws is not None and sota.any():
-        sota = sota & (axis_coverage(A_draws, k, data) >= min_coverage)
-    dated = np.array([m in model_dates.index for m in names], dtype=bool)
-    measured = informed & ~low_obs
-    return dated & ~np.asarray(data.is_human, dtype=bool) & (measured | sota)
+    keep = np.array([m in model_dates.index for m in names], dtype=bool)
+    keep &= ~np.asarray(data.is_human, dtype=bool)
+    if A_draws is not None:
+        keep &= axis_coverage(A_draws, k, data) >= min_coverage
+    if sd_cap is not None:
+        keep &= theta_k.std(axis=0) < sd_cap
+    if drop_low_obs and data.is_low_obs is not None:
+        keep &= ~np.asarray(data.is_low_obs, dtype=bool)
+    return keep
 
 
 def mirt_model_timeline_df(theta_canon: np.ndarray, k: int,
                            data: ECIData, raw_df: pd.DataFrame,
-                           sd_cap: float | None = INFORMED_SD_CAP,
-                           drop_low_obs: bool = True,
+                           sd_cap: float | None = None,
+                           drop_low_obs: bool = False,
                            A_draws: np.ndarray | None = None,
-                           hdi_prob: float = 0.5) -> pd.DataFrame:
+                           hdi_prob: float = 0.5,
+                           min_coverage: float = MIN_AXIS_COVERAGE) -> pd.DataFrame:
     """Model-ability timeline for axis k (kind='model'); humans excluded
     (they have no release date and are drawn as reference bands instead).
 
-    Two filters, both toggleable so callers can build an 'all models' view and
-    a clean 'informed' view from the same trace:
-      * drop_low_obs — skip models flagged is_low_obs (< LOW_OBS_THRESHOLD obs).
-      * sd_cap — skip models whose axis-k ability is not data-informed
-        (posterior SD >= sd_cap; see mirt_informed_mask). Pass None to disable.
-    Defaults give the clean view; pass sd_cap=None, drop_low_obs=False for all
-    dated models (including the sparse old ones with near-prior-wide CIs).
-
-    SOTA models (data.is_sota) are EXEMPT from both filters and always shown,
-    even when sparse and wide (e.g. Fable 5 / Mythos): a frontier release is the
-    headline of the timeline, and its uncertainty is communicated honestly by the
-    drawn CI rather than by silently dropping the point. Humans and the
-    missing-release-date guard still apply to every model (`candidate_mask`)."""
+    The rows are `candidate_mask`'s: dated, not human, and with `A_draws` (the loadings)
+    evaluated on the axis (own coverage of at least `min_coverage`); `min_coverage=0.0`
+    gives the all-models view. `sd_cap` and `drop_low_obs` are the optional tightenings
+    the K=1 tools pass; the K-axis figures leave them off."""
     model_dates, _ = _release_dates(raw_df)
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
-    keep = candidate_mask(theta_canon, k, data, model_dates, sd_cap=sd_cap, A_draws=A_draws,
-                          drop_low_obs=drop_low_obs)
+    keep = candidate_mask(theta_canon, k, data, model_dates, A_draws=A_draws,
+                          min_coverage=min_coverage, sd_cap=sd_cap, drop_low_obs=drop_low_obs)
     rows = []
     for i, m in enumerate(names):
         if not keep[i]:

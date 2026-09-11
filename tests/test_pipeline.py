@@ -492,7 +492,7 @@ class TestAnalysis:
         assert FORECAST_KW["fit_basis"] == "regimes"       # two-regime lines on medians
         assert FORECAST_KW["top_k"] == 2
         assert FORECAST_KW["hdi_prob"] == 0.8              # the figures' mass
-        assert FORECAST_KW["sd_cap"] == 0.33               # the measured cloud
+        assert "sd_cap" not in FORECAST_KW                 # the gate is candidate_mask's coverage rule
         # Raw backcast dates on every axis: no clamp configured. Any entry
         # must at least name a real axis and parse as a date.
         assert all(re.fullmatch(r"axis\d+", k) for k in FORECAST_BACKCAST_FLOOR)
@@ -2861,10 +2861,11 @@ class TestIsolatedFamilies:
 
 
 
-def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
-    """The one guard of the measured timelines, the forecast candidates and the country frontier:
-    a dated, non-human test-taker passes when measured on the axis (SD below the cap, not
-    low-observation) or when its family is SOTA; `sota_exempt=False` withdraws the exemption."""
+def test_candidate_mask_is_the_own_coverage_rule():
+    """The one guard of the timelines, the forecast candidates and the forests: a dated,
+    non-human test-taker passes when its OWN scores cover the axis (`axis_coverage` at least
+    `MIN_AXIS_COVERAGE`), whatever its posterior SD, observation count or SOTA status; without
+    loadings (K=1) every dated model passes; `sd_cap` / `drop_low_obs` are optional tightenings."""
     from multiaxis_eci.analysis.timelines import candidate_mask
     names = ["measured", "wide", "sparse", "sota_wide", "human", "undated", "sota_ghost"]
     n = len(names)
@@ -2884,19 +2885,20 @@ def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
         is_sota=np.array([False, False, False, True, False, False, True]))
     dates = pd.Series(pd.to_datetime(["2025-01-01"] * 5 + ["2025-06-01"]),
                       index=names[:5] + [names[6]])
-    # Every SOTA member is admitted, however wide its interval (the prior-only one at
-    # SD 1.2 included): the exemption is unconditional.
+    # No loadings (K=1): every dated, non-human model passes, wide or sparse or not.
     keep = candidate_mask(theta, 0, data, dates)
-    assert keep.tolist() == [True, False, False, True, False, False, True]
-    strict = candidate_mask(theta, 0, data, dates, sota_exempt=False)
-    assert strict.tolist() == [True, False, False, False, False, False, False]
-    loose = candidate_mask(theta, 0, data, dates, sd_cap=None, drop_low_obs=False)
-    assert loose.tolist() == [True, True, True, True, False, False, True]
+    assert keep.tolist() == [True, True, True, True, False, False, True]
+    # The optional tightenings the K=1 tools pass.
+    capped = candidate_mask(theta, 0, data, dates, sd_cap=0.33)
+    assert capped.tolist() == [True, False, True, False, False, False, False]
+    dense = candidate_mask(theta, 0, data, dates, drop_low_obs=True)
+    assert dense.tolist() == [True, True, False, False, False, False, False]
 
-    # With the loadings, the exemption holds only where the release was evaluated: two
-    # benchmarks, b_on loading on axis 0 and b_off on axis 1. sota_wide was scored on b_on
-    # (coverage 1 on axis 0), sota_ghost on b_off only (coverage 0): the ghost drops out of
-    # axis 0 but stays a candidate on axis 1, and a lower threshold lets it back in.
+    # With the loadings, only the model's OWN scores count: two benchmarks, b_on loading on
+    # axis 0 and b_off on axis 1. sota_wide was scored on b_on (coverage 1 on axis 0),
+    # sota_ghost on b_off only (coverage 0), the others on nothing: only sota_wide is a
+    # candidate on axis 0 whatever its SD, the ghost only on axis 1, and a zero threshold
+    # admits every dated model again.
     A = np.zeros((400, 2, 2))
     A[:, 0, 0] = 1.0                      # b_on -> axis 0
     A[:, 1, 1] = 1.0                      # b_off -> axis 1
@@ -2906,7 +2908,8 @@ def test_candidate_mask_hides_sparse_and_uninformed_takers_unless_sota():
                                                       "benchmark_idx": [1, 2]}))
     theta2 = np.repeat(theta, 2, axis=2)
     covered = candidate_mask(theta2, 0, data2, dates, A_draws=A)
-    assert covered.tolist() == [True, False, False, True, False, False, False]
+    assert covered.tolist() == [False, False, False, True, False, False, False]
     other_axis = candidate_mask(theta2, 1, data2, dates, A_draws=A)
     assert other_axis[6] and not other_axis[3]
-    assert candidate_mask(theta2, 0, data2, dates, A_draws=A, min_coverage=0.0)[6]
+    assert candidate_mask(theta2, 0, data2, dates, A_draws=A, min_coverage=0.0).tolist() == \
+        [True, True, True, True, False, False, True]

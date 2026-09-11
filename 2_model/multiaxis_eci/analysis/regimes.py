@@ -1,15 +1,25 @@
 """Two-regime frontier forecast: reasoning models against the others, fitted on posterior medians.
 
-The frontier of an axis is the running top-k of posterior-median abilities by release date
-(`frontier_topk`, k = 2 by default: a release enters when it is at least the second best seen
-so far). Its points split into two regimes, reasoning models and the others
-(`reasoning_mask`: a family carries a reasoning level, a thinking budget or a thinking variant
-in the models table, or matches `config.REASONING_FAMILY_PATTERNS`). Each regime gets its own
-straight line fitted on the posterior MEDIANS, each point weighted by its posterior SD plus a
-common dispersion term integrated out over a grid (`weighted_line_fit`, analytic, no
-sampling). The reasoning line is projected forward from the first reasoning release; the
-others' line is drawn only over its own points. Crossing dates read the piecewise frontier:
-the reasoning line after the switch, the others' line before it (`regime_crossover_df`).
+The candidates of an axis (`timelines.candidate_mask`) are first reduced to one effort per
+family, the one with the highest posterior median on the axis (`family_best`; a family is a
+base model and snapshot across its reasoning efforts and run variants), then to one release
+per organization and day (`one_per_org_day`: o1-mini and o1-preview, both OpenAI on
+2024-09-12, count as one frontier point, the better one, rather than filling a top-2 between
+them). They split into two
+regimes, reasoning models and the others (`reasoning_mask`: a family carries a reasoning
+level, a thinking budget or a thinking variant in the models table, or matches
+`config.REASONING_FAMILY_PATTERNS`). The reasoning fit set is the running top-k of
+posterior-median abilities by release date AMONG reasoning families (`frontier_topk`, k = 2 by
+default: a release enters when it is at least the second best of its regime seen so far), so
+the reasoning line starts at the first reasoning releases even where non-reasoning models
+still stood above them; the others' fit set is the non-reasoning part of the top-k frontier
+over every family, so their line stops where reasoning models took the frontier over (user
+decision 2026-09-11). Each regime gets its own straight line fitted on the posterior MEDIANS,
+each point weighted by its posterior SD plus a common dispersion term integrated out over a
+grid (`weighted_line_fit`, analytic, no sampling). The reasoning line is projected forward
+from the first reasoning release; the others' line is drawn only over its own points.
+Crossing dates read the piecewise frontier: the reasoning line after the switch, the others'
+line before it (`regime_crossover_df`).
 
 Fitting medians rather than draws conditions on the fitted axis: the posterior correlation
 between points (the axis's own orientation) is not propagated into the trend bands, which is
@@ -29,7 +39,7 @@ from scipy.stats import multivariate_normal
 from multiaxis_eci.analysis.forecast import ForecastResult, _to_date, _to_year
 from multiaxis_eci.analysis.stats import post_stats
 from multiaxis_eci.config import REASONING_FAMILY_PATTERNS
-from multiaxis_eci.data import MODELS_FILE, ECIData, model_family
+from multiaxis_eci.data import MODELS_FILE, ECIData, model_family, model_organization
 
 _OFF_LEVELS = {"", "none", "minimal"}
 
@@ -55,6 +65,26 @@ def is_reasoning(name: str) -> bool:
 def reasoning_mask(data: ECIData) -> np.ndarray:
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     return np.array([is_reasoning(m) for m in names], dtype=bool)
+
+
+def family_best(tl: pd.DataFrame) -> pd.DataFrame:
+    """One row per family (`data.model_family`): the effort with the highest posterior median
+    (`mean`) on the axis, keeping its own name and release date. Ties keep the first."""
+    d = tl.assign(_fam=tl["name"].map(model_family))
+    d = d.sort_values(["_fam", "mean"], ascending=[True, False], kind="stable")
+    return d.drop_duplicates("_fam", keep="first").drop(columns="_fam").reset_index(drop=True)
+
+
+def one_per_org_day(tl: pd.DataFrame) -> pd.DataFrame:
+    """One row per organization and release date: the highest posterior median (`mean`) among
+    the releases an organization put out the same day, so simultaneous siblings cannot fill a
+    top-k frontier between themselves. Names absent from the models table (no organization)
+    are never pooled. Ties keep the first."""
+    org = tl["name"].map(model_organization)
+    key = np.where(org.to_numpy() == "", tl["name"].to_numpy(),
+                   org.to_numpy() + "@" + pd.to_datetime(tl["release_date"]).dt.strftime("%Y-%m-%d").to_numpy())
+    d = tl.assign(_key=key).sort_values(["_key", "mean"], ascending=[True, False], kind="stable")
+    return d.drop_duplicates("_key", keep="first").drop(columns="_key").reset_index(drop=True)
 
 
 def frontier_topk(tl: pd.DataFrame, k: int = 2) -> list[str]:
@@ -130,20 +160,25 @@ def two_regime_forecast(theta_draws: np.ndarray, k: int, data: ECIData, tl: pd.D
                         top_k: int = 2, hdi_prob: float = 0.8,
                         horizon_date="2030-01-01") -> ForecastResult:
     """The two-regime forecast of axis k from the candidates' timeline frame `tl` (name,
-    release_date, mean). Returns a ForecastResult on the reasoning line (`fit_basis`
-    "regimes"), carrying the others' line as `other` and the switch date (first reasoning
-    release) as `switch_year`. Raises ValueError when fewer than three reasoning releases sit
-    on the frontier."""
+    release_date, mean): one effort per family (`family_best`), one release per organization
+    and day (`one_per_org_day`), the reasoning fit set as the top-`top_k` frontier among
+    reasoning families, the others' as the non-reasoning part of the frontier over every
+    family. Returns a ForecastResult on the reasoning line (`fit_basis`
+    "regimes"), carrying the others' line as `other`, the switch date (first reasoning
+    release) as `switch_year` and both fit sets' union as `frontier_names`. Raises ValueError
+    when fewer than three reasoning families qualify."""
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     idx = {m: i for i, m in enumerate(names)}
-    tl = tl.assign(release_date=pd.to_datetime(tl["release_date"]))
-    front = tl[tl["name"].isin(frontier_topk(tl, top_k))].sort_values("release_date")
-    if front.empty:
+    best = one_per_org_day(family_best(tl.assign(release_date=pd.to_datetime(tl["release_date"]))))
+    if best.empty:
         raise ValueError("no frontier candidate")
-    reason = front[front["name"].map(is_reasoning)]
+    is_r = best["name"].map(is_reasoning)
+    reason = best[is_r]
+    reason = reason[reason["name"].isin(frontier_topk(reason, top_k))].sort_values("release_date")
+    front = best[best["name"].isin(frontier_topk(best, top_k))].sort_values("release_date")
     other = front[~front["name"].map(is_reasoning)]
     if len(reason) < 3:
-        raise ValueError(f"only {len(reason)} reasoning releases on the frontier")
+        raise ValueError(f"only {len(reason)} reasoning families on the frontier")
 
     def fit(sub):
         t = _to_year(pd.DatetimeIndex(sub["release_date"]))
@@ -167,7 +202,8 @@ def two_regime_forecast(theta_draws: np.ndarray, k: int, data: ECIData, tl: pd.D
                 fit_basis="regimes", kind="line")
     return ForecastResult(
         grid_dates=grid.values, median=med, lo=lo, hi=hi, slope=fit_r.b,
-        intercept=fit_r.a - fit_r.b * fit_r.t0, frontier_names=front["name"].tolist(),
+        intercept=fit_r.a - fit_r.b * fit_r.t0,
+        frontier_names=sorted(set(reason["name"]) | set(other["name"])),
         last_obs_date=reason["release_date"].max(), fit_names=fit_r.names, fit_basis="regimes",
         kind="line", other=other_fc, switch_year=fit_r.t_min)
 

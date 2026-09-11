@@ -98,8 +98,8 @@ Computed on the **whole** fit, never on a plot-side subset.
 
 | key | what it shows |
 |---|---|
-| `timeline_{k}_{axis}` | the **measured** timeline for axis k: ability against release date, 50% intervals, models at posterior SD >= 0.33 and low-observation models dropped, human tiers as horizontal bands. The headline per-axis figure |
-| `timeline_{k}_{axis}_all` | the all-models companion: every dated model including the sparse pre-2023 ones, drawn with their prior-wide intervals. Use it to see who the measured view drops and why |
+| `timeline_{k}_{axis}` | the **measured** timeline for axis k: ability against release date, 50% intervals, the models evaluated on the axis (`candidate_mask`, own coverage of at least `config.MIN_AXIS_COVERAGE`), human tiers as horizontal bands. The headline per-axis figure |
+| `timeline_{k}_{axis}_all` | the all-models companion: every dated model, the ones never scored on the axis included, drawn with their prior-wide intervals. Use it to see who the measured view drops and why |
 | `timeline_difficulty` | benchmark difficulty D against benchmark release date, 50% intervals. The mirror of the ability timeline on the same latent scale |
 | `axes_timeline_compare` | every axis's running frontier (cumulative best ability) on one panel. Answers which axis is moving fastest. Single-fit CLI only, K >= 2 |
 | `axes_scatter_matrix` | pairwise scatter of model abilities across axes, coloured by organization, informed models only. Single-fit CLI only |
@@ -113,13 +113,13 @@ Computed on the **whole** fit, never on a plot-side subset.
 | `factor_correlations` | correlation heatmap of the axis abilities, K >= 2 (single-fit CLI figure; the dashboard filters it out of its cards and reports `max_phi` in the comparison table instead). When the display frame is promax the title flags it and the raw ability correlation is annotated, so an oblique correlation is never read as the raw one |
 | `axis_strength` | forest of per-axis strength, i.e. the loading column norms (or `tau_A` where the fit has a per-axis scale). How much of the fit each axis carries |
 | `qmatrix` | the allowed-loading pattern, for conjunctive and anchored fits only |
-| `forests_per_axis` | the post's forest figure (`forest_grid_fig`): per axis the top models among the timeline candidates, the pinned frontier releases (`config.FOREST_PINNED_RELEASES`, drawn even when wide) and every human tier, 95% intervals, K >= 2 |
+| `forests_per_axis` | the post's forest figure (`forest_grid_fig`): per axis the top models among the timeline candidates (`candidate_mask`), the pinned frontier releases (`config.FOREST_PINNED_RELEASES`, drawn even when wide) and every human tier, 95% intervals, K >= 2 |
 | `forests_per_family` | the same forest with one row per release (`data.model_family`, base model plus snapshot), each represented by its best reasoning effort on the axis; the row keeps the winning effort's name |
 | `loadings_per_axis` | the post's loadings figure (`loadings_grid_fig`): per axis the 20 benchmarks with the largest axis share, bar = loading with its 95% interval, colour and the right-hand number = share, K >= 2 |
 
 ### Forecast pair
 
-The forecast (`config.FORECAST_KW`, `analysis.regimes`, user decision 2026-09-10) reads the axis's frontier as the running top-2 of posterior-median abilities by release date, splits it into reasoning models and the others (a family with a reasoning level, a thinking budget or a thinking variant in the models table, or a name matching `config.REASONING_FAMILY_PATTERNS`), and fits one straight line per regime on the posterior medians, each point weighted by its posterior SD plus a common dispersion integrated out. The reasoning line is projected from the first reasoning release to 2030; the others' line stops at its last point. Fitting medians conditions on the fitted axis: the posterior correlation between points is not propagated into the band, consistently with a cloud drawn at its medians. Crossing dates read the piecewise frontier: a tier still below the reasoning line at the switch is crossed on the reasoning line (its posterior draws paired with the line's samples; no crossing when the slope is not positive); a tier already above it at the switch was passed earlier and is dated on the others' line, backcast when it was above at that line's first point too. `p_passed_now` is the probability the reasoning line exceeds the tier today. The per-draw record envelope and the regression bases of `mirt_frontier_forecast` remain available as `fit_basis` alternatives.
+The forecast (`config.FORECAST_KW`, `analysis.regimes`, user decisions 2026-09-10 and 2026-09-11) starts from the axis's candidates (`candidate_mask`) reduced to one effort per family, the one with the highest posterior median on the axis (`family_best`), then to one release per organization and day (`one_per_org_day`: o1-mini and o1-preview, both OpenAI on 2024-09-12, are one frontier point, the better one, rather than a top-2 between themselves), and splits them into reasoning models and the others (a family with a reasoning level, a thinking budget or a thinking variant in the models table, or a name matching `config.REASONING_FAMILY_PATTERNS`). The reasoning fit set is the running top-2 of posterior-median abilities by release date among reasoning families, so the reasoning line starts at the first reasoning releases even where non-reasoning models still stood above them; the others' fit set is the non-reasoning part of the top-2 frontier over every family, so their line stops where reasoning models took the frontier over. One straight line per regime is fitted on the posterior medians, each point weighted by its posterior SD plus a common dispersion integrated out. The reasoning line is projected from the first reasoning release to 2030; the others' line stops at its last point. Fitting medians conditions on the fitted axis: the posterior correlation between points is not propagated into the band, consistently with a cloud drawn at its medians. Crossing dates read the piecewise frontier: a tier still below the reasoning line at the switch is crossed on the reasoning line (its posterior draws paired with the line's samples; no crossing when the slope is not positive); a tier already above it at the switch was passed earlier and is dated on the others' line, backcast when it was above at that line's first point too. `p_passed_now` is the probability the reasoning line exceeds the tier today. The per-draw record envelope and the regression bases of `mirt_frontier_forecast` remain available as `fit_basis` alternatives.
 
 
 Two figures per axis, added by `--forecast` on the CLI and by
@@ -146,22 +146,28 @@ same results folder.
 
 **Abilities are shown in human units.** A fitted ability is a latent logit with an arbitrary origin and unit, so the ability-side figures (timelines, forecasts, forests, chain-group comparisons) re-express every axis with the Average Human tier's posterior median at 0 and the Top Performer's at 1, draw by draw (`config.ABILITY_SCALE`, `HUMAN_UNIT_ANCHORS`, `analysis.scale`). A model at 0.5 is halfway between the two on that axis; a slope of 0.3 per year is three tenths of the human span a year. Intervals, records and crossing dates keep their meaning under the per-draw affine map. Loadings, item characteristic curves and every table stay on the fitted scale.
 
-**The informed filter is plot-side only.** `analysis.timelines.candidate_mask` drops a
-model's axis ability from a figure when its posterior SD is at or above
-`config.INFORMED_SD_CAP` (0.33, a 95% interval width of about 1.3) or when the
-model is flagged low-observation, SOTA families excepted. It never touches the
-fit and never touches a diagnostic: convergence, PPC, PIT, GoF and LOO are
-computed on every draw of the posterior they describe, never on a plot-side
-subset of models. On the dashboard that posterior is the whole fit, and a
-mode-restricted card is an addition to the whole-fit figures, not a replacement;
-in a fit's own figure folder it is the chain group the folder shows (see
-"Where figures go"). The K=1 ECI-H timeline of the canonical fit draws every
-dated model.
+**The candidate gate is one rule, and plot-side only.** `analysis.timelines.candidate_mask`
+shows a dated model on an axis when its own scores cover the axis: the axis shares of
+the benchmarks it was run on sum to at least `config.MIN_AXIS_COVERAGE` (1.0, one full
+axis-unit of evidence, whatever the benchmarks). Below that its position is the prior and
+the lineage link alone. Nothing else gates the K-axis figures (user decision 2026-09-11):
+no posterior-SD cap, no low-observation flag, no SOTA exemption, so a thinly-evaluated
+release stands on the figure with its wide interval instead of vanishing. On the
+2026-09-08 K=4 fit the rule keeps out GPT-2 XL, davinci, text-davinci-002 and PaLM 540B
+on the fluid-intelligence axis, all scored on legacy QA sets only. The gate never
+touches the fit and never touches a diagnostic: convergence, PPC, PIT, GoF and LOO are
+computed on every draw of the posterior they describe, never on a plot-side subset of
+models. On the dashboard that posterior is the whole fit, and a mode-restricted card is
+an addition to the whole-fit figures, not a replacement; in a fit's own figure folder it
+is the chain group the folder shows (see "Where figures go"). A K=1 fit has one axis
+with share 1 everywhere, so its timelines draw every dated model; the K=1 frontier gap
+keeps the posterior-SD cap `config.INFORMED_SD_CAP` as its own measured filter.
 
-**SOTA models are exempt from that drop.** Models of the `config.SOTA_FAMILIES` releases
-stay on every timeline even when sparse and wide, because a frontier release
-is the headline of the figure and its uncertainty is better communicated by
-the drawn interval than by a silent omission.
+**What keeps a thin release out of the trend is the fit rule, not the gate.** The
+two-regime fit takes one effort per family and weights every point by its posterior SD,
+so a release with four scores on the axis is drawn, can hold a record, and barely moves
+the line. Tried and dropped the same day: an SD cap, a minimum of five scores, a record
+rule on the interval's lower bound, a probabilistic top-2 rule, a relative-precision rule.
 
 **Records are read off the posterior median**, the number the timelines plot,
 so every fitted point is a point the reader can see. The mean fails on both
@@ -170,25 +176,13 @@ mean sits above every plotted point, and a ridge-split ability is bimodal and
 its mean lands in the empty valley between the two lumps.
 
 **The forecast rule lives in one place.** `config.FORECAST_KW` is
-`fit_basis="envelope"`, `fit_start="2024-10-01"` (the reasoning-model cutoff,
-used only by the regression bases kept for sensitivity runs), `sd_cap=0.33`,
-`hdi_prob=0.8`. The dashboard card and the blog post figures both read it, so
-the two cannot drift apart on the basis, the cap or the interval width. The
-cloud and the trend fit share the one cap, which is what makes every fitted
-record also a plotted point.
-
-**The SOTA exemption holds where the release was evaluated.** A SOTA release is
-admitted on an axis with its interval, however wide, provided its family's scores
-cover the axis: the axis shares of the benchmarks any of its efforts was scored on
-must sum to at least `config.SOTA_MIN_AXIS_COVERAGE` (1.0, one full axis-unit of
-evidence). Below that the position is the prior and the lineage link alone and
-would lift the running-max envelope through its right tail: on the 2026-09-08
-K=4 fit, GPT-2 XL, davinci, text-davinci-002 and PaLM 540B on the
-fluid-intelligence axis, all scored on legacy QA sets only. An uncertainty cap on
-the exemption was tried and dropped the same day; the axis-4 trend that once sat
-under its cloud came from the cloud and the fit using different candidate sets
-(an axis index, `FORECAST_NO_SOTA_AXES`, named the published fit's fourth axis),
-which the shared `candidate_mask` rules out. Titles, too, follow identity:
+`fit_basis="regimes"`, `top_k=2`, `fit_start="2024-10-01"` (the reasoning-model
+cutoff, used only by the regression bases kept for sensitivity runs),
+`hdi_prob=0.8`. The dashboard card and the blog post figures both read it, and
+the cloud and the fit share `candidate_mask`, so the two cannot drift apart on
+the basis, the candidates or the interval width, and every fitted point is a
+plotted point (the axis-4 trend that once sat under its cloud came from the cloud
+and the fit using different candidate sets). Titles, too, follow identity:
 `analysis.load_axis_titles` applies a hand-confirmed title only to an axis whose
 top benchmarks still contain one of its signature benchmarks (`axis_names.json`).
 

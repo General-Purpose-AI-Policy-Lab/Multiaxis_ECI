@@ -39,7 +39,7 @@ def test_forest_rows_and_family_collapse():
     view = _View(theta, 1)
     data = _Data(pd.DataFrame({"model": names, "model_idx": np.arange(1, len(names) + 1)}),
                  np.array([False] * 6 + [True]), np.zeros(len(names), bool))
-    gate = dict(sd_cap=None, drop_low_obs=False, sota_exempt=False)
+    gate = dict(sd_cap=None, drop_low_obs=False)
     (df,) = forest_frames(view, data, n_top=4, pinned={"llama-3-70b"}, **gate)
     # Ascending by median: the strongest lands at the top of the panel; the pinned
     # release is a frontier row even outside the top n; the tier is a human row.

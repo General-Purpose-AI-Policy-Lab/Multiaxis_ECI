@@ -72,10 +72,10 @@ ECI_EPS = 1e-3
 LOW_OBS_THRESHOLD = 4
 
 # ── Informed-ability cap ────────────────────────────────────────────────────
-# A model's ability on an axis counts as measured when its posterior SD is below
-# this cap (analysis.timelines.mirt_informed_mask; history 0.6 -> 0.3 -> 0.4 ->
-# 0.33 in its docstring). The one value behind the measured timelines, the
-# forecast candidates (FORECAST_KW), the country frontier and the bimodality scan.
+# The posterior-SD cap of `analysis.timelines.mirt_informed_mask` (history 0.6 -> 0.3
+# -> 0.4 -> 0.33 in its docstring). Since 2026-09-11 it no longer gates the K-axis
+# figures or the forecast candidates (`MIN_AXIS_COVERAGE` does); the K=1 frontier gap
+# and the bimodality scan still pass it explicitly.
 INFORMED_SD_CAP = 0.33
 
 # ── Priors (LogNormal mu, sigma on the log scale) ─────────────────────────
@@ -257,16 +257,18 @@ def _load_sota_families() -> list[str]:
 
 SOTA_FAMILIES: list[str] = _load_sota_families()
 
-# The SOTA exemption of `candidate_mask` holds on an axis only where the release was
-# evaluated on it: the axis shares of the benchmarks its efforts were scored on
-# (union over the family) must sum to at least this much. One full axis-unit of
-# evidence, whatever the benchmarks. Below it the position is the prior and the
-# lineage link alone; on the 2026-09-08 K=4 fit that is GPT-2 XL, davinci,
-# text-davinci-002 and PaLM 540B on the fluid-intelligence axis, whose 5 to 8
-# scores are all on legacy QA sets (user decision 2026-09-10, replacing an
-# uncertainty cap tried the same day). A K=1 fit has one axis with share 1
-# everywhere, so any scored release passes.
-SOTA_MIN_AXIS_COVERAGE = 1.0
+# The one gate of the K-axis figures and the forecast candidates (`candidate_mask`):
+# a dated model is shown on an axis when the axis shares of the benchmarks IT was
+# scored on sum to at least this much, one full axis-unit of evidence whatever the
+# benchmarks. Below it the position is the prior and the lineage link alone; on the
+# 2026-09-08 K=4 fit that is GPT-2 XL, davinci, text-davinci-002 and PaLM 540B on
+# the fluid-intelligence axis, whose 5 to 8 scores are all on legacy QA sets. User
+# decision 2026-09-11: this rule alone, replacing the posterior-SD cap, the
+# low-observation flag and the SOTA exemption that had gated the figures; what
+# keeps a thinly-measured release out of the trend fit is the one-effort-per-family
+# rule of `analysis.regimes` and the weighting by posterior SD. A K=1 fit has one
+# axis with share 1 everywhere, so any scored release passes.
+MIN_AXIS_COVERAGE = 1.0
 
 # The ability scale of the figures (analysis.scale): "human" re-expresses every axis so the
 # posterior median of the first anchor tier sits at 0 and the second at 1, draw by draw; any
@@ -276,14 +278,15 @@ HUMAN_UNIT_ANCHORS = ("Average Human", "Top Performer")
 
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post
 # (analysis.regimes, user decision 2026-09-10): the running top-`top_k` frontier of
-# posterior MEDIANS split into reasoning models and the others, one weighted
-# straight line per regime (noise = each point's posterior SD plus a common
-# dispersion), the reasoning line projected from its first release, the others'
-# drawn over their own span; 80% intervals. `sd_cap` is the candidates' informed
-# filter. The per-draw ENVELOPE and the regression bases of `mirt_frontier_forecast`
-# remain available as `fit_basis` alternatives (`fit_start` only matters to them).
-FORECAST_KW = dict(fit_basis="regimes", top_k=2, fit_start="2024-10-01",
-                   sd_cap=INFORMED_SD_CAP, hdi_prob=0.8)
+# posterior MEDIANS of one effort per family (the best on the axis) and one release
+# per organization and day, split into
+# reasoning models and the others, one weighted straight line per regime (noise =
+# each point's posterior SD plus a common dispersion), the reasoning line projected
+# from its first release, the others' drawn over their own span; 80% intervals. The
+# candidates are `candidate_mask`'s (MIN_AXIS_COVERAGE). The per-draw ENVELOPE and
+# the regression bases of `mirt_frontier_forecast` remain available as `fit_basis`
+# alternatives (`fit_start` only matters to them).
+FORECAST_KW = dict(fit_basis="regimes", top_k=2, fit_start="2024-10-01", hdi_prob=0.8)
 
 # A release is a reasoning model when its family carries a reasoning level, a
 # thinking budget or a thinking variant in the models table, or when its name

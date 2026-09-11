@@ -196,8 +196,10 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         if other is not None:
             fit_sets.append((OTHER_FIT_COLOR, set(other.fit_names or [])))
         in_fit = tl["name"].isin(set().union(*(names for _, names in fit_sets)))
+        # The rest of the cloud is faint: since the gate is the coverage rule alone it holds
+        # every effort of every family, several hundred points per axis.
         for col_, sub, alpha_m, alpha_e in (
-                [(MODEL_COLOR, tl[~in_fit], 0.55, 0.35)]
+                [(MODEL_COLOR, tl[~in_fit], 0.3, 0.18)]
                 + [(c, tl[tl["name"].isin(n)], 0.9, 0.6) for c, n in fit_sets]):
             if sub.empty:
                 continue

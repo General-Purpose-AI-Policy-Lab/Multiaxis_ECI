@@ -1,8 +1,8 @@
 """K=4 forest figure: top models and human tiers per axis, at the post's scale.
 
 Same rows as `make_all.forests()` — `forest_frames`'s top models by posterior
-mean under the trend figure's gate (SD < FORECAST_KW["sd_cap"] and not
-low-obs, or SOTA), the pinned frontier releases, and every human tier — drawn by
+median under the trend figure's gate (`candidate_mask`: evaluated on the axis),
+the pinned frontier releases, and every human tier — drawn by
 the dashboard's own `viz.forest_grid_fig`, so markers, whiskers and the legend
 are the definitions the fit's CSVs use. The type constants match
 `make_timeline_plotly.py` / `make_loadings_plotly.py`. Reads the flagship
@@ -44,9 +44,6 @@ from multiaxis_eci.analysis import (  # noqa: E402
     require_axis_titles,
 )
 from multiaxis_eci.analysis import FLAGSHIP_TRACE as TRACE
-from multiaxis_eci.config import (
-    FORECAST_KW,  # noqa: E402
-)
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.viz import POST, forest_grid_fig  # noqa: E402
 from multiaxis_eci.viz.core import save_html, save_print  # noqa: E402
@@ -95,8 +92,7 @@ def main(trace: Path = TRACE, tag: str = "_draft", out_dir: Path = HERE,
     # (the forecast's candidates, the pinned frontier releases, every human
     # tier). The post draws frontier releases as ordinary model rows: one
     # marker class for machines, no "shown even when wide" legend entry.
-    frames = forest_frames(view, data, pd.read_csv(PROCESSED_FILE),
-                           sd_cap=FORECAST_KW["sd_cap"], A_draws=view.A)
+    frames = forest_frames(view, data, pd.read_csv(PROCESSED_FILE), A_draws=view.A)
     fig = forest_grid_fig(frames, [titles[n] for n in view.names], title=TITLE,
                           style=POST, collapse_frontier=True, col_domains=COL_DOMAINS)
 
