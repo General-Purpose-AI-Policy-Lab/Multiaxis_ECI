@@ -74,4 +74,4 @@ def test_group_builders():
     cf = crossover_compare_fig(cx, cx_b, ["axis1"], titles, today="2026-09-10")
     markers = [t for t in cf.data if t.mode == "markers"]
     assert [len(t.x) for t in markers] == [2, 1]                        # the None row is skipped
-    assert cf.layout.xaxis.range == ("2014-07-25", "2030-06-10")
+    assert cf.layout.xaxis.range == ("2014-07-25", "2035-06-10")

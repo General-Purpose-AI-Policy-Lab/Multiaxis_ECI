@@ -17,7 +17,7 @@ All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`),
 |---|---|---|
 | `mirt{tag}/figures/k{K}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit/fit.py --plots` | no |
 | `canonical/figures/` | `3_fit/fit.py --preset canonical` | no |
-| `comparisons/figures/` | `4_diagnostics/1_country_frontier.py`, `2_plot_crossovers.py` | no |
+| `comparisons/figures/` | `4_diagnostics/1_frontier_gap.py`, `2_plot_frontier_gap.py` | no |
 | `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |
 | `dashboard_stills/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |
@@ -31,7 +31,7 @@ When `diagnose_chains.py --write-modes` has found more than one posterior mode f
 
 **Axis names are given by hand.** Nothing in the code names an axis. The fit and the plotting CLI write an `axis_names.json` template beside the trace when none exists (each axis's top benchmarks by share, empty titles, `confirmed: false`), and every figure calls the axes `Axis 1`, `Axis 2`, ... until a person fills in the titles (and `title_fr` for the French renders) and two or three signature benchmarks and sets `confirmed: true`. A confirmed title is applied only while one of its signature benchmarks stays among the axis's top benchmarks (`analysis.load_axis_titles`); the blog post's scripts refuse to run on unconfirmed or drifted names (`analysis.require_axis_titles`). The published fit's names live in `5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`.
 
-Every figure is English by default; builders that carry text take `lang="fr"`, and the canonical fit writes that render of its `capability_timeline` under `figures/fr/`. That figure is the post's figure 1 drawn by the same `capability_timeline_fig`: anchored ECI-H scale, 80% intervals, and the interval of the bottom and top human tiers (Average Human, Top Performer) as a faint band, so the human ladder's bounds read as uncertain. The country-frontier figure draws the same two bands.
+Every figure is English by default; builders that carry text take `lang="fr"`, and the canonical fit writes that render of its `capability_timeline` under `figures/fr/`. That figure is the post's figure 1 drawn by the same `capability_timeline_fig`: anchored ECI-H scale, 80% intervals, and the interval of the bottom and top human tiers (Average Human, Top Performer) as a faint band, so the human ladder's bounds read as uncertain. The frontier-gap panels name every tier in their right margin the same way.
 
 ## The commands
 
@@ -71,7 +71,7 @@ pickle and fails if it is missing.
 python 6_writeups/blogpost/figures/make_all.py all --cached
 ```
 
-The post's figures are the same builders as the outputs at another scale: each builder takes a `FigureStyle` (`viz/style.py`), `DASHBOARD` for the cards and the per-fit folders, `POST` for a figure shared flat at about 2,000 pixels. The post's scripts own only the flagship trace, the caches beside it, the fixed windows (2023 to 2030 for the trend, 2015 to 2030 for the crossings) and the hand-placed callouts of figure 1; the figure design lives in `viz/` and cannot drift between the post and the outputs.
+The post's figures are the same builders as the outputs at another scale: each builder takes a `FigureStyle` (`viz/style.py`), `DASHBOARD` for the cards and the per-fit folders, `POST` for a figure shared flat at about 2,000 pixels. The post's scripts own only the flagship trace, the caches beside it, the fixed windows (2023 to 2030 for the trend, 2015 to 2035 for the crossings) and the hand-placed callouts of figure 1; the figure design lives in `viz/` and cannot drift between the post and the outputs.
 
 ## Figure catalogue
 
@@ -128,8 +128,8 @@ family, and human tiers being in the fit.
 
 | key | what it shows |
 |---|---|
-| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the two-regime forecast of `analysis.regimes` (the reasoning models' line and 80% band projected from their first release in orange, the non-reasoning models' line and band in muted purple over their own span, the line alone carried on thin to today so the change of slope shows; the releases each line was fitted on carry that regime's colour, muted red for the reasoning fit set and muted purple for the other, on their markers and whiskers), the human tiers as dashed lines named in the right margin, and a today line; the x-axis stops at 2030 like the crossover figures |
-| `forecast_{k}_{axis}_when` | the post's crossover panel (`crossover_panels_fig`): per tier the median crossing date, a thick 50% bar over a thin 80% bar, both split at today (green behind us, red ahead); whatever runs past the window is clipped at the edge and dated |
+| `forecast_{k}_{axis}` | the post's trend panel (`frontier_trend_fig`): the measured cloud with 80% whiskers, the two-regime forecast of `analysis.regimes` (the reasoning models' line and 80% band projected from their first release in orange, the non-reasoning models' line and band in muted purple over their own span, the line alone carried on thin to today so the change of slope shows; the releases each line was fitted on carry that regime's colour, muted red for the reasoning fit set and muted purple for the other, on their markers and whiskers), the human tiers as dashed lines named in the right margin, and a today line; the x-axis stops at 2030, the projection's horizon |
+| `forecast_{k}_{axis}_when` | the post's crossover panel (`crossover_panels_fig`): per tier the median crossing date, a thick 50% bar over a thin 80% bar, both split at today (green behind us, red ahead), on a fixed 2015 to 2035 window (`CROSSOVER_WINDOW`); whatever runs past the window is clipped at the edge and dated |
 
 ### K against K=1
 

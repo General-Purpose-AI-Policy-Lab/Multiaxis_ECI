@@ -48,8 +48,8 @@ REASONING_FIT_COLOR = "#c0504d"
 OTHER_FIT_COLOR = "#8064a2"
 # Every crossover figure shares this x-range, so panels from different fits, chain groups
 # and scopes read against the same years.
-CROSSOVER_WINDOW = ("2015-01-01", "2030-01-01")
-# Every trend panel stops at the same year too; its start follows the data (the post fixes 2023).
+CROSSOVER_WINDOW = ("2015-01-01", "2035-01-01")
+# Every trend panel stops at 2030 (the horizon of the projection); its start follows the data (the post fixes 2023).
 TREND_WINDOW_END = "2030-01-01"
 TODAY_COLOR = "#444"
 
@@ -287,7 +287,7 @@ def crossover_panels_fig(cx: pd.DataFrame, axes: list[str], titles: dict | None 
     when a second, wider mass was computed). `probs` names the bars, widest last: one value
     draws one thick bar, two draw the thick first-mass bar over the thin second-mass bar. Every
     bar is split at the today line, green behind, red ahead. `window` fixes the x-range, 2015
-    to 2030 by default (`CROSSOVER_WINDOW`) so every crossover figure is comparable; None spans
+    to 2035 by default (`CROSSOVER_WINDOW`) so every crossover figure is comparable; None spans
     the data. Whatever runs past the window is clipped at
     the edge, marked by a small dot with the true year above it.
     """

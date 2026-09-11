@@ -188,7 +188,7 @@ def crossover_compare_fig(cx_a: pd.DataFrame, cx_b: pd.DataFrame, axes: list[str
                           titles: dict | None = None, labels=("majority", "minority"), *,
                           today=None, style: FigureStyle = DASHBOARD) -> go.Figure:
     """Per axis, each tier's median crossing date with its 50% interval in the two groups,
-    dodged on the row, on the shared 2015 to 2030 window. `cx_a` / `cx_b` are
+    dodged on the row, on the shared 2015 to 2035 window. `cx_a` / `cx_b` are
     `analysis.crossover_table` outputs over the axes (columns axis, tier, human_mean,
     crossover_date_median, crossover_hdi_low, crossover_hdi_high)."""
     titles = titles or {}
