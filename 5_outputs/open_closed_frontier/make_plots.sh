@@ -1,7 +1,8 @@
 #!/bin/zsh
 # Open-weights vs closed frontier on ECI-H, by benchmark access class (all / public / semi-private /
 # private): the per-scope step on each canonical trace, the cross-scope figures and tables, then a
-# copy of the deliverables into this folder.
+# copy of the deliverables into this folder — English at the top level, French under fr/ with the
+# vector twins the lab's site embeds in fr/svg/.
 #
 # Prerequisites: the four K=1 fits of the current data generation,
 #   python 3_fit/fit.py --preset canonical                                   # canonical/ (full length)
@@ -24,11 +25,15 @@ done
 $PY 4_diagnostics/2_plot_frontier_gap.py --group $GROUP $T
 
 F=$GEN/comparisons/figures
+mkdir -p "$OUT/fr/svg"
 for name in panels lag table; do
   cp "$F/frontier_gap_${GROUP}_$name.png" "$OUT/"
+  cp "$F/fr/frontier_gap_${GROUP}_${name}_fr.png" "$OUT/fr/"          # French renders
+  cp "$F/fr/svg/frontier_gap_${GROUP}_${name}_fr.svg" "$OUT/fr/svg/"  # ... and their vector twins
 done
 for name in panels lag; do
   cp "$F/html/frontier_gap_${GROUP}_$name.html" "$OUT/"
+  cp "$F/fr/html/frontier_gap_${GROUP}_${name}_fr.html" "$OUT/fr/"
 done
 cp "$GEN/comparisons/frontier_gap_${GROUP}_table.csv" "$GEN/comparisons/frontier_gap_${GROUP}_table.md" \
    "$GEN/comparisons/frontier_gap_${GROUP}_benchmark_classes.md" "$OUT/"

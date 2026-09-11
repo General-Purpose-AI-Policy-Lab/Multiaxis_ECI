@@ -120,8 +120,11 @@ Outputs land in the data generation's `comparisons/` as
 `frontier_gap_<group>_<scope>_*`. `2_plot_frontier_gap.py` draws every scope it
 finds side by side (panels, the months-behind figure, the
 summary table with each scope's change against all benchmarks; the crossing dates stay in CSV) with no trace
-loaded; `--y-range LO,HI` pins the panels' axis. The write-up's
-`5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes.
+loaded; `--y-range LO,HI` pins the panels' axis. Every figure is also written in French
+under `comparisons/figures/fr/` (`<stem>_fr.png`, the vector twin in `fr/svg/`), the
+`viz.i18n` string walk over the finished English figure. The write-up's
+`5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes and copies
+the deliverables, French included, into that folder.
 
 ## Plot a fit
 

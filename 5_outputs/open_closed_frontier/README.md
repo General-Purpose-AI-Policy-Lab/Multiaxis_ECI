@@ -70,4 +70,5 @@ TODAY=2026-09-11 5_outputs/open_closed_frontier/make_plots.sh                   
 - `frontier_gap_openness_table.{png,csv,md}`: the summary table above (the CSV holds every quantity numerically)
 - `frontier_gap_openness_<scope>_records.csv`: every open record with its level, its lag and the closed models that first beat it; `_summary.csv`: the per-scope quantities
 - `frontier_gap_openness_benchmark_classes.md`: the benchmarks of each class
+- `fr/`: the three figures in French, `<stem>_fr.png`, with their vector twins in `fr/svg/` for the lab's site and their interactive twins beside them (git-ignored like the English ones). They are `viz.i18n`'s string walk over the finished English figures, so the two cannot drift apart; model names are not translated.
 - per-draw arrays and the candidates of both groups: `5_outputs/data20260908/comparisons/frontier_gap_openness_<scope>{.npz,_candidates.csv,_humans.csv}`

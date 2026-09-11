@@ -30,13 +30,14 @@ from multiaxis_eci.analysis.frontier_gap import (  # noqa: E402
     load_scope,
     summarize,
 )
-from multiaxis_eci.viz.core import save_fig  # noqa: E402
+from multiaxis_eci.viz.core import save_fig, save_svg  # noqa: E402
 from multiaxis_eci.viz.frontier_gap import (  # noqa: E402
     SCOPE_TITLES,
     frontier_panels_fig,
     lag_fig,
     summary_table_fig,
 )
+from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 
 # (quantity, group role, label, unit, signed)
 TABLE_ROWS = [
@@ -119,6 +120,22 @@ def build_table(results: dict, scopes: list[str], kind: str) -> tuple[pd.DataFra
     return pd.DataFrame(cells), pd.DataFrame(long)
 
 
+def save_en_fr(fig, name: str, figures_dir: Path) -> None:
+    """The English render, then its French twin under `figures/fr/`.
+
+    Both get the PNG and the interactive twin (`html/` beside each); the French one also gets
+    the vector SVG the lab's site embeds, in `fr/svg/`, the blog post's convention. The French
+    figure is `viz.i18n`'s string walk over the finished English one, so the two cannot drift:
+    the record names the months-behind figure places are not translated, and its layout, worked
+    out in pixels, carries over untouched.
+    """
+    save_fig(fig, name, figures_dir)
+    fr_dir = figures_dir / "fr"
+    fr = translate_fig(fig)
+    save_fig(fr, f"{name}_fr", fr_dir)
+    save_svg(fr, fr_dir / f"{name}_fr.png")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -147,12 +164,12 @@ def main():
 
     fig = frontier_panels_fig(results, scopes, today=args.today, group_titles=titles, y_range=y_range,
                               title=f"{titles[leader]} vs {titles[follower]} (ECI-H), by benchmark access")
-    save_fig(fig, f"{stem}_panels", figures_dir)
+    save_en_fr(fig, f"{stem}_panels", figures_dir)
 
     fig = lag_fig(results, scopes, today=args.today, label_scope="all",
                   follower_title=titles[follower].lower(), leader_title=titles[leader].lower(),
                   title=f"How far behind the {titles[leader].lower()} frontier are {titles[follower].lower()}?")
-    save_fig(fig, f"{stem}_lag", figures_dir)
+    save_en_fr(fig, f"{stem}_lag", figures_dir)
 
     cx_all = []
     for s in scopes:
@@ -168,8 +185,13 @@ def main():
     (cmp_dir / f"{stem}_table.md").write_text(markdown_table(cells))
     fig = summary_table_fig(cells, f"{titles[leader]} vs {titles[follower]}: median [80% interval]",
                             width=1700)
+    # A table is not a plot: it has no HTML twin worth keeping, so it skips save_en_fr.
     fig.write_image(str(figures_dir / f"{stem}_table.png"), scale=2)
-    print(f"wrote {figures_dir / stem}_{{panels,lag,table}}.png, "
+    fr = translate_fig(fig)
+    (figures_dir / "fr").mkdir(parents=True, exist_ok=True)
+    fr.write_image(str(figures_dir / "fr" / f"{stem}_table_fr.png"), scale=2)
+    save_svg(fr, figures_dir / "fr" / f"{stem}_table_fr.png")
+    print(f"wrote {figures_dir / stem}_{{panels,lag,table}}.png (+ fr/, fr/svg/), "
           f"{cmp_dir / stem}_{{table.csv,table.md,crossovers.csv}}")
     (cmp_dir / f"{stem}_benchmark_classes.md").write_text(benchmark_classes_md())
     pd.set_option("display.width", 250)
