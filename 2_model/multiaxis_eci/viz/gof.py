@@ -101,7 +101,10 @@ def density_overlay_fig(y_rep_flat: np.ndarray,
                           n_samples: int = 200,
                           seed: int = DENSITY_SEED) -> go.Figure:
     rng = np.random.default_rng(seed)
-    sample_idx = rng.choice(y_rep_flat.shape[0], size=n_samples, replace=False)
+    # A short run (a smoke fit of a few dozen draws) has fewer replicates than the overlay
+    # asks for: draw them all rather than fail.
+    sample_idx = rng.choice(y_rep_flat.shape[0], size=min(n_samples, y_rep_flat.shape[0]),
+                            replace=False)
     x_grid = np.linspace(0, 1, 80)
     x_mid  = (x_grid[:-1] + x_grid[1:]) / 2
 
