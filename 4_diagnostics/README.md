@@ -16,8 +16,8 @@ Commands and their options: [`../docs/cli.md`](../docs/cli.md).
 
 | Script | Purpose |
 |---|---|
-| `1_country_frontier.py` | US vs China frontier on a K=1 canonical trace: per-country record-setters, per-draw OLS trends, gap / lag / crossovers |
-| `2_plot_crossovers.py` | Human-tier crossover dates as a 2x3 grid: US/CN x all / open-only / closed-only. Reads what `1_country_frontier.py` writes |
+| `1_frontier_gap.py` | Open-weights vs closed frontier (or US vs CN with `--group country`) on one K=1 canonical trace, in ECI-H: records per group, the months each open record trails the closed frontier (per posterior draw), one trend line per group with the gap and lag it implies, human-tier crossings. One benchmark access scope per run (`--access all|public|semi_private|private`) |
+| `2_plot_frontier_gap.py` | The scopes side by side, from what step 1 wrote: frontier panels, the months-behind figure, the summary table (crossing dates as CSV) with each scope's change against all benchmarks |
 | `3_plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → the fit's `figures/k{K}/` |
 | `4_build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ the data generation's `comparisons/*.csv`). Card registry: `6_writeups/dashboard/dashboard_fits.json` |
 

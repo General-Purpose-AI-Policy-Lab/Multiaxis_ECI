@@ -1,0 +1,2027 @@
+obs_idx,model,benchmark,score,pit
+0,Baichuan-2-13B-Base,ARC AI2,0.38,0.035
+1,Baichuan-2-7B-Base,ARC AI2,0.325,0.0365
+2,Cerebras-GPT-13B,ARC AI2,0.324,0.4825
+3,CodeQwen1.5-7B,ARC AI2,0.357,0.165
+4,DeepSeek-Coder-V2-Base,ARC AI2,0.643,0.113
+5,DeepSeek-Coder-V2-Lite-Base,ARC AI2,0.573,0.2065
+6,DeepSeek-V2,ARC AI2,0.922,0.838
+7,DeepSeek-V3,ARC AI2,0.953,0.8655
+8,INTELLECT-1-Instruct,ARC AI2,0.5452,0.4375
+9,LLaMA-13B,ARC AI2,0.527,0.497
+10,LLaMA-33B,ARC AI2,0.675,0.5965
+11,LLaMA-65B,ARC AI2,0.695,0.5145
+12,LLaMA-7B,ARC AI2,0.476,0.666
+13,Llama-2-13b,ARC AI2,0.603,0.5145
+14,Llama-2-34b,ARC AI2,0.545,0.195
+15,Llama-2-70b-hf,ARC AI2,0.783,0.591
+16,Llama-2-7b,ARC AI2,0.459,0.38
+17,Llama-3.1-405B,ARC AI2,0.953,0.829
+18,Meta-Llama-3-8B-Instruct,ARC AI2,0.828,0.9
+19,Mistral-7B-v0.1,ARC AI2,0.786,0.795
+20,Mixtral-8x7B-v0.1,ARC AI2,0.873,0.841
+21,Nemotron-4 15B,ARC AI2,0.555,0.2635
+22,PaLM 2-L,ARC AI2,0.692,0.271
+23,PaLM 2-M,ARC AI2,0.649,0.27
+24,PaLM 2-S,ARC AI2,0.596,0.302
+25,PaLM 540B,ARC AI2,0.852,0.8625
+26,PaLM 62B,ARC AI2,0.525,0.3365
+27,Phi-3-medium-128k-instruct,ARC AI2,0.916,0.95
+28,Phi-3-mini-4k-instruct,ARC AI2,0.849,0.8295
+29,Phi-3-small-8k-instruct,ARC AI2,0.907,0.8745
+30,Qwen-14B,ARC AI2,0.844,0.868
+31,Qwen-1_8B,ARC AI2,0.532,0.8535
+32,Qwen-7B,ARC AI2,0.753,0.93
+33,Qwen2.5-72B,ARC AI2,0.945,0.7935
+34,Qwen2.5-Coder-0.5B,ARC AI2,0.344,0.1285
+35,Qwen2.5-Coder-1.5B,ARC AI2,0.452,0.0995
+36,Qwen2.5-Coder-14B,ARC AI2,0.66,0.1135
+37,Qwen2.5-Coder-32B,ARC AI2,0.705,0.1445
+38,Qwen2.5-Coder-3B,ARC AI2,0.529,0.058
+39,Qwen2.5-Coder-7B,ARC AI2,0.609,0.1295
+40,RedPajama-INCITE-7B-Base,ARC AI2,0.391,0.6335
+41,StableBeluga2,ARC AI2,0.861,0.868
+42,Yi-6B,ARC AI2,0.503,0.1495
+43,Yi-9B,ARC AI2,0.556,0.106
+44,chatglm2-6b,ARC AI2,0.61,0.6345
+45,claude-instant-1.1,ARC AI2,0.857,0.738
+46,claude-instant-1.2,ARC AI2,0.863,0.7115
+47,deepseek-coder-1.3b-base,ARC AI2,0.254,0.3225
+48,deepseek-coder-33b-base,ARC AI2,0.422,0.3185
+49,deepseek-coder-6.7b-base,ARC AI2,0.364,0.282
+50,dolly-v2-12b,ARC AI2,0.396,0.653
+51,falcon-180B,ARC AI2,0.678,0.3455
+52,falcon-40b,ARC AI2,0.6186,0.5715
+53,falcon-7b,ARC AI2,0.4786,0.7105
+54,gemma-2b,ARC AI2,0.421,0.3555
+55,gemma-7b,ARC AI2,0.783,0.7795
+56,gpt-3.5-turbo-1106,ARC AI2,0.874,0.913
+57,gpt-j-6b,ARC AI2,0.363,0.58
+58,gpt2-xl,ARC AI2,0.25,0.6465
+59,internlm-20b,ARC AI2,0.817,0.6835
+60,internlm-7b,ARC AI2,0.695,0.821
+61,mpt-30b,ARC AI2,0.506,0.4625
+62,mpt-7b,ARC AI2,0.426,0.6475
+63,open_llama_7b,ARC AI2,0.387,0.5245
+64,opt-13b,ARC AI2,0.358,0.587
+65,phi-1_5,ARC AI2,0.444,0.49
+66,phi-2,ARC AI2,0.759,0.8195
+67,starcoder2-15b,ARC AI2,0.472,0.0605
+68,starcoder2-3b,ARC AI2,0.342,0.2395
+69,starcoder2-7b,ARC AI2,0.387,0.279
+70,text-davinci-001,ARC AI2,0.532,0.544
+71,text-davinci-002,ARC AI2,0.852,0.918
+72,vicuna-13b-v1.1,ARC AI2,0.432,0.249
+73,xgen-7b-8k-base,ARC AI2,0.412,0.44
+74,DeepSeek-R1,Aider Polyglot,0.569,0.571
+75,DeepSeek-R1-0528,Aider Polyglot,0.7140000000000001,0.675
+76,DeepSeek-V3,Aider Polyglot,0.484,0.8825
+77,DeepSeek-V3-0324,Aider Polyglot,0.551,0.7505
+78,DeepSeek-V3.2-Exp,Aider Polyglot,0.7020000000000001,0.5645
+79,DeepSeek-V3.2-Exp_thinking,Aider Polyglot,0.742,0.711
+80,Kimi-K2-Instruct,Aider Polyglot,0.591,0.597
+81,Llama-4-Maverick-17B-128E-Instruct,Aider Polyglot,0.156,0.018
+82,QwQ-32B,Aider Polyglot,0.209,0.1455
+83,Qwen2.5-Coder-32B-Instruct,Aider Polyglot,0.1639999999999999,0.349
+84,Qwen3-235B-A22B-Instruct-2507,Aider Polyglot,0.596,0.915
+85,Qwen3-32B,Aider Polyglot,0.4,0.438
+86,claude-3-5-haiku-20241022,Aider Polyglot,0.28,0.8525
+87,claude-3-5-sonnet-20241022,Aider Polyglot,0.516,0.8815
+88,claude-3-7-sonnet-20250219,Aider Polyglot,0.604,0.9295
+89,claude-3-7-sonnet-20250219_32K,Aider Polyglot,0.649,0.576
+90,claude-opus-4-20250514,Aider Polyglot,0.7070000000000001,0.718
+91,claude-opus-4-20250514_32K,Aider Polyglot,0.72,0.508
+92,claude-sonnet-4-20250514,Aider Polyglot,0.564,0.551
+93,claude-sonnet-4-20250514_32K,Aider Polyglot,0.613,0.371
+94,codestral-2501,Aider Polyglot,0.111,0.7415
+95,deepseek-chat,Aider Polyglot,0.7020000000000001,0.743
+96,deepseek-reasoner,Aider Polyglot,0.742,0.406
+97,gemini-2.0-flash-exp,Aider Polyglot,0.222,0.427
+98,gemini-2.0-flash-thinking-exp-01-21,Aider Polyglot,0.182,0.1775
+99,gemini-2.0-pro-exp-02-05,Aider Polyglot,0.356,0.311
+100,gemini-2.5-flash-preview-04-17,Aider Polyglot,0.471,0.51
+101,gemini-2.5-flash-preview-05-20,Aider Polyglot,0.44,0.2615
+102,gemini-2.5-flash-preview-05-20_24K,Aider Polyglot,0.551,0.501
+103,gemini-2.5-pro-exp-03-25,Aider Polyglot,0.7290000000000001,0.52
+104,gemini-2.5-pro-preview-05-06,Aider Polyglot,0.769,0.9045
+105,gemini-2.5-pro-preview-06-05,Aider Polyglot,0.7909999999999999,0.514
+106,gemini-2.5-pro-preview-06-05_32K,Aider Polyglot,0.831,0.5165
+107,gemma-3-27b-it,Aider Polyglot,0.049,0.016
+108,gpt-4.1-2025-04-14,Aider Polyglot,0.524,0.5985
+109,gpt-4.1-mini-2025-04-14,Aider Polyglot,0.324,0.376
+110,gpt-4.1-nano-2025-04-14,Aider Polyglot,0.089,0.069
+111,gpt-4.5-preview-2025-02-27,Aider Polyglot,0.449,0.539
+112,gpt-4o-2024-08-06,Aider Polyglot,0.231,0.4245
+113,gpt-4o-2024-11-20,Aider Polyglot,0.182,0.327
+114,gpt-4o-mini-2024-07-18,Aider Polyglot,0.036,0.0425
+115,gpt-5-2025-08-07_high,Aider Polyglot,0.88,0.7495
+116,gpt-5-2025-08-07_low,Aider Polyglot,0.813,0.496
+117,gpt-5-2025-08-07_medium,Aider Polyglot,0.867,0.6265
+118,gpt-oss-120b_high,Aider Polyglot,0.418,0.2005
+119,grok-3-beta,Aider Polyglot,0.5329999999999999,0.5655
+120,grok-3-mini-beta_high,Aider Polyglot,0.493,0.3305
+121,grok-3-mini-beta_low,Aider Polyglot,0.347,0.0955
+122,grok-4-0709,Aider Polyglot,0.7959999999999999,0.7
+123,grok-4-0709_high,Aider Polyglot,0.7959999999999999,0.513
+124,o1-2024-12-17_high,Aider Polyglot,0.617,0.3985
+125,o1-mini-2024-09-12_unknown,Aider Polyglot,0.3289999999999999,0.6495
+126,o3-2025-04-16_high,Aider Polyglot,0.813,0.5535
+127,o3-2025-04-16_medium,Aider Polyglot,0.769,0.6165
+128,o3-2025-04-16_unknown,Aider Polyglot,0.769,0.4415
+129,o3-mini-2025-01-31_high,Aider Polyglot,0.604,0.5625
+130,o3-mini-2025-01-31_medium,Aider Polyglot,0.5379999999999999,0.5375
+131,o3-pro-2025-06-10_high,Aider Polyglot,0.8490000000000001,0.4185
+132,o4-mini-2025-04-16_high,Aider Polyglot,0.72,0.734
+133,qwen-max-2025-01-25,Aider Polyglot,0.218,0.312
+134,qwen3-235b-a22b,Aider Polyglot,0.596,0.8585
+135,Inkling_thinking,AudioMultiChallenge,0.5664,0.5925
+136,gemini-2.5-flash,AudioMultiChallenge,0.4004,0.3735
+137,gemini-2.5-pro,AudioMultiChallenge,0.469,0.507
+138,gemini-3-pro-preview,AudioMultiChallenge,0.5465,0.397
+139,inkling-small,AudioMultiChallenge,0.5487,0.564
+140,DeepSeek-R1,Balrog,0.349,0.6255
+141,DeepSeek-R1-Distill-Qwen-32B,Balrog,0.195,0.1555
+142,Llama-3.1-70B-Instruct,Balrog,0.2789999999999999,0.904
+143,Llama-3.1-8B-Instruct,Balrog,0.151,0.677
+144,Llama-3.2-11B-Vision-Instruct,Balrog,0.168,0.885
+145,Llama-3.2-1B-Instruct,Balrog,0.066,0.137
+146,Llama-3.2-90B-Vision-Instruct,Balrog,0.273,0.8905
+147,Llama-3.3-70B-Instruct,Balrog,0.23,0.635
+148,claude-3-5-haiku-20241022,Balrog,0.193,0.4615
+149,claude-3-5-sonnet-20241022,Balrog,0.326,0.815
+150,claude-haiku-4-5-20251001,Balrog,0.312,0.612
+151,claude-haiku-4-5-20251001_1K,Balrog,0.312,0.51
+152,claude-opus-4-5-20251101,Balrog,0.435,0.397
+153,claude-opus-4-5-20251101_64K,Balrog,0.43,0.5445
+154,claude-opus-4-5-20251101_unknown,Balrog,0.43,0.1105
+155,gemini-1.5-flash-002,Balrog,0.146,0.119
+156,gemini-1.5-pro-002,Balrog,0.21,0.3205
+157,gemini-2.5-flash,Balrog,0.335,0.6855
+158,gemini-2.5-pro-exp-03-25,Balrog,0.433,0.7065
+159,gemini-3-flash-preview,Balrog,0.481,0.6615
+160,gemini-3-pro-preview,Balrog,0.5810000000000001,0.7455
+161,gemini-3.1-pro-preview,Balrog,0.57,0.5945
+162,gpt-4o-2024-05-13,Balrog,0.3229999999999999,0.904
+163,gpt-4o-mini-2024-07-18,Balrog,0.174,0.3835
+164,gpt-5-2025-08-07_minimal,Balrog,0.3279999999999999,0.4985
+165,grok-3-beta,Balrog,0.295,0.4145
+166,grok-4-0709,Balrog,0.436,0.679
+167,phi-4,Balrog,0.1159999999999999,0.0205
+168,qwen2.5-72b-instruct,Balrog,0.162,0.149
+169,qwen2.5-7b-instruct,Balrog,0.078,0.073
+170,DeepSeek-R1,BioLP-bench,0.198,0.14
+171,DeepSeek-V3,BioLP-bench,0.061,0.0535
+172,Llama-3.1-405B-Instruct,BioLP-bench,0.021,0.045
+173,Llama-3.1-405B-Instruct,BioLP-bench,0.034,0.1205
+174,Llama-3.1-405B-Instruct,BioLP-bench,0.042,0.1765
+175,Llama-3.1-405B-Instruct,BioLP-bench,0.062,0.3815
+176,Llama-3.1-70B-Instruct,BioLP-bench,0.026,0.169
+177,Llama-3.1-8B-Instruct,BioLP-bench,0.019,0.694
+178,Llama-4-Maverick-17B-128E-Instruct,BioLP-bench,0.125,0.2185
+179,Llama-4-Scout-17B-16E-Instruct,BioLP-bench,0.099,0.5995
+180,Mixtral-8x7B-Instruct-v0.1,BioLP-bench,0.0139999999999999,0.7225
+181,amazon.nova-lite-v1:0,BioLP-bench,0.026,0.341
+182,amazon.nova-micro-v1:0,BioLP-bench,0.0139999999999999,0.5295
+183,amazon.nova-pro-v1:0,BioLP-bench,0.06,0.4675
+184,claude-3-5-sonnet-20240620,BioLP-bench,0.061,0.1575
+185,claude-3-5-sonnet-20241022,BioLP-bench,0.239,0.905
+186,claude-3-7-sonnet-20250219,BioLP-bench,0.2339999999999999,0.7825
+187,claude-3-7-sonnet-20250219_16K,BioLP-bench,0.374,0.72
+188,claude-3-haiku-20240307,BioLP-bench,0.016,0.4775
+189,claude-3-opus-20240229,BioLP-bench,0.025,0.085
+190,claude-3-sonnet-20240229,BioLP-bench,0.026,0.446
+191,gemini-1.0-pro-001,BioLP-bench,0.01,0.419
+192,gemini-1.5-flash-001,BioLP-bench,0.048,0.4265
+193,gemini-1.5-pro-001,BioLP-bench,0.068,0.323
+194,gpt-4-turbo-2024-04-09,BioLP-bench,0.104,0.7835
+195,gpt-4.5-preview-2025-02-27,BioLP-bench,0.306,0.937
+196,gpt-4o-2024-05-13,BioLP-bench,0.171,0.8825
+197,grok-2,BioLP-bench,0.119,0.907
+198,mistral-large-2402,BioLP-bench,0.024,0.494
+199,mistral-large-2407,BioLP-bench,0.095,0.632
+200,o1-2024-12-17_medium,BioLP-bench,0.318,0.505
+201,o1-preview-2024-09-12,BioLP-bench,0.324,0.96
+202,o3-2025-04-16_medium,BioLP-bench,0.412,0.2725
+203,o3-mini-2025-01-31_medium,BioLP-bench,0.258,0.4735
+204,o4-mini-2025-04-16_medium,BioLP-bench,0.3989999999999999,0.733
+205,DeepSeek-V3.2-Exp_thinking,CL-bench,0.132,0.1945
+206,MiniMax-M2.5,CL-bench,0.114,0.1605
+207,claude-opus-4-5-20251101_unknown,CL-bench,0.211,0.521
+208,claude-opus-4-6_unknown,CL-bench,0.207,0.1755
+209,deepseek-v3.2,CL-bench,0.124,0.2175
+210,gemini-3-pro-preview_high,CL-bench,0.158,0.5425
+211,gemini-3.1-pro-preview_high,CL-bench,0.208,0.3
+212,glm-4.7,CL-bench,0.159,0.386
+213,glm-5,CL-bench,0.187,0.4805
+214,gpt-5.1-2025-11-13_high,CL-bench,0.237,0.885
+215,gpt-5.1-2025-11-13_unknown,CL-bench,0.211,0.801
+216,gpt-5.2-2025-12-11_high,CL-bench,0.181,0.2595
+217,gpt-5.2-2025-12-11_unknown,CL-bench,0.182,0.4045
+218,gpt-5.4-2026-03-05_xhigh,CL-bench,0.279,0.919
+219,grok-4-20,CL-bench,0.222,0.7165
+220,kimi-k2-thinking,CL-bench,0.176,0.661
+221,kimi-k2.5,CL-bench,0.193,0.7175
+222,mimo-v2-pro,CL-bench,0.157,0.551
+223,o3-2025-04-16_high,CL-bench,0.178,0.5205
+224,qwen3-max-2025-09-23,CL-bench,0.145,0.3385
+225,qwen3.5-plus,CL-bench,0.198,0.696
+226,qwen3.6-plus,CL-bench,0.203,0.582
+227,DeepSeek-V3.2-Exp_thinking,CL-bench Life,0.095,0.3425
+228,MiniMax-M2.5,CL-bench Life,0.063,0.107
+229,claude-opus-4-6_high,CL-bench Life,0.17,0.4755
+230,claude-opus-4-6_unknown,CL-bench Life,0.136,0.1955
+231,deepseek-v3.2,CL-bench Life,0.074,0.182
+232,deepseek-v4-pro_high,CL-bench Life,0.135,0.3905
+233,gemini-3.1-pro-preview_high,CL-bench Life,0.169,0.601
+234,glm-4.7_high,CL-bench Life,0.109,0.549
+235,gpt-5.1-2025-11-13_high,CL-bench Life,0.173,0.8015
+236,gpt-5.4-2026-03-05_high,CL-bench Life,0.193,0.8325
+237,gpt-5.4-2026-03-05_unknown,CL-bench Life,0.138,0.1965
+238,gpt-5.4-2026-03-05_xhigh,CL-bench Life,0.217,0.885
+239,gpt-5.5_high,CL-bench Life,0.222,0.733
+240,grok-4-20_high,CL-bench Life,0.119,0.58
+241,kimi-k2.5_high,CL-bench Life,0.132,0.6135
+242,mimo-v2-pro_high,CL-bench Life,0.069,0.42
+243,qwen3.5-plus_high,CL-bench Life,0.124,0.6075
+244,claude-mythos-preview-early,CTI-REALM,0.685,0.2015
+245,claude-opus-4-5-20251101_unknown,CTI-REALM,0.6244,0.809
+246,claude-opus-4-6_unknown,CTI-REALM,0.6373,0.6175
+247,claude-sonnet-4-5-20250929_unknown,CTI-REALM,0.5872,0.8575
+248,gpt-4.1-2025-04-14,CTI-REALM,0.4186,0.4485
+249,gpt-5-2025-08-07_unknown,CTI-REALM,0.572,0.6935
+250,gpt-5-mini-2025-08-07_unknown,CTI-REALM,0.4506,0.493
+251,gpt-5.1-2025-11-13_unknown,CTI-REALM,0.5133,0.4155
+252,gpt-5.2-2025-12-11_unknown,CTI-REALM,0.5716,0.7265
+253,o3-2025-04-16_unknown,CTI-REALM,0.4707,0.278
+254,o4-mini-2025-04-16,CTI-REALM,0.3602,0.091
+255,claude-3-5-haiku-20241022,CadEval,0.32,0.8115
+256,claude-3-5-sonnet-20241022,CadEval,0.48,0.8165
+257,claude-3-7-sonnet-20250219,CadEval,0.54,0.864
+258,claude-3-haiku-20240307,CadEval,0.12,0.452
+259,gemini-1.5-pro-002,CadEval,0.34,0.546
+260,gemini-2.0-flash-001,CadEval,0.3,0.1855
+261,gemini-2.5-pro-exp-03-25,CadEval,0.64,0.4675
+262,gpt-4.1-2025-04-14,CadEval,0.42,0.2975
+263,gpt-4.1-mini-2025-04-14,CadEval,0.16,0.012
+264,gpt-4o-2024-08-06,CadEval,0.26,0.3455
+265,o1-2024-12-17_medium,CadEval,0.56,0.55
+266,o3-2025-04-16_medium,CadEval,0.74,0.806
+267,o3-mini-2025-01-31_medium,CadEval,0.54,0.642
+268,o4-mini-2025-04-16_medium,CadEval,0.62,0.682
+269,Llama-3.1-405B-Instruct,Cybench,0.075,0.4265
+270,Meta-Llama-3-70B-Instruct,Cybench,0.05,0.685
+271,Mixtral-8x22B-Instruct-v0.1,Cybench,0.075,0.8395
+272,claude-3-5-sonnet-20240620,Cybench,0.175,0.853
+273,claude-3-7-sonnet-20250219,Cybench,0.2,0.545
+274,claude-3-7-sonnet-20250219_unknown,Cybench,0.2,0.4915
+275,claude-3-opus-20240229,Cybench,0.1,0.6935
+277,claude-opus-4-1-20250805,Cybench,0.42,0.576
+278,claude-opus-4-1-20250805_unknown,Cybench,0.42,0.4675
+279,claude-opus-4-20250514,Cybench,0.38,0.559
+280,claude-opus-4-20250514_unknown,Cybench,0.38,0.2615
+281,claude-opus-4-5-20251101_unknown,Cybench,0.82,0.7
+282,claude-opus-4-6_unknown,Cybench,0.93,0.8055
+283,claude-opus-4-7_unknown,Cybench,0.96,0.9125
+284,claude-sonnet-4-20250514,Cybench,0.35,0.7625
+285,claude-sonnet-4-20250514_unknown,Cybench,0.35,0.497
+286,claude-sonnet-4-5-20250929,Cybench,0.55,0.898
+287,claude-sonnet-4-5-20250929_unknown,Cybench,0.6,0.3815
+288,gemini-1.5-pro-001,Cybench,0.075,0.2875
+289,gemini-1.5-pro-001-feb24,Cybench,0.075,0.398
+290,gpt-4.5-preview-2025-02-27,Cybench,0.175,0.338
+291,gpt-4o-2024-05-13,Cybench,0.125,0.5815
+292,gpt-4o-2024-11-20,Cybench,0.125,0.7095
+293,grok-4-0709,Cybench,0.43,0.32
+294,grok-4-fast,Cybench,0.3,0.5305
+295,muse-spark,Cybench,0.654,0.1015
+296,o1-mini-2024-09-12_medium,Cybench,0.1,0.1775
+297,o1-mini-2024-09-12_unknown,Cybench,0.1,0.3735
+298,o1-preview-2024-09-12,Cybench,0.1,0.047
+299,o3-mini-2025-01-31,Cybench,0.225,0.566
+300,o3-mini-2025-01-31_medium,Cybench,0.225,0.254
+301,claude-3-7-sonnet-20250219_unknown,CyberGym,0.4968421052631579,0.4415
+302,claude-mythos-5,CyberGym,0.8821052631578947,0.515
+303,claude-mythos-preview,CyberGym,0.8747368421052631,0.4765
+304,claude-opus-4-1-20250805_unknown,CyberGym,0.6452631578947369,0.669
+305,claude-opus-4-5-20251101_unknown,CyberGym,0.5326315789473685,0.033
+306,claude-opus-4-6_unknown,CyberGym,0.7789473684210526,0.5875
+307,claude-opus-4-7_unknown,CyberGym,0.768421052631579,0.468
+308,claude-opus-4-8_unknown,CyberGym,0.8294736842105263,0.697
+309,claude-sonnet-4-20250514_unknown,CyberGym,0.6263157894736842,0.6855
+310,claude-sonnet-4-5-20250929_unknown,CyberGym,0.7021052631578948,0.6615
+311,claude-sonnet-4-6_unknown,CyberGym,0.6863157894736842,0.5535
+312,gpt-5.4-2026-03-05_unknown,CyberGym,0.8315789473684211,0.762
+313,gpt-5.5,CyberGym,0.8621052631578948,0.7475
+314,gpt-5.5_unknown,CyberGym,0.8610526315789474,0.7185
+315,gpt-5.6-sol_unknown,CyberGym,0.88,0.565
+316,muse-spark,CyberGym,0.4578947368421053,0.0105
+317,DeepSeek-R1-0528,DeepResearch Bench,0.351,0.0205
+318,claude-3-7-sonnet-20250219_2K,DeepResearch Bench,0.436,0.4395
+319,claude-haiku-4-5-20251001_low,DeepResearch Bench,0.455,0.5185
+320,claude-opus-4-1-20250805,DeepResearch Bench,0.483,0.662
+321,claude-opus-4-20250514_2K,DeepResearch Bench,0.4679999999999999,0.5765
+322,claude-opus-4-5-20251101_high,DeepResearch Bench,0.5479999999999999,0.827
+323,claude-opus-4-5-20251101_low,DeepResearch Bench,0.537,0.7945
+324,claude-opus-4-6_high,DeepResearch Bench,0.5529999999999999,0.7985
+325,claude-opus-4-6_low,DeepResearch Bench,0.514,0.762
+326,claude-opus-4-6_medium,DeepResearch Bench,0.532,0.787
+327,claude-opus-4-8_high,DeepResearch Bench,0.502,0.5845
+328,claude-opus-4-8_low,DeepResearch Bench,0.493,0.554
+329,claude-opus-4-8_medium,DeepResearch Bench,0.474,0.5785
+330,claude-sonnet-4-20250514_2K,DeepResearch Bench,0.466,0.564
+331,claude-sonnet-4-5-20250929_2K,DeepResearch Bench,0.526,0.764
+332,claude-sonnet-4-5-20250929_low,DeepResearch Bench,0.475,0.5875
+333,claude-sonnet-4-6_high,DeepResearch Bench,0.549,0.9155
+334,claude-sonnet-4-6_low,DeepResearch Bench,0.504,0.7105
+335,gemini-2.5-pro,DeepResearch Bench,0.415,0.1615
+336,gemini-2.5-pro-preview-06-05,DeepResearch Bench,0.428,0.2015
+337,gemini-3-flash-preview_high,DeepResearch Bench,0.479,0.451
+338,gemini-3-flash-preview_low,DeepResearch Bench,0.498,0.699
+339,gemini-3-flash-preview_minimal,DeepResearch Bench,0.49,0.663
+340,gemini-3-pro-preview_low,DeepResearch Bench,0.4629999999999999,0.524
+341,gemini-3.1-flash-lite,DeepResearch Bench,0.364,0.0295
+342,gemini-3.1-flash-lite_low,DeepResearch Bench,0.373,0.057
+343,gemini-3.1-pro-preview_high,DeepResearch Bench,0.478,0.348
+344,gemini-3.1-pro-preview_low,DeepResearch Bench,0.445,0.4835
+345,gpt-5-2025-08-07_high,DeepResearch Bench,0.481,0.554
+346,gpt-5-2025-08-07_low,DeepResearch Bench,0.496,0.64
+347,gpt-5-2025-08-07_medium,DeepResearch Bench,0.486,0.5705
+348,gpt-5-2025-08-07_minimal,DeepResearch Bench,0.489,0.735
+349,gpt-5.1-2025-11-13_low,DeepResearch Bench,0.428,0.41
+350,gpt-5.2-2025-12-11_low,DeepResearch Bench,0.411,0.146
+351,gpt-5.4-2026-03-05_low,DeepResearch Bench,0.351,0.015
+352,gpt-5.4-mini-2026-03-17_low,DeepResearch Bench,0.363,0.1755
+353,gpt-5.5_high,DeepResearch Bench,0.54,0.679
+354,gpt-5.5_low,DeepResearch Bench,0.487,0.4805
+355,gpt-5.5_medium,DeepResearch Bench,0.496,0.6875
+356,grok-4-0709,DeepResearch Bench,0.473,0.538
+357,o3-2025-04-16_medium,DeepResearch Bench,0.452,0.389
+358,MiniMax-M2.7,ExploitBench,0.133,0.446
+359,claude-haiku-4-5-20251001_unknown,ExploitBench,0.1369999999999999,0.5605
+360,claude-mythos-5,ExploitBench,0.672,0.667
+361,claude-mythos-preview,ExploitBench,0.6585518292682927,0.571
+362,claude-mythos-preview-early,ExploitBench,0.738,0.8145
+363,claude-opus-4-7,ExploitBench,0.265,0.1995
+364,claude-opus-4-7_unknown,ExploitBench,0.2317073170731707,0.067
+365,claude-opus-4-8_unknown,ExploitBench,0.3475,0.3365
+366,claude-sonnet-4-6,ExploitBench,0.236,0.6785
+367,claude-sonnet-4-6_unknown,ExploitBench,0.2109756097560975,0.6015
+368,gemini-3.1-pro-preview,ExploitBench,0.261,0.4485
+369,gemini-3.1-pro-preview_unknown,ExploitBench,0.1753048780487804,0.5585
+370,glm-5.1,ExploitBench,0.181,0.4095
+371,gpt-5.5_unknown,ExploitBench,0.474,0.5665
+372,gpt-5.6-sol_unknown,ExploitBench,0.633,0.6185
+373,kimi-k2.6,ExploitBench,0.184,0.4215
+374,Inkling_xhigh,FrontierSWE v2,0.0411888647058823,0.075
+375,claude-fable-5-1_max,FrontierSWE v2,0.5629078999999999,0.6965
+376,gemini-3.7-flash_high,FrontierSWE v2,0.2026059058823529,0.3095
+377,glm-5.3_max,FrontierSWE v2,0.3018186411764705,0.7775
+378,gpt-5.6-sol_max,FrontierSWE v2,0.3220246705882353,0.5875
+379,grok-4.6_xhigh,FrontierSWE v2,0.2528619588235294,0.6335
+380,kimi-k3_max,FrontierSWE v2,0.2586503205882353,0.594
+381,muse-spark-1.2_xhigh,FrontierSWE v2,0.1197025647058823,0.407
+382,qwen3.8-max_xhigh,FrontierSWE v2,0.1580935058823529,0.3495
+384,MiniMax-M3,GBAEval,0.009136320401503,0.143
+385,claude-fable-5_unknown,GBAEval,0.7447198828312318,0.7925
+386,claude-opus-4-6_unknown,GBAEval,0.4411559216788414,0.6985
+387,claude-opus-4-7_unknown,GBAEval,0.4381136187608589,0.664
+388,claude-opus-4-8_unknown,GBAEval,0.7090450062635527,0.855
+389,claude-opus-5_unknown,GBAEval,0.7959852171423216,0.885
+390,claude-sonnet-4-6_unknown,GBAEval,0.4875663483204475,0.844
+391,claude-sonnet-5_unknown,GBAEval,0.6526299757455419,0.8455
+392,gemini-3.1-pro-preview,GBAEval,0.0084627909799686,0.096
+393,gemini-3.5-flash_unknown,GBAEval,0.0670136640255754,0.5655
+395,glm-5.2_unknown,GBAEval,0.0001721823188174,0.2825
+396,gpt-5.4-2026-03-05_unknown,GBAEval,0.4514817826662626,0.7055
+397,gpt-5.5_unknown,GBAEval,0.5322037178151383,0.6325
+398,gpt-5.6-sol_unknown,GBAEval,0.5259227864005247,0.465
+399,grok-4.5_unknown,GBAEval,0.6541267565853209,0.836
+400,kimi-k2.6,GBAEval,0.0086249321153157,0.1645
+401,kimi-k2.7-code,GBAEval,0.0085265631089688,0.194
+402,kimi-k3_unknown,GBAEval,0.4834685537953759,0.75
+403,muse-spark-1.1,GBAEval,0.0791725771495411,0.2085
+404,qwen3.7-max,GBAEval,0.0040666088933695,0.087
+405,claude-fable-5_max,GDP.pdf,0.298,0.942
+406,claude-fable-5_unknown,GDP.pdf,0.3,0.8235
+407,claude-opus-4-7_max,GDP.pdf,0.21,0.745
+408,claude-opus-4-8_max,GDP.pdf,0.24,0.781
+409,claude-opus-5_max,GDP.pdf,0.24,0.7085
+410,claude-sonnet-4-6_max,GDP.pdf,0.18,0.6675
+411,gemini-3-flash-preview,GDP.pdf,0.1,0.0875
+412,gemini-3-flash-preview_high,GDP.pdf,0.1,0.0485
+413,gemini-3.1-pro-preview,GDP.pdf,0.17,0.365
+414,gemini-3.1-pro-preview_high,GDP.pdf,0.17,0.3235
+415,gemini-3.5-flash-lite_high,GDP.pdf,0.1,0.104
+416,gemini-3.5-flash_medium,GDP.pdf,0.14,0.48
+417,gemini-3.5-flash_unknown,GDP.pdf,0.14,0.4425
+418,gemini-3.6-flash_high,GDP.pdf,0.14,0.1415
+419,gemini-3.6-flash_unknown,GDP.pdf,0.14,0.4965
+420,gemini-3.7-flash_high,GDP.pdf,0.238,0.6995
+421,gemini-3.7-flash_medium,GDP.pdf,0.218,0.748
+422,glm-5.3-flash_max,GDP.pdf,0.14,0.236
+423,gpt-5.5_xhigh,GDP.pdf,0.26,0.7845
+424,gpt-5.6-luna_medium,GDP.pdf,0.227,0.7635
+425,gpt-5.6-luna_unknown,GDP.pdf,0.227,0.787
+426,gpt-5.6-sol_max,GDP.pdf,0.307,0.906
+427,gpt-5.6-sol_unknown,GDP.pdf,0.307,0.723
+428,gpt-5.6-terra_medium,GDP.pdf,0.247,0.807
+429,gpt-5.6-terra_unknown,GDP.pdf,0.247,0.805
+430,grok-4.3_high,GDP.pdf,0.08,0.0275
+431,grok-4.5_high,GDP.pdf,0.14,0.1935
+432,grok-4.6_high,GDP.pdf,0.16,0.292
+433,grok-4.6_xhigh,GDP.pdf,0.172,0.346
+434,kimi-k2.6,GDP.pdf,0.12,0.1435
+435,kimi-k3_max,GDP.pdf,0.19,0.4285
+436,muse-spark-1.1,GDP.pdf,0.15,0.1605
+437,muse-spark-1.1_medium,GDP.pdf,0.15,0.5265
+438,muse-spark-1.2,GDP.pdf,0.12,0.413
+439,muse-spark-1.2_xhigh,GDP.pdf,0.16,0.4155
+440,qwen3.8-max_xhigh,GDP.pdf,0.2319999999999999,0.7545
+441,DeepSeek-R1,GPQA Diamond,0.6922348484848484,0.3675
+442,DeepSeek-R1-0528,GPQA Diamond,0.7632575757575758,0.486
+443,DeepSeek-R1-Distill-Llama-70B,GPQA Diamond,0.5574494949494949,0.101
+444,DeepSeek-R1-Distill-Qwen-14B,GPQA Diamond,0.4469696969696969,0.016
+445,DeepSeek-R1-Distill-Qwen-32B,GPQA Diamond,0.6414141414141414,0.6465
+446,DeepSeek-V3,GPQA Diamond,0.5653409090909091,0.3425
+447,DeepSeek-V3-0324,GPQA Diamond,0.6761363636363636,0.566
+448,Hermes-2-Theta-Llama-3-70B,GPQA Diamond,0.3746843434343434,0.5815
+449,Inkling_xhigh,GPQA Diamond,0.8825757575757576,0.788
+450,Llama-2-70b-chat,GPQA Diamond,0.2632575757575757,0.7695
+451,Llama-3.1-405B-Instruct,GPQA Diamond,0.5091540404040404,0.5445
+452,Llama-3.1-70B-Instruct,GPQA Diamond,0.4419191919191919,0.4425
+453,Llama-3.1-8B-Instruct,GPQA Diamond,0.269570707070707,0.4765
+454,Llama-3.1-Tulu-3-70B-DPO,GPQA Diamond,0.4627525252525252,0.531
+455,Llama-3.2-1B-Instruct,GPQA Diamond,0.2392676767676767,0.5635
+456,Llama-3.2-90B-Vision-Instruct,GPQA Diamond,0.4103535353535353,0.309
+457,Llama-3.3-70B-Instruct,GPQA Diamond,0.4744318181818182,0.417
+458,Llama-4-Maverick-17B-128E-Instruct-FP8,GPQA Diamond,0.6698232323232324,0.691
+459,Llama-4-Scout-17B-16E-Instruct,GPQA Diamond,0.5183080808080808,0.4695
+460,Meta-Llama-3-70B-Instruct,GPQA Diamond,0.4056186868686868,0.7095
+461,Meta-Llama-3-8B-Instruct,GPQA Diamond,0.2607323232323232,0.5615
+462,MiniMax-M3,GPQA Diamond,0.9090909090909092,0.623
+463,MiniMax-M3_none,GPQA Diamond,0.8131313131313131,0.5055
+464,Mistral-7B-Instruct-v0.3,GPQA Diamond,0.1518308080808081,0.277
+465,Mixtral-8x22B-Instruct-v0.1,GPQA Diamond,0.3405934343434343,0.2865
+466,Mixtral-8x7B-Instruct-v0.1,GPQA Diamond,0.3058712121212121,0.9315
+467,Phi-3-medium-128k-instruct,GPQA Diamond,0.2758838383838384,0.148
+468,QwQ-32B,GPQA Diamond,0.6534090909090909,0.7655
+469,Qwen3-235B-A22B-Thinking-2507,GPQA Diamond,0.8005050505050505,0.988
+470,Qwen3-30B-A3B,GPQA Diamond,0.6167929292929293,0.481
+471,Qwen3-30B-A3B_none,GPQA Diamond,0.5037878787878788,0.4925
+472,Qwen3-32B,GPQA Diamond,0.6571969696969697,0.554
+473,Qwen3-32B_none,GPQA Diamond,0.5410353535353535,0.4915
+474,WizardLM-2-8x22B,GPQA Diamond,0.4343434343434343,0.692
+475,Yi-1.5-34B-Chat,GPQA Diamond,0.319760101010101,0.333
+476,Yi-34B-Chat,GPQA Diamond,0.1474116161616161,0.026
+477,claude-2.0,GPQA Diamond,0.3465909090909091,0.521
+478,claude-2.1,GPQA Diamond,0.3295454545454545,0.405
+479,claude-3-5-haiku-20241022,GPQA Diamond,0.3813131313131313,0.11
+480,claude-3-5-sonnet-20240620,GPQA Diamond,0.5404040404040404,0.4055
+481,claude-3-5-sonnet-20241022,GPQA Diamond,0.553030303030303,0.16
+482,claude-3-7-sonnet-20250219,GPQA Diamond,0.6603535353535354,0.6125
+483,claude-3-7-sonnet-20250219_16K,GPQA Diamond,0.7676767676767676,0.722
+484,claude-3-7-sonnet-20250219_32K,GPQA Diamond,0.7676767676767676,0.6185
+485,claude-3-7-sonnet-20250219_64K,GPQA Diamond,0.7850378787878788,0.6155
+486,claude-3-haiku-20240307,GPQA Diamond,0.3630050505050505,0.7495
+487,claude-3-opus-20240229,GPQA Diamond,0.4715909090909091,0.405
+488,claude-3-sonnet-20240229,GPQA Diamond,0.4059343434343434,0.6995
+489,claude-fable-5_high,GPQA Diamond,0.8333333333333334,0.504
+490,claude-fable-5_low,GPQA Diamond,0.7878787878787878,0.49
+491,claude-fable-5_max,GPQA Diamond,0.8585858585858586,0.2745
+492,claude-haiku-4-5-20251001,GPQA Diamond,0.6047979797979798,0.1785
+493,claude-haiku-4-5-20251001_32K,GPQA Diamond,0.7121212121212122,0.322
+494,claude-opus-4-1-20250805,GPQA Diamond,0.7323232323232324,0.2165
+495,claude-opus-4-1-20250805_16K,GPQA Diamond,0.7727272727272727,0.451
+496,claude-opus-4-1-20250805_27K,GPQA Diamond,0.7676767676767676,0.4805
+497,claude-opus-4-20250514,GPQA Diamond,0.6919191919191919,0.1295
+498,claude-opus-4-20250514_16K,GPQA Diamond,0.7626262626262627,0.4415
+499,claude-opus-4-5-20251101,GPQA Diamond,0.8068181818181818,0.135
+500,claude-opus-4-5-20251101_16K,GPQA Diamond,0.8547979797979798,0.5305
+501,claude-opus-4-5-20251101_32K,GPQA Diamond,0.860479797979798,0.503
+502,claude-opus-4-6_32K,GPQA Diamond,0.9053030303030304,0.539
+503,claude-opus-4-6_64K,GPQA Diamond,0.8876262626262627,0.525
+504,claude-opus-4-6_max,GPQA Diamond,0.8838383838383839,0.613
+505,claude-opus-4-7_max,GPQA Diamond,0.8636363636363636,0.489
+506,claude-opus-4-7_xhigh,GPQA Diamond,0.9015151515151516,0.5045
+507,claude-opus-4-8_low,GPQA Diamond,0.8838383838383839,0.5115
+508,claude-opus-4-8_max,GPQA Diamond,0.9103535353535354,0.4405
+509,claude-opus-4-8_none,GPQA Diamond,0.8535353535353535,0.5235
+510,claude-opus-5,GPQA Diamond,0.9292929292929292,0.723
+511,claude-opus-5_low,GPQA Diamond,0.8787878787878788,0.512
+512,claude-opus-5_max,GPQA Diamond,0.9387626262626264,0.4855
+513,claude-sonnet-4-20250514,GPQA Diamond,0.6666666666666666,0.2185
+514,claude-sonnet-4-20250514_16K,GPQA Diamond,0.7575757575757576,0.4635
+515,claude-sonnet-4-20250514_32K,GPQA Diamond,0.7828282828282829,0.5895
+516,claude-sonnet-4-20250514_59K,GPQA Diamond,0.7781991873045173,0.495
+517,claude-sonnet-4-5-20250929,GPQA Diamond,0.7373737373737373,0.1815
+518,claude-sonnet-4-5-20250929_16K,GPQA Diamond,0.7878787878787878,0.51
+519,claude-sonnet-4-5-20250929_32K,GPQA Diamond,0.817258883248731,0.4865
+520,claude-sonnet-4-5-20250929_59K,GPQA Diamond,0.8232323232323232,0.5695
+521,claude-sonnet-4-6_32K,GPQA Diamond,0.8737373737373737,0.518
+522,claude-sonnet-4-6_high,GPQA Diamond,0.8333333333333334,0.4605
+523,claude-sonnet-4-6_max,GPQA Diamond,0.7878787878787878,0.4585
+524,claude-sonnet-4-6_medium,GPQA Diamond,0.8333333333333334,0.524
+525,claude-sonnet-5_max,GPQA Diamond,0.803030303030303,0.505
+526,claude-sonnet-5_xhigh,GPQA Diamond,0.9053030303030304,0.606
+527,dbrx-instruct,GPQA Diamond,0.3289141414141414,0.662
+528,deepseek-chat,GPQA Diamond,0.7121212121212122,0.312
+529,deepseek-llm-67b-chat,GPQA Diamond,0.2462121212121212,0.548
+530,deepseek-reasoner,GPQA Diamond,0.8342352092352093,0.5985
+531,deepseek-v4-flash-0731_max,GPQA Diamond,0.9103535353535354,0.6165
+532,deepseek-v4-pro-0813_max,GPQA Diamond,0.9166666666666666,0.5425
+533,deepseek-v4-pro_high,GPQA Diamond,0.9090909090909092,0.5645
+534,deepseek-v4-pro_max,GPQA Diamond,0.8964646464646465,0.5275
+535,deepseek-v4-pro_none,GPQA Diamond,0.7323232323232324,0.494
+536,gemini-1.0-pro-001,GPQA Diamond,0.3396464646464646,0.7805
+537,gemini-1.5-flash-001,GPQA Diamond,0.4037247474747474,0.2005
+538,gemini-1.5-flash-002,GPQA Diamond,0.4731691919191919,0.364
+539,gemini-1.5-flash-8b-001,GPQA Diamond,0.3295454545454545,0.5125
+540,gemini-1.5-pro-001,GPQA Diamond,0.4586489898989899,0.1315
+541,gemini-1.5-pro-002,GPQA Diamond,0.5722853535353535,0.578
+542,gemini-2.0-flash-001,GPQA Diamond,0.6414141414141414,0.6665
+543,gemini-2.0-flash-thinking-exp-01-21,GPQA Diamond,0.5707070707070707,0.549
+544,gemini-2.0-pro-exp-02-05,GPQA Diamond,0.6565656565656566,0.561
+545,gemini-2.5-pro,GPQA Diamond,0.8529040404040404,0.9285
+546,gemini-2.5-pro-exp-03-25,GPQA Diamond,0.8383838383838383,0.774
+547,gemini-2.5-pro-preview-05-06,GPQA Diamond,0.6666666666666666,0.1195
+548,gemini-2.5-pro-preview-06-05,GPQA Diamond,0.8484848484848485,0.676
+549,gemini-3-flash-preview,GPQA Diamond,0.8320707070707071,0.3205
+550,gemini-3-flash-preview_high,GPQA Diamond,0.8939393939393939,0.5475
+551,gemini-3-pro-preview,GPQA Diamond,0.9261363636363636,0.682
+552,gemini-3.1-flash-lite_high,GPQA Diamond,0.8181818181818182,0.499
+553,gemini-3.1-flash-lite_low,GPQA Diamond,0.7424242424242424,0.563
+554,gemini-3.1-flash-lite_minimal,GPQA Diamond,0.7373737373737373,0.491
+555,gemini-3.1-pro-preview,GPQA Diamond,0.941,0.754
+556,gemini-3.1-pro-preview_high,GPQA Diamond,0.9444444444444444,0.6445
+557,gemini-3.5-flash-lite_high,GPQA Diamond,0.8333333333333334,0.567
+558,gemini-3.5-flash-lite_low,GPQA Diamond,0.7575757575757576,0.4875
+559,gemini-3.5-flash-lite_minimal,GPQA Diamond,0.7424242424242424,0.488
+560,gemini-3.5-flash_high,GPQA Diamond,0.928030303030303,0.478
+561,gemini-3.5-flash_low,GPQA Diamond,0.8888888888888888,0.5455
+562,gemini-3.5-flash_minimal,GPQA Diamond,0.8636363636363636,0.5295
+563,gemini-3.6-flash_high,GPQA Diamond,0.9412878787878788,0.605
+564,gemini-3.6-flash_low,GPQA Diamond,0.8636363636363636,0.5165
+565,gemini-3.6-flash_minimal,GPQA Diamond,0.8585858585858586,0.5225
+566,gemini-3.7-flash_high,GPQA Diamond,0.9482323232323232,0.6235
+567,gemma-2-27b-it,GPQA Diamond,0.3648989898989899,0.415
+568,gemma-2-9b-it,GPQA Diamond,0.2746212121212121,0.2505
+569,gemma-3-12b-it,GPQA Diamond,0.394570707070707,0.469
+570,gemma-3-27b-it,GPQA Diamond,0.4772727272727273,0.2895
+571,gemma-3-4b-it,GPQA Diamond,0.2323232323232323,0.5455
+572,gemma-4-26b-a4b_minimal,GPQA Diamond,0.7323232323232324,0.485
+573,gemma-4-31b-it_minimal,GPQA Diamond,0.7575757575757576,0.4905
+574,glm-4.7,GPQA Diamond,0.8333333333333334,0.732
+575,glm-5,GPQA Diamond,0.8781725888324873,0.611
+576,glm-5.1,GPQA Diamond,0.898989898989899,0.753
+577,glm-5.2_low,GPQA Diamond,0.8787878787878788,0.5215
+578,glm-5.2_max,GPQA Diamond,0.918560606060606,0.5805
+579,glm-5.2_none,GPQA Diamond,0.7121212121212122,0.494
+580,glm-5.3-flash_max,GPQA Diamond,0.9015151515151516,0.587
+581,glm-5.3_max,GPQA Diamond,0.9090909090909092,0.374
+582,gpt-3.5-turbo-0125,GPQA Diamond,0.271780303030303,0.4505
+583,gpt-3.5-turbo-1106,GPQA Diamond,0.2803030303030303,0.345
+584,gpt-4-0125-preview,GPQA Diamond,0.4226641414141414,0.5055
+585,gpt-4-0314,GPQA Diamond,0.3573232323232323,0.0735
+586,gpt-4-0613,GPQA Diamond,0.3065025252525252,0.0945
+587,gpt-4-1106-preview,GPQA Diamond,0.4236111111111111,0.4435
+588,gpt-4-turbo-2024-04-09,GPQA Diamond,0.4659090909090909,0.3665
+589,gpt-4.1-2025-04-14,GPQA Diamond,0.6691919191919192,0.3925
+590,gpt-4.1-mini-2025-04-14,GPQA Diamond,0.6584595959595959,0.7405
+591,gpt-4.1-nano-2025-04-14,GPQA Diamond,0.4892676767676767,0.375
+592,gpt-4.5-preview-2025-02-27,GPQA Diamond,0.6868686868686869,0.705
+593,gpt-4o-2024-05-13,GPQA Diamond,0.4889520202020202,0.1675
+594,gpt-4o-2024-08-06,GPQA Diamond,0.4921085858585858,0.2285
+595,gpt-4o-2024-11-20,GPQA Diamond,0.4788510101010101,0.2565
+596,gpt-4o-mini-2024-07-18,GPQA Diamond,0.3772095959595959,0.1285
+597,gpt-5-2025-08-07_high,GPQA Diamond,0.8617424242424242,0.654
+598,gpt-5-2025-08-07_medium,GPQA Diamond,0.8535353535353535,0.503
+599,gpt-5-2025-08-07_minimal,GPQA Diamond,0.7171717171717171,0.4885
+600,gpt-5-mini-2025-08-07_high,GPQA Diamond,0.75,0.3455
+601,gpt-5-mini-2025-08-07_medium,GPQA Diamond,0.7165404040404041,0.229
+602,gpt-5-mini-2025-08-07_minimal,GPQA Diamond,0.7171717171717171,0.5015
+603,gpt-5-nano-2025-08-07_high,GPQA Diamond,0.6944444444444444,0.327
+604,gpt-5-nano-2025-08-07_low,GPQA Diamond,0.5757575757575758,0.476
+605,gpt-5-nano-2025-08-07_medium,GPQA Diamond,0.6742424242424242,0.3505
+606,gpt-5-nano-2025-08-07_minimal,GPQA Diamond,0.4848484848484848,0.4795
+607,gpt-5.1-2025-11-13_high,GPQA Diamond,0.8762626262626263,0.4075
+608,gpt-5.1-2025-11-13_medium,GPQA Diamond,0.8503787878787878,0.554
+609,gpt-5.1-2025-11-13_none,GPQA Diamond,0.6666666666666666,0.4025
+610,gpt-5.2-2025-12-11_high,GPQA Diamond,0.8819444444444444,0.389
+611,gpt-5.2-2025-12-11_low,GPQA Diamond,0.827020202020202,0.5825
+612,gpt-5.2-2025-12-11_medium,GPQA Diamond,0.8787878787878788,0.4405
+613,gpt-5.2-2025-12-11_none,GPQA Diamond,0.7323232323232324,0.472
+614,gpt-5.2-2025-12-11_xhigh,GPQA Diamond,0.914,0.6015
+615,gpt-5.4-2026-03-05_high,GPQA Diamond,0.898989898989899,0.3165
+616,gpt-5.4-2026-03-05_low,GPQA Diamond,0.8484848484848485,0.613
+617,gpt-5.4-2026-03-05_medium,GPQA Diamond,0.8888888888888888,0.5305
+618,gpt-5.4-2026-03-05_none,GPQA Diamond,0.7474747474747475,0.497
+619,gpt-5.4-2026-03-05_xhigh,GPQA Diamond,0.933,0.49
+620,gpt-5.4-mini-2026-03-17_high,GPQA Diamond,0.8358585858585859,0.551
+621,gpt-5.4-mini-2026-03-17_none,GPQA Diamond,0.6414141414141414,0.47
+622,gpt-5.4-mini-2026-03-17_xhigh,GPQA Diamond,0.8686868686868687,0.5185
+623,gpt-5.4-nano-2026-03-17_high,GPQA Diamond,0.7847,0.5985
+624,gpt-5.4-nano-2026-03-17_low,GPQA Diamond,0.7222222222222222,0.52
+625,gpt-5.4-nano-2026-03-17_none,GPQA Diamond,0.5555555555555556,0.483
+626,gpt-5.4-pro-2026-03-05_xhigh,GPQA Diamond,0.946,0.6225
+627,gpt-5.5_low,GPQA Diamond,0.9065656565656566,0.537
+628,gpt-5.5_none,GPQA Diamond,0.7727272727272727,0.514
+629,gpt-5.6-luna_low,GPQA Diamond,0.8232323232323232,0.4855
+630,gpt-5.6-luna_max,GPQA Diamond,0.9160353535353536,0.595
+631,gpt-5.6-luna_none,GPQA Diamond,0.6363636363636364,0.501
+632,gpt-5.6-sol_low,GPQA Diamond,0.898989898989899,0.559
+633,gpt-5.6-sol_max,GPQA Diamond,0.9349747474747476,0.273
+634,gpt-5.6-sol_none,GPQA Diamond,0.8282828282828283,0.5155
+635,gpt-5.6-terra_low,GPQA Diamond,0.8737373737373737,0.5065
+636,gpt-5.6-terra_max,GPQA Diamond,0.933080808080808,0.612
+637,gpt-5.6-terra_none,GPQA Diamond,0.7727272727272727,0.492
+638,gpt-6-astra_max,GPQA Diamond,0.9577020202020202,0.4915
+639,gpt-oss-120b_high,GPQA Diamond,0.7575757575757576,0.745
+640,gpt-oss-20b_high,GPQA Diamond,0.4595959595959596,0.4865
+641,gpt-oss-20b_low,GPQA Diamond,0.5315656565656566,0.468
+642,gpt-oss-20b_medium,GPQA Diamond,0.6079545454545454,0.4905
+643,grok-2-1212,GPQA Diamond,0.5378787878787878,0.303
+644,grok-3-beta,GPQA Diamond,0.6758207070707071,0.401
+645,grok-3-mini-beta_high,GPQA Diamond,0.7462121212121212,0.699
+646,grok-3-mini-beta_low,GPQA Diamond,0.7626262626262627,0.841
+647,grok-4-0709,GPQA Diamond,0.87,0.9255
+648,grok-4.20-0309-reasoning,GPQA Diamond,0.8933080808080808,0.627
+649,grok-4.3_high,GPQA Diamond,0.8882575757575758,0.679
+650,grok-4.5_high,GPQA Diamond,0.9343434343434344,0.7295
+651,grok-4.6_high,GPQA Diamond,0.9400252525252524,0.6485
+652,grok-4.6_xhigh,GPQA Diamond,0.9318181818181818,0.5635
+653,inkling-small_xhigh,GPQA Diamond,0.88510101010101,0.657
+654,kimi-k2.6,GPQA Diamond,0.9078282828282828,0.78
+655,kimi-k2.7-code,GPQA Diamond,0.8787878787878788,0.5935
+656,kimi-k3_high,GPQA Diamond,0.9191919191919192,0.5595
+657,kimi-k3_low,GPQA Diamond,0.8484848484848485,0.529
+658,kimi-k3_max,GPQA Diamond,0.9311868686868688,0.488
+659,ministral-3b-2410,GPQA Diamond,0.2525252525252525,0.696
+660,ministral-8b-2410,GPQA Diamond,0.2714646464646464,0.6975
+661,mistral-large-2402,GPQA Diamond,0.3876262626262626,0.7225
+662,mistral-large-2407,GPQA Diamond,0.4902146464646464,0.365
+663,mistral-large-2411,GPQA Diamond,0.5132575757575758,0.444
+664,mistral-medium-2505,GPQA Diamond,0.5953282828282829,0.291
+665,mistral-small-2501,GPQA Diamond,0.4529671717171717,0.4715
+666,mistral-small-2503,GPQA Diamond,0.4747474747474747,0.509
+667,muse-spark,GPQA Diamond,0.898,0.4255
+668,o1-2024-12-17_high,GPQA Diamond,0.7676767676767676,0.534
+669,o1-2024-12-17_low,GPQA Diamond,0.7424242424242424,0.4845
+670,o1-2024-12-17_medium,GPQA Diamond,0.7575757575757576,0.655
+671,o1-mini-2024-09-12_high,GPQA Diamond,0.6237373737373737,0.2525
+672,o1-mini-2024-09-12_medium,GPQA Diamond,0.5950126262626263,0.4485
+673,o1-preview-2024-09-12,GPQA Diamond,0.5031565656565656,0.0095
+674,o3-2025-04-16_high,GPQA Diamond,0.8181818181818182,0.341
+675,o3-2025-04-16_low,GPQA Diamond,0.797979797979798,0.5075
+676,o3-2025-04-16_medium,GPQA Diamond,0.8080808080808081,0.576
+677,o3-mini-2025-01-31_high,GPQA Diamond,0.7702020202020202,0.795
+678,o3-mini-2025-01-31_low,GPQA Diamond,0.6818181818181818,0.6145
+679,o3-mini-2025-01-31_medium,GPQA Diamond,0.742739898989899,0.7795
+680,o4-mini-2025-04-16_high,GPQA Diamond,0.7960858585858586,0.758
+681,o4-mini-2025-04-16_low,GPQA Diamond,0.7525252525252525,0.55
+682,o4-mini-2025-04-16_medium,GPQA Diamond,0.7777777777777778,0.7005
+683,open-mistral-7b,GPQA Diamond,0.132260101010101,0.325
+684,open-mistral-nemo-2407,GPQA Diamond,0.2989267676767677,0.573
+685,open-mixtral-8x7b,GPQA Diamond,0.2982954545454545,0.592
+686,phi-4,GPQA Diamond,0.5606060606060606,0.6555
+687,qwen-max-2025-01-25,GPQA Diamond,0.5612373737373737,0.528
+688,qwen-plus-2025-01-25,GPQA Diamond,0.4810606060606061,0.239
+689,qwen-turbo-2024-11-01,GPQA Diamond,0.4179292929292929,0.1905
+690,qwen2-72b-instruct,GPQA Diamond,0.4078282828282828,0.341
+691,qwen2.5-32b-instruct,GPQA Diamond,0.4608585858585858,0.2915
+692,qwen2.5-72b-instruct,GPQA Diamond,0.4914772727272727,0.3255
+693,qwen2.5-7b-instruct,GPQA Diamond,0.3547979797979798,0.621
+694,qwen3-235b-a22b,GPQA Diamond,0.7070707070707071,0.7685
+695,qwen3-max-2025-09-23,GPQA Diamond,0.726010101010101,0.2695
+696,qwen3.5-9B,GPQA Diamond,0.7897727272727273,0.8875
+697,qwen3.5-9B_none,GPQA Diamond,0.7891414141414141,0.512
+698,qwen3.5-flash,GPQA Diamond,0.8232323232323232,0.6065
+699,qwen3.5-plus,GPQA Diamond,0.8484848484848485,0.502
+700,qwen3.6-35b-a3b,GPQA Diamond,0.8383838383838383,0.824
+701,qwen3.6-35b-a3b_none,GPQA Diamond,0.8484848484848485,0.5055
+702,qwen3.6-flash,GPQA Diamond,0.8333333333333334,0.6015
+703,qwen3.6-max-preview,GPQA Diamond,0.8737373737373737,0.481
+704,qwen3.6-plus,GPQA Diamond,0.8838383838383839,0.503
+705,qwen3.7-max,GPQA Diamond,0.9090909090909092,0.5805
+706,qwen3.8-max_xhigh,GPQA Diamond,0.9267676767676768,0.6685
+707,DeepSeek-R1,GPQA Diamond Biology,0.684,0.506
+708,DeepSeek-V3,GPQA Diamond Biology,0.579,0.411
+709,Llama-3.1-405B-Instruct,GPQA Diamond Biology,0.421,0.1235
+710,Llama-3.1-405B-Instruct,GPQA Diamond Biology,0.474,0.2325
+711,Llama-3.1-405B-Instruct,GPQA Diamond Biology,0.526,0.3965
+712,Llama-3.1-405B-Instruct,GPQA Diamond Biology,0.526,0.391
+713,Llama-3.1-70B-Instruct,GPQA Diamond Biology,0.579,0.68
+714,Llama-3.1-8B-Instruct,GPQA Diamond Biology,0.474,0.705
+715,Llama-4-Maverick-17B-128E-Instruct,GPQA Diamond Biology,0.684,0.7125
+716,Llama-4-Scout-17B-16E-Instruct,GPQA Diamond Biology,0.368,0.035
+717,Meta-Llama-3-70B-Instruct,GPQA Diamond Biology,0.526,0.678
+718,Mixtral-8x7B-Instruct-v0.1,GPQA Diamond Biology,0.368,0.442
+719,amazon.nova-lite-v1:0,GPQA Diamond Biology,0.579,0.7655
+720,amazon.nova-micro-v1:0,GPQA Diamond Biology,0.368,0.311
+721,amazon.nova-pro-v1:0,GPQA Diamond Biology,0.789,0.9885
+722,claude-3-5-sonnet-20240620,GPQA Diamond Biology,0.526,0.3045
+723,claude-3-5-sonnet-20241022,GPQA Diamond Biology,0.579,0.3755
+724,claude-3-7-sonnet-20250219,GPQA Diamond Biology,0.579,0.2885
+725,claude-3-7-sonnet-20250219_16K,GPQA Diamond Biology,0.632,0.2695
+726,claude-3-haiku-20240307,GPQA Diamond Biology,0.474,0.5785
+727,claude-3-opus-20240229,GPQA Diamond Biology,0.368,0.056
+728,claude-3-sonnet-20240229,GPQA Diamond Biology,0.316,0.068
+729,gemini-1.0-pro-001,GPQA Diamond Biology,0.421,0.4665
+730,gemini-1.5-flash-001,GPQA Diamond Biology,0.684,0.923
+731,gemini-1.5-pro-001,GPQA Diamond Biology,0.579,0.526
+732,gpt-4-0613,GPQA Diamond Biology,0.526,0.6535
+733,gpt-4-turbo-2024-04-09,GPQA Diamond Biology,0.579,0.629
+734,gpt-4.5-preview-2025-02-27,GPQA Diamond Biology,0.632,0.462
+735,gpt-4o-2024-05-13,GPQA Diamond Biology,0.737,0.933
+736,grok-2,GPQA Diamond Biology,0.632,0.8025
+737,mistral-large-2402,GPQA Diamond Biology,0.632,0.9255
+738,mistral-large-2407,GPQA Diamond Biology,0.579,0.564
+739,o1-2024-12-17_medium,GPQA Diamond Biology,0.632,0.2835
+740,o1-preview-2024-09-12,GPQA Diamond Biology,0.684,0.676
+741,o3-2025-04-16_medium,GPQA Diamond Biology,0.684,0.3155
+742,o3-mini-2025-01-31_medium,GPQA Diamond Biology,0.737,0.7365
+743,o4-mini-2025-04-16_medium,GPQA Diamond Biology,0.737,0.642
+744,DeepSeek-R1,GPQA Diamond Chemistry,0.527,0.316
+745,DeepSeek-V3,GPQA Diamond Chemistry,0.3979999999999999,0.235
+746,Llama-3.1-405B-Instruct,GPQA Diamond Chemistry,0.29,0.1065
+747,Llama-3.1-405B-Instruct,GPQA Diamond Chemistry,0.355,0.3115
+748,Llama-3.1-405B-Instruct,GPQA Diamond Chemistry,0.376,0.424
+749,Llama-3.1-405B-Instruct,GPQA Diamond Chemistry,0.452,0.7545
+750,Llama-3.1-70B-Instruct,GPQA Diamond Chemistry,0.366,0.5465
+751,Llama-3.1-8B-Instruct,GPQA Diamond Chemistry,0.29,0.798
+752,Llama-4-Maverick-17B-128E-Instruct,GPQA Diamond Chemistry,0.505,0.554
+753,Llama-4-Scout-17B-16E-Instruct,GPQA Diamond Chemistry,0.258,0.036
+754,Meta-Llama-3-70B-Instruct,GPQA Diamond Chemistry,0.355,0.7735
+755,Meta-Llama-3-8B-Instruct,GPQA Diamond Chemistry,0.2689999999999999,0.76
+756,Mistral-7B-Instruct-v0.1,GPQA Diamond Chemistry,0.054,0.4165
+757,Mixtral-8x7B-Instruct-v0.1,GPQA Diamond Chemistry,0.247,0.781
+758,amazon.nova-lite-v1:0,GPQA Diamond Chemistry,0.2689999999999999,0.2885
+759,amazon.nova-micro-v1:0,GPQA Diamond Chemistry,0.29,0.753
+760,amazon.nova-pro-v1:0,GPQA Diamond Chemistry,0.344,0.3535
+761,claude-3-5-sonnet-20240620,GPQA Diamond Chemistry,0.3979999999999999,0.36
+762,claude-3-5-sonnet-20241022,GPQA Diamond Chemistry,0.43,0.292
+763,claude-3-7-sonnet-20250219,GPQA Diamond Chemistry,0.3979999999999999,0.1105
+764,claude-3-7-sonnet-20250219_16K,GPQA Diamond Chemistry,0.645,0.725
+765,claude-3-haiku-20240307,GPQA Diamond Chemistry,0.28,0.5685
+766,claude-3-opus-20240229,GPQA Diamond Chemistry,0.366,0.454
+767,claude-3-sonnet-20240229,GPQA Diamond Chemistry,0.441,0.942
+768,gemini-1.0-pro-001,GPQA Diamond Chemistry,0.28,0.696
+769,gemini-1.5-flash-001,GPQA Diamond Chemistry,0.43,0.7975
+770,gemini-1.5-pro-001,GPQA Diamond Chemistry,0.387,0.375
+771,gpt-3.5-turbo-0125,GPQA Diamond Chemistry,0.301,0.8035
+772,gpt-4-0613,GPQA Diamond Chemistry,0.28,0.382
+773,gpt-4-turbo-2024-04-09,GPQA Diamond Chemistry,0.29,0.14
+774,gpt-4.5-preview-2025-02-27,GPQA Diamond Chemistry,0.3979999999999999,0.091
+775,gpt-4o-2024-05-13,GPQA Diamond Chemistry,0.387,0.3275
+776,grok-2,GPQA Diamond Chemistry,0.247,0.076
+777,mistral-large-2402,GPQA Diamond Chemistry,0.29,0.5335
+778,mistral-large-2407,GPQA Diamond Chemistry,0.301,0.112
+779,o1-2024-12-17_medium,GPQA Diamond Chemistry,0.645,0.74
+780,o1-preview-2024-09-12,GPQA Diamond Chemistry,0.5479999999999999,0.6715
+781,o3-2025-04-16_medium,GPQA Diamond Chemistry,0.774,0.927
+782,o3-mini-2025-01-31_medium,GPQA Diamond Chemistry,0.634,0.8
+783,o4-mini-2025-04-16_medium,GPQA Diamond Chemistry,0.634,0.6315
+784,DeepSeek-R1,GPQA Main Biology,0.7559999999999999,0.639
+785,DeepSeek-V3,GPQA Main Biology,0.667,0.5795
+786,Llama-3.1-405B-Instruct,GPQA Main Biology,0.59,0.5055
+787,Llama-3.1-405B-Instruct,GPQA Main Biology,0.603,0.57
+788,Llama-3.1-405B-Instruct,GPQA Main Biology,0.6409999999999999,0.732
+789,Llama-3.1-405B-Instruct,GPQA Main Biology,0.654,0.7735
+790,Llama-3.1-70B-Instruct,GPQA Main Biology,0.654,0.8675
+791,Llama-3.1-8B-Instruct,GPQA Main Biology,0.385,0.3395
+792,Llama-4-Maverick-17B-128E-Instruct,GPQA Main Biology,0.7559999999999999,0.8325
+793,Llama-4-Scout-17B-16E-Instruct,GPQA Main Biology,0.284,0.001
+794,Meta-Llama-3-70B-Instruct,GPQA Main Biology,0.284,0.006
+795,Mixtral-8x7B-Instruct-v0.1,GPQA Main Biology,0.423,0.6705
+796,amazon.nova-lite-v1:0,GPQA Main Biology,0.564,0.6625
+797,amazon.nova-micro-v1:0,GPQA Main Biology,0.487,0.7205
+798,amazon.nova-pro-v1:0,GPQA Main Biology,0.6409999999999999,0.759
+799,claude-3-5-sonnet-20240620,GPQA Main Biology,0.679,0.72
+800,claude-3-5-sonnet-20241022,GPQA Main Biology,0.615,0.3205
+801,claude-3-7-sonnet-20250219,GPQA Main Biology,0.6409999999999999,0.326
+802,claude-3-7-sonnet-20250219_16K,GPQA Main Biology,0.7440000000000001,0.4955
+803,claude-3-haiku-20240307,GPQA Main Biology,0.449,0.4395
+804,claude-3-opus-20240229,GPQA Main Biology,0.603,0.6105
+805,claude-3-sonnet-20240229,GPQA Main Biology,0.5,0.504
+806,gemini-1.0-pro-001,GPQA Main Biology,0.436,0.4975
+807,gemini-1.5-flash-001,GPQA Main Biology,0.615,0.744
+808,gemini-1.5-pro-001,GPQA Main Biology,0.628,0.58
+809,gpt-4-0613,GPQA Main Biology,0.301,0.0105
+810,gpt-4-turbo-2024-04-09,GPQA Main Biology,0.667,0.819
+811,gpt-4.5-preview-2025-02-27,GPQA Main Biology,0.654,0.3555
+812,gpt-4o-2024-05-13,GPQA Main Biology,0.667,0.6745
+813,grok-2,GPQA Main Biology,0.679,0.892
+814,mistral-large-2402,GPQA Main Biology,0.5379999999999999,0.727
+815,mistral-large-2407,GPQA Main Biology,0.603,0.5205
+816,o1-2024-12-17_medium,GPQA Main Biology,0.718,0.3755
+817,o1-preview-2024-09-12,GPQA Main Biology,0.705,0.586
+818,o3-2025-04-16_medium,GPQA Main Biology,0.821,0.6615
+819,o3-mini-2025-01-31_medium,GPQA Main Biology,0.731,0.533
+820,o4-mini-2025-04-16_medium,GPQA Main Biology,0.782,0.6505
+821,DeepSeek-R1,GPQA Main Chemistry,0.557,0.6025
+822,DeepSeek-V3,GPQA Main Chemistry,0.4429999999999999,0.5035
+823,Llama-3.1-405B-Instruct,GPQA Main Chemistry,0.366,0.4575
+824,Llama-3.1-405B-Instruct,GPQA Main Chemistry,0.3829999999999999,0.5585
+825,Llama-3.1-405B-Instruct,GPQA Main Chemistry,0.3929999999999999,0.63
+826,Llama-3.1-405B-Instruct,GPQA Main Chemistry,0.421,0.7915
+827,Llama-3.1-70B-Instruct,GPQA Main Chemistry,0.284,0.1665
+828,Llama-3.1-8B-Instruct,GPQA Main Chemistry,0.23,0.588
+829,Llama-4-Maverick-17B-128E-Instruct,GPQA Main Chemistry,0.59,0.966
+830,Llama-4-Scout-17B-16E-Instruct,GPQA Main Chemistry,0.301,0.067
+831,Meta-Llama-3-70B-Instruct,GPQA Main Chemistry,0.284,0.496
+832,Meta-Llama-3-8B-Instruct,GPQA Main Chemistry,0.262,0.847
+833,Mistral-7B-Instruct-v0.1,GPQA Main Chemistry,0.055,0.37
+834,Mixtral-8x7B-Instruct-v0.1,GPQA Main Chemistry,0.208,0.669
+835,amazon.nova-lite-v1:0,GPQA Main Chemistry,0.306,0.487
+836,amazon.nova-micro-v1:0,GPQA Main Chemistry,0.317,0.9205
+837,amazon.nova-pro-v1:0,GPQA Main Chemistry,0.317,0.2435
+838,claude-3-5-sonnet-20240620,GPQA Main Chemistry,0.372,0.2885
+839,claude-3-5-sonnet-20241022,GPQA Main Chemistry,0.361,0.069
+840,claude-3-7-sonnet-20250219,GPQA Main Chemistry,0.377,0.056
+841,claude-3-7-sonnet-20250219_16K,GPQA Main Chemistry,0.596,0.6875
+842,claude-3-haiku-20240307,GPQA Main Chemistry,0.257,0.545
+843,claude-3-opus-20240229,GPQA Main Chemistry,0.317,0.224
+844,claude-3-sonnet-20240229,GPQA Main Chemistry,0.246,0.2425
+845,gemini-1.0-pro-001,GPQA Main Chemistry,0.295,0.862
+846,gemini-1.5-flash-001,GPQA Main Chemistry,0.3389999999999999,0.4935
+847,gemini-1.5-pro-001,GPQA Main Chemistry,0.4039999999999999,0.5795
+848,gpt-3.5-turbo-0125,GPQA Main Chemistry,0.2189999999999999,0.4825
+849,gpt-4-0613,GPQA Main Chemistry,0.322,0.705
+850,gpt-4-turbo-2024-04-09,GPQA Main Chemistry,0.2789999999999999,0.0855
+851,gpt-4.5-preview-2025-02-27,GPQA Main Chemistry,0.426,0.1565
+852,gpt-4o-2024-05-13,GPQA Main Chemistry,0.3279999999999999,0.0985
+853,grok-2,GPQA Main Chemistry,0.284,0.1525
+854,mistral-large-2402,GPQA Main Chemistry,0.284,0.5795
+855,mistral-large-2407,GPQA Main Chemistry,0.3329999999999999,0.2165
+856,o1-2024-12-17_medium,GPQA Main Chemistry,0.574,0.564
+857,o1-preview-2024-09-12,GPQA Main Chemistry,0.514,0.6735
+858,o3-2025-04-16_medium,GPQA Main Chemistry,0.716,0.9035
+859,o3-mini-2025-01-31_medium,GPQA Main Chemistry,0.557,0.6395
+860,o4-mini-2025-04-16_medium,GPQA Main Chemistry,0.563,0.433
+861,Baichuan-13B-Base,GSM8K,0.268,0.28
+862,Baichuan-2-13B-Base,GSM8K,0.528,0.65
+863,Baichuan-2-7B-Base,GSM8K,0.246,0.27
+864,Baichuan-7B,GSM8K,0.092,0.1505
+865,Baichuan2-13B-Chat,GSM8K,0.457,0.535
+866,CodeQwen1.5-7B,GSM8K,0.377,0.853
+867,DeepSeek-Coder-V2-Base,GSM8K,0.858,0.642
+868,DeepSeek-Coder-V2-Lite-Base,GSM8K,0.671,0.769
+869,INTELLECT-1-Instruct,GSM8K,0.3858,0.5915
+870,LLaMA-13B,GSM8K,0.2055,0.265
+871,LLaMA-33B,GSM8K,0.441,0.3355
+872,LLaMA-65B,GSM8K,0.544,0.399
+873,LLaMA-7B,GSM8K,0.11,0.3035
+874,Llama-2-13b,GSM8K,0.343,0.3145
+875,Llama-2-13b-chat,GSM8K,0.369,0.4955
+876,Llama-2-34b,GSM8K,0.422,0.293
+877,Llama-2-70b-chat,GSM8K,0.587,0.6085
+878,Llama-2-70b-hf,GSM8K,0.696,0.453
+879,Llama-2-7b,GSM8K,0.167,0.2415
+880,Llama-3.1-8B-Instruct,GSM8K,0.824,0.947
+881,Mistral-7B-Instruct-v0.2,GSM8K,0.354,0.1625
+882,Mistral-7B-v0.1,GSM8K,0.544,0.392
+883,Mixtral-8x7B-v0.1,GSM8K,0.744,0.4855
+884,Nemotron-4 15B,GSM8K,0.46,0.477
+885,PaLM 540B,GSM8K,0.565,0.2165
+886,PaLM 62B,GSM8K,0.33,0.379
+887,Qwen-14B,GSM8K,0.613,0.38
+888,Qwen-14B-Chat,GSM8K,0.612,0.469
+889,Qwen-1_8B,GSM8K,0.212,0.7535
+890,Qwen-7B,GSM8K,0.517,0.8045
+891,Qwen2.5-Coder-0.5B,GSM8K,0.345,0.748
+892,Qwen2.5-Coder-1.5B,GSM8K,0.658,0.9095
+893,Qwen2.5-Coder-14B,GSM8K,0.887,0.7955
+894,Qwen2.5-Coder-32B,GSM8K,0.911,0.724
+895,Qwen2.5-Coder-32B-Instruct,GSM8K,0.93,0.7155
+896,Qwen2.5-Coder-3B,GSM8K,0.757,0.677
+897,Qwen2.5-Coder-7B,GSM8K,0.839,0.8535
+898,StableBeluga2,GSM8K,0.696,0.461
+899,Yi-34B,GSM8K,0.672,0.2255
+900,Yi-34B-Chat,GSM8K,0.76,0.902
+901,Yi-6B,GSM8K,0.325,0.145
+902,Yi-6B-Chat,GSM8K,0.449,0.348
+903,chatglm2-6b,GSM8K,0.324,0.478
+904,claude-instant-1.1,GSM8K,0.809,0.5675
+905,claude-instant-1.2,GSM8K,0.867,0.7165
+906,davinci,GSM8K,0.09,0.567
+907,deepseek-coder-1.3b-base,GSM8K,0.044,0.368
+908,deepseek-coder-33b-base,GSM8K,0.354,0.7985
+909,deepseek-coder-6.7b-base,GSM8K,0.213,0.6505
+910,falcon-11b,GSM8K,0.5383,0.5985
+911,falcon-180B,GSM8K,0.544,0.24
+912,falcon-40b,GSM8K,0.25,0.137
+913,falcon-7b,GSM8K,0.068,0.202
+914,gemini-1.5-flash-001,GSM8K,0.824,0.41
+915,gemma-2b,GSM8K,0.177,0.407
+916,gemma-7b,GSM8K,0.464,0.1875
+917,gpt-3.5-turbo-0613,GSM8K,0.5777,0.318
+918,gpt-4-0314,GSM8K,0.92,0.7955
+919,gpt-4-0613,GSM8K,0.8999,0.9
+920,gpt-4o-mini-2024-07-18,GSM8K,0.913,0.797
+921,internlm-20b,GSM8K,0.629,0.31
+922,internlm-7b,GSM8K,0.312,0.325
+923,internlm-chat-20b,GSM8K,0.157,0.058
+924,mpt-30b,GSM8K,0.164,0.1825
+925,mpt-7b,GSM8K,0.091,0.403
+926,starcoder2-15b,GSM8K,0.577,0.554
+927,starcoder2-3b,GSM8K,0.216,0.6405
+928,starcoder2-7b,GSM8K,0.327,0.8
+929,text-davinci-002,GSM8K,0.415,0.064
+930,vicuna-13b-v1.1,GSM8K,0.2813,0.479
+931,GLM-4.5-Air,GSO-Bench,0.0294,0.7425
+932,Kimi-K2-Instruct,GSO-Bench,0.049,0.56
+933,Qwen3-Coder-480B-A35B-Instruct,GSO-Bench,0.049,0.5295
+934,claude-3-5-sonnet-20241022,GSO-Bench,0.046,0.781
+935,claude-3-7-sonnet-20250219,GSO-Bench,0.038,0.644
+936,claude-3-7-sonnet-20250219_unknown,GSO-Bench,0.038,0.6335
+937,claude-opus-4-20250514,GSO-Bench,0.069,0.6015
+938,claude-opus-4-20250514_unknown,GSO-Bench,0.0686,0.427
+939,claude-opus-4-5-20251101,GSO-Bench,0.265,0.954
+940,claude-opus-4-5-20251101_unknown,GSO-Bench,0.2647,0.7135
+941,claude-opus-4-6,GSO-Bench,0.3333,0.6705
+942,claude-opus-4-6_high,GSO-Bench,0.412,0.5795
+943,claude-opus-4-6_unknown,GSO-Bench,0.3333,0.432
+944,claude-opus-4-7,GSO-Bench,0.4412,0.7785
+945,claude-opus-4-7_high,GSO-Bench,0.4412,0.5885
+946,claude-opus-4-8_unknown,GSO-Bench,0.4706,0.607
+947,claude-sonnet-4-20250514,GSO-Bench,0.049,0.55
+948,claude-sonnet-4-20250514_unknown,GSO-Bench,0.049,0.4055
+949,claude-sonnet-4-5-20250929,GSO-Bench,0.147,0.9075
+950,claude-sonnet-4-5-20250929_unknown,GSO-Bench,0.1471,0.562
+951,claude-sonnet-5_unknown,GSO-Bench,0.3725,0.549
+952,gemini-2.5-pro,GSO-Bench,0.0392,0.1755
+953,gemini-2.5-pro-preview-06-05,GSO-Bench,0.0392,0.0435
+954,gemini-3-flash-preview,GSO-Bench,0.098,0.2855
+955,gemini-3-pro-preview,GSO-Bench,0.1863,0.2645
+956,gemini-3.1-pro-preview,GSO-Bench,0.2255,0.3025
+958,gpt-5-2025-08-07_high,GSO-Bench,0.0686,0.1575
+959,gpt-5.1-2025-11-13_high,GSO-Bench,0.137,0.2755
+960,gpt-5.1-2025-11-13_unknown,GSO-Bench,0.1373,0.53
+961,gpt-5.2-2025-12-11_high,GSO-Bench,0.2745,0.836
+962,gpt-5.4-2026-03-05_high,GSO-Bench,0.2549,0.5435
+963,gpt-5.4-2026-03-05_xhigh,GSO-Bench,0.3137,0.523
+964,gpt-5.5_xhigh,GSO-Bench,0.402,0.5945
+965,o3-2025-04-16_high,GSO-Bench,0.088,0.321
+966,o3-mini-2025-01-31_high,GSO-Bench,0.013,0.066
+967,o3-mini-2025-01-31_low,GSO-Bench,0.013,0.1905
+968,o4-mini-2025-04-16_high,GSO-Bench,0.036,0.2115
+969,DeepSeek-V3.1,InterCode-CTF,0.8918918918918919,0.581
+970,claude-3-opus-20240229,InterCode-CTF,0.6486486486486487,0.745
+971,claude-opus-4-20250514_unknown,InterCode-CTF,0.9594594594594594,0.8045
+973,claude-sonnet-4-6_unknown,InterCode-CTF,0.972972972972973,0.382
+975,gemini-2.5-pro,InterCode-CTF,0.918918918918919,0.2795
+976,glm-5_unknown,InterCode-CTF,0.958904109589041,0.472
+977,gpt-4o-2024-05-13,InterCode-CTF,0.726027397260274,0.663
+978,gpt-5.1-codex-max,InterCode-CTF,0.972972972972973,0.3765
+979,gpt-5.2-codex,InterCode-CTF,0.945945945945946,0.1605
+980,gpt-5.3-codex,InterCode-CTF,0.9864864864864864,0.2935
+983,o3-2025-04-16_unknown,InterCode-CTF,0.9594594594594594,0.478
+984,text-davinci-002,InterCode-CTF,0.2191780821917808,0.3365
+985,DeepSeek-R1,Lech Mazur Writing,0.8300000000000001,0.8005
+986,DeepSeek-R1-0528,Lech Mazur Writing,0.819,0.633
+987,DeepSeek-V3-0324,Lech Mazur Writing,0.77,0.5405
+988,Kimi-K2-Instruct,Lech Mazur Writing,0.8560000000000001,0.923
+989,Llama-4-Maverick-17B-128E-Instruct,Lech Mazur Writing,0.62,0.028
+990,QwQ-32B_16K,Lech Mazur Writing,0.8019999999999999,0.5405
+991,Qwen3-235B-A22B-Thinking-2507,Lech Mazur Writing,0.8240000000000001,0.8625
+992,Qwen3-30B-A3B,Lech Mazur Writing,0.753,0.5175
+993,amazon.nova-pro-v1:0,Lech Mazur Writing,0.605,0.0725
+994,claude-3-5-haiku-20241022,Lech Mazur Writing,0.735,0.6855
+995,claude-3-5-sonnet-20241022,Lech Mazur Writing,0.8029999999999999,0.82
+996,claude-3-7-sonnet-20250219,Lech Mazur Writing,0.794,0.7245
+997,claude-3-7-sonnet-20250219_16K,Lech Mazur Writing,0.8109999999999999,0.6545
+998,claude-opus-4-1-20250805,Lech Mazur Writing,0.8470000000000001,0.7935
+999,claude-opus-4-1-20250805_16K,Lech Mazur Writing,0.845,0.758
+1000,claude-opus-4-20250514,Lech Mazur Writing,0.8310000000000001,0.7535
+1001,claude-opus-4-20250514_16K,Lech Mazur Writing,0.836,0.725
+1002,claude-sonnet-4-20250514,Lech Mazur Writing,0.8089999999999999,0.6925
+1003,claude-sonnet-4-20250514_16K,Lech Mazur Writing,0.8140000000000001,0.6015
+1004,gemini-2.0-flash-exp,Lech Mazur Writing,0.7150000000000001,0.4725
+1005,gemini-2.0-flash-thinking-exp-01-21,Lech Mazur Writing,0.738,0.537
+1006,gemini-2.5-flash-preview-04-17_24K,Lech Mazur Writing,0.765,0.489
+1007,gemini-2.5-pro,Lech Mazur Writing,0.8380000000000001,0.713
+1008,gemini-2.5-pro-exp-03-25,Lech Mazur Writing,0.805,0.446
+1009,gemini-2.5-pro-preview-05-06,Lech Mazur Writing,0.8089999999999999,0.638
+1010,gemma-3-27b-it,Lech Mazur Writing,0.799,0.898
+1011,glm-4.5,Lech Mazur Writing,0.734,0.4215
+1012,gpt-4.5-preview-2025-02-27,Lech Mazur Writing,0.756,0.4725
+1013,gpt-4o-2024-11-20,Lech Mazur Writing,0.818,0.9425
+1014,gpt-4o-mini-2024-07-18,Lech Mazur Writing,0.6719999999999999,0.361
+1015,gpt-5-2025-08-07_medium,Lech Mazur Writing,0.86,0.7
+1016,gpt-5-mini-2025-08-07_medium,Lech Mazur Writing,0.8310000000000001,0.727
+1017,gpt-oss-120b,Lech Mazur Writing,0.771,0.587
+1018,grok-2-1212,Lech Mazur Writing,0.636,0.0705
+1019,grok-3-beta,Lech Mazur Writing,0.764,0.429
+1020,grok-3-mini-beta_low,Lech Mazur Writing,0.735,0.229
+1021,grok-4-0709,Lech Mazur Writing,0.769,0.233
+1022,mistral-large-2407,Lech Mazur Writing,0.6900000000000001,0.3525
+1023,mistral-medium-2505,Lech Mazur Writing,0.773,0.59
+1024,o1-2024-12-17_medium,Lech Mazur Writing,0.702,0.0785
+1025,o1-mini-2024-09-12_medium,Lech Mazur Writing,0.649,0.082
+1026,o3-2025-04-16_medium,Lech Mazur Writing,0.8390000000000001,0.6815
+1027,o3-mini-2025-01-31_high,Lech Mazur Writing,0.617,0.0075
+1028,o3-mini-2025-01-31_medium,Lech Mazur Writing,0.615,0.008
+1029,o3-pro-2025-06-10_medium,Lech Mazur Writing,0.844,0.586
+1030,o4-mini-2025-04-16_medium,Lech Mazur Writing,0.75,0.2315
+1031,phi-4,Lech Mazur Writing,0.626,0.0865
+1032,qwen-max-2025-01-25,Lech Mazur Writing,0.729,0.4885
+1033,qwen3-235b-a22b,Lech Mazur Writing,0.8300000000000001,0.8695
+1034,DeepSeek-R1,MATH Level 5,0.9305135951661632,0.7275
+1035,DeepSeek-R1-0528,MATH Level 5,0.9663897280966768,0.719
+1036,DeepSeek-R1-Distill-Llama-70B,MATH Level 5,0.8989803625377644,0.8585
+1037,DeepSeek-R1-Distill-Qwen-14B,MATH Level 5,0.8712235649546828,0.9445
+1038,DeepSeek-V3,MATH Level 5,0.6485083081570997,0.2645
+1039,DeepSeek-V3-0324,MATH Level 5,0.75547583081571,0.2
+1040,Hermes-2-Theta-Llama-3-70B,MATH Level 5,0.226869335347432,0.4135
+1041,Llama-2-70b-chat,MATH Level 5,0.0328549848942598,0.251
+1042,Llama-3.1-405B-Instruct,MATH Level 5,0.4977341389728096,0.3765
+1043,Llama-3.1-70B-Instruct,MATH Level 5,0.366786253776435,0.2615
+1044,Llama-3.1-8B-Instruct,MATH Level 5,0.2287575528700906,0.926
+1045,Llama-3.1-Tulu-3-70B-DPO,MATH Level 5,0.426642749244713,0.4585
+1046,Llama-3.2-90B-Vision-Instruct,MATH Level 5,0.3943542296072507,0.4345
+1047,Llama-3.3-70B-Instruct,MATH Level 5,0.4159743202416918,0.241
+1048,Llama-4-Maverick-17B-128E-Instruct-FP8,MATH Level 5,0.7301737160120846,0.3055
+1049,Llama-4-Scout-17B-16E-Instruct,MATH Level 5,0.6227341389728097,0.6525
+1050,Meta-Llama-3-70B-Instruct,MATH Level 5,0.225547583081571,0.3265
+1051,Meta-Llama-3-8B-Instruct,MATH Level 5,0.0612726586102719,0.2825
+1052,Mistral-7B-Instruct-v0.3,MATH Level 5,0.0359705438066465,0.503
+1053,Mixtral-8x22B-Instruct-v0.1,MATH Level 5,0.2424471299093655,0.4045
+1054,Mixtral-8x7B-Instruct-v0.1,MATH Level 5,0.0929003021148036,0.6745
+1055,Phi-3-medium-128k-instruct,MATH Level 5,0.1756042296072507,0.327
+1056,WizardLM-2-8x22B,MATH Level 5,0.2573640483383685,0.311
+1057,Yi-1.5-34B-Chat,MATH Level 5,0.2548149546827795,0.6065
+1058,Yi-34B-Chat,MATH Level 5,0.0514539274924471,0.275
+1059,claude-2.0,MATH Level 5,0.1172583081570997,0.1265
+1060,claude-3-5-haiku-20241022,MATH Level 5,0.4635574018126888,0.5355
+1061,claude-3-5-sonnet-20240620,MATH Level 5,0.5168051359516617,0.129
+1062,claude-3-5-sonnet-20241022,MATH Level 5,0.5694864048338368,0.0425
+1063,claude-3-7-sonnet-20250219,MATH Level 5,0.6818353474320241,0.111
+1064,claude-3-7-sonnet-20250219_16K,MATH Level 5,0.8625377643504532,0.218
+1065,claude-3-7-sonnet-20250219_32K,MATH Level 5,0.9003021148036254,0.334
+1066,claude-3-7-sonnet-20250219_64K,MATH Level 5,0.9116314199395772,0.326
+1067,claude-3-haiku-20240307,MATH Level 5,0.1487915407854985,0.325
+1068,claude-3-opus-20240229,MATH Level 5,0.3748111782477341,0.1135
+1069,claude-3-sonnet-20240229,MATH Level 5,0.1817409365558912,0.161
+1070,claude-haiku-4-5-20251001,MATH Level 5,0.8691465256797583,0.675
+1071,claude-haiku-4-5-20251001_32K,MATH Level 5,0.9636087945413192,0.7895
+1072,claude-opus-4-20250514,MATH Level 5,0.850453172205438,0.1015
+1073,claude-sonnet-4-20250514,MATH Level 5,0.8436555891238671,0.2415
+1074,claude-sonnet-4-5-20250929_32K,MATH Level 5,0.9773413897280968,0.5225
+1075,dbrx-instruct,MATH Level 5,0.1165030211480362,0.331
+1076,deepseek-llm-67b-chat,MATH Level 5,0.0639161631419939,0.383
+1077,gemini-1.0-pro-001,MATH Level 5,0.1124433534743202,0.344
+1078,gemini-1.5-flash-001,MATH Level 5,0.2512273413897281,0.0375
+1079,gemini-1.5-flash-002,MATH Level 5,0.6186744712990937,0.7945
+1080,gemini-1.5-pro-001,MATH Level 5,0.4074773413897281,0.048
+1081,gemini-1.5-pro-002,MATH Level 5,0.7039274924471299,0.68
+1082,gemini-2.0-flash-001,MATH Level 5,0.8216578549848943,0.7525
+1083,gemini-2.0-pro-exp-02-05,MATH Level 5,0.8345921450151057,0.6005
+1084,gemini-2.5-pro-exp-03-25,MATH Level 5,0.9556268882175226,0.4045
+1085,gemini-2.5-pro-preview-05-06,MATH Level 5,0.959025679758308,0.7855
+1086,gemma-2-27b-it,MATH Level 5,0.2788897280966767,0.523
+1087,gemma-2-9b-it,MATH Level 5,0.2100641993957704,0.6515
+1088,gemma-3-27b-it,MATH Level 5,0.740370090634441,0.9565
+1089,gpt-3.5-turbo-0125,MATH Level 5,0.1163141993957704,0.4765
+1090,gpt-3.5-turbo-1106,MATH Level 5,0.158893504531722,0.515
+1091,gpt-4-0125-preview,MATH Level 5,0.3541351963746224,0.4455
+1092,gpt-4-0613,MATH Level 5,0.2297016616314199,0.284
+1093,gpt-4-1106-preview,MATH Level 5,0.4002077039274924,0.534
+1094,gpt-4-turbo-2024-04-09,MATH Level 5,0.467333836858006,0.379
+1095,gpt-4.1-2025-04-14,MATH Level 5,0.8300604229607251,0.3565
+1096,gpt-4.1-mini-2025-04-14,MATH Level 5,0.8729229607250756,0.8915
+1097,gpt-4.1-nano-2025-04-14,MATH Level 5,0.6999622356495468,0.881
+1098,gpt-4.5-preview-2025-02-27,MATH Level 5,0.7862537764350453,0.364
+1099,gpt-4o-2024-05-13,MATH Level 5,0.5104796072507553,0.1215
+1100,gpt-4o-2024-08-06,MATH Level 5,0.5327605740181269,0.2625
+1101,gpt-4o-2024-11-20,MATH Level 5,0.4977341389728096,0.2435
+1102,gpt-4o-mini-2024-07-18,MATH Level 5,0.5263406344410876,0.8345
+1103,gpt-5-2025-08-07_high,MATH Level 5,0.9813066465256798,0.4315
+1104,gpt-5-2025-08-07_medium,MATH Level 5,0.9792296072507553,0.3485
+1105,gpt-5-mini-2025-08-07_high,MATH Level 5,0.978474320241692,0.7815
+1106,gpt-5-mini-2025-08-07_medium,MATH Level 5,0.9679003021148036,0.7755
+1107,gpt-5-nano-2025-08-07_high,MATH Level 5,0.9490181268882176,0.764
+1108,gpt-5-nano-2025-08-07_medium,MATH Level 5,0.952416918429003,0.907
+1109,grok-2-1212,MATH Level 5,0.6351963746223565,0.372
+1110,grok-3-beta,MATH Level 5,0.8874622356495468,0.58
+1111,grok-3-mini-beta_high,MATH Level 5,0.8806646525679759,0.4225
+1112,grok-3-mini-beta_low,MATH Level 5,0.9093655589123868,0.628
+1113,ministral-3b-2410,MATH Level 5,0.1444486404833836,0.8785
+1114,ministral-8b-2410,MATH Level 5,0.149358006042296,0.8175
+1115,mistral-large-2402,MATH Level 5,0.2446185800604229,0.5415
+1116,mistral-large-2407,MATH Level 5,0.4481684290030212,0.1845
+1117,mistral-large-2411,MATH Level 5,0.5028323262839879,0.2525
+1118,mistral-medium-2505,MATH Level 5,0.8162764350453172,0.6265
+1119,mistral-small-2501,MATH Level 5,0.4481684290030212,0.517
+1120,mistral-small-2503,MATH Level 5,0.4677114803625378,0.4595
+1121,o1-2024-12-17_high,MATH Level 5,0.947129909365559,0.5445
+1122,o1-2024-12-17_medium,MATH Level 5,0.9441087613293052,0.703
+1123,o1-mini-2024-09-12_high,MATH Level 5,0.8918051359516617,0.7465
+1124,o1-mini-2024-09-12_medium,MATH Level 5,0.8425226586102719,0.867
+1125,o1-preview-2024-09-12,MATH Level 5,0.8164652567975831,0.536
+1126,o3-2025-04-16_high,MATH Level 5,0.9777190332326284,0.41
+1127,o3-mini-2025-01-31_high,MATH Level 5,0.9648791540785498,0.8545
+1128,o3-mini-2025-01-31_medium,MATH Level 5,0.9516616314199396,0.9125
+1129,o4-mini-2025-04-16_high,MATH Level 5,0.978285498489426,0.8535
+1130,open-mistral-7b,MATH Level 5,0.0368202416918429,0.6545
+1131,open-mistral-nemo-2407,MATH Level 5,0.1082892749244713,0.372
+1132,open-mixtral-8x7b,MATH Level 5,0.0995090634441087,0.355
+1133,phi-4,MATH Level 5,0.6493580060422961,0.656
+1134,qwen-max-2025-01-25,MATH Level 5,0.6718277945619335,0.5715
+1135,qwen-plus-2025-01-25,MATH Level 5,0.6527567975830816,0.6895
+1136,qwen-turbo-2024-11-01,MATH Level 5,0.5623111782477341,0.721
+1137,qwen2-72b-instruct,MATH Level 5,0.3906722054380664,0.508
+1138,qwen2.5-32b-instruct,MATH Level 5,0.5607061933534743,0.601
+1139,qwen2.5-72b-instruct,MATH Level 5,0.631703172205438,0.67
+1140,qwen3-235b-a22b,MATH Level 5,0.6885699899295065,0.074
+1141,qwen3-max-2025-09-23,MATH Level 5,0.9712990936555892,0.747
+1142,Baichuan-13B-Base,MMLU,0.516,0.517
+1143,Baichuan-2-13B-Base,MMLU,0.592,0.5525
+1144,Baichuan-2-7B-Base,MMLU,0.5416,0.751
+1145,Baichuan-7B,MMLU,0.423,0.6365
+1146,Baichuan2-13B-Chat,MMLU,0.551,0.3885
+1147,Cerebras-GPT-13B,MMLU,0.262,0.3825
+1148,Chinchilla (70B),MMLU,0.675,0.49
+1149,CodeQwen1.5-7B,MMLU,0.405,0.326
+1150,DeepSeek-Coder-V2-Lite-Base,MMLU,0.605,0.3445
+1151,DeepSeek-R1-0528,MMLU,0.9031476997578692,0.32
+1152,DeepSeek-V2,MMLU,0.784,0.3225
+1153,DeepSeek-V3,MMLU,0.8951004130465746,0.887
+1154,DeepSeek-V3.1,MMLU,0.896168636946304,0.466
+1155,Gopher (280B),MMLU,0.6,0.488
+1156,INTELLECT-1-Instruct,MMLU,0.4989,0.3875
+1157,LLaMA-13B,MMLU,0.477,0.5215
+1158,LLaMA-33B,MMLU,0.587,0.4415
+1159,LLaMA-65B,MMLU,0.634,0.444
+1160,LLaMA-7B,MMLU,0.356,0.3895
+1161,Llama-2-13b,MMLU,0.556,0.523
+1162,Llama-2-13b-chat,MMLU,0.509,0.3985
+1163,Llama-2-34b,MMLU,0.626,0.6285
+1164,Llama-2-70b-chat,MMLU,0.599,0.315
+1165,Llama-2-70b-hf,MMLU,0.699,0.391
+1166,Llama-2-7b,MMLU,0.458,0.5695
+1167,Llama-3.1-405B,MMLU,0.844,0.346
+1168,Llama-3.1-405B-Instruct,MMLU,0.845,0.7815
+1169,Llama-3.1-70B-Instruct,MMLU,0.801,0.5685
+1170,Llama-3.1-8B-Instruct,MMLU,0.561,0.0215
+1171,Llama-3.2-11B-Vision-Instruct,MMLU,0.565,0.3435
+1172,Llama-3.2-90B-Vision-Instruct,MMLU,0.803,0.6345
+1173,Llama-3.3-70B-Instruct,MMLU,0.863,0.9105
+1174,Meta-Llama-3-70B-Instruct,MMLU,0.793,0.8435
+1175,Meta-Llama-3-8B-Instruct,MMLU,0.688,0.7395
+1176,Mistral-7B-Instruct-v0.2,MMLU,0.625,0.654
+1177,Mistral-7B-Instruct-v0.3,MMLU,0.599,0.6105
+1178,Mistral-7B-v0.1,MMLU,0.625,0.363
+1179,Mixtral-8x22B-Instruct-v0.1,MMLU,0.7748896168636946,0.6995
+1180,Mixtral-8x7B-v0.1,MMLU,0.706,0.31
+1181,Nemotron-4 15B,MMLU,0.587,0.52
+1182,PaLM 540B,MMLU,0.693,0.473
+1183,PaLM 62B,MMLU,0.537,0.5605
+1184,Phi-3-medium-128k-instruct,MMLU,0.78,0.869
+1185,Phi-3-mini-4k-instruct,MMLU,0.688,0.3735
+1186,Phi-3-small-8k-instruct,MMLU,0.757,0.406
+1187,Qwen-14B,MMLU,0.663,0.3805
+1188,Qwen-14B-Chat,MMLU,0.65,0.438
+1189,Qwen-1_8B,MMLU,0.282,0.1785
+1190,Qwen-7B,MMLU,0.45,0.109
+1191,Qwen2.5-72B,MMLU,0.85,0.401
+1192,Qwen2.5-Coder-0.5B,MMLU,0.42,0.3855
+1193,Qwen2.5-Coder-1.5B,MMLU,0.536,0.2705
+1194,Qwen2.5-Coder-14B,MMLU,0.752,0.3965
+1195,Qwen2.5-Coder-32B,MMLU,0.791,0.4495
+1196,Qwen2.5-Coder-7B,MMLU,0.68,0.3235
+1197,Qwen3-235B-A22B-Instruct-2507,MMLU,0.8891756272401433,0.7165
+1198,Qwen3-235B-A22B-Thinking-2507,MMLU,0.66735507762427,0.0
+1199,RedPajama-INCITE-7B-Base,MMLU,0.263,0.334
+1200,StableBeluga2,MMLU,0.686,0.316
+1201,Yi-34B,MMLU,0.763,0.6175
+1202,Yi-34B-Chat,MMLU,0.735,0.947
+1203,Yi-6B,MMLU,0.64,0.795
+1204,Yi-6B-Chat,MMLU,0.61,0.529
+1205,Yi-9B,MMLU,0.684,0.568
+1206,amazon.nova-lite-v1:0,MMLU,0.77,0.5145
+1207,amazon.nova-micro-v1:0,MMLU,0.708,0.66
+1208,amazon.nova-pro-v1:0,MMLU,0.82,0.621
+1209,c4ai-command-r-plus-08-2024,MMLU,0.694,0.549
+1210,chatglm2-6b,MMLU,0.479,0.364
+1211,claude-1.3,MMLU,0.77,0.4195
+1212,claude-2.0,MMLU,0.785,0.8805
+1213,claude-2.1,MMLU,0.735,0.5605
+1214,claude-3-5-haiku-20241022,MMLU,0.8097849309215212,0.617
+1215,claude-3-5-sonnet-20240620,MMLU,0.865,0.7625
+1216,claude-3-5-sonnet-20241022,MMLU,0.8948155533399801,0.831
+1217,claude-3-7-sonnet-20250219,MMLU,0.901652186298248,0.811
+1218,claude-3-haiku-20240307,MMLU,0.738,0.679
+1219,claude-3-opus-20240229,MMLU,0.846,0.8365
+1220,claude-3-sonnet-20240229,MMLU,0.759,0.5955
+1221,claude-instant-1.1,MMLU,0.734,0.3315
+1222,claude-instant-1.2,MMLU,0.732,0.264
+1223,claude-opus-4-1-20250805,MMLU,0.9339225889229452,0.691
+1224,claude-opus-4-20250514,MMLU,0.928286568864834,0.6805
+1225,claude-opus-4-8,MMLU,0.9300669420310496,0.376
+1226,claude-opus-5,MMLU,0.9415787973781704,0.178
+1227,claude-sonnet-4-20250514,MMLU,0.9139011536818116,0.6815
+1228,codestral-2501,MMLU,0.6759008688221051,0.291
+1229,deepseek-coder-1.3b-base,MMLU,0.258,0.453
+1230,deepseek-coder-33b-base,MMLU,0.394,0.2685
+1231,deepseek-coder-6.7b-base,MMLU,0.364,0.3725
+1232,dolly-v2-12b,MMLU,0.262,0.348
+1233,falcon-11b,MMLU,0.584,0.364
+1234,falcon-180B,MMLU,0.706,0.6725
+1235,falcon-40b,MMLU,0.569,0.6275
+1236,falcon-7b,MMLU,0.35,0.4805
+1237,gemini-1.0-pro-001,MMLU,0.7,0.5655
+1238,gemini-1.5-flash-001,MMLU,0.779,0.3635
+1239,gemini-1.5-flash-002,MMLU,0.81398661159379,0.4935
+1240,gemini-1.5-flash-8b-001,MMLU,0.750106822389973,0.7565
+1241,gemini-1.5-pro-001,MMLU,0.859,0.789
+1242,gemini-1.5-pro-001-feb24,MMLU,0.827,0.592
+1243,gemini-1.5-pro-002,MMLU,0.869,0.7575
+1244,gemini-2.0-flash-001,MMLU,0.876940606751175,0.649
+1245,gemini-2.0-flash-exp,MMLU,0.797,0.258
+1246,gemini-2.5-pro-preview-06-05,MMLU,0.9235863837060247,0.309
+1247,gemini-3-pro-preview,MMLU,0.9386127332,0.1315
+1248,gemini-3.5-flash,MMLU,0.9359777809428856,0.319
+1249,gemini-3.5-flash-lite,MMLU,0.9125480700754878,0.486
+1250,gemini-3.6-flash,MMLU,0.9417461900014245,0.438
+1251,gemini-3.7-flash,MMLU,0.9452357214072068,0.345
+1252,gemma-2-27b-it,MMLU,0.757,0.5735
+1253,gemma-2-9b-it,MMLU,0.721,0.5885
+1254,gemma-2b,MMLU,0.423,0.5385
+1255,gemma-3-12b-it,MMLU,0.7712576556046147,0.5635
+1256,gemma-3-27b-it,MMLU,0.8151260504201681,0.4495
+1257,gemma-3-4b-it,MMLU,0.6274747187010398,0.4745
+1258,gemma-4-31b-it,MMLU,0.9182452642073778,0.449
+1259,gemma-7b,MMLU,0.661,0.582
+1260,gpt-3.5-turbo-0125,MMLU,0.673,0.473
+1261,gpt-3.5-turbo-0613,MMLU,0.689,0.546
+1262,gpt-3.5-turbo-1106,MMLU,0.714,0.6045
+1263,gpt-4-0314,MMLU,0.864,0.9485
+1264,gpt-4-0613,MMLU,0.824,0.95
+1265,gpt-4-turbo,MMLU,0.796,0.2285
+1266,gpt-4-turbo-2024-04-09,MMLU,0.813,0.5455
+1267,gpt-4.1-2025-04-14,MMLU,0.9031476997578692,0.68
+1268,gpt-4o-2024-05-13,MMLU,0.842,0.5625
+1269,gpt-4o-2024-08-06,MMLU,0.8808574277168495,0.9215
+1270,gpt-4o-2024-11-20,MMLU,0.881,0.933
+1271,gpt-4o-mini-2024-07-18,MMLU,0.818,0.7595
+1272,gpt-5-2025-08-07,MMLU,0.934767127189859,0.497
+1273,gpt-5.6-luna,MMLU,0.9188861985472156,0.4555
+1274,gpt-5.6-terra,MMLU,0.9329867540236434,0.487
+1275,gpt-j-6b,MMLU,0.257,0.3135
+1276,gpt-oss-120b,MMLU,0.8772966813844182,0.561
+1277,gpt-oss-20b,MMLU,0.8221051132317334,0.6245
+1278,granite-4.0-h-small,MMLU,0.7771921076999786,0.582
+1279,grok-2-1212,MMLU,0.8800740635237145,0.8305
+1280,grok-3,MMLU,0.9010824668850592,0.5845
+1281,grok-3-mini,MMLU,0.8916108816407919,0.4255
+1282,grok-4-0709,MMLU,0.9164648910411622,0.3115
+1283,grok-4.5,MMLU,0.9453781512605042,0.4485
+1284,internlm-7b,MMLU,0.51,0.3915
+1285,internlm-chat-20b,MMLU,0.574,0.7835
+1286,ministral-3b-2410,MMLU,0.5760575416607321,0.1915
+1287,ministral-8b-2410,MMLU,0.5727816550348953,0.1085
+1288,mistral-large-2402,MMLU,0.688,0.1965
+1289,mistral-large-2407,MMLU,0.8,0.3195
+1290,mistral-large-2411,MMLU,0.8513032331576699,0.739
+1291,mpt-30b,MMLU,0.479,0.6075
+1292,mpt-7b,MMLU,0.308,0.376
+1293,o1-2024-12-17,MMLU,0.91917105825381,0.5215
+1294,o1-mini-2024-09-12,MMLU,0.8396239851872953,0.445
+1295,o3-2025-04-16,MMLU,0.9227318045862412,0.363
+1296,o3-mini-2025-01-31,MMLU,0.8587808004557755,0.288
+1297,o4-mini-2025-04-16,MMLU,0.9004415325452215,0.522
+1298,open_llama_7b,MMLU,0.299,0.3505
+1299,opt-13b,MMLU,0.251,0.3275
+1300,phi-1_5,MMLU,0.376,0.396
+1301,phi-2,MMLU,0.584,0.4365
+1302,phi-4,MMLU,0.848,0.6915
+1303,qwen2-72b-instruct,MMLU,0.824,0.842
+1304,qwen2.5-72b-instruct,MMLU,0.853,0.7605
+1305,qwen2.5-7b-instruct,MMLU,0.729,0.563
+1306,starcoder2-15b,MMLU,0.641,0.601
+1307,starcoder2-3b,MMLU,0.366,0.3955
+1308,starcoder2-7b,MMLU,0.388,0.3145
+1309,text-davinci-001,MMLU,0.439,0.3695
+1310,text-davinci-002,MMLU,0.7,0.74
+1311,xgen-7b-8k-base,MMLU,0.363,0.4015
+1312,DeepSeek-R1,MMLU Biology,0.745,0.202
+1313,DeepSeek-V3,MMLU Biology,0.7390000000000001,0.482
+1314,Llama-3.1-405B-Instruct,MMLU Biology,0.726,0.648
+1315,Llama-3.1-405B-Instruct,MMLU Biology,0.7290000000000001,0.688
+1316,Llama-3.1-405B-Instruct,MMLU Biology,0.732,0.718
+1317,Llama-3.1-405B-Instruct,MMLU Biology,0.742,0.7915
+1318,Llama-3.1-70B-Instruct,MMLU Biology,0.732,0.8275
+1319,Llama-3.1-8B-Instruct,MMLU Biology,0.652,0.6755
+1320,Llama-4-Maverick-17B-128E-Instruct,MMLU Biology,0.755,0.5455
+1321,Llama-4-Scout-17B-16E-Instruct,MMLU Biology,0.74,0.7075
+1322,Meta-Llama-3-70B-Instruct,MMLU Biology,0.57,0.011
+1323,Mixtral-8x7B-Instruct-v0.1,MMLU Biology,0.523,0.0265
+1324,amazon.nova-lite-v1:0,MMLU Biology,0.706,0.725
+1325,amazon.nova-micro-v1:0,MMLU Biology,0.652,0.627
+1326,amazon.nova-pro-v1:0,MMLU Biology,0.7290000000000001,0.734
+1327,claude-3-5-sonnet-20240620,MMLU Biology,0.745,0.6615
+1328,claude-3-5-sonnet-20241022,MMLU Biology,0.758,0.659
+1329,claude-3-7-sonnet-20250219,MMLU Biology,0.755,0.4985
+1330,claude-3-7-sonnet-20250219_16K,MMLU Biology,0.745,0.1405
+1331,claude-3-haiku-20240307,MMLU Biology,0.648,0.439
+1332,claude-3-opus-20240229,MMLU Biology,0.71,0.5285
+1333,claude-3-sonnet-20240229,MMLU Biology,0.687,0.6695
+1334,gemini-1.0-pro-001,MMLU Biology,0.6609999999999999,0.694
+1335,gemini-1.5-flash-001,MMLU Biology,0.703,0.547
+1336,gemini-1.5-pro-001,MMLU Biology,0.7190000000000001,0.487
+1337,gpt-4-0613,MMLU Biology,0.58,0.011
+1338,gpt-4-turbo-2024-04-09,MMLU Biology,0.748,0.8575
+1339,gpt-4.5-preview-2025-02-27,MMLU Biology,0.758,0.5165
+1340,gpt-4o-2024-05-13,MMLU Biology,0.748,0.725
+1341,grok-2,MMLU Biology,0.7290000000000001,0.7835
+1342,mistral-large-2402,MMLU Biology,0.69,0.741
+1343,mistral-large-2407,MMLU Biology,0.7390000000000001,0.7585
+1344,o1-2024-12-17_medium,MMLU Biology,0.768,0.3345
+1345,o1-preview-2024-09-12,MMLU Biology,0.758,0.5265
+1346,o3-2025-04-16_medium,MMLU Biology,0.748,0.059
+1347,o3-mini-2025-01-31_medium,MMLU Biology,0.735,0.157
+1348,o4-mini-2025-04-16_medium,MMLU Biology,0.765,0.267
+1349,DeepSeek-R1,MMLU Chemistry,0.77,0.816
+1350,DeepSeek-V3,MMLU Chemistry,0.6,0.042
+1351,Llama-3.1-405B-Instruct,MMLU Chemistry,0.61,0.35
+1352,Llama-3.1-405B-Instruct,MMLU Chemistry,0.63,0.548
+1353,Llama-3.1-405B-Instruct,MMLU Chemistry,0.64,0.647
+1354,Llama-3.1-405B-Instruct,MMLU Chemistry,0.68,0.906
+1355,Llama-3.1-70B-Instruct,MMLU Chemistry,0.6,0.4715
+1356,Llama-3.1-8B-Instruct,MMLU Chemistry,0.52,0.744
+1357,Llama-4-Maverick-17B-128E-Instruct,MMLU Chemistry,0.75,0.9275
+1358,Llama-4-Scout-17B-16E-Instruct,MMLU Chemistry,0.7,0.933
+1359,Meta-Llama-3-70B-Instruct,MMLU Chemistry,0.57,0.6365
+1360,Meta-Llama-3-8B-Instruct,MMLU Chemistry,0.45,0.27
+1361,Mistral-7B-Instruct-v0.1,MMLU Chemistry,0.23,0.2005
+1362,Mixtral-8x7B-Instruct-v0.1,MMLU Chemistry,0.47,0.6225
+1363,amazon.nova-lite-v1:0,MMLU Chemistry,0.6,0.711
+1364,amazon.nova-micro-v1:0,MMLU Chemistry,0.56,0.904
+1365,amazon.nova-pro-v1:0,MMLU Chemistry,0.61,0.441
+1366,claude-3-5-sonnet-20240620,MMLU Chemistry,0.64,0.371
+1367,claude-3-5-sonnet-20241022,MMLU Chemistry,0.64,0.146
+1368,claude-3-7-sonnet-20250219,MMLU Chemistry,0.63,0.053
+1369,claude-3-7-sonnet-20250219_16K,MMLU Chemistry,0.74,0.409
+1370,claude-3-haiku-20240307,MMLU Chemistry,0.54,0.6355
+1371,claude-3-opus-20240229,MMLU Chemistry,0.6,0.331
+1372,claude-3-sonnet-20240229,MMLU Chemistry,0.54,0.365
+1373,gemini-1.0-pro-001,MMLU Chemistry,0.46,0.145
+1374,gemini-1.5-flash-001,MMLU Chemistry,0.59,0.384
+1375,gemini-1.5-pro-001,MMLU Chemistry,0.7,0.9265
+1376,gpt-3.5-turbo-0125,MMLU Chemistry,0.55,0.8875
+1377,gpt-4-0613,MMLU Chemistry,0.56,0.493
+1378,gpt-4-turbo-2024-04-09,MMLU Chemistry,0.61,0.422
+1379,gpt-4.5-preview-2025-02-27,MMLU Chemistry,0.65,0.0945
+1380,gpt-4o-2024-05-13,MMLU Chemistry,0.61,0.164
+1381,grok-2,MMLU Chemistry,0.61,0.5205
+1382,mistral-large-2402,MMLU Chemistry,0.51,0.2065
+1383,mistral-large-2407,MMLU Chemistry,0.58,0.1205
+1384,o1-2024-12-17_medium,MMLU Chemistry,0.77,0.733
+1385,o1-preview-2024-09-12,MMLU Chemistry,0.74,0.8465
+1386,o3-2025-04-16_medium,MMLU Chemistry,0.77,0.356
+1387,o3-mini-2025-01-31_medium,MMLU Chemistry,0.72,0.386
+1388,o4-mini-2025-04-16_medium,MMLU Chemistry,0.75,0.4615
+1389,DeepSeek-R1,MMLU Pro Biology,0.907,0.336
+1390,DeepSeek-V3,MMLU Pro Biology,0.8859999999999999,0.6345
+1391,Llama-3.1-405B-Instruct,MMLU Pro Biology,0.816,0.2895
+1392,Llama-3.1-405B-Instruct,MMLU Pro Biology,0.831,0.446
+1393,Llama-3.1-405B-Instruct,MMLU Pro Biology,0.8370000000000001,0.5195
+1394,Llama-3.1-405B-Instruct,MMLU Pro Biology,0.87,0.8545
+1395,Llama-3.1-70B-Instruct,MMLU Pro Biology,0.8190000000000001,0.5765
+1396,Llama-3.1-8B-Instruct,MMLU Pro Biology,0.664,0.378
+1397,Llama-4-Maverick-17B-128E-Instruct,MMLU Pro Biology,0.904,0.7095
+1398,Llama-4-Scout-17B-16E-Instruct,MMLU Pro Biology,0.883,0.8805
+1399,Meta-Llama-3-70B-Instruct,MMLU Pro Biology,0.7879999999999999,0.7705
+1400,Mixtral-8x7B-Instruct-v0.1,MMLU Pro Biology,0.611,0.363
+1401,amazon.nova-lite-v1:0,MMLU Pro Biology,0.7809999999999999,0.455
+1402,amazon.nova-micro-v1:0,MMLU Pro Biology,0.545,0.001
+1403,amazon.nova-pro-v1:0,MMLU Pro Biology,0.841,0.667
+1404,claude-3-5-sonnet-20240620,MMLU Pro Biology,0.887,0.8275
+1405,claude-3-5-sonnet-20241022,MMLU Pro Biology,0.887,0.5295
+1406,claude-3-7-sonnet-20250219,MMLU Pro Biology,0.893,0.496
+1407,claude-3-7-sonnet-20250219_16K,MMLU Pro Biology,0.922,0.4205
+1408,claude-3-haiku-20240307,MMLU Pro Biology,0.695,0.2545
+1409,claude-3-opus-20240229,MMLU Pro Biology,0.8540000000000001,0.7855
+1410,claude-3-sonnet-20240229,MMLU Pro Biology,0.768,0.571
+1411,gemini-1.0-pro-001,MMLU Pro Biology,0.7,0.5025
+1412,gemini-1.5-flash-001,MMLU Pro Biology,0.841,0.7895
+1413,gemini-1.5-pro-001,MMLU Pro Biology,0.883,0.8855
+1414,gpt-4-0613,MMLU Pro Biology,0.812,0.877
+1415,gpt-4-turbo-2024-04-09,MMLU Pro Biology,0.851,0.7535
+1416,gpt-4.5-preview-2025-02-27,MMLU Pro Biology,0.911,0.6765
+1417,gpt-4o-2024-05-13,MMLU Pro Biology,0.8490000000000001,0.4065
+1418,grok-2,MMLU Pro Biology,0.784,0.215
+1419,mistral-large-2402,MMLU Pro Biology,0.7340000000000001,0.368
+1420,mistral-large-2407,MMLU Pro Biology,0.833,0.4215
+1421,o1-2024-12-17_medium,MMLU Pro Biology,0.921,0.436
+1422,o1-preview-2024-09-12,MMLU Pro Biology,0.8909999999999999,0.4315
+1423,o3-2025-04-16_medium,MMLU Pro Biology,0.8859999999999999,0.0135
+1424,o3-mini-2025-01-31_medium,MMLU Pro Biology,0.895,0.231
+1425,o4-mini-2025-04-16_medium,MMLU Pro Biology,0.909,0.2265
+1426,DeepSeek-R1,MMLU Pro Chemistry,0.895,0.6765
+1427,DeepSeek-V3,MMLU Pro Chemistry,0.7979999999999999,0.6085
+1428,Llama-3.1-405B-Instruct,MMLU Pro Chemistry,0.633,0.114
+1429,Llama-3.1-405B-Instruct,MMLU Pro Chemistry,0.655,0.189
+1430,Llama-3.1-405B-Instruct,MMLU Pro Chemistry,0.682,0.356
+1431,Llama-3.1-405B-Instruct,MMLU Pro Chemistry,0.7609999999999999,0.8715
+1432,Llama-3.1-70B-Instruct,MMLU Pro Chemistry,0.6759999999999999,0.669
+1433,Llama-3.1-8B-Instruct,MMLU Pro Chemistry,0.3979999999999999,0.393
+1434,Llama-4-Maverick-17B-128E-Instruct,MMLU Pro Chemistry,0.8690000000000001,0.8735
+1435,Llama-4-Scout-17B-16E-Instruct,MMLU Pro Chemistry,0.759,0.737
+1436,Meta-Llama-3-70B-Instruct,MMLU Pro Chemistry,0.511,0.27
+1437,Meta-Llama-3-8B-Instruct,MMLU Pro Chemistry,0.3279999999999999,0.206
+1438,Mistral-7B-Instruct-v0.1,MMLU Pro Chemistry,0.13,0.906
+1439,Mixtral-8x7B-Instruct-v0.1,MMLU Pro Chemistry,0.311,0.3365
+1440,amazon.nova-lite-v1:0,MMLU Pro Chemistry,0.61,0.561
+1441,amazon.nova-micro-v1:0,MMLU Pro Chemistry,0.455,0.655
+1442,amazon.nova-pro-v1:0,MMLU Pro Chemistry,0.6890000000000001,0.57
+1443,claude-3-5-sonnet-20240620,MMLU Pro Chemistry,0.765,0.5905
+1444,claude-3-5-sonnet-20241022,MMLU Pro Chemistry,0.777,0.296
+1445,claude-3-7-sonnet-20250219,MMLU Pro Chemistry,0.826,0.492
+1446,claude-3-7-sonnet-20250219_16K,MMLU Pro Chemistry,0.878,0.3585
+1447,claude-3-haiku-20240307,MMLU Pro Chemistry,0.442,0.2405
+1448,claude-3-opus-20240229,MMLU Pro Chemistry,0.7190000000000001,0.7165
+1449,claude-3-sonnet-20240229,MMLU Pro Chemistry,0.529,0.359
+1450,gemini-1.0-pro-001,MMLU Pro Chemistry,0.405,0.2815
+1451,gemini-1.5-flash-001,MMLU Pro Chemistry,0.73,0.915
+1452,gemini-1.5-pro-001,MMLU Pro Chemistry,0.805,0.9245
+1453,gpt-3.5-turbo-0125,MMLU Pro Chemistry,0.36,0.1875
+1454,gpt-4-0613,MMLU Pro Chemistry,0.53,0.2855
+1455,gpt-4-turbo-2024-04-09,MMLU Pro Chemistry,0.6759999999999999,0.438
+1456,gpt-4.5-preview-2025-02-27,MMLU Pro Chemistry,0.857,0.6695
+1457,gpt-4o-2024-05-13,MMLU Pro Chemistry,0.7290000000000001,0.346
+1458,grok-2,MMLU Pro Chemistry,0.629,0.3185
+1459,mistral-large-2402,MMLU Pro Chemistry,0.484,0.26
+1460,mistral-large-2407,MMLU Pro Chemistry,0.8340000000000001,0.994
+1461,o1-2024-12-17_medium,MMLU Pro Chemistry,0.877,0.3215
+1462,o1-preview-2024-09-12,MMLU Pro Chemistry,0.845,0.614
+1463,o3-2025-04-16_medium,MMLU Pro Chemistry,0.867,0.0535
+1464,o3-mini-2025-01-31_medium,MMLU Pro Chemistry,0.873,0.5065
+1465,o4-mini-2025-04-16_medium,MMLU Pro Chemistry,0.883,0.3175
+1466,DeepSeek-R1-0528,MMLU-Pro,0.8401761968085106,0.5445
+1467,DeepSeek-V3,MMLU-Pro,0.7815824468085106,0.9085
+1468,DeepSeek-V3.1,MMLU-Pro,0.8310498444986131,0.762
+1469,Mixtral-8x22B-Instruct-v0.1,MMLU-Pro,0.551279920212766,0.4075
+1470,Qwen3-235B-A22B-Instruct-2507,MMLU-Pro,0.660904255319149,0.055
+1471,Qwen3-235B-A22B-Thinking-2507,MMLU-Pro,0.5835272606382979,0.004
+1472,claude-3-5-haiku-20241022,MMLU-Pro,0.613031914893617,0.3535
+1473,claude-3-5-sonnet-20241022,MMLU-Pro,0.7757646276595744,0.806
+1474,claude-3-7-sonnet-20250219,MMLU-Pro,0.718500664893617,0.1745
+1475,claude-opus-4-1-20250805,MMLU-Pro,0.8788970834730138,0.8545
+1476,claude-opus-4-20250514,MMLU-Pro,0.8686003989361702,0.846
+1477,claude-opus-4-8,MMLU-Pro,0.8866356382978723,0.5615
+1478,claude-opus-5,MMLU-Pro,0.9168051861702128,0.395
+1479,claude-sonnet-4-20250514,MMLU-Pro,0.8372672872340425,0.797
+1480,codestral-2501,MMLU-Pro,0.5157912234042553,0.5155
+1481,gemini-1.5-flash-002,MMLU-Pro,0.647161499459729,0.4135
+1482,gemini-1.5-flash-8b-001,MMLU-Pro,0.4821309840425531,0.246
+1483,gemini-1.5-pro-002,MMLU-Pro,0.7007978723404256,0.468
+1484,gemini-2.0-flash-001,MMLU-Pro,0.761469414893617,0.6685
+1485,gemini-2.5-flash-preview-05-20,MMLU-Pro,0.828873005319149,0.7235
+1486,gemini-2.5-pro-preview-06-05,MMLU-Pro,0.8668550531914894,0.3915
+1487,gemini-3-flash-preview,MMLU-Pro,0.8941988031914894,0.5285
+1488,gemini-3.1-flash-lite,MMLU-Pro,0.8449135638297872,0.5735
+1489,gemini-3.1-pro-preview,MMLU-Pro,0.9128699700698372,0.215
+1490,gemini-3.5-flash,MMLU-Pro,0.8956117021276596,0.459
+1491,gemini-3.5-flash-lite,MMLU-Pro,0.8323636968085106,0.4875
+1492,gemini-3.6-flash,MMLU-Pro,0.897938829787234,0.5675
+1493,gemini-3.7-flash,MMLU-Pro,0.903091755319149,0.427
+1494,gemma-3-12b-it,MMLU-Pro,0.5805352393617021,0.469
+1495,gemma-3-27b-it,MMLU-Pro,0.6621509308510638,0.432
+1496,gemma-3-4b-it,MMLU-Pro,0.4109873670212766,0.435
+1497,gemma-4-31b-it,MMLU-Pro,0.8672706117021277,0.703
+1498,gpt-3.5-turbo-1106,MMLU-Pro,0.4690824468085106,0.2905
+1499,gpt-4.1-2025-04-14,MMLU-Pro,0.8103390957446809,0.745
+1500,gpt-4o-2024-08-06,MMLU-Pro,0.7298869680851063,0.81
+1501,gpt-4o-mini-2024-07-18,MMLU-Pro,0.6236702127659575,0.518
+1502,gpt-5-2025-08-07,MMLU-Pro,0.87109375,0.5285
+1503,gpt-5.6-luna,MMLU-Pro,0.8441655585106383,0.4945
+1504,gpt-5.6-sol,MMLU-Pro,0.8439162234042553,0.3325
+1505,gpt-5.6-terra,MMLU-Pro,0.8633643617021277,0.465
+1506,gpt-oss-120b,MMLU-Pro,0.784906914893617,0.704
+1507,gpt-oss-20b,MMLU-Pro,0.6710438829787234,0.6485
+1508,granite-4.0-h-small,MMLU-Pro,0.5737800315903234,0.4075
+1509,grok-2-1212,MMLU-Pro,0.7411070478723404,0.7395
+1510,grok-3,MMLU-Pro,0.7716921542553191,0.3575
+1511,grok-3-mini,MMLU-Pro,0.8121675531914894,0.5945
+1512,grok-4-0709,MMLU-Pro,0.8658627858627859,0.5465
+1513,grok-4.5,MMLU-Pro,0.89453125,0.47
+1514,ministral-3b-2410,MMLU-Pro,0.383061835106383,0.297
+1515,ministral-8b-2410,MMLU-Pro,0.4276928191489361,0.4385
+1516,mistral-large-2411,MMLU-Pro,0.7001329787234043,0.653
+1517,o1-2024-12-17,MMLU-Pro,0.8386801861702128,0.508
+1518,o1-mini-2024-09-12,MMLU-Pro,0.7198304521276596,0.524
+1519,o3-2025-04-16,MMLU-Pro,0.8636136968085106,0.504
+1520,o3-mini-2025-01-31,MMLU-Pro,0.7771775265957447,0.556
+1521,o4-mini-2025-04-16,MMLU-Pro,0.7794215425531915,0.3315
+1522,DeepSeek-V3.1,MultiChallenge,0.461,0.3575
+1523,claude-3-7-sonnet-20250219_thinking,MultiChallenge,0.5158,0.588
+1524,claude-haiku-4-5-20251001_thinking,MultiChallenge,0.5049,0.539
+1525,claude-opus-4-1-20250805_thinking,MultiChallenge,0.5720000000000001,0.665
+1526,claude-opus-4-20250514_thinking,MultiChallenge,0.5861999999999999,0.6695
+1527,claude-opus-4-5-20251101_thinking,MultiChallenge,0.5897,0.407
+1528,claude-opus-4-6_max,MultiChallenge,0.3715,0.002
+1529,claude-opus-4-6_none,MultiChallenge,0.5602,0.2745
+1530,claude-sonnet-4-20250514_thinking,MultiChallenge,0.5710999999999999,0.815
+1531,claude-sonnet-4-5-20250929_thinking,MultiChallenge,0.5532,0.5815
+1532,gemini-2.0-flash-001,MultiChallenge,0.3635,0.167
+1533,gemini-2.5-pro,MultiChallenge,0.5362,0.5015
+1534,gemini-3-pro-preview,MultiChallenge,0.6567000000000001,0.48
+1535,gemini-3.1-flash-lite,MultiChallenge,0.6061,0.852
+1536,gemini-3.1-pro-preview,MultiChallenge,0.7137,0.715
+1537,gpt-4.1-2025-04-14,MultiChallenge,0.3943,0.1405
+1538,gpt-5-2025-08-07_thinking,MultiChallenge,0.6319,0.549
+1539,gpt-5-mini-2025-08-07_thinking,MultiChallenge,0.5899,0.5655
+1540,gpt-5.1-2025-11-13_none,MultiChallenge,0.5123,0.6975
+1541,gpt-5.1-2025-11-13_thinking,MultiChallenge,0.6341,0.581
+1542,gpt-5.4-pro-2026-03-05_unknown,MultiChallenge,0.6923,0.593
+1543,gpt-oss-120b,MultiChallenge,0.4534,0.525
+1544,kimi-k2-thinking,MultiChallenge,0.5542,0.5335
+1545,kimi-k2.5,MultiChallenge,0.6139,0.6915
+1546,muse-spark,MultiChallenge,0.7552,0.933
+1547,muse-spark-1.1,MultiChallenge,0.753,0.687
+1548,o3-2025-04-16_high,MultiChallenge,0.5661999999999999,0.413
+1549,o3-pro-2025-06-10_high,MultiChallenge,0.624,0.542
+1550,o4-mini-2025-04-16_high,MultiChallenge,0.449,0.169
+1551,qwen3-235b-a22b,MultiChallenge,0.4122,0.264
+1552,DeepSeek-R1,MultiNRC,0.2427,0.5475
+1553,DeepSeek-R1-0528,MultiNRC,0.2758,0.4195
+1554,DeepSeek-V3.1,MultiNRC,0.236,0.5005
+1555,GLM-4.5-Air,MultiNRC,0.1043,0.376
+1556,Kimi-K2-Instruct,MultiNRC,0.1848,0.2025
+1557,Llama-4-Maverick-17B-128E-Instruct,MultiNRC,0.0843999999999999,0.0225
+1558,Qwen3-235B-A22B-Thinking-2507,MultiNRC,0.2711,0.8995
+1559,claude-3-7-sonnet-20250219_thinking,MultiNRC,0.2777,0.6255
+1560,claude-opus-4-1-20250805,MultiNRC,0.2967,0.4595
+1561,claude-opus-4-1-20250805_thinking,MultiNRC,0.3839,0.794
+1562,claude-opus-4-20250514,MultiNRC,0.29,0.5455
+1563,claude-opus-4-20250514_thinking,MultiNRC,0.3393,0.4695
+1564,claude-opus-4-5-20251101,MultiNRC,0.4122999999999999,0.338
+1565,claude-opus-4-5-20251101_thinking,MultiNRC,0.4863,0.6435
+1566,claude-opus-4-6_max,MultiNRC,0.5706,0.879
+1567,claude-opus-4-6_none,MultiNRC,0.4834,0.6385
+1568,claude-sonnet-4-20250514,MultiNRC,0.1839,0.1675
+1569,claude-sonnet-4-5-20250929,MultiNRC,0.2815,0.266
+1570,claude-sonnet-4-5-20250929_thinking,MultiNRC,0.3583,0.7055
+1571,gemini-2.5-pro-preview-06-05,MultiNRC,0.4512,0.8325
+1572,gemini-3-pro-preview,MultiNRC,0.5896,0.639
+1573,gemini-3.1-flash-lite,MultiNRC,0.2502,0.231
+1574,gemini-3.1-pro-preview,MultiNRC,0.6474,0.743
+1575,glm-4.5,MultiNRC,0.1744,0.54
+1576,gpt-4.1-2025-04-14,MultiNRC,0.2123,0.486
+1577,gpt-4o-2024-08-06,MultiNRC,0.1242,0.515
+1578,gpt-5-2025-08-07_unknown,MultiNRC,0.5213,0.6955
+1579,gpt-5-mini-2025-08-07_unknown,MultiNRC,0.2389,0.3745
+1580,gpt-5.1-2025-11-13_none,MultiNRC,0.1828999999999999,0.309
+1581,gpt-5.1-2025-11-13_thinking,MultiNRC,0.49,0.5515
+1582,gpt-5.2-2025-12-11_unknown,MultiNRC,0.4218,0.285
+1583,gpt-5.4-2026-03-05_xhigh,MultiNRC,0.5829,0.2025
+1584,gpt-5.4-pro-2026-03-05_unknown,MultiNRC,0.6227,0.5845
+1585,gpt-oss-120b,MultiNRC,0.1517,0.279
+1586,gpt-oss-20b,MultiNRC,0.1043,0.543
+1587,kimi-k2.5,MultiNRC,0.3517,0.2855
+1588,muse-spark,MultiNRC,0.5905,0.6695
+1589,muse-spark-1.1,MultiNRC,0.6559,0.3015
+1590,o3-2025-04-16_high,MultiNRC,0.455,0.7845
+1591,o3-2025-04-16_medium,MultiNRC,0.4445,0.938
+1592,o3-pro-2025-06-10_high,MultiNRC,0.49,0.5815
+1593,o4-mini-2025-04-16_high,MultiNRC,0.2218,0.164
+1594,qwen3-235b-a22b,MultiNRC,0.1762999999999999,0.34
+1595,DeepSeek-V3.1,NL2Bash,0.6744186046511628,0.0535
+1596,claude-3-opus-20240229,NL2Bash,0.6356589147286822,0.381
+1597,claude-opus-4-20250514_unknown,NL2Bash,0.8682170542635659,0.48
+1598,claude-opus-4-6_unknown,NL2Bash,0.9147286821705426,0.1555
+1599,claude-sonnet-4-6_unknown,NL2Bash,0.9302325581395348,0.5555
+1600,davinci,NL2Bash,0.2248062015503876,0.877
+1601,gemini-2.5-pro,NL2Bash,0.8604651162790697,0.4725
+1602,glm-5_unknown,NL2Bash,0.8914728682170543,0.49
+1603,gpt-4o-2024-05-13,NL2Bash,0.7596899224806202,0.687
+1604,gpt-5.1-codex-max,NL2Bash,0.937984496124031,0.6135
+1605,gpt-5.2-codex,NL2Bash,0.9224806201550388,0.559
+1606,gpt-5.3-codex,NL2Bash,0.9534883720930232,0.4935
+1608,gpt2-xl,NL2Bash,0.0077519379844961,0.063
+1609,o3-2025-04-16_unknown,NL2Bash,0.8992248062015504,0.542
+1610,text-davinci-002,NL2Bash,0.6046511627906976,0.9005
+1611,claude-3-7-sonnet-20250219,OSWorld,0.358,0.219
+1612,claude-opus-4-5-20251101,OSWorld,0.6629999999999999,0.6075
+1613,claude-sonnet-4-20250514,OSWorld,0.439,0.3145
+1614,claude-sonnet-4-5-20250929,OSWorld,0.629,0.665
+1615,claude-sonnet-4-6,OSWorld,0.721,0.7235
+1616,kimi-k2.5,OSWorld,0.633,0.5855
+1617,o3-2025-04-16_medium,OSWorld,0.23,0.023
+1618,claude-fable-5_max,PostTrainBench v1.1,0.4179,0.9425
+1619,claude-opus-4-7_xhigh,PostTrainBench v1.1,0.2856,0.496
+1620,claude-opus-4-8_high,PostTrainBench v1.1,0.3384,0.717
+1621,claude-opus-4-8_max,PostTrainBench v1.1,0.329,0.663
+1622,claude-opus-5_unknown,PostTrainBench v1.1,0.3504,0.617
+1623,gemini-3.1-pro-preview,PostTrainBench v1.1,0.2198999999999999,0.1325
+1624,glm-5.2_max,PostTrainBench v1.1,0.317,0.6375
+1625,gpt-5.4-2026-03-05_high,PostTrainBench v1.1,0.19,0.06
+1626,gpt-5.5_xhigh,PostTrainBench v1.1,0.2723,0.2575
+1627,gpt-5.6-sol_max,PostTrainBench v1.1,0.3622999999999999,0.658
+1628,grok-4.5_high,PostTrainBench v1.1,0.2345,0.2095
+1629,kimi-k3_unknown,PostTrainBench v1.1,0.3196,0.6055
+1630,DeepSeek-R1,SEAL Tool Use (Enterprise),0.6527,0.3825
+1631,DeepSeek-V3,SEAL Tool Use (Enterprise),0.625,0.747
+1632,DeepSeek-V3-0324,SEAL Tool Use (Enterprise),0.6423000000000001,0.5125
+1633,Llama-3.1-405B-Instruct,SEAL Tool Use (Enterprise),0.5035000000000001,0.4655
+1634,Llama-3.1-70B-Instruct,SEAL Tool Use (Enterprise),0.3722999999999999,0.079
+1635,Llama-3.1-8B-Instruct,SEAL Tool Use (Enterprise),0.1742,0.0145
+1636,amazon.nova-lite-v1:0,SEAL Tool Use (Enterprise),0.3653,0.1575
+1637,amazon.nova-micro-v1:0,SEAL Tool Use (Enterprise),0.2893,0.236
+1638,amazon.nova-pro-v1:0,SEAL Tool Use (Enterprise),0.4704,0.36
+1639,c4ai-command-r-plus-08-2024,SEAL Tool Use (Enterprise),0.3021,0.2885
+1640,claude-3-5-sonnet-20240620,SEAL Tool Use (Enterprise),0.5938,0.7045
+1641,claude-3-7-sonnet-20250219,SEAL Tool Use (Enterprise),0.6493000000000001,0.6375
+1642,claude-3-7-sonnet-20250219_thinking,SEAL Tool Use (Enterprise),0.6527,0.3465
+1643,claude-3-opus-20240229,SEAL Tool Use (Enterprise),0.5278,0.6545
+1644,claude-3-sonnet-20240229,SEAL Tool Use (Enterprise),0.5417000000000001,0.9405
+1645,gemini-1.5-pro-001,SEAL Tool Use (Enterprise),0.4042,0.0515
+1646,gemini-1.5-pro-002,SEAL Tool Use (Enterprise),0.6028,0.741
+1647,gemini-2.0-flash-001,SEAL Tool Use (Enterprise),0.556,0.287
+1648,gemini-2.0-flash-exp,SEAL Tool Use (Enterprise),0.6007,0.79
+1649,gemini-2.0-flash-thinking-exp-01-21,SEAL Tool Use (Enterprise),0.6319,0.812
+1650,gemini-2.0-pro-exp-02-05,SEAL Tool Use (Enterprise),0.6145,0.4485
+1651,gemini-2.5-pro-exp-03-25,SEAL Tool Use (Enterprise),0.6875,0.19
+1652,gpt-4-0613,SEAL Tool Use (Enterprise),0.5139,0.878
+1653,gpt-4-turbo,SEAL Tool Use (Enterprise),0.6076,0.7585
+1654,gpt-4.5-preview-2025-02-27,SEAL Tool Use (Enterprise),0.6376,0.545
+1655,gpt-4o-2024-05-13,SEAL Tool Use (Enterprise),0.6457999999999999,0.901
+1656,gpt-4o-2024-08-06,SEAL Tool Use (Enterprise),0.5992999999999999,0.7665
+1657,gpt-4o-mini-2024-07-18,SEAL Tool Use (Enterprise),0.5174,0.7315
+1658,mistral-large-2407,SEAL Tool Use (Enterprise),0.5035000000000001,0.417
+1659,o1-2024-12-17_unknown,SEAL Tool Use (Enterprise),0.7014,0.5235
+1660,o1-preview-2024-09-12,SEAL Tool Use (Enterprise),0.6643000000000001,0.702
+1661,o3-mini-2025-01-31_high,SEAL Tool Use (Enterprise),0.6527,0.3205
+1662,o3-mini-2025-01-31_medium,SEAL Tool Use (Enterprise),0.6493000000000001,0.406
+1663,DeepSeek-R1-0528,SimpleQA Verified,0.2857142857142857,0.4245
+1664,DeepSeek-V3,SimpleQA Verified,0.2738336713995943,0.638
+1665,DeepSeek-V3.1,SimpleQA Verified,0.2426065162907268,0.4185
+1666,Inkling_xhigh,SimpleQA Verified,0.403,0.516
+1667,Mixtral-8x22B-Instruct-v0.1,SimpleQA Verified,0.1784424961320268,0.638
+1668,Qwen3-235B-A22B-Thinking-2507,SimpleQA Verified,0.5371642723297938,0.965
+1669,claude-3-opus-20240229,SimpleQA Verified,0.126,0.347
+1670,claude-fable-5-1_max,SimpleQA Verified,0.708,0.481
+1671,claude-fable-5_xhigh,SimpleQA Verified,0.707,0.778
+1672,claude-haiku-4-5-20251001,SimpleQA Verified,0.132,0.1725
+1673,claude-haiku-4-5-20251001_32K,SimpleQA Verified,0.126,0.0895
+1674,claude-opus-4-1-20250805,SimpleQA Verified,0.3102493074792243,0.457
+1675,claude-opus-4-5-20251101,SimpleQA Verified,0.3900414937759336,0.4585
+1676,claude-opus-4-5-20251101_32K,SimpleQA Verified,0.457,0.6185
+1677,claude-opus-4-6,SimpleQA Verified,0.4518872939925571,0.345
+1678,claude-opus-4-6_max,SimpleQA Verified,0.47,0.623
+1679,claude-opus-4-7_xhigh,SimpleQA Verified,0.517,0.6145
+1680,claude-opus-4-8,SimpleQA Verified,0.4453386988598256,0.652
+1681,claude-opus-4-8_max,SimpleQA Verified,0.53,0.5525
+1682,claude-opus-5,SimpleQA Verified,0.632996632996633,0.8035
+1683,claude-opus-5_max,SimpleQA Verified,0.599,0.604
+1684,claude-sonnet-4-5-20250929,SimpleQA Verified,0.237,0.263
+1685,claude-sonnet-4-5-20250929_59K,SimpleQA Verified,0.307,0.373
+1686,claude-sonnet-4-5-20250929_thinking,SimpleQA Verified,0.2921195652173913,0.4175
+1687,claude-sonnet-4-6,SimpleQA Verified,0.3088391906283279,0.2415
+1688,claude-sonnet-4-6_high,SimpleQA Verified,0.355,0.42
+1689,claude-sonnet-4-6_max,SimpleQA Verified,0.328,0.4925
+1690,claude-sonnet-5,SimpleQA Verified,0.3206696716033483,0.558
+1691,claude-sonnet-5_max,SimpleQA Verified,0.337,0.483
+1692,claude-sonnet-5_xhigh,SimpleQA Verified,0.329,0.249
+1693,codestral-2501,SimpleQA Verified,0.055613850996852,0.2585
+1694,deepseek-v4-flash-0731_max,SimpleQA Verified,0.3363363363363363,0.2325
+1695,deepseek-v4-pro-0813_max,SimpleQA Verified,0.5290581162324649,0.5845
+1696,deepseek-v4-pro_max,SimpleQA Verified,0.469939879759519,0.5345
+1697,gemini-2.5-flash,SimpleQA Verified,0.2805429864253393,0.5785
+1698,gemini-3-flash-preview_high,SimpleQA Verified,0.668,0.8895
+1699,gemini-3-pro-preview,SimpleQA Verified,0.7210300429,0.9235
+1700,gemini-3.1-pro-preview,SimpleQA Verified,0.775178026449644,0.958
+1701,gemini-3.1-pro-preview_high,SimpleQA Verified,0.735,0.893
+1702,gemini-3.5-flash,SimpleQA Verified,0.704112337011033,0.955
+1703,gemini-3.5-flash-lite,SimpleQA Verified,0.3308119011598587,0.5375
+1704,gemini-3.5-flash_high,SimpleQA Verified,0.662,0.7665
+1705,gemini-3.6-flash_high,SimpleQA Verified,0.662,0.763
+1706,gemini-3.7-flash,SimpleQA Verified,0.7319277108433735,0.96
+1707,gemini-3.7-flash_high,SimpleQA Verified,0.692,0.8085
+1708,gemma-3-12b-it,SimpleQA Verified,0.0670335167583792,0.2465
+1709,gemma-3-27b-it,SimpleQA Verified,0.1071071071071071,0.2645
+1710,gemma-3-4b-it,SimpleQA Verified,0.046046046046046,0.317
+1711,gemma-4-26b-a4b,SimpleQA Verified,0.0905125408942202,0.324
+1712,gemma-4-31b-it,SimpleQA Verified,0.1068376068376068,0.038
+1713,glm-4.7,SimpleQA Verified,0.322,0.4445
+1714,glm-5.1,SimpleQA Verified,0.34,0.3155
+1715,glm-5.2_max,SimpleQA Verified,0.342,0.1985
+1716,glm-5.3_max,SimpleQA Verified,0.41,0.282
+1717,gpt-3.5-turbo-1106,SimpleQA Verified,0.1118951612903225,0.5185
+1718,gpt-4.1-2025-04-14,SimpleQA Verified,0.311,0.6175
+1719,gpt-4.1-mini-2025-04-14,SimpleQA Verified,0.127,0.2105
+1720,gpt-4.1-nano-2025-04-14,SimpleQA Verified,0.06,0.108
+1721,gpt-4o-2024-08-06,SimpleQA Verified,0.26,0.692
+1722,gpt-4o-mini-2024-07-18,SimpleQA Verified,0.0906344410876133,0.2595
+1723,gpt-5-2025-08-07_high,SimpleQA Verified,0.501,0.75
+1724,gpt-5-mini-2025-08-07_high,SimpleQA Verified,0.216,0.23
+1725,gpt-5-nano-2025-08-07_high,SimpleQA Verified,0.117,0.079
+1726,gpt-5.1-2025-11-13,SimpleQA Verified,0.3492222779729051,0.584
+1727,gpt-5.1-2025-11-13_high,SimpleQA Verified,0.48,0.579
+1728,gpt-5.2-2025-12-11_high,SimpleQA Verified,0.343,0.244
+1729,gpt-5.2-2025-12-11_low,SimpleQA Verified,0.328,0.401
+1730,gpt-5.2-2025-12-11_medium,SimpleQA Verified,0.327,0.2295
+1731,gpt-5.2-2025-12-11_xhigh,SimpleQA Verified,0.371,0.288
+1732,gpt-5.4-2026-03-05,SimpleQA Verified,0.3045226130653266,0.524
+1733,gpt-5.4-2026-03-05_xhigh,SimpleQA Verified,0.451,0.31
+1734,gpt-5.4-mini-2026-03-17_high,SimpleQA Verified,0.294,0.294
+1735,gpt-5.4-nano-2026-03-17_high,SimpleQA Verified,0.117,0.06
+1736,gpt-5.4-pro-2026-03-05_xhigh,SimpleQA Verified,0.463,0.34
+1737,gpt-5.5_xhigh,SimpleQA Verified,0.63,0.6155
+1738,gpt-5.6-luna,SimpleQA Verified,0.3907815631262525,0.641
+1739,gpt-5.6-luna_max,SimpleQA Verified,0.41,0.342
+1740,gpt-5.6-sol,SimpleQA Verified,0.692384769539078,0.972
+1741,gpt-5.6-sol_max,SimpleQA Verified,0.697,0.7415
+1742,gpt-5.6-terra,SimpleQA Verified,0.415454089312594,0.635
+1743,gpt-5.6-terra_max,SimpleQA Verified,0.432,0.339
+1744,gpt-6-astra_max,SimpleQA Verified,0.756,0.816
+1745,gpt-oss-120b,SimpleQA Verified,0.131198347107438,0.1885
+1746,gpt-oss-20b,SimpleQA Verified,0.0594503645541222,0.1275
+1747,granite-4.0-h-small,SimpleQA Verified,0.0856983861992209,0.2855
+1748,grok-2-1212,SimpleQA Verified,0.2048192771084337,0.4995
+1749,grok-3,SimpleQA Verified,0.3933434190620272,0.7755
+1750,grok-3-mini,SimpleQA Verified,0.2020725388601036,0.3025
+1751,grok-4-0709,SimpleQA Verified,0.5185185185185186,0.8385
+1752,grok-4-fast_thinking,SimpleQA Verified,0.1967380224260958,0.4415
+1753,grok-4.20-0309-reasoning,SimpleQA Verified,0.302,0.2015
+1754,grok-4.3_high,SimpleQA Verified,0.332,0.314
+1755,grok-4.5,SimpleQA Verified,0.5381443298969072,0.755
+1756,grok-4.5_high,SimpleQA Verified,0.483,0.4885
+1757,grok-4.6_high,SimpleQA Verified,0.493,0.459
+1758,grok-4.6_xhigh,SimpleQA Verified,0.489,0.446
+1759,inkling-small_xhigh,SimpleQA Verified,0.191,0.076
+1760,kimi-k2.5,SimpleQA Verified,0.343,0.4145
+1761,kimi-k2.6,SimpleQA Verified,0.349,0.3355
+1762,kimi-k2.7-code,SimpleQA Verified,0.365,0.353
+1763,kimi-k3_max,SimpleQA Verified,0.506,0.4595
+1764,ministral-3b-2410,SimpleQA Verified,0.0542797494780793,0.3815
+1765,ministral-8b-2410,SimpleQA Verified,0.0681699003670686,0.4285
+1766,mistral-large-2411,SimpleQA Verified,0.222684703433923,0.604
+1767,muse-spark-1.1,SimpleQA Verified,0.5778894472361809,0.547
+1768,muse-spark-1.2_xhigh,SimpleQA Verified,0.6030150753768844,0.8525
+1769,o1-2024-12-17_high,SimpleQA Verified,0.411,0.718
+1770,o3-2025-04-16,SimpleQA Verified,0.522567703109328,0.822
+1771,o3-2025-04-16_high,SimpleQA Verified,0.494,0.7565
+1772,o3-mini-2025-01-31_high,SimpleQA Verified,0.153,0.1385
+1773,o4-mini-2025-04-16,SimpleQA Verified,0.2121366649668536,0.311
+1774,o4-mini-2025-04-16_high,SimpleQA Verified,0.188,0.1845
+1775,o4-mini-2025-04-16_low,SimpleQA Verified,0.196,0.2315
+1776,qwen3-max-2025-09-23,SimpleQA Verified,0.4874874874874875,0.853
+1777,qwen3.5-flash,SimpleQA Verified,0.2032032032032032,0.1445
+1778,qwen3.5-plus,SimpleQA Verified,0.2535070140280561,0.192
+1779,qwen3.6-flash,SimpleQA Verified,0.1591591591591591,0.069
+1780,qwen3.6-max-preview,SimpleQA Verified,0.5200400801603207,0.679
+1781,qwen3.6-plus,SimpleQA Verified,0.4414414414414414,0.511
+1782,qwen3.7-max,SimpleQA Verified,0.5576730190571715,0.682
+1783,qwen3.8-max_xhigh,SimpleQA Verified,0.458,0.444
+1784,Kimi-K2-Instruct,Terminal Bench 2.0,0.278,0.531
+1785,MiniMax-M2.5,Terminal Bench 2.0,0.427,0.8825
+1786,MiniMax-M2.7,Terminal Bench 2.0,0.451,0.6305
+1787,Qwen3-Coder-480B-A35B-Instruct,Terminal Bench 2.0,0.272,0.502
+1788,claude-haiku-4-5-20251001,Terminal Bench 2.0,0.298,0.7915
+1789,claude-haiku-4-5-20251001_unknown,Terminal Bench 2.0,0.355,0.469
+1790,claude-opus-4-1-20250805,Terminal Bench 2.0,0.38,0.63
+1791,claude-opus-4-1-20250805_unknown,Terminal Bench 2.0,0.38,0.5535
+1792,claude-opus-4-5-20251101,Terminal Bench 2.0,0.631,0.8465
+1793,claude-opus-4-5-20251101_128K,Terminal Bench 2.0,0.591,0.557
+1794,claude-opus-4-5-20251101_unknown,Terminal Bench 2.0,0.631,0.4345
+1795,claude-opus-4-6,Terminal Bench 2.0,0.699,0.4325
+1796,claude-opus-4-6_unknown,Terminal Bench 2.0,0.798,0.633
+1797,claude-opus-4-7_unknown,Terminal Bench 2.0,0.802,0.5725
+1798,claude-sonnet-4-5-20250929,Terminal Bench 2.0,0.428,0.7185
+1799,claude-sonnet-4-5-20250929_unknown,Terminal Bench 2.0,0.465,0.3285
+1800,claude-sonnet-4-6,Terminal Bench 2.0,0.534,0.4385
+1801,claude-sonnet-4-6_unknown,Terminal Bench 2.0,0.534,0.4465
+1802,deepseek-v3.2,Terminal Bench 2.0,0.396,0.81
+1803,gemini-2.5-flash,Terminal Bench 2.0,0.171,0.2925
+1804,gemini-2.5-flash-preview-09-2025,Terminal Bench 2.0,0.171,0.135
+1805,gemini-2.5-pro,Terminal Bench 2.0,0.326,0.3795
+1806,gemini-3-flash-preview,Terminal Bench 2.0,0.643,0.885
+1807,gemini-3-pro-preview,Terminal Bench 2.0,0.6940000000000001,0.6555
+1808,gemini-3.1-pro-preview,Terminal Bench 2.0,0.802,0.878
+1809,glm-4.7,Terminal Bench 2.0,0.334,0.317
+1810,glm-5,Terminal Bench 2.0,0.524,0.473
+1811,gpt-5-2025-08-07_medium,Terminal Bench 2.0,0.496,0.4875
+1812,gpt-5-2025-08-07_unknown,Terminal Bench 2.0,0.496,0.2925
+1813,gpt-5-mini-2025-08-07_medium,Terminal Bench 2.0,0.319,0.4695
+1814,gpt-5-mini-2025-08-07_unknown,Terminal Bench 2.0,0.348,0.6785
+1815,gpt-5-nano-2025-08-07_medium,Terminal Bench 2.0,0.115,0.052
+1816,gpt-5-nano-2025-08-07_unknown,Terminal Bench 2.0,0.218,0.5355
+1817,gpt-5.1-2025-11-13_medium,Terminal Bench 2.0,0.476,0.4965
+1818,gpt-5.1-2025-11-13_unknown,Terminal Bench 2.0,0.476,0.3805
+1819,gpt-5.1-codex-max,Terminal Bench 2.0,0.604,0.6785
+1820,gpt-5.2-2025-12-11_medium,Terminal Bench 2.0,0.649,0.699
+1821,gpt-5.2-2025-12-11_unknown,Terminal Bench 2.0,0.649,0.829
+1822,gpt-5.2-codex,Terminal Bench 2.0,0.665,0.8775
+1823,gpt-5.3-codex,Terminal Bench 2.0,0.784,0.748
+1824,gpt-5.4-2026-03-05_unknown,Terminal Bench 2.0,0.818,0.616
+1825,gpt-5.5_unknown,Terminal Bench 2.0,0.8470000000000001,0.3095
+1826,gpt-oss-120b,Terminal Bench 2.0,0.187,0.4465
+1827,gpt-oss-120b_unknown,Terminal Bench 2.0,0.187,0.5105
+1828,gpt-oss-20b,Terminal Bench 2.0,0.034,0.0995
+1829,gpt-oss-20b_unknown,Terminal Bench 2.0,0.034,0.409
+1830,grok-4-0709,Terminal Bench 2.0,0.272,0.1105
+1831,grok-4-20,Terminal Bench 2.0,0.573,0.413
+1832,kimi-k2-thinking,Terminal Bench 2.0,0.357,0.4215
+1833,kimi-k2.5,Terminal Bench 2.0,0.432,0.4065
+1834,qwen3.5-9B,Terminal Bench 2.0,0.092,0.0215
+1835,qwen3.6-35b-a3b,Terminal Bench 2.0,0.23,0.118
+1836,DeepSeek-V3.2-Exp,The Agent Company,0.524,0.4845
+1837,Llama-3.1-405B-Instruct,The Agent Company,0.141,0.615
+1838,Llama-3.1-70B-Instruct,The Agent Company,0.128,0.719
+1839,amazon.nova-pro-v1:0,The Agent Company,0.057,0.1495
+1840,claude-3-5-sonnet-20241022,The Agent Company,0.344,0.8715
+1841,claude-3-7-sonnet-20250219,The Agent Company,0.402,0.891
+1842,claude-sonnet-4-20250514,The Agent Company,0.432,0.5935
+1843,gemini-1.5-pro-002,The Agent Company,0.08,0.074
+1844,gemini-2.0-flash-001,The Agent Company,0.19,0.271
+1845,gemini-2.5-flash-preview-09-2025,The Agent Company,0.518,0.7535
+1846,gemini-2.5-pro-preview-05-06,The Agent Company,0.393,0.3225
+1847,gpt-4o-2024-11-20,The Agent Company,0.167,0.631
+1848,qwen2-72b-instruct,The Agent Company,0.042,0.212
+1849,qwen2.5-72b-instruct,The Agent Company,0.118,0.3935
+1850,Chinchilla (70B),TriviaQA,0.646,0.1125
+1851,DeepSeek-V2,TriviaQA,0.8,0.471
+1852,DeepSeek-V3,TriviaQA,0.829,0.514
+1853,Gopher (280B),TriviaQA,0.572,0.0595
+1854,LLaMA-13B,TriviaQA,0.779,0.769
+1855,LLaMA-33B,TriviaQA,0.838,0.85
+1856,LLaMA-65B,TriviaQA,0.86,0.8925
+1857,LLaMA-7B,TriviaQA,0.71,0.601
+1858,Llama-2-13b,TriviaQA,0.796,0.7475
+1859,Llama-2-34b,TriviaQA,0.846,0.8865
+1860,Llama-2-70b-hf,TriviaQA,0.876,0.8835
+1861,Llama-2-7b,TriviaQA,0.737,0.6305
+1862,Llama-3.1-405B,TriviaQA,0.827,0.499
+1863,Meta-Llama-3-8B-Instruct,TriviaQA,0.677,0.195
+1864,Mistral-7B-v0.1,TriviaQA,0.752,0.4485
+1865,Mixtral-8x7B-v0.1,TriviaQA,0.822,0.675
+1866,PaLM 2-L,TriviaQA,0.861,0.7815
+1867,PaLM 2-M,TriviaQA,0.817,0.667
+1868,PaLM 2-S,TriviaQA,0.752,0.485
+1869,PaLM 540B,TriviaQA,0.814,0.6965
+1870,Phi-3-medium-128k-instruct,TriviaQA,0.739,0.3395
+1871,Phi-3-mini-4k-instruct,TriviaQA,0.64,0.0925
+1872,Phi-3-small-8k-instruct,TriviaQA,0.581,0.0185
+1873,Qwen2.5-72B,TriviaQA,0.719,0.1335
+1874,claude-1.3,TriviaQA,0.867,0.8055
+1875,claude-2.0,TriviaQA,0.875,0.877
+1876,claude-instant-1.1,TriviaQA,0.789,0.4945
+1877,claude-instant-1.2,TriviaQA,0.787,0.4715
+1878,falcon-40b,TriviaQA,0.799,0.749
+1879,falcon-7b,TriviaQA,0.646,0.3815
+1880,gemma-2b,TriviaQA,0.532,0.0645
+1881,gemma-7b,TriviaQA,0.723,0.3375
+1882,gpt-3.5-turbo-1106,TriviaQA,0.858,0.8465
+1883,gpt-4-0613,TriviaQA,0.848,0.7645
+1884,mpt-30b,TriviaQA,0.736,0.594
+1885,mpt-7b,TriviaQA,0.616,0.3075
+1886,phi-2,TriviaQA,0.452,0.0045
+1887,text-davinci-001,TriviaQA,0.712,0.495
+1888,Llama-4-Maverick-17B-128E-Instruct,TutorBench,0.402,0.247
+1889,claude-3-7-sonnet-20250219_thinking,TutorBench,0.4645,0.4655
+1890,claude-opus-4-1-20250805,TutorBench,0.474,0.393
+1891,claude-opus-4-1-20250805_thinking,TutorBench,0.5078,0.618
+1892,claude-opus-4-20250514,TutorBench,0.4546,0.284
+1893,claude-opus-4-20250514_thinking,TutorBench,0.4971,0.4435
+1894,claude-opus-4-5-20251101,TutorBench,0.498202,0.2
+1895,claude-opus-4-5-20251101_thinking,TutorBench,0.511982,0.2985
+1896,claude-opus-4-6_max,TutorBench,0.5367999999999999,0.474
+1897,claude-opus-4-6_none,TutorBench,0.5355,0.503
+1898,claude-sonnet-4-5-20250929,TutorBench,0.457,0.1935
+1899,claude-sonnet-4-5-20250929_thinking,TutorBench,0.49,0.47
+1900,gemini-2.5-pro-preview-06-05,TutorBench,0.5565,0.832
+1901,gemini-3-pro-preview,TutorBench,0.536706,0.2145
+1902,gemini-3.1-flash-lite,TutorBench,0.515049,0.759
+1903,gemini-3.1-pro-preview,TutorBench,0.529926,0.115
+1904,gpt-4o-2024-08-06,TutorBench,0.3611999999999999,0.197
+1905,gpt-5-2025-08-07_unknown,TutorBench,0.5533,0.5775
+1906,gpt-5.1-2025-11-13_none,TutorBench,0.4907999999999999,0.8045
+1907,gpt-5.1-2025-11-13_thinking,TutorBench,0.540871,0.468
+1908,gpt-5.2-2025-12-11_unknown,TutorBench,0.5349470000000001,0.473
+1909,gpt-5.4-pro-2026-03-05_unknown,TutorBench,0.566249,0.3705
+1910,kimi-k2.5,TutorBench,0.545605,0.7615
+1911,muse-spark,TutorBench,0.6855,0.997
+1912,o3-2025-04-16_high,TutorBench,0.5209,0.523
+1913,o3-2025-04-16_medium,TutorBench,0.5276,0.753
+1914,o3-pro-2025-06-10,TutorBench,0.5462,0.5705
+1915,Llama-4-Maverick-17B-128E-Instruct,VisualToolBench,0.0141,0.172
+1916,Llama-4-Scout-17B-16E-Instruct,VisualToolBench,0.0158,0.4945
+1917,claude-opus-4-1-20250805,VisualToolBench,0.0471,0.158
+1918,claude-opus-4-1-20250805_thinking,VisualToolBench,0.0516,0.16
+1919,claude-opus-4-6_thinking,VisualToolBench,0.2752,0.574
+1920,claude-sonnet-4-20250514,VisualToolBench,0.0448,0.416
+1921,claude-sonnet-4-20250514_thinking,VisualToolBench,0.0444,0.345
+1922,claude-sonnet-4-5-20250929,VisualToolBench,0.0559999999999999,0.1885
+1923,claude-sonnet-4-5-20250929_thinking,VisualToolBench,0.062,0.283
+1924,gemini-2.5-flash,VisualToolBench,0.0469,0.635
+1925,gemini-2.5-pro-preview-06-05,VisualToolBench,0.1175,0.534
+1926,gemini-3-pro-preview,VisualToolBench,0.2685,0.6115
+1927,gemini-3.1-pro-preview,VisualToolBench,0.2897,0.515
+1928,gpt-4.1-2025-04-14,VisualToolBench,0.0552,0.7255
+1929,gpt-5-2025-08-07_thinking,VisualToolBench,0.1868,0.5465
+1930,gpt-5-2025-08-07_unknown,VisualToolBench,0.1696,0.431
+1931,gpt-5.4-2026-03-05_high,VisualToolBench,0.2917,0.633
+1932,muse-spark-1.1,VisualToolBench,0.4477,0.723
+1933,o3-2025-04-16_unknown,VisualToolBench,0.1374,0.701
+1934,o4-mini-2025-04-16,VisualToolBench,0.1112,0.948
+1935,DeepSeek-R1,WMDP Biology,0.863,0.526
+1936,DeepSeek-V3,WMDP Biology,0.836,0.5595
+1937,Llama-3.1-405B-Instruct,WMDP Biology,0.8,0.4725
+1938,Llama-3.1-405B-Instruct,WMDP Biology,0.805,0.499
+1939,Llama-3.1-405B-Instruct,WMDP Biology,0.841,0.7685
+1940,Llama-3.1-405B-Instruct,WMDP Biology,0.843,0.786
+1941,Llama-3.1-70B-Instruct,WMDP Biology,0.81,0.644
+1942,Llama-3.1-8B-Instruct,WMDP Biology,0.723,0.4825
+1943,Llama-4-Maverick-17B-128E-Instruct,WMDP Biology,0.866,0.7255
+1944,Llama-4-Scout-17B-16E-Instruct,WMDP Biology,0.823,0.5925
+1945,Meta-Llama-3-70B-Instruct,WMDP Biology,0.789,0.681
+1946,Mixtral-8x7B-Instruct-v0.1,WMDP Biology,0.524,0.007
+1947,amazon.nova-lite-v1:0,WMDP Biology,0.772,0.461
+1948,amazon.nova-micro-v1:0,WMDP Biology,0.7170000000000001,0.418
+1949,amazon.nova-pro-v1:0,WMDP Biology,0.82,0.655
+1950,claude-3-5-sonnet-20240620,WMDP Biology,0.848,0.752
+1951,claude-3-5-sonnet-20241022,WMDP Biology,0.833,0.5195
+1952,claude-3-7-sonnet-20250219,WMDP Biology,0.86,0.665
+1953,claude-3-7-sonnet-20250219_16K,WMDP Biology,0.863,0.4525
+1954,claude-3-haiku-20240307,WMDP Biology,0.773,0.6965
+1955,claude-3-opus-20240229,WMDP Biology,0.8190000000000001,0.631
+1956,claude-3-sonnet-20240229,WMDP Biology,0.767,0.5155
+1957,gemini-1.0-pro-001,WMDP Biology,0.698,0.272
+1958,gemini-1.5-flash-001,WMDP Biology,0.765,0.3445
+1959,gemini-1.5-pro-001,WMDP Biology,0.795,0.365
+1960,gpt-4-0613,WMDP Biology,0.797,0.7105
+1961,gpt-4-turbo-2024-04-09,WMDP Biology,0.8270000000000001,0.7085
+1962,gpt-4.5-preview-2025-02-27,WMDP Biology,0.867,0.688
+1963,gpt-4o-2024-05-13,WMDP Biology,0.8290000000000001,0.586
+1964,grok-2,WMDP Biology,0.8190000000000001,0.6875
+1965,mistral-large-2402,WMDP Biology,0.7879999999999999,0.7245
+1966,mistral-large-2407,WMDP Biology,0.818,0.603
+1967,o1-2024-12-17_medium,WMDP Biology,0.863,0.4685
+1968,o1-preview-2024-09-12,WMDP Biology,0.85,0.573
+1969,o3-2025-04-16_medium,WMDP Biology,0.875,0.4295
+1970,o3-mini-2025-01-31_medium,WMDP Biology,0.852,0.448
+1971,o4-mini-2025-04-16_medium,WMDP Biology,0.873,0.5365
+1972,DeepSeek-R1,WMDP Chemistry,0.787,0.764
+1973,DeepSeek-V3,WMDP Chemistry,0.701,0.6035
+1974,Llama-3.1-405B-Instruct,WMDP Chemistry,0.657,0.593
+1975,Llama-3.1-405B-Instruct,WMDP Chemistry,0.674,0.7095
+1976,Llama-3.1-405B-Instruct,WMDP Chemistry,0.691,0.783
+1977,Llama-3.1-405B-Instruct,WMDP Chemistry,0.716,0.886
+1978,Llama-3.1-70B-Instruct,WMDP Chemistry,0.635,0.6035
+1979,Llama-3.1-8B-Instruct,WMDP Chemistry,0.475,0.3035
+1980,Llama-4-Maverick-17B-128E-Instruct,WMDP Chemistry,0.775,0.883
+1981,Llama-4-Scout-17B-16E-Instruct,WMDP Chemistry,0.674,0.6455
+1982,Meta-Llama-3-70B-Instruct,WMDP Chemistry,0.5760000000000001,0.521
+1983,Meta-Llama-3-8B-Instruct,WMDP Chemistry,0.495,0.4775
+1984,Mistral-7B-Instruct-v0.1,WMDP Chemistry,0.243,0.243
+1985,Mixtral-8x7B-Instruct-v0.1,WMDP Chemistry,0.441,0.2865
+1986,amazon.nova-lite-v1:0,WMDP Chemistry,0.574,0.395
+1987,amazon.nova-micro-v1:0,WMDP Chemistry,0.5,0.383
+1988,amazon.nova-pro-v1:0,WMDP Chemistry,0.63,0.4865
+1989,claude-3-5-sonnet-20240620,WMDP Chemistry,0.672,0.5255
+1990,claude-3-5-sonnet-20241022,WMDP Chemistry,0.605,0.0965
+1991,claude-3-7-sonnet-20250219,WMDP Chemistry,0.6890000000000001,0.3715
+1992,claude-3-7-sonnet-20250219_16K,WMDP Chemistry,0.755,0.4945
+1993,claude-3-haiku-20240307,WMDP Chemistry,0.5660000000000001,0.63
+1994,claude-3-opus-20240229,WMDP Chemistry,0.574,0.175
+1995,claude-3-sonnet-20240229,WMDP Chemistry,0.517,0.194
+1996,gemini-1.0-pro-001,WMDP Chemistry,0.537,0.54
+1997,gemini-1.5-flash-001,WMDP Chemistry,0.647,0.667
+1998,gemini-1.5-pro-001,WMDP Chemistry,0.713,0.823
+1999,gpt-3.5-turbo-0125,WMDP Chemistry,0.49,0.3635
+2000,gpt-4-0613,WMDP Chemistry,0.61,0.6695
+2001,gpt-4-turbo-2024-04-09,WMDP Chemistry,0.652,0.613
+2002,gpt-4.5-preview-2025-02-27,WMDP Chemistry,0.748,0.7095
+2003,gpt-4o-2024-05-13,WMDP Chemistry,0.684,0.633
+2004,grok-2,WMDP Chemistry,0.672,0.801
+2005,mistral-large-2402,WMDP Chemistry,0.564,0.504
+2006,mistral-large-2407,WMDP Chemistry,0.664,0.624
+2007,o1-2024-12-17_medium,WMDP Chemistry,0.752,0.5005
+2008,o1-preview-2024-09-12,WMDP Chemistry,0.775,0.857
+2009,o3-2025-04-16_medium,WMDP Chemistry,0.809,0.642
+2010,o3-mini-2025-01-31_medium,WMDP Chemistry,0.708,0.3435
+2011,o4-mini-2025-04-16_medium,WMDP Chemistry,0.723,0.281
+2012,Domain Expert,BioLP-bench,0.384,0.6385
+2013,Domain Expert,GPQA Diamond,0.697,0.174
+2014,Skilled Generalist,GPQA Diamond,0.219,0.004
+2015,Domain Expert,GPQA Diamond Biology,0.831,0.9185
+2016,Skilled Generalist,GPQA Diamond Biology,0.219,0.0075
+2017,Domain Expert,GPQA Diamond Chemistry,0.831,0.9985
+2018,Skilled Generalist,GPQA Diamond Chemistry,0.219,0.1545
+2019,Domain Expert,GPQA Main Biology,0.667,0.1655
+2020,Skilled Generalist,GPQA Main Biology,0.432,0.2455
+2021,Domain Expert,GPQA Main Chemistry,0.72,0.987
+2022,Skilled Generalist,GPQA Main Chemistry,0.314,0.7065
+2023,Skilled Generalist,GSM8K,0.9677,0.996
+2024,Domain Expert,MATH Level 5,0.9,0.3265
+2025,Skilled Generalist,MATH Level 5,0.4,0.8755
+2026,Average Human,MMLU,0.345,0.3625
+2027,High School Top Performer,MMLU,0.898,0.005
+2028,High School Top Performer,MMLU Biology,0.898,0.855
+2029,High School Top Performer,MMLU Chemistry,0.898,0.7175
+2030,Skilled Generalist,OSWorld,0.724,0.966
+2031,Skilled Generalist,SimpleQA Verified,0.944,1.0
+2032,Average Human,TriviaQA,0.797,0.8755
+2033,Domain Expert,WMDP Biology,0.605,0.0
+2034,Domain Expert,WMDP Chemistry,0.433,0.0

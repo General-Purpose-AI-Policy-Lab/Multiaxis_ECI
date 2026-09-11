@@ -188,6 +188,18 @@ def load_benchmark_floors(data: ECIData) -> np.ndarray:
 
 BENCHMARK_CLIPS_FILE = CURATED_DIR / "benchmark_score_clips.csv"
 N_ITEMS_FILE = CURATED_DIR / "benchmark_n_items.csv"
+MODEL_OPENNESS_FILE = CURATED_DIR / "model_openness.csv"
+
+
+def load_model_openness() -> dict[str, str]:
+    """model_version -> 'open' / 'closed' / 'unknown', from 1_curated/model_openness.csv
+    (built by 1_curated/3_build_model_openness.py from Epoch's accessibility column, the
+    release family and the hand-researched overrides)."""
+    if not MODEL_OPENNESS_FILE.exists():
+        raise FileNotFoundError(f"{MODEL_OPENNESS_FILE} missing: run "
+                                "`python 1_curated/3_build_model_openness.py`")
+    df = pd.read_csv(MODEL_OPENNESS_FILE, dtype=str).fillna("")
+    return dict(zip(df["model_version"], df["openness"]))
 
 
 def load_boundary_eps(data: ECIData) -> np.ndarray:
@@ -869,17 +881,24 @@ def find_model_idx(mlookup: pd.DataFrame, model_name: str) -> int:
     return int(matches[0]) - 1
 
 
-def open_only_drop_list(include_all_benchmarks: bool, keep_open: bool = True) -> list[str]:
-    """Benchmarks to drop for --open-only (keep_open=True) or --closed-only
-    (keep_open=False), filtered down to whatever load_eci_data would
-    otherwise have loaded (curated-exclusion scope unless
-    include_all_benchmarks). Lives here rather than in the fit CLI so the CLI and
-    the country-frontier diagnostic both build the exact same open-only data scope from one place.
+ACCESS_SCOPES = ("public", "semi_private", "private", "nonpublic")
+
+
+def access_scope_drop_list(include_all_benchmarks: bool, access: str) -> list[str]:
+    """Benchmarks to drop so a fit sees one access class only: `public`, `semi_private` or
+    `private` (the pipeline's classes in 0_input/benchmarks.csv), or `nonpublic` (everything
+    but public; `open_problems` counts as non-public). Filtered down to whatever load_eci_data
+    would otherwise have loaded (curated-exclusion scope unless include_all_benchmarks). Lives
+    here rather than in the fit CLI so the CLI and the frontier diagnostics build the exact same
+    scope from one place.
     """
+    if access not in ACCESS_SCOPES:
+        raise ValueError(f"access scope must be one of {ACCESS_SCOPES}, got {access!r}")
     if not BENCHMARKS_FILE.exists():
-        raise FileNotFoundError(f"--open-only needs {BENCHMARKS_FILE}: run `python -m multiaxis_eci sync`.")
-    access = pd.read_csv(BENCHMARKS_FILE)
-    open_ok = set(access.loc[access["access"] == "public", "name"])
+        raise FileNotFoundError(f"--access needs {BENCHMARKS_FILE}: run `python -m multiaxis_eci sync`.")
+    table = pd.read_csv(BENCHMARKS_FILE)
+    keep = (set(table.loc[table["access"] != "public", "name"]) if access == "nonpublic"
+            else set(table.loc[table["access"] == access, "name"]))
     # The access table covers the pipeline's full included scope; canonical only
     # ever sees the curated-exclusion scope. The drop list is filtered down to
     # what load_eci_data will actually have loaded, so the printed kept/dropped
@@ -887,9 +906,13 @@ def open_only_drop_list(include_all_benchmarks: bool, keep_open: bool = True) ->
     all_benchmarks = set(read_scores()["benchmark"])
     in_scope = all_benchmarks if include_all_benchmarks \
         else all_benchmarks - load_excluded_benchmarks()
-    drop = sorted(in_scope - open_ok) if keep_open else sorted(in_scope & open_ok)
-    label = "--open-only" if keep_open else "--closed-only"
-    print(f"── {label}: {len(in_scope) - len(drop)} "
-          f"{'public' if keep_open else 'closed'} "
-          f"benchmarks kept, {len(drop)} dropped ─────")
+    drop = sorted(in_scope - keep)
+    print(f"── --access {access}: {len(in_scope) - len(drop)} benchmarks kept, "
+          f"{len(drop)} dropped ─────")
     return drop
+
+
+def open_only_drop_list(include_all_benchmarks: bool, keep_open: bool = True) -> list[str]:
+    """--open-only (public benchmarks) / --closed-only (the rest): `access_scope_drop_list`
+    on `public` / `nonpublic`."""
+    return access_scope_drop_list(include_all_benchmarks, "public" if keep_open else "nonpublic")

@@ -11,9 +11,11 @@ Inputs that belong to this model rather than to the data. Everything about the s
 | `benchmark_score_clips.csv` | generated draft, then reviewed | `data.clip_scores_to_floors` applies these row-level clips at fit time (floors fits, the default); drift against the current data warns loudly | no, refresh with `python 4_diagnostics/audit_lower_bounds.py --write-clips` after a sync, review the diff, commit |
 | `simpleqa_original/` | curated extra column | `--simpleqa-original` | see its README |
 | `eci_data.csv` | reference | `--eci-data-only` (Epoch's original ECI table) | no |
+| `model_openness.csv` | generated | `analysis.frontier_gap` (open-weights vs closed frontier): `open` when the weights can be downloaded, `closed` when the model is reachable through an API or a product only (its state at release) | no, regenerate with `python 1_curated/3_build_model_openness.py` after a sync: Epoch's `accessibility` from the pipeline checkout, then the release family, then the overrides; anything left is `unknown` and listed |
+| `model_openness_overrides.csv` | hand-researched | `3_build_model_openness.py` | yes, `model_version, openness, note` for the models Epoch does not cover (or gets wrong) |
 | `benchmark_n_items.csv` | hand-researched | `data.load_boundary_eps` for `--censor-bounds` (eps_b = 1 / (2 N_b)); a benchmark without a row falls back to 0.001 with a warning | yes, `benchmark, n_items, source_url, note, verification` with the pipeline's names |
 
-The two builders run after a sync: `2_build_lineage_map.py` redrafts the lineage map from the new model list; `1_compute_sota.py` reads the canonical fit of the current data generation (`all_models_eci.csv`, `timeline.csv`), so it runs once that fit exists and samples nothing itself.
+The builders run after a sync: `2_build_lineage_map.py` redrafts the lineage map from the new model list; `3_build_model_openness.py` relabels the models from the pipeline checkout's Epoch metadata (`config.PIPELINE_DIR`, or `--pipeline PATH`) and the overrides; `1_compute_sota.py` reads the canonical fit of the current data generation (`all_models_eci.csv`, `timeline.csv`), so it runs once that fit exists and samples nothing itself.
 
 ## Effort variants
 

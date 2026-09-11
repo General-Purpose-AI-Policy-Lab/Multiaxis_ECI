@@ -39,7 +39,7 @@ DATA_TAG = data_tag()
 # ── Output layout ──────────────────────────────────────────────────────────
 # Everything a fit or a diagnostic writes goes under 5_outputs/<data generation>/:
 #   <fit>/                 tables, trace.nc and figures/ (PNG) + figures/html/ per fit
-#   comparisons/           cross-fit tables (country frontier, chain verdicts) + figures/
+#   comparisons/           cross-fit tables (frontier gap, chain verdicts) + figures/
 #   diagnostics/           one-off diagnostic outputs (residual correlations, chain plots)
 # 5_outputs/pre_pipeline/ holds the fits published before the data pipeline existed.
 OUTPUTS_DIR     = PROJECT_ROOT / "5_outputs"

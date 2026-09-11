@@ -1,0 +1,89 @@
+model_version,openness,note
+Baichuan2-13B-Chat,open,weights on Hugging Face (baichuan-inc)
+CodeQwen1.5-7B,open,weights on Hugging Face (Qwen)
+DeepSeek-Coder-V2-Lite-Base,open,weights on Hugging Face (deepseek-ai)
+INTELLECT-1-Instruct,open,weights on Hugging Face (PrimeIntellect)
+Llama-2-70b-hf,open,Llama 2 community license
+PaLM 2-L,closed,API only (Vertex AI)
+PaLM 2-M,closed,API only (Vertex AI)
+PaLM 2-S,closed,API only (Vertex AI)
+PaLM 62B,closed,never released
+Qwen-1_8B,open,weights on Hugging Face (Qwen)
+Qwen2-VL-72B-Instruct,open,weights on Hugging Face (Qwen)
+Qwen2.5-Coder-0.5B,open,weights on Hugging Face (Qwen)
+Qwen2.5-Coder-14B,open,weights on Hugging Face (Qwen)
+Qwen2.5-Coder-3B,open,weights on Hugging Face (Qwen)
+RedPajama-INCITE-7B-Base,open,weights on Hugging Face (togethercomputer)
+Yi-9B,open,weights on Hugging Face (01-ai)
+c4ai-command-r-08-2024,open,weights on Hugging Face (CohereLabs; CC-BY-NC)
+chatglm2-6b,open,weights on Hugging Face (THUDM)
+claude-mythos-5,closed,API only
+claude-mythos-preview,closed,invitation-only preview; not downloadable
+deepseek-r1-0528-qwen3-8b,open,weights on Hugging Face (deepseek-ai)
+glm-4.7-flash,open,weights on Hugging Face (zai-org/GLM-4.7-Flash; 2026-01)
+granite-4.0-1b,open,weights on Hugging Face (ibm-granite; Apache 2.0)
+granite-4.0-350m,open,weights on Hugging Face (ibm-granite; Apache 2.0)
+granite-4.0-h-small,open,weights on Hugging Face (ibm-granite; Apache 2.0)
+granite-4.0-micro,open,weights on Hugging Face (ibm-granite; Apache 2.0)
+grok-2,closed,API only at release (2024-08); weights published a year later (2025-08); classed by its state at release
+grok-code-fast-1,closed,API only
+internlm-20b,open,weights on Hugging Face (internlm)
+internlm-7b,open,weights on Hugging Face (internlm)
+internlm-chat-20b,open,weights on Hugging Face (internlm)
+kimi-k2p5,open,Kimi K2.5; weights on Hugging Face (moonshotai)
+laguna-m.1,open,weights on Hugging Face (poolside; Apache 2.0; 2026-04)
+mistral-small-2402,closed,Mistral Small 24.02 was API only (the open Mistral Small line starts with Small 3 in 2025)
+open_llama_7b,open,weights on Hugging Face (openlm-research; Apache 2.0)
+opt-13b,open,weights on Hugging Face (facebook; research license)
+qwen3-4b-instruct-2507,open,weights on Hugging Face (Qwen)
+qwen3-coder-next,open,weights on Hugging Face (Qwen/Qwen3-Coder-Next; 2026-02)
+qwen3.5-flash,closed,API only (Alibaba Cloud Model Studio)
+qwen3.5-plus,closed,API only (Alibaba Cloud Model Studio)
+qwen3.6-flash,closed,API only (Alibaba Cloud Model Studio)
+qwen3.6-max-preview,closed,API only (Alibaba Cloud Model Studio)
+qwen3.7-plus,closed,API only (Alibaba Cloud Model Studio)
+seed-oss-36b-instruct,open,weights on Hugging Face (ByteDance-Seed; Apache 2.0)
+trinity-large-thinking,open,weights on Hugging Face (arcee-ai; Apache 2.0; 2026-04)
+vicuna-13b-v1.1,open,weights on Hugging Face (lmsys)
+ChatGPT agent,closed,product only
+DeepSeek-Coder-V2-Lite-Instruct,open,weights on Hugging Face (deepseek-ai)
+Kimi-Audio-7B-Instruct,open,weights on Hugging Face (moonshotai)
+LFM2-Audio-1.5B,open,weights on Hugging Face (LiquidAI)
+Manus 1.0,closed,product only
+Manus 1.5,closed,product only
+Manus 1.6_max,closed,product only
+MiMo-Audio-7B-Instruct,open,weights on Hugging Face (XiaomiMiMo)
+Phi-3.5-vision-instruct,open,weights on Hugging Face (microsoft; MIT)
+Phi-4-multimodal-instruct,open,weights on Hugging Face (microsoft; MIT)
+Qwen2-VL-7B-Instruct,open,weights on Hugging Face (Qwen)
+Qwen2.5-Coder-14B-Instruct,open,weights on Hugging Face (Qwen)
+Qwen2.5-Coder-3B-Instruct,open,weights on Hugging Face (Qwen)
+Qwen2.5-Omni-7B,open,weights on Hugging Face (Qwen)
+Qwen3-Next-80B-A3B-Instruct,open,weights on Hugging Face (Qwen; Apache 2.0)
+Qwen3-Omni-30B-A3B-Instruct,open,weights on Hugging Face (Qwen; Apache 2.0)
+Voxtral-Small-24B-2507,open,weights on Hugging Face (mistralai; Apache 2.0)
+ada,closed,API only
+babbage,closed,API only
+codex-mini-2025-05-16,closed,API only
+computer-use-preview-2025-03-11,closed,API only
+curie,closed,API only
+gemini-2.5-flash-2025-04,closed,API only
+gemini-2.5-flash-2025-05,closed,API only
+gemini-2.5-flash-native-audio-preview-12-2025,closed,API only
+gemini-3-deep-think-preview,closed,product and API only
+gemini-3.1-flash-live-preview,closed,API only
+gemini-robotics-er-1.5-preview,closed,API only
+gemma-3n-E4B-it,open,weights on Hugging Face (google; Gemma licence)
+gpt-4o-audio-preview-2025-06-03,closed,API only
+gpt-4o-mini-audio-preview-2024-12-17,closed,API only
+gpt-realtime-1.5,closed,API only
+gpt-realtime-2,closed,API only
+gpt-realtime-2025-08-28,closed,API only
+gpt-realtime-mini-2025-12-15,closed,API only
+nova-premier,closed,API only (Amazon Bedrock)
+openhands-lm-32b-v0.1,open,weights on Hugging Face (all-hands)
+stablelm-tuned-alpha-7b,open,weights on Hugging Face (stabilityai)
+swe-1.7,closed,product only (Windsurf)
+text-ada-001,closed,API only
+text-davinci-003,closed,API only
+tiny-recursion-model,open,code and weights on GitHub (SamsungSAILMontreal)

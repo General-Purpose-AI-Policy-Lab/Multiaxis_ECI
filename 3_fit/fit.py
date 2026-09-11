@@ -57,12 +57,13 @@ from multiaxis_eci.analysis import (
 )
 from multiaxis_eci.config import SAMPLE_KW
 from multiaxis_eci.data import (
+    ACCESS_SCOPES,
     PROCESSED_FILE,
     REFERENCE_ECI_FILE,
+    access_scope_drop_list,
     drop_zero_scores,
     load_boundary_eps,
     load_eci_data,
-    open_only_drop_list,
     release_time_covariate,
 )
 from multiaxis_eci.lineage import build_lineage_structure
@@ -269,23 +270,24 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
 # ── Canonical preset: the headline ECI pipeline ─────────────────────────────
 
 def run_canonical(args) -> None:
-    if args.open_only and args.closed_only:
-        raise ValueError("--open-only and --closed-only cannot compose: "
-                          "they are complementary scopes.")
-    if args.open_only and args.eci_data_only:
+    # One access scope at most: --open-only is --access public, --closed-only is
+    # --access nonpublic.
+    wanted = [a for a in ([args.access] if args.access else [])
+              + (["public"] if args.open_only else [])
+              + (["nonpublic"] if args.closed_only else [])]
+    if len(set(wanted)) > 1:
+        raise ValueError("--access, --open-only and --closed-only name one scope each; "
+                         f"got {sorted(set(wanted))}")
+    access = wanted[0] if wanted else None
+    if access and args.eci_data_only:
         # eci_data.csv uses the reference dataset's "pretty" benchmark names,
         # which don't match 0_input/benchmarks.csv (keyed on the view's
         # names) — the drop list would silently match nothing.
-        raise ValueError("--open-only and --eci-data-only cannot compose: "
-                          "the reference eci_data.csv names don't match "
-                          "0_input/benchmarks.csv")
-    if args.closed_only and args.eci_data_only:
-        raise ValueError("--closed-only and --eci-data-only cannot compose: "
+        raise ValueError("--access and --eci-data-only cannot compose: "
                           "the reference eci_data.csv names don't match "
                           "0_input/benchmarks.csv")
 
-    scope_tag = "canonical_open" if args.open_only else \
-        ("canonical_closed" if args.closed_only else "canonical")
+    scope_tag = f"canonical_{access}" if access else "canonical"
     # The ordered-human prior is a MODEL choice on top of the scope, so it gets
     # its own folder suffix: canonical/ stays the plain index.
     human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
@@ -305,11 +307,8 @@ def run_canonical(args) -> None:
     results_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    # keep_open is exactly --open-only: the two flags are complementary and
-    # cannot compose, so one call covers both scopes.
-    access_drop = (open_only_drop_list(args.include_all_benchmarks,
-                                       keep_open=args.open_only)
-                   if args.open_only or args.closed_only else None)
+    access_drop = (access_scope_drop_list(args.include_all_benchmarks, access)
+                   if access else None)
 
     if args.raw_c:
         config.RAW_C_MODE = True
@@ -346,10 +345,10 @@ def run_canonical(args) -> None:
     print(f"   n_obs={data.n_obs}  n_models={data.n_models}  "
           f"n_benchmarks={data.n_benchmarks}  zero_scores={data.zero_score_mask.sum()}")
 
-    if args.open_only or args.closed_only:
+    if access:
         # Sampling costs hours; catch a missing anchor here rather than in
         # eci_transform after the fact.
-        flag = "--open-only" if args.open_only else "--closed-only"
+        flag = f"--access {access}"
         n_ge4 = int((data.n_obs_per_model >= config.LOW_OBS_THRESHOLD).sum())
         print(f"   {flag} preflight: n_benchmarks={data.n_benchmarks} "
               f"(dropped {len(access_drop)})  n_obs={data.n_obs}  "
@@ -836,14 +835,16 @@ def main():
                         help="[canonical] report raw C instead of anchored ECI")
     parser.add_argument("--include-all-benchmarks", action="store_true",
                         help="[canonical] keep the curated-excluded benchmarks in the fit")
+    parser.add_argument("--access", choices=list(ACCESS_SCOPES), default=None,
+                        help="[canonical] fit one access class of benchmarks only "
+                             "(the `access` column of 0_input/benchmarks.csv: public, "
+                             "semi_private or private; nonpublic is everything but public); "
+                             "results go to canonical_<access>/ under the data generation's "
+                             "folder")
     parser.add_argument("--open-only", action="store_true",
-                        help="[canonical] fit only benchmarks whose items are public "
-                             "(access == public in 0_input/benchmarks.csv); results go to "
-                             "canonical_open/ under the data generation's folder")
+                        help="[canonical] alias of --access public")
     parser.add_argument("--closed-only", action="store_true",
-                        help="[canonical] fit only benchmarks whose items are not public "
-                             "(the complement of --open-only); results go to "
-                             "canonical_closed/ under the data generation's folder")
+                        help="[canonical] alias of --access nonpublic")
     # Exploration flags.
     parser.add_argument("--K", type=int, default=4,
                         help="[exploration] latent dimension")

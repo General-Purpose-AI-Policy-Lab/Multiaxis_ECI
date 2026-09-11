@@ -17,7 +17,8 @@ All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`),
 |---|---|---|
 | `mirt{tag}/figures/k{K}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit/fit.py --plots` | no |
 | `canonical/figures/` | `3_fit/fit.py --preset canonical` | no |
-| `comparisons/figures/` | `4_diagnostics/1_country_frontier.py`, `2_plot_crossovers.py` | no |
+| `comparisons/figures/` | `4_diagnostics/1_frontier_gap.py`, `2_plot_frontier_gap.py` | no |
+| `5_outputs/open_closed_frontier/` | `5_outputs/open_closed_frontier/make_plots.sh` (copies the frontier-gap deliverables out of `comparisons/`) | **yes**, except `*.html` |
 | `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |
 | `dashboard_stills/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |

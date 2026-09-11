@@ -5,3 +5,4 @@ censor_humanmerge_short,results/canonical_censor_humanmerge_data20260908/trace.n
 canonical_data20260908,results/canonical_data20260908/trace.nc,8,71,2.07,0.17,1.002,1.0026,,1.002,CONVERGED,
 canonical_humanmerge_data20260908,results/canonical_humanmerge_data20260908/trace.nc,8,431,2.04,0.071,1.0016,1.0016,,1.0016,CONVERGED,
 k4_main,results/mirt_humanmerge_lineageprior_lineagebm_data20260908/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,241,20.9,0.8,1.1479,1.1018,1 6,1.0972,ISLANDS,
+k4_long,5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,44,23.43,0.802,1.1419,1.1188,1 6,1.0924,ISLANDS,

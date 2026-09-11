@@ -1,0 +1,890 @@
+model_version,openness,source
+Baichuan-13B-Base,open,epoch:Open weights (restricted use)
+Baichuan-2-13B-Base,open,epoch:Open weights (restricted use)
+Baichuan-2-7B-Base,open,epoch:Open weights (restricted use)
+Baichuan-7B,open,epoch:Open weights (non-commercial)
+Baichuan2-13B-Chat,open,override
+Cerebras-GPT-13B,open,epoch:Open weights (unrestricted)
+ChatGPT agent,closed,override
+Chinchilla (70B),closed,epoch:Unreleased
+CodeQwen1.5-7B,open,override
+Composer 2.5,closed,epoch:API access
+DeepSeek-Coder-V2-Base,open,epoch:Open weights (restricted use)
+DeepSeek-Coder-V2-Instruct,open,epoch:Open weights (restricted use)
+DeepSeek-Coder-V2-Lite-Base,open,override
+DeepSeek-Coder-V2-Lite-Instruct,open,override
+DeepSeek-R1,open,epoch:Open weights (unrestricted)
+DeepSeek-R1-0528,open,epoch:Open weights (unrestricted)
+DeepSeek-R1-Distill-Llama-70B,open,epoch:Open weights (unrestricted)
+DeepSeek-R1-Distill-Qwen-1.5B,open,epoch:Open weights (unrestricted)
+DeepSeek-R1-Distill-Qwen-14B,open,epoch:Open weights (unrestricted)
+DeepSeek-R1-Distill-Qwen-32B,open,epoch:Open weights (unrestricted)
+DeepSeek-V2,open,epoch:Open weights (restricted use)
+DeepSeek-V2.5,open,epoch:Open weights (restricted use)
+DeepSeek-V3,open,epoch:Open weights (restricted use)
+DeepSeek-V3-0324,open,epoch:Open weights (restricted use)
+DeepSeek-V3-Base,open,epoch:Open weights (restricted use)
+DeepSeek-V3.1,open,epoch:Open weights (unrestricted)
+DeepSeek-V3.1-Terminus,open,epoch:Open weights (unrestricted)
+DeepSeek-V3.1_thinking,open,epoch:Open weights (unrestricted)
+DeepSeek-V3.2-Exp,open,epoch:Open weights (unrestricted)
+DeepSeek-V3.2-Exp_thinking,open,epoch:Open weights (unrestricted)
+DeepSeek-V3.2-Speciale,open,epoch:Open weights (unrestricted)
+Eurus-2-7B-PRIME,open,epoch:Open weights (unrestricted)
+GLM-4.5-Air,open,epoch:Open weights (unrestricted)
+GLaM (MoE),closed,epoch:Unreleased
+Gopher (280B),closed,epoch:Unreleased
+Hermes-2-Theta-Llama-3-70B,open,epoch:Open weights (restricted use)
+INTELLECT-1-Instruct,open,override
+Inflection-1,closed,epoch:Hosted access (no API)
+Inkling,open,epoch:Open weights (unrestricted)
+Inkling_high,open,epoch:Open weights (unrestricted)
+Inkling_thinking,open,family:Inkling
+Inkling_xhigh,open,epoch:Open weights (unrestricted)
+Kimi-Audio-7B-Instruct,open,override
+Kimi-K2-Instruct,open,epoch:Open weights (restricted use)
+Kimi-K2-Instruct-0905,open,epoch:Open weights (restricted use)
+LFM2-Audio-1.5B,open,override
+LLaMA-13B,open,epoch:Open weights (non-commercial)
+LLaMA-33B,open,epoch:Open weights (non-commercial)
+LLaMA-65B,open,epoch:Open weights (non-commercial)
+LLaMA-7B,open,epoch:Open weights (non-commercial)
+Llama-2-13b,open,epoch:Open weights (restricted use)
+Llama-2-13b-chat,open,epoch:Open weights (restricted use)
+Llama-2-34b,closed,epoch:Unreleased
+Llama-2-70b-chat,open,epoch:Open weights (restricted use)
+Llama-2-70b-hf,open,override
+Llama-2-7b,open,epoch:Open weights (restricted use)
+Llama-3.1-405B,open,epoch:Open weights (restricted use)
+Llama-3.1-405B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-405B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-405B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-405B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-70B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-8B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-Tulu-3-70B-DPO,open,epoch:Open weights (restricted use)
+Llama-3.2-11B-Vision-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.2-1B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.2-3B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.2-90B-Vision-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.3-70B-Instruct,open,epoch:Open weights (restricted use)
+Llama-4-Maverick-17B-128E-Instruct,open,epoch:Open weights (restricted use)
+Llama-4-Maverick-17B-128E-Instruct-FP8,open,epoch:Open weights (restricted use)
+Llama-4-Scout-17B-16E-Instruct,open,epoch:Open weights (restricted use)
+Manus 1.0,closed,override
+Manus 1.5,closed,override
+Manus 1.6_max,closed,override
+Megatron-Turing NLG 530B,closed,epoch:Unreleased
+Meta-Llama-3-70B,open,epoch:Open weights (restricted use)
+Meta-Llama-3-70B-Instruct,open,epoch:Open weights (restricted use)
+Meta-Llama-3-8B,open,epoch:Open weights (restricted use)
+Meta-Llama-3-8B-Instruct,open,epoch:Open weights (restricted use)
+MiMo-Audio-7B-Instruct,open,override
+MiMo-Audio-7B-Instruct_thinking,open,family:MiMo-Audio-7B-Instruct
+MiniMax-M1-80k,open,epoch:Open weights (unrestricted)
+MiniMax-M2,open,epoch:Open weights (unrestricted)
+MiniMax-M2.1,open,epoch:Open weights (restricted use)
+MiniMax-M2.5,open,epoch:Open weights (unrestricted)
+MiniMax-M2.5_unknown,open,family:MiniMax-M2.5
+MiniMax-M2.7,open,epoch:Open weights (non-commercial)
+MiniMax-M3,open,epoch:Open weights (restricted use)
+MiniMax-M3_none,open,epoch:Open weights (restricted use)
+MiniMax-M3_xhigh,open,family:MiniMax-M3
+Mistral-7B-Instruct-v0.1,open,epoch:Open weights (unrestricted)
+Mistral-7B-Instruct-v0.2,open,epoch:Open weights (unrestricted)
+Mistral-7B-Instruct-v0.3,open,epoch:Open weights (unrestricted)
+Mistral-7B-v0.1,open,epoch:Open weights (unrestricted)
+Mistral-Nemo-Base-2407,open,epoch:Open weights (unrestricted)
+Mistral-Nemo-Instruct-2407,open,epoch:Open weights (unrestricted)
+Mixtral-8x22B-Instruct-v0.1,open,epoch:Open weights (unrestricted)
+Mixtral-8x22B-v0.1,open,epoch:Open weights (unrestricted)
+Mixtral-8x7B-Instruct-v0.1,open,epoch:Open weights (unrestricted)
+Mixtral-8x7B-v0.1,open,epoch:Open weights (unrestricted)
+Nemotron-4 15B,closed,epoch:Unreleased
+PaLM 2-L,closed,override
+PaLM 2-M,closed,override
+PaLM 2-S,closed,override
+PaLM 540B,closed,epoch:Unreleased
+PaLM 62B,closed,override
+Phi-3-medium-128k-instruct,open,epoch:Open weights (unrestricted)
+Phi-3-mini-4k-instruct,open,epoch:Open weights (unrestricted)
+Phi-3-small-8k-instruct,open,epoch:Open weights (unrestricted)
+Phi-3.5-MoE-instruct,open,epoch:Open weights (unrestricted)
+Phi-3.5-mini-instruct,open,epoch:Open weights (unrestricted)
+Phi-3.5-vision-instruct,open,override
+Phi-4-mini-instruct,open,epoch:Open weights (unrestricted)
+Phi-4-multimodal-instruct,open,override
+Pixtral-12B-2409,open,epoch:Open weights (unrestricted)
+QwQ-32B,open,epoch:Open weights (unrestricted)
+QwQ-32B_16K,open,epoch:Open weights (unrestricted)
+Qwen-14B,open,epoch:Open weights (restricted use)
+Qwen-14B-Chat,open,epoch:Open weights (restricted use)
+Qwen-1_8B,open,override
+Qwen-7B,open,epoch:Open weights (restricted use)
+Qwen1.5-7B,open,epoch:Open weights (unrestricted)
+Qwen2-VL-72B-Instruct,open,override
+Qwen2-VL-7B-Instruct,open,override
+Qwen2.5-72B,open,epoch:Open weights (unrestricted)
+Qwen2.5-Coder-0.5B,open,override
+Qwen2.5-Coder-1.5B,open,epoch:Open weights (unrestricted)
+Qwen2.5-Coder-14B,open,override
+Qwen2.5-Coder-14B-Instruct,open,override
+Qwen2.5-Coder-32B,open,epoch:Open weights (unrestricted)
+Qwen2.5-Coder-32B-Instruct,open,epoch:Open weights (unrestricted)
+Qwen2.5-Coder-3B,open,override
+Qwen2.5-Coder-3B-Instruct,open,override
+Qwen2.5-Coder-7B,open,epoch:Open weights (unrestricted)
+Qwen2.5-Coder-7B-Instruct,open,epoch:Open weights (unrestricted)
+Qwen2.5-Omni-7B,open,override
+Qwen2.5-VL-72B-Instruct,open,epoch:Open weights (unrestricted)
+Qwen3-235B-A22B-Instruct-2507,open,epoch:Open weights (unrestricted)
+Qwen3-235B-A22B-Thinking-2507,open,epoch:Open weights (unrestricted)
+Qwen3-30B-A3B,open,epoch:Open weights (unrestricted)
+Qwen3-30B-A3B_none,open,epoch:Open weights (unrestricted)
+Qwen3-32B,open,epoch:Open weights (unrestricted)
+Qwen3-32B_none,open,epoch:Open weights (unrestricted)
+Qwen3-Coder-480B-A35B-Instruct,open,epoch:Open weights (unrestricted)
+Qwen3-Next-80B-A3B-Instruct,open,override
+Qwen3-Omni-30B-A3B-Instruct,open,override
+RedPajama-INCITE-7B-Base,open,override
+Ring-2.6-1T,open,epoch:Open weights (unrestricted)
+StableBeluga2,open,epoch:Open weights (non-commercial)
+Voxtral-Small-24B-2507,open,override
+WizardLM-2-8x22B,open,epoch:Open weights (unrestricted)
+Yi-1.5-34B-Chat,open,epoch:Open weights (restricted use)
+Yi-34B,open,epoch:Open weights (restricted use)
+Yi-34B-Chat,open,epoch:Open weights (restricted use)
+Yi-6B,open,epoch:Open weights (restricted use)
+Yi-6B-Chat,open,epoch:Open weights (restricted use)
+Yi-9B,open,override
+Yi-large,closed,epoch:API access
+ada,closed,override
+amazon.nova-lite-v1:0,closed,epoch:API access
+amazon.nova-micro-v1:0,closed,epoch:API access
+amazon.nova-pro-v1:0,closed,epoch:API access
+babbage,closed,override
+bloom,open,epoch:Open weights (restricted use)
+c4ai-command-a-03-2025,open,epoch:Open weights (non-commercial)
+c4ai-command-r-08-2024,open,override
+c4ai-command-r-plus-08-2024,open,epoch:Open weights (non-commercial)
+chatglm2-6b,open,override
+claude-1.3,closed,epoch:API access
+claude-2.0,closed,epoch:API access
+claude-2.1,closed,epoch:API access
+claude-3-5-haiku-20241022,closed,epoch:API access
+claude-3-5-sonnet-20240620,closed,epoch:API access
+claude-3-5-sonnet-20241022,closed,epoch:API access
+claude-3-7-sonnet-20250219,closed,epoch:API access
+claude-3-7-sonnet-20250219_12K,closed,epoch:API access
+claude-3-7-sonnet-20250219_15K,closed,epoch:API access
+claude-3-7-sonnet-20250219_16K,closed,epoch:API access
+claude-3-7-sonnet-20250219_1K,closed,epoch:API access
+claude-3-7-sonnet-20250219_2K,closed,epoch:API access
+claude-3-7-sonnet-20250219_32K,closed,epoch:API access
+claude-3-7-sonnet-20250219_64K,closed,epoch:API access
+claude-3-7-sonnet-20250219_8K,closed,epoch:API access
+claude-3-7-sonnet-20250219_thinking,closed,family:claude-3-7-sonnet-20250219
+claude-3-7-sonnet-20250219_unknown,closed,epoch:API access
+claude-3-haiku-20240307,closed,epoch:API access
+claude-3-opus-20240229,closed,epoch:API access
+claude-3-sonnet-20240229,closed,epoch:API access
+claude-fable-5,closed,epoch:API access
+claude-fable-5-1_high,closed,epoch:API access
+claude-fable-5-1_low,closed,epoch:API access
+claude-fable-5-1_max,closed,epoch:API access
+claude-fable-5-1_medium,closed,epoch:API access
+claude-fable-5-1_unknown,closed,epoch:API access
+claude-fable-5-1_xhigh,closed,epoch:API access
+claude-fable-5_high,closed,epoch:API access
+claude-fable-5_low,closed,epoch:API access
+claude-fable-5_max,closed,epoch:API access
+claude-fable-5_medium,closed,epoch:API access
+claude-fable-5_unknown,closed,epoch:API access
+claude-fable-5_xhigh,closed,epoch:API access
+claude-haiku-4-5-20251001,closed,epoch:API access
+claude-haiku-4-5-20251001_16K,closed,epoch:API access
+claude-haiku-4-5-20251001_1K,closed,epoch:API access
+claude-haiku-4-5-20251001_32K,closed,epoch:API access
+claude-haiku-4-5-20251001_8K,closed,epoch:API access
+claude-haiku-4-5-20251001_low,closed,epoch:API access
+claude-haiku-4-5-20251001_thinking,closed,family:claude-haiku-4-5-20251001
+claude-haiku-4-5-20251001_unknown,closed,epoch:API access
+claude-instant-1.1,closed,epoch:API access
+claude-instant-1.2,closed,epoch:API access
+claude-mythos-5,closed,override
+claude-mythos-preview,closed,override
+claude-mythos-preview-early,closed,epoch:Unreleased
+claude-opus-4-1-20250805,closed,epoch:API access
+claude-opus-4-1-20250805_16K,closed,epoch:API access
+claude-opus-4-1-20250805_24K,closed,epoch:API access
+claude-opus-4-1-20250805_27K,closed,epoch:API access
+claude-opus-4-1-20250805_32K,closed,epoch:API access
+claude-opus-4-1-20250805_thinking,closed,family:claude-opus-4-1-20250805
+claude-opus-4-1-20250805_unknown,closed,epoch:API access
+claude-opus-4-20250514,closed,epoch:API access
+claude-opus-4-20250514_12K,closed,epoch:API access
+claude-opus-4-20250514_16K,closed,epoch:API access
+claude-opus-4-20250514_1K,closed,epoch:API access
+claude-opus-4-20250514_27K,closed,epoch:API access
+claude-opus-4-20250514_2K,closed,epoch:API access
+claude-opus-4-20250514_32K,closed,epoch:API access
+claude-opus-4-20250514_8K,closed,epoch:API access
+claude-opus-4-20250514_thinking,closed,family:claude-opus-4-20250514
+claude-opus-4-20250514_unknown,closed,epoch:API access
+claude-opus-4-5-20251101,closed,epoch:API access
+claude-opus-4-5-20251101_128K,closed,epoch:API access
+claude-opus-4-5-20251101_16K,closed,epoch:API access
+claude-opus-4-5-20251101_32K,closed,epoch:API access
+claude-opus-4-5-20251101_48K,closed,epoch:API access
+claude-opus-4-5-20251101_64K,closed,epoch:API access
+claude-opus-4-5-20251101_8K,closed,epoch:API access
+claude-opus-4-5-20251101_high,closed,epoch:API access
+claude-opus-4-5-20251101_low,closed,epoch:API access
+claude-opus-4-5-20251101_none,closed,epoch:API access
+claude-opus-4-5-20251101_thinking,closed,family:claude-opus-4-5-20251101
+claude-opus-4-5-20251101_unknown,closed,epoch:API access
+claude-opus-4-6,closed,epoch:API access
+claude-opus-4-6_120K,closed,epoch:API access
+claude-opus-4-6_32K,closed,epoch:API access
+claude-opus-4-6_64K,closed,epoch:API access
+claude-opus-4-6_high,closed,epoch:API access
+claude-opus-4-6_low,closed,epoch:API access
+claude-opus-4-6_max,closed,epoch:API access
+claude-opus-4-6_medium,closed,epoch:API access
+claude-opus-4-6_none,closed,family:claude-opus-4-6
+claude-opus-4-6_thinking,closed,family:claude-opus-4-6
+claude-opus-4-6_unknown,closed,epoch:API access
+claude-opus-4-7,closed,epoch:API access
+claude-opus-4-7_high,closed,epoch:API access
+claude-opus-4-7_low,closed,epoch:API access
+claude-opus-4-7_max,closed,epoch:API access
+claude-opus-4-7_medium,closed,epoch:API access
+claude-opus-4-7_unknown,closed,epoch:API access
+claude-opus-4-7_xhigh,closed,epoch:API access
+claude-opus-4-8,closed,epoch:API access
+claude-opus-4-8_high,closed,epoch:API access
+claude-opus-4-8_low,closed,epoch:API access
+claude-opus-4-8_max,closed,epoch:API access
+claude-opus-4-8_medium,closed,epoch:API access
+claude-opus-4-8_none,closed,epoch:API access
+claude-opus-4-8_unknown,closed,epoch:API access
+claude-opus-4-8_xhigh,closed,epoch:API access
+claude-opus-5,closed,epoch:API access
+claude-opus-5_high,closed,epoch:API access
+claude-opus-5_low,closed,epoch:API access
+claude-opus-5_max,closed,epoch:API access
+claude-opus-5_medium,closed,epoch:API access
+claude-opus-5_unknown,closed,epoch:API access
+claude-opus-5_xhigh,closed,epoch:API access
+claude-sonnet-4-20250514,closed,epoch:API access
+claude-sonnet-4-20250514_12K,closed,epoch:API access
+claude-sonnet-4-20250514_16K,closed,epoch:API access
+claude-sonnet-4-20250514_1K,closed,epoch:API access
+claude-sonnet-4-20250514_2K,closed,epoch:API access
+claude-sonnet-4-20250514_32K,closed,epoch:API access
+claude-sonnet-4-20250514_59K,closed,epoch:API access
+claude-sonnet-4-20250514_8K,closed,epoch:API access
+claude-sonnet-4-20250514_thinking,closed,family:claude-sonnet-4-20250514
+claude-sonnet-4-20250514_unknown,closed,epoch:API access
+claude-sonnet-4-5-20250929,closed,epoch:API access
+claude-sonnet-4-5-20250929_12K,closed,epoch:API access
+claude-sonnet-4-5-20250929_16K,closed,epoch:API access
+claude-sonnet-4-5-20250929_1K,closed,epoch:API access
+claude-sonnet-4-5-20250929_2K,closed,epoch:API access
+claude-sonnet-4-5-20250929_32K,closed,epoch:API access
+claude-sonnet-4-5-20250929_48K,closed,epoch:API access
+claude-sonnet-4-5-20250929_59K,closed,epoch:API access
+claude-sonnet-4-5-20250929_8K,closed,epoch:API access
+claude-sonnet-4-5-20250929_low,closed,epoch:API access
+claude-sonnet-4-5-20250929_thinking,closed,family:claude-sonnet-4-5-20250929
+claude-sonnet-4-5-20250929_unknown,closed,epoch:API access
+claude-sonnet-4-6,closed,epoch:API access
+claude-sonnet-4-6_32K,closed,epoch:API access
+claude-sonnet-4-6_high,closed,epoch:API access
+claude-sonnet-4-6_low,closed,epoch:API access
+claude-sonnet-4-6_max,closed,epoch:API access
+claude-sonnet-4-6_medium,closed,epoch:API access
+claude-sonnet-4-6_unknown,closed,epoch:API access
+claude-sonnet-5,closed,epoch:API access
+claude-sonnet-5_high,closed,epoch:API access
+claude-sonnet-5_low,closed,epoch:API access
+claude-sonnet-5_max,closed,epoch:API access
+claude-sonnet-5_medium,closed,epoch:API access
+claude-sonnet-5_unknown,closed,epoch:API access
+claude-sonnet-5_xhigh,closed,epoch:API access
+code-davinci-002,closed,epoch:API access
+codestral-2501,open,epoch:Open weights (non-commercial)
+codex-mini-2025-05-16,closed,override
+cogito-671b-v2.1,open,epoch:Open weights (unrestricted)
+command-a-plus-05-2026,open,epoch:Open weights (unrestricted)
+computer-use-preview-2025-03-11,closed,override
+curie,closed,override
+davinci,closed,epoch:API access
+dbrx-instruct,open,epoch:Open weights (restricted use)
+deepseek-chat,open,epoch:Open weights (unrestricted)
+deepseek-coder-1.3b-base,open,epoch:Open weights (restricted use)
+deepseek-coder-33b-base,open,epoch:Open weights (restricted use)
+deepseek-coder-6.7b-base,open,epoch:Open weights (restricted use)
+deepseek-llm-67b-chat,open,epoch:Open weights (restricted use)
+deepseek-r1-0528-qwen3-8b,open,override
+deepseek-reasoner,open,epoch:Open weights (unrestricted)
+deepseek-v3.2,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash-0731_high,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash-0731_low,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash-0731_max,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash-0731_none,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash-0731_unknown,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash_high,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash_max,open,epoch:Open weights (unrestricted)
+deepseek-v4-flash_unknown,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro-0813_high,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro-0813_low,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro-0813_max,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro-0813_none,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro-0813_unknown,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro_high,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro_max,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro_none,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro_unknown,open,epoch:Open weights (unrestricted)
+deepseek-v4-pro_xhigh,open,family:deepseek-v4-pro_unknown
+devstral-small-2512,open,epoch:Open weights (unrestricted)
+dolly-v2-12b,open,epoch:Open weights (unrestricted)
+falcon-11b,open,epoch:Open weights (restricted use)
+falcon-180B,open,epoch:Open weights (restricted use)
+falcon-40b,open,epoch:Open weights (unrestricted)
+falcon-40b-instruct,open,epoch:Open weights (unrestricted)
+falcon-7b,open,epoch:Open weights (unrestricted)
+gdm-ai-co-mathematician,closed,epoch:Unreleased
+gemini-1.0-pro-001,closed,epoch:API access
+gemini-1.5-flash-001,closed,epoch:API access
+gemini-1.5-flash-002,closed,epoch:API access
+gemini-1.5-flash-0514,closed,epoch:API access
+gemini-1.5-flash-8b-001,closed,epoch:API access
+gemini-1.5-pro-001,closed,epoch:API access
+gemini-1.5-pro-001-feb24,closed,epoch:API access
+gemini-1.5-pro-002,closed,epoch:API access
+gemini-2.0-flash-001,closed,epoch:API access
+gemini-2.0-flash-exp,closed,epoch:API access
+gemini-2.0-flash-lite,closed,epoch:API access
+gemini-2.0-flash-thinking-exp-01-21,closed,epoch:API access
+gemini-2.0-flash-thinking-exp-1219,closed,epoch:API access
+gemini-2.0-pro-exp-02-05,closed,epoch:Hosted access (no API)
+gemini-2.5-flash,closed,epoch:API access
+gemini-2.5-flash-2025-04,closed,override
+gemini-2.5-flash-2025-05,closed,override
+gemini-2.5-flash-lite-preview-06-17_16K,closed,epoch:API access
+gemini-2.5-flash-lite-preview-06-17_thinking,closed,epoch:API access
+gemini-2.5-flash-lite-preview-09-2025,closed,epoch:API access
+gemini-2.5-flash-native-audio-preview-12-2025_none,closed,family:gemini-2.5-flash-native-audio-preview-12-2025
+gemini-2.5-flash-native-audio-preview-12-2025_thinking,closed,family:gemini-2.5-flash-native-audio-preview-12-2025
+gemini-2.5-flash-preview-04-17,closed,epoch:API access
+gemini-2.5-flash-preview-04-17_16K,closed,epoch:API access
+gemini-2.5-flash-preview-04-17_24K,closed,epoch:API access
+gemini-2.5-flash-preview-05-20,closed,epoch:API access
+gemini-2.5-flash-preview-05-20_16K,closed,epoch:API access
+gemini-2.5-flash-preview-05-20_1K,closed,epoch:API access
+gemini-2.5-flash-preview-05-20_24K,closed,epoch:API access
+gemini-2.5-flash-preview-05-20_8K,closed,epoch:API access
+gemini-2.5-flash-preview-09-2025,closed,epoch:API access
+gemini-2.5-flash-preview-09-2025_16k,closed,epoch:API access
+gemini-2.5-pro,closed,epoch:API access
+gemini-2.5-pro-exp-03-25,closed,epoch:API access
+gemini-2.5-pro-preview-05-06,closed,epoch:API access
+gemini-2.5-pro-preview-06-05,closed,epoch:API access
+gemini-2.5-pro-preview-06-05_1K,closed,epoch:API access
+gemini-2.5-pro-preview-06-05_32K,closed,epoch:API access
+gemini-2.5-pro_16K,closed,epoch:API access
+gemini-2.5-pro_32K,closed,epoch:API access
+gemini-2.5-pro_8K,closed,epoch:API access
+gemini-3-deep-think-preview,closed,override
+gemini-3-flash-preview,closed,epoch:API access
+gemini-3-flash-preview_high,closed,epoch:API access
+gemini-3-flash-preview_low,closed,epoch:API access
+gemini-3-flash-preview_medium,closed,epoch:API access
+gemini-3-flash-preview_minimal,closed,epoch:API access
+gemini-3-flash-preview_unknown,closed,family:gemini-3-flash-preview
+gemini-3-pro-preview,closed,epoch:API access
+gemini-3-pro-preview_high,closed,epoch:API access
+gemini-3-pro-preview_low,closed,epoch:API access
+gemini-3.1-flash-lite,closed,epoch:API access
+gemini-3.1-flash-lite_high,closed,epoch:API access
+gemini-3.1-flash-lite_low,closed,epoch:API access
+gemini-3.1-flash-lite_minimal,closed,epoch:API access
+gemini-3.1-flash-live-preview,closed,override
+gemini-3.1-pro-preview,closed,epoch:API access
+gemini-3.1-pro-preview_high,closed,epoch:API access
+gemini-3.1-pro-preview_low,closed,epoch:API access
+gemini-3.1-pro-preview_medium,closed,epoch:API access
+gemini-3.1-pro-preview_unknown,closed,family:gemini-3.1-pro-preview
+gemini-3.5-flash,closed,epoch:API access
+gemini-3.5-flash-lite,closed,epoch:API access
+gemini-3.5-flash-lite_high,closed,epoch:API access
+gemini-3.5-flash-lite_low,closed,epoch:API access
+gemini-3.5-flash-lite_medium,closed,epoch:API access
+gemini-3.5-flash-lite_minimal,closed,epoch:API access
+gemini-3.5-flash_high,closed,epoch:API access
+gemini-3.5-flash_low,closed,epoch:API access
+gemini-3.5-flash_medium,closed,epoch:API access
+gemini-3.5-flash_minimal,closed,epoch:API access
+gemini-3.5-flash_unknown,closed,epoch:API access
+gemini-3.6-flash,closed,epoch:API access
+gemini-3.6-flash_high,closed,epoch:API access
+gemini-3.6-flash_low,closed,epoch:API access
+gemini-3.6-flash_medium,closed,epoch:API access
+gemini-3.6-flash_minimal,closed,epoch:API access
+gemini-3.6-flash_unknown,closed,epoch:API access
+gemini-3.7-flash,closed,epoch:API access
+gemini-3.7-flash_high,closed,epoch:API access
+gemini-3.7-flash_low,closed,epoch:API access
+gemini-3.7-flash_medium,closed,epoch:API access
+gemini-3.7-flash_unknown,closed,epoch:API access
+gemini-3.8-flash_high,closed,epoch:API access
+gemini-3.8-flash_low,closed,epoch:API access
+gemini-3.8-flash_medium,closed,epoch:API access
+gemini-3.8-flash_unknown,closed,epoch:API access
+gemini-exp-1206,closed,epoch:API access
+gemini-robotics-er-1.5-preview,closed,override
+gemini-robotics-er-1.6-preview,closed,epoch:API access
+gemma-2-27b,open,epoch:Open weights (restricted use)
+gemma-2-27b-it,open,epoch:Open weights (restricted use)
+gemma-2-9b,open,epoch:Open weights (restricted use)
+gemma-2-9b-it,open,epoch:Open weights (restricted use)
+gemma-2b,open,epoch:Open weights (restricted use)
+gemma-3-12b-it,open,epoch:Open weights (restricted use)
+gemma-3-1b-it,open,epoch:Open weights (restricted use)
+gemma-3-27b-it,open,epoch:Open weights (restricted use)
+gemma-3-4b-it,open,epoch:Open weights (restricted use)
+gemma-3n-E4B-it,open,override
+gemma-4-26b-a4b,open,epoch:Open weights (unrestricted)
+gemma-4-26b-a4b_minimal,open,epoch:Open weights (unrestricted)
+gemma-4-31b-it,open,epoch:Open weights (restricted use)
+gemma-4-31b-it_minimal,open,epoch:Open weights (restricted use)
+gemma-4-31b-it_none,open,epoch:Open weights (restricted use)
+gemma-7b,open,epoch:Open weights (restricted use)
+glm-4.5,open,epoch:Open weights (unrestricted)
+glm-4.5_thinking,open,epoch:Open weights (unrestricted)
+glm-4.6,open,epoch:Open weights (unrestricted)
+glm-4.7,open,epoch:Open weights (unrestricted)
+glm-4.7-flash,open,override
+glm-4.7-flash_none,open,family:glm-4.7-flash
+glm-4.7_high,open,epoch:Open weights (unrestricted)
+glm-5,open,epoch:Open weights (unrestricted)
+glm-5.1,open,epoch:Open weights (unrestricted)
+glm-5.1_none,open,epoch:Open weights (unrestricted)
+glm-5.2_high,open,epoch:Open weights (unrestricted)
+glm-5.2_low,open,epoch:Open weights (unrestricted)
+glm-5.2_max,open,epoch:Open weights (unrestricted)
+glm-5.2_medium,open,epoch:Open weights (unrestricted)
+glm-5.2_minimal,open,epoch:Open weights (unrestricted)
+glm-5.2_none,open,epoch:Open weights (unrestricted)
+glm-5.2_unknown,open,epoch:Open weights (unrestricted)
+glm-5.2_xhigh,open,family:glm-5.2_unknown
+glm-5.3-flash_max,open,epoch:Open weights (unrestricted)
+glm-5.3-flash_unknown,open,epoch:Open weights (unrestricted)
+glm-5.3_max,closed,epoch:API access
+glm-5_unknown,open,family:glm-5
+gpt-3.5-turbo-0125,closed,epoch:API access
+gpt-3.5-turbo-0613,closed,epoch:API access
+gpt-3.5-turbo-1106,closed,epoch:API access
+gpt-3.5-turbo-instruct,closed,epoch:API access
+gpt-4-0125-preview,closed,epoch:API access
+gpt-4-0314,closed,epoch:API access
+gpt-4-0613,closed,epoch:API access
+gpt-4-1106-preview,closed,epoch:API access
+gpt-4-32k-0314,closed,epoch:API access
+gpt-4-turbo,closed,epoch:API access
+gpt-4-turbo-2024-04-09,closed,epoch:API access
+gpt-4.1-2025-04-14,closed,epoch:API access
+gpt-4.1-mini-2025-04-14,closed,epoch:API access
+gpt-4.1-nano-2025-04-14,closed,epoch:API access
+gpt-4.5-preview-2025-02-27,closed,epoch:API access
+gpt-4o-2024-05-13,closed,epoch:API access
+gpt-4o-2024-08-06,closed,epoch:API access
+gpt-4o-2024-11-20,closed,epoch:API access
+gpt-4o-2025-01-29,closed,epoch:API access
+gpt-4o-2025-03-27,closed,epoch:API access
+gpt-4o-audio-preview-2025-06-03,closed,override
+gpt-4o-mini-2024-07-18,closed,epoch:API access
+gpt-4o-mini-audio-preview-2024-12-17,closed,override
+gpt-5-2025-08-07,closed,epoch:API access
+gpt-5-2025-08-07,closed,epoch:API access
+gpt-5-2025-08-07_high,closed,epoch:API access
+gpt-5-2025-08-07_low,closed,epoch:API access
+gpt-5-2025-08-07_medium,closed,epoch:API access
+gpt-5-2025-08-07_minimal,closed,epoch:API access
+gpt-5-2025-08-07_thinking,closed,family:gpt-5-2025-08-07_unknown
+gpt-5-2025-08-07_unknown,closed,epoch:API access
+gpt-5-codex,closed,epoch:API access
+gpt-5-codex_high,closed,epoch:API access
+gpt-5-mini-2025-08-07_high,closed,epoch:API access
+gpt-5-mini-2025-08-07_low,closed,epoch:API access
+gpt-5-mini-2025-08-07_medium,closed,epoch:API access
+gpt-5-mini-2025-08-07_minimal,closed,epoch:API access
+gpt-5-mini-2025-08-07_thinking,closed,family:gpt-5-mini-2025-08-07_unknown
+gpt-5-mini-2025-08-07_unknown,closed,epoch:API access
+gpt-5-nano-2025-08-07_high,closed,epoch:API access
+gpt-5-nano-2025-08-07_low,closed,epoch:API access
+gpt-5-nano-2025-08-07_medium,closed,epoch:API access
+gpt-5-nano-2025-08-07_minimal,closed,epoch:API access
+gpt-5-nano-2025-08-07_unknown,closed,epoch:API access
+gpt-5-pro-2025-10-06_high,closed,epoch:API access
+gpt-5-pro-2025-10-06_unknown,closed,epoch:API access
+gpt-5.1-2025-11-13,closed,epoch:API access
+gpt-5.1-2025-11-13_high,closed,epoch:API access
+gpt-5.1-2025-11-13_low,closed,epoch:API access
+gpt-5.1-2025-11-13_medium,closed,epoch:API access
+gpt-5.1-2025-11-13_none,closed,epoch:API access
+gpt-5.1-2025-11-13_thinking,closed,family:gpt-5.1-2025-11-13_unknown
+gpt-5.1-2025-11-13_unknown,closed,epoch:API access
+gpt-5.1-codex,closed,epoch:API access
+gpt-5.1-codex-max,closed,epoch:API access
+gpt-5.1-codex-mini,closed,epoch:API access
+gpt-5.2-2025-12-11_high,closed,epoch:API access
+gpt-5.2-2025-12-11_low,closed,epoch:API access
+gpt-5.2-2025-12-11_medium,closed,epoch:API access
+gpt-5.2-2025-12-11_none,closed,epoch:API access
+gpt-5.2-2025-12-11_unknown,closed,epoch:API access
+gpt-5.2-2025-12-11_xhigh,closed,epoch:API access
+gpt-5.2-codex,closed,epoch:API access
+gpt-5.2-pro-2025-12-11,closed,epoch:API access
+gpt-5.2-pro-2025-12-11_high,closed,epoch:API access
+gpt-5.2-pro-2025-12-11_medium,closed,epoch:API access
+gpt-5.2-pro-2025-12-11_xhigh,closed,epoch:API access
+gpt-5.3-codex,closed,epoch:API access
+gpt-5.3-codex_xhigh,closed,epoch:API access
+gpt-5.4-2026-03-05,closed,epoch:API access
+gpt-5.4-2026-03-05,closed,epoch:API access
+gpt-5.4-2026-03-05_high,closed,epoch:API access
+gpt-5.4-2026-03-05_low,closed,epoch:API access
+gpt-5.4-2026-03-05_medium,closed,epoch:API access
+gpt-5.4-2026-03-05_none,closed,epoch:API access
+gpt-5.4-2026-03-05_unknown,closed,epoch:API access
+gpt-5.4-2026-03-05_xhigh,closed,epoch:API access
+gpt-5.4-mini-2026-03-17_high,closed,epoch:API access
+gpt-5.4-mini-2026-03-17_low,closed,epoch:API access
+gpt-5.4-mini-2026-03-17_medium,closed,epoch:API access
+gpt-5.4-mini-2026-03-17_none,closed,epoch:API access
+gpt-5.4-mini-2026-03-17_unknown,closed,epoch:API access
+gpt-5.4-mini-2026-03-17_xhigh,closed,epoch:API access
+gpt-5.4-nano-2026-03-17_high,closed,epoch:API access
+gpt-5.4-nano-2026-03-17_low,closed,epoch:API access
+gpt-5.4-nano-2026-03-17_medium,closed,epoch:API access
+gpt-5.4-nano-2026-03-17_none,closed,epoch:API access
+gpt-5.4-nano-2026-03-17_unknown,closed,epoch:API access
+gpt-5.4-nano-2026-03-17_xhigh,closed,epoch:API access
+gpt-5.4-pro-2026-03-05_none,closed,epoch:API access
+gpt-5.4-pro-2026-03-05_unknown,closed,epoch:API access
+gpt-5.4-pro-2026-03-05_xhigh,closed,epoch:API access
+gpt-5.5,closed,family:gpt-5.5_unknown
+gpt-5.5-instant,closed,epoch:API access
+gpt-5.5-pre-release_xhigh,closed,epoch:API access
+gpt-5.5-pro-pre-release_xhigh,closed,epoch:API access
+gpt-5.5-pro_high,closed,epoch:API access
+gpt-5.5-pro_unknown,closed,epoch:API access
+gpt-5.5-pro_xhigh,closed,epoch:API access
+gpt-5.5_high,closed,epoch:API access
+gpt-5.5_low,closed,epoch:API access
+gpt-5.5_medium,closed,epoch:API access
+gpt-5.5_none,closed,epoch:API access
+gpt-5.5_unknown,closed,epoch:API access
+gpt-5.5_xhigh,closed,epoch:API access
+gpt-5.6-luna,closed,epoch:API access
+gpt-5.6-luna_high,closed,epoch:API access
+gpt-5.6-luna_low,closed,epoch:API access
+gpt-5.6-luna_max,closed,epoch:API access
+gpt-5.6-luna_medium,closed,epoch:API access
+gpt-5.6-luna_none,closed,epoch:API access
+gpt-5.6-luna_unknown,closed,epoch:API access
+gpt-5.6-luna_xhigh,closed,epoch:API access
+gpt-5.6-sol,closed,epoch:API access
+gpt-5.6-sol_high,closed,epoch:API access
+gpt-5.6-sol_low,closed,epoch:API access
+gpt-5.6-sol_max,closed,epoch:API access
+gpt-5.6-sol_medium,closed,epoch:API access
+gpt-5.6-sol_none,closed,epoch:API access
+gpt-5.6-sol_promax,closed,epoch:API access
+gpt-5.6-sol_prounknown,closed,epoch:API access
+gpt-5.6-sol_proxhigh,closed,epoch:API access
+gpt-5.6-sol_unknown,closed,epoch:API access
+gpt-5.6-sol_xhigh,closed,epoch:API access
+gpt-5.6-terra,closed,epoch:API access
+gpt-5.6-terra_high,closed,epoch:API access
+gpt-5.6-terra_low,closed,epoch:API access
+gpt-5.6-terra_max,closed,epoch:API access
+gpt-5.6-terra_medium,closed,epoch:API access
+gpt-5.6-terra_none,closed,epoch:API access
+gpt-5.6-terra_unknown,closed,epoch:API access
+gpt-5.6-terra_xhigh,closed,epoch:API access
+gpt-6-astra_high,closed,epoch:API access
+gpt-6-astra_low,closed,epoch:API access
+gpt-6-astra_max,closed,epoch:API access
+gpt-6-astra_medium,closed,epoch:API access
+gpt-6-astra_none,closed,epoch:API access
+gpt-6-astra_unknown,closed,epoch:API access
+gpt-6-astra_xhigh,closed,epoch:API access
+gpt-j-6b,open,epoch:Open weights (unrestricted)
+gpt-neo-2.7B,open,epoch:Open weights (unrestricted)
+gpt-neox-20b,open,epoch:Open weights (unrestricted)
+gpt-oss-120b,open,epoch:Open weights (unrestricted)
+gpt-oss-120b_high,open,epoch:Open weights (unrestricted)
+gpt-oss-120b_low,open,epoch:Open weights (unrestricted)
+gpt-oss-120b_medium,open,epoch:Open weights (unrestricted)
+gpt-oss-120b_unknown,open,epoch:Open weights (unrestricted)
+gpt-oss-20b,open,epoch:Open weights (unrestricted)
+gpt-oss-20b_high,open,epoch:Open weights (unrestricted)
+gpt-oss-20b_low,open,epoch:Open weights (unrestricted)
+gpt-oss-20b_medium,open,epoch:Open weights (unrestricted)
+gpt-oss-20b_unknown,open,epoch:Open weights (unrestricted)
+gpt-realtime-1.5,closed,override
+gpt-realtime-2,closed,override
+gpt-realtime-2025-08-28,closed,override
+gpt-realtime-2_xhigh,closed,family:gpt-realtime-2
+gpt-realtime-mini-2025-12-15,closed,override
+gpt2-xl,open,epoch:Open weights (unrestricted)
+granite-4.0-1b,open,override
+granite-4.0-350m,open,override
+granite-4.0-h-small,open,override
+granite-4.0-micro,open,override
+granite-4.1-30b,open,epoch:Open weights (unrestricted)
+grok-2,closed,override
+grok-2-1212,closed,epoch:API access
+grok-3,closed,epoch:API access
+grok-3-beta,closed,epoch:API access
+grok-3-mini,closed,family:grok-3-mini_high
+grok-3-mini-beta_high,closed,epoch:API access
+grok-3-mini-beta_low,closed,epoch:API access
+grok-3-mini-beta_medium,closed,epoch:API access
+grok-3-mini_high,closed,epoch:API access
+grok-3-mini_low,closed,epoch:API access
+grok-4-0709,closed,epoch:API access
+grok-4-0709_high,closed,epoch:API access
+grok-4-1,closed,epoch:API access
+grok-4-1-fast-non-reasoning,closed,epoch:API access
+grok-4-1-fast-reasoning,closed,epoch:API access
+grok-4-20,closed,epoch:API access
+grok-4-20_high,closed,epoch:API access
+grok-4-fast,closed,epoch:API access
+grok-4-fast_thinking,closed,family:grok-4-fast
+grok-4.20-0309-reasoning,closed,epoch:API access
+grok-4.3_high,closed,epoch:Hosted access (no API)
+grok-4.3_none,closed,epoch:Hosted access (no API)
+grok-4.3_unknown,closed,epoch:Hosted access (no API)
+grok-4.5,closed,epoch:API access
+grok-4.5_high,closed,epoch:API access
+grok-4.5_low,closed,epoch:API access
+grok-4.5_medium,closed,epoch:API access
+grok-4.5_unknown,closed,epoch:API access
+grok-4.6_high,closed,epoch:API access
+grok-4.6_low,closed,epoch:API access
+grok-4.6_medium,closed,epoch:API access
+grok-4.6_unknown,closed,epoch:API access
+grok-4.6_xhigh,closed,epoch:API access
+grok-build-0.1,closed,epoch:API access
+grok-code-fast-1,closed,override
+inkling-small,open,epoch:Open weights (unrestricted)
+inkling-small_high,open,epoch:Open weights (unrestricted)
+inkling-small_low,open,epoch:Open weights (unrestricted)
+inkling-small_medium,open,epoch:Open weights (unrestricted)
+inkling-small_minimal,open,epoch:Open weights (unrestricted)
+inkling-small_none,open,epoch:Open weights (unrestricted)
+inkling-small_xhigh,open,epoch:Open weights (unrestricted)
+internlm-20b,open,override
+internlm-7b,open,override
+internlm-chat-20b,open,override
+kimi-k2-thinking,open,epoch:Open weights (restricted use)
+kimi-k2-thinking-turbo,open,epoch:Open weights (restricted use)
+kimi-k2.5,open,epoch:Open weights (unrestricted)
+kimi-k2.5_high,open,epoch:Open weights (unrestricted)
+kimi-k2.5_unknown,open,family:kimi-k2.5
+kimi-k2.6,open,epoch:Open weights (unrestricted)
+kimi-k2.6_none,open,epoch:Open weights (unrestricted)
+kimi-k2.7-code,open,epoch:Open weights (unrestricted)
+kimi-k2.7-code_xhigh,open,family:kimi-k2.7-code
+kimi-k2p5,open,override
+kimi-k3_high,open,epoch:Open weights (non-commercial)
+kimi-k3_low,open,epoch:Open weights (non-commercial)
+kimi-k3_max,open,epoch:Open weights (non-commercial)
+kimi-k3_unknown,open,epoch:Open weights (non-commercial)
+laguna-m.1,open,override
+laguna-xs.2,open,epoch:Open weights (unrestricted)
+llama-2-7b-chat,open,epoch:Open weights (restricted use)
+magistral-medium-2506,closed,epoch:API access
+magistral-medium-2509,closed,epoch:API access
+magistral-small-2506,open,epoch:Open weights (unrestricted)
+magistral-small-2509,open,epoch:Open weights (unrestricted)
+mercury-2,closed,epoch:API access
+mimo-v2-flash,open,epoch:Open weights (unrestricted)
+mimo-v2-pro,closed,epoch:API access
+mimo-v2-pro_high,closed,epoch:API access
+mimo-v2.5,open,epoch:Open weights (unrestricted)
+mimo-v2.5-pro,open,epoch:Open weights (unrestricted)
+ministral-3b-2410,closed,epoch:API access
+ministral-8b-2410,open,epoch:Open weights (non-commercial)
+mistral-large-2402,closed,epoch:API access
+mistral-large-2407,open,epoch:Open weights (non-commercial)
+mistral-large-2411,open,epoch:Open weights (non-commercial)
+mistral-large-2512,open,epoch:Open weights (unrestricted)
+mistral-medium-2312,closed,epoch:API access
+mistral-medium-2505,closed,epoch:API access
+mistral-medium-2508,closed,epoch:API access
+mistral-medium-2604,open,epoch:Open weights (restricted use)
+mistral-medium-2604_high,open,epoch:Open weights (restricted use)
+mistral-small-2402,closed,override
+mistral-small-2409,open,epoch:Open weights (non-commercial)
+mistral-small-2501,open,epoch:Open weights (unrestricted)
+mistral-small-2503,open,epoch:Open weights (unrestricted)
+mistral-small-2506,open,epoch:Open weights (unrestricted)
+mistral-small-2603,open,epoch:Open weights (unrestricted)
+mistral-small-3-2501,open,epoch:Open weights (unrestricted)
+mistral-small-3.1-2503,open,epoch:Open weights (unrestricted)
+mistral-small-3.2-2506,open,epoch:Open weights (unrestricted)
+ml-elephant,unknown,
+mpt-30b,open,epoch:Open weights (unrestricted)
+mpt-30b-instruct,open,epoch:Open weights (unrestricted)
+mpt-7b,open,epoch:Open weights (unrestricted)
+muse-spark,closed,epoch:API access
+muse-spark-1.1,closed,epoch:API access
+muse-spark-1.1_high,closed,epoch:API access
+muse-spark-1.1_medium,closed,epoch:API access
+muse-spark-1.1_xhigh,closed,epoch:API access
+muse-spark-1.2,closed,epoch:API access
+muse-spark-1.2_xhigh,closed,epoch:API access
+nemotron-3-super,open,epoch:Open weights (unrestricted)
+nemotron-3-ultra,open,epoch:Open weights (unrestricted)
+nova-2.0-pro-preview_low,closed,epoch:API access
+nova-2.0-pro-preview_medium,closed,epoch:API access
+nova-2.0-pro-preview_none,closed,epoch:API access
+nova-2.0-pro-preview_unknown,closed,epoch:API access
+nova-premier,closed,override
+o1-2024-12-17,closed,epoch:API access
+o1-2024-12-17_high,closed,epoch:API access
+o1-2024-12-17_low,closed,epoch:API access
+o1-2024-12-17_medium,closed,epoch:API access
+o1-2024-12-17_unknown,closed,epoch:API access
+o1-mini-2024-09-12,closed,epoch:API access
+o1-mini-2024-09-12_high,closed,epoch:API access
+o1-mini-2024-09-12_medium,closed,epoch:API access
+o1-mini-2024-09-12_unknown,closed,epoch:API access
+o1-preview-2024-09-12,closed,epoch:API access
+o1-pro-2025-03-19,closed,epoch:API access
+o1-pro-2025-03-19_low,closed,epoch:API access
+o3-2025-04-16,closed,epoch:API access
+o3-2025-04-16_high,closed,epoch:API access
+o3-2025-04-16_low,closed,epoch:API access
+o3-2025-04-16_medium,closed,epoch:API access
+o3-2025-04-16_unknown,closed,epoch:API access
+o3-mini-2025-01-31,closed,family:o3-mini-2025-01-31_high
+o3-mini-2025-01-31_high,closed,epoch:API access
+o3-mini-2025-01-31_low,closed,epoch:API access
+o3-mini-2025-01-31_medium,closed,epoch:API access
+o3-pro-2025-06-10,closed,family:o3-pro-2025-06-10_high
+o3-pro-2025-06-10_high,closed,epoch:API access
+o3-pro-2025-06-10_low,closed,epoch:API access
+o3-pro-2025-06-10_medium,closed,epoch:API access
+o4-mini-2025-04-16,closed,family:o4-mini-2025-04-16_high
+o4-mini-2025-04-16_high,closed,epoch:API access
+o4-mini-2025-04-16_low,closed,epoch:API access
+o4-mini-2025-04-16_medium,closed,epoch:API access
+open-mistral-7b,open,epoch:Open weights (unrestricted)
+open-mistral-nemo-2407,open,epoch:Open weights (unrestricted)
+open-mixtral-8x7b,open,epoch:Open weights (unrestricted)
+open_llama_7b,open,override
+openhands-lm-32b-v0.1,open,override
+opt-1.3b,open,epoch:Open weights (non-commercial)
+opt-13b,open,override
+opt-175b,open,epoch:Open weights (non-commercial)
+opt-66b,open,epoch:Open weights (non-commercial)
+phi-1_5,open,epoch:Open weights (unrestricted)
+phi-2,open,epoch:Open weights (unrestricted)
+phi-4,open,epoch:Open weights (unrestricted)
+pixtral-large-2411,open,epoch:Open weights (non-commercial)
+qwen-max-2025-01-25,closed,epoch:API access
+qwen-plus-2025-01-25,closed,epoch:API access
+qwen-plus-2025-04-28,closed,epoch:API access
+qwen-turbo-2024-11-01,closed,epoch:API access
+qwen1.5-14B,open,epoch:Open weights (unrestricted)
+qwen1.5-32B,open,epoch:Open weights (restricted use)
+qwen1.5-32b-chat,open,epoch:Open weights (restricted use)
+qwen1.5-72b-chat,open,epoch:Open weights (restricted use)
+qwen2-72b-instruct,open,epoch:Open weights (unrestricted)
+qwen2.5-14b-instruct,open,epoch:Open weights (unrestricted)
+qwen2.5-32b-instruct,open,epoch:Open weights (unrestricted)
+qwen2.5-72b-instruct,open,epoch:Open weights (unrestricted)
+qwen2.5-7b-instruct,open,epoch:Open weights (unrestricted)
+qwen3-1.7b,open,epoch:Open weights (unrestricted)
+qwen3-1.7b_none,open,epoch:Open weights (unrestricted)
+qwen3-14b,open,epoch:Open weights (unrestricted)
+qwen3-14b_none,open,epoch:Open weights (unrestricted)
+qwen3-235b-a22b,open,epoch:Open weights (unrestricted)
+qwen3-30b-a3b-instruct-2507,open,epoch:Open weights (unrestricted)
+qwen3-30b-a3b-thinking-2507,open,epoch:Open weights (unrestricted)
+qwen3-4b,open,epoch:Open weights (unrestricted)
+qwen3-4b-instruct-2507,open,override
+qwen3-4b_none,open,epoch:Open weights (unrestricted)
+qwen3-8b,open,epoch:Open weights (unrestricted)
+qwen3-8b_none,open,epoch:Open weights (unrestricted)
+qwen3-coder-next,open,override
+qwen3-max-2025-09-23,closed,epoch:API access
+qwen3.5-122b-a10b_none,open,epoch:Open weights (restricted use)
+qwen3.5-27B,open,epoch:Open weights (restricted use)
+qwen3.5-2b_none,open,epoch:Open weights (restricted use)
+qwen3.5-35b-a3b,open,epoch:Open weights (unrestricted)
+qwen3.5-35b-a3b_none,open,epoch:Open weights (unrestricted)
+qwen3.5-397b-a17b,open,epoch:Open weights (unrestricted)
+qwen3.5-397b-a17b_none,open,epoch:Open weights (unrestricted)
+qwen3.5-4b_none,open,epoch:Open weights (restricted use)
+qwen3.5-9B,open,epoch:Open weights (restricted use)
+qwen3.5-9B_none,open,epoch:Open weights (restricted use)
+qwen3.5-flash,closed,override
+qwen3.5-flash_none,closed,family:qwen3.5-flash
+qwen3.5-plus,closed,override
+qwen3.5-plus_high,closed,family:qwen3.5-plus
+qwen3.5-plus_none,closed,family:qwen3.5-plus
+qwen3.6-27b,open,epoch:Open weights (unrestricted)
+qwen3.6-27b_none,open,epoch:Open weights (unrestricted)
+qwen3.6-35b-a3b,open,epoch:Open weights (unrestricted)
+qwen3.6-35b-a3b_none,open,epoch:Open weights (unrestricted)
+qwen3.6-flash,closed,override
+qwen3.6-flash_none,closed,family:qwen3.6-flash
+qwen3.6-max-preview,closed,override
+qwen3.6-max-preview_none,closed,family:qwen3.6-max-preview
+qwen3.6-plus,closed,epoch:API access
+qwen3.6-plus_none,closed,epoch:API access
+qwen3.7-flash,closed,epoch:API access
+qwen3.7-flash_none,closed,epoch:API access
+qwen3.7-max,closed,epoch:API access
+qwen3.7-max_none,closed,epoch:API access
+qwen3.7-max_xhigh,closed,family:qwen3.7-max
+qwen3.7-plus,closed,override
+qwen3.7-plus_none,closed,family:qwen3.7-plus
+qwen3.8-27b,open,epoch:Open weights (unrestricted)
+qwen3.8-27b_low,open,epoch:Open weights (unrestricted)
+qwen3.8-27b_medium,open,epoch:Open weights (unrestricted)
+qwen3.8-27b_none,open,epoch:Open weights (unrestricted)
+qwen3.8-27b_xhigh,open,epoch:Open weights (unrestricted)
+qwen3.8-max_unknown,closed,epoch:API access
+qwen3.8-max_xhigh,closed,epoch:API access
+qwq-plus,closed,epoch:API access
+reka-flash-3,open,epoch:Open weights (unrestricted)
+seed-oss-36b-instruct,open,override
+solar-pro-3,closed,epoch:API access
+stablelm-tuned-alpha-7b,open,override
+starcoder2-15b,open,epoch:Open weights (restricted use)
+starcoder2-3b,open,epoch:Open weights (restricted use)
+starcoder2-7b,open,epoch:Open weights (restricted use)
+step-3.7-flash,open,epoch:Open weights (unrestricted)
+swe-1.6,closed,epoch:Hosted access (no API)
+swe-1.7,closed,override
+text-ada-001,closed,override
+text-babbage-001,closed,epoch:API access
+text-curie-001,closed,epoch:API access
+text-davinci-001,closed,epoch:API access
+text-davinci-002,closed,epoch:API access
+text-davinci-003,closed,override
+tiny-recursion-model,open,override
+tml-interaction-small,unknown,
+trinity-large-thinking,open,override
+vicuna-13b-v1.1,open,override
+vicuna-13b-v1.3,open,epoch:Open weights (restricted use)
+xgen-7b-8k-base,open,epoch:Open weights (unrestricted)
+yi-lightning,closed,epoch:API access

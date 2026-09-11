@@ -8,7 +8,7 @@ catalogue counts as top-line are read off the recent records only. The file list
 release: base model plus snapshot, `data.model_family`), so every reasoning effort of a SOTA
 release is shown; the canonical fit's SOTA table keeps the best effort of each.
 Read off the canonical K=1 fit of the current data generation (`all_models_eci.csv`,
-`timeline.csv`): no separate sampling. The list drives the timelines, the country frontier's
+`timeline.csv`): no separate sampling. The list drives the timelines, the frontier gap's
 record candidates and the SOTA table; it decides nothing about what a fit sees, so reading it
 off the canonical fit is not circular. Candidates need MIN_OBS observations, Epoch's rule for a
 record-setter and the repository's low-observation threshold (user decisions 2026-09-09).

@@ -46,8 +46,8 @@ unmarked to both.
 | `--apply-exclusions` | `[expl]` apply `excluded_benchmarks.txt`, i.e. fit the canonical scope |
 | `--include-all-benchmarks` | `[canon]` the mirror: keep the curated-excluded benchmarks |
 | `--drop-benchmarks A,B` | `[expl]` drop the named benchmarks (comma-separated, exact names) for a sensitivity run |
-| `--open-only` | `[canon]` keep only benchmarks whose access class in `0_input/benchmarks.csv` is `public`; results go to `canonical_open/` |
-| `--closed-only` | `[canon]` the complement of `--open-only`: only benchmarks whose access class in `0_input/benchmarks.csv` is not `public`; results go to `canonical_closed/` |
+| `--access CLASS` | `[canon]` keep one access class of benchmarks only (the `access` column of `0_input/benchmarks.csv`): `public`, `semi_private`, `private`, or `nonpublic` for everything but public; results go to `canonical_<CLASS>/`. The ECI anchors must keep observations in the class (checked before sampling) |
+| `--open-only` / `--closed-only` | `[canon]` aliases of `--access public` / `--access nonpublic` |
 | `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
 | `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
 | `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
@@ -78,7 +78,7 @@ unmarked to both.
 
 Everything a fit or a diagnostic writes lives under `5_outputs/`, whose first level is the data generation: `data<YYYYMMDD>`, the build date of the pipeline tables in `0_input/provenance.json` (`config.DATA_TAG`). Fits on two data generations therefore never overwrite each other. `5_outputs/pre_pipeline/` holds the fits published with the post, on the pre-pipeline dataset, kept as they were.
 
-Inside a generation, one folder per fit holds its tables, its trace and its figures (`figures/` for the PNGs, `figures/html/` for the interactive twins, `figures/fr/` for the French versions); `comparisons/` holds the cross-fit tables (country frontier, chain verdicts) with their own `figures/`; `diagnostics/` the one-off diagnostic outputs.
+Inside a generation, one folder per fit holds its tables, its trace and its figures (`figures/` for the PNGs, `figures/html/` for the interactive twins, `figures/fr/` for the French versions); `comparisons/` holds the cross-fit tables (frontier gap, chain verdicts) with their own `figures/`; `diagnostics/` the one-off diagnostic outputs.
 
 A fit's flags become one tag, and the tag names the results folder and the trace, so the two cannot drift apart. A default contributes no token, so the K=4 command above reduces to:
 
@@ -93,22 +93,35 @@ figures    └── figures/k4/            (PNG; html/ beneath it)
 `FitSpec.from_trace` reads that identity back off a trace, so a trace path is
 the only thing a plotting or diagnostic caller has to name.
 
-## Country frontier and crossovers (reproduction steps 1-2)
+## Frontier gap: open weights vs closed, by benchmark access (reproduction steps 1-2)
 
 ```bash
-python 4_diagnostics/1_country_frontier.py
-python 4_diagnostics/2_plot_crossovers.py
+python 1_curated/3_build_model_openness.py                      # open / closed per model, after a sync
+python 4_diagnostics/1_frontier_gap.py --access all              # then public, semi_private, private
+python 4_diagnostics/2_plot_frontier_gap.py
 ```
 
-`1_country_frontier.py` builds the US/China frontier comparison from the
-canonical traces (all three scopes). Flags: `--results-dir DIR` overrides the
-default (the data generation's `canonical/`); `--open-only` / `--closed-only` restrict to one access
-scope; `--allow-stale` proceeds when a trace predates the current data snapshot
-(otherwise it refuses); `--horizon DATE` sets the forecast horizon;
-`--fit-start DATE` (default `2024-10-01`) sets the trend-fit window;
-`--y-range LO,HI` pins the y-axis. `2_plot_crossovers.py` renders the
-crossover panels from the CSVs step 1 wrote; its "today" line is pinned to the
-published snapshot date in the source, not the wall clock.
+`1_frontier_gap.py` reads one canonical trace, the fit on all benchmarks
+(`canonical/`) or on one access class (`canonical_<CLASS>/`, from `3_fit/fit.py
+--preset canonical --access CLASS`), and compares the two groups' frontiers in
+ECI-H: records per group, the months every open record trails the closed
+frontier of the same posterior draw (a record whose crossing has to be dated
+back from the closed field's first measured day in more than two thirds of the
+draws is left out: `analysis.frontier_gap.MAX_DATED_BACK_FRAC`), one trend line
+per group (frontier points
+released since `--fit-start`, default `2024-10-01`, in the running top-`--top-k`,
+default 2) with the gap and the lag it implies, and each line's human-tier
+crossings. `--group country` compares US and CN instead; `--results-dir DIR`
+overrides the trace folder; `--min-obs N` (default 2) is the K=1 reading of the
+coverage rule, a candidate needs that many scores in the scope; `--allow-stale`
+joins a trace that predates the data snapshot by model name instead of refusing;
+`--today DATE` pins the today line.
+Outputs land in the data generation's `comparisons/` as
+`frontier_gap_<group>_<scope>_*`. `2_plot_frontier_gap.py` draws every scope it
+finds side by side (panels, the months-behind figure, the
+summary table with each scope's change against all benchmarks; the crossing dates stay in CSV) with no trace
+loaded; `--y-range LO,HI` pins the panels' axis. The write-up's
+`5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes.
 
 ## Plot a fit
 
