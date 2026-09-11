@@ -81,3 +81,52 @@ def test_two_regime_forecast_and_crossings():
     assert pd.Timestamp("2024-08-01") < avg.crossover_date_median <= pd.Timestamp("2024-09-02")
     with pytest.raises(ValueError):
         two_regime_forecast(theta, 0, data, tl[tl["name"].str.startswith("llama")], top_k=2)
+
+
+def test_rgba_accepts_hex_and_rgb():
+    from multiaxis_eci.viz.core import _rgba
+    assert _rgba("#c0504d", 0.6) == "rgba(192,80,77,0.6)"
+    assert _rgba("rgb(1,2,3)", 0.5) == "rgba(1,2,3,0.5)"
+
+
+def test_trend_fig_colours_fit_sets():
+    """The releases each regime's line was fitted on are drawn in that regime's colour, the
+    rest of the cloud in the model colour."""
+    import numpy as np
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    from multiaxis_eci.analysis.forecast import ForecastResult
+    from multiaxis_eci.viz import frontier_trend_fig
+    from multiaxis_eci.viz.core import MODEL_COLOR
+    from multiaxis_eci.viz.forecast import OTHER_FIT_COLOR, REASONING_FIT_COLOR
+
+    grid = pd.date_range("2024-01-01", "2030-01-01", freq="MS").values
+    n = len(grid)
+    other = ForecastResult(grid_dates=grid[:12], median=np.zeros(12), lo=-np.ones(12),
+                           hi=np.ones(12), slope=np.ones(3), intercept=np.zeros(3),
+                           frontier_names=["a", "b"], last_obs_date=pd.Timestamp("2024-12-01"),
+                           fit_names=["a", "b"], fit_basis="regimes", kind="line")
+    fc = ForecastResult(grid_dates=grid, median=np.linspace(0, 2, n), lo=np.linspace(-1, 1, n),
+                        hi=np.linspace(1, 3, n), slope=np.ones(3), intercept=np.zeros(3),
+                        frontier_names=["a", "b", "c", "d"],
+                        last_obs_date=pd.Timestamp("2026-01-01"), fit_names=["c", "d"],
+                        fit_basis="regimes", kind="line", other=other, switch_year=2025.0)
+    tl = pd.DataFrame({"name": list("abcde"),
+                       "release_date": pd.to_datetime(["2024-01-01", "2024-06-01", "2025-01-01",
+                                                       "2025-09-01", "2025-03-01"]),
+                       "mean": [0.1, 0.2, 1.0, 1.4, 0.3],
+                       "hdi_low": [0, 0.1, 0.8, 1.2, 0.1], "hdi_high": [0.2, 0.3, 1.2, 1.6, 0.5]})
+    hs = pd.DataFrame({"name": ["Average Human", "Top Performer"], "mean": [0.0, 1.0],
+                       "hdi_low": [-0.2, 0.8], "hdi_high": [0.2, 1.2]})
+    fig = frontier_trend_fig({"axis1": dict(fc=fc, tl=tl, hs=hs)}, ["axis1"],
+                             today="2026-01-01")
+    by_colour = {}
+    for tr in fig.data:
+        if isinstance(tr, go.Scatter) and tr.mode == "markers" and tr.text is not None:
+            by_colour.setdefault(tr.marker.color, set()).update(tr.text)
+    assert by_colour[REASONING_FIT_COLOR] == {"c", "d"}
+    assert by_colour[OTHER_FIT_COLOR] == {"a", "b"}
+    assert by_colour[MODEL_COLOR] == {"e"}
+    assert "192,80,77" in {tr.error_y.color for tr in fig.data if tr.mode == "markers"
+                           and tr.marker.color == REASONING_FIT_COLOR}.pop()

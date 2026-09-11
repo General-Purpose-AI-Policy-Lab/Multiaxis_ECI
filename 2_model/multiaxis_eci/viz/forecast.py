@@ -27,6 +27,11 @@ from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 FORECAST_COLOR = "#ff9500"        # frontier extrapolation (the reasoning regime)
 OTHER_COLOR = "#6e6e6e"           # the non-reasoning regime's line
+# The releases each regime's line was fitted on: muted red for the reasoning fit set, muted
+# purple for the non-reasoning one (their markers and whiskers; every other release keeps
+# MODEL_COLOR).
+REASONING_FIT_COLOR = "#c0504d"
+OTHER_FIT_COLOR = "#8064a2"
 # Every crossover figure shares this x-range, so panels from different fits, chain groups
 # and scopes read against the same years.
 CROSSOVER_WINDOW = ("2015-01-01", "2030-01-01")
@@ -118,7 +123,9 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
     (the candidates' timeline frame: release_date, mean, hdi_low, hdi_high, name) and `hs` (the
     human tiers: name, mean, and hdi_low / hdi_high, which band the bottom and top tiers). Each panel draws the dated models with their intervals, the
     forecast band (fc.lo to fc.hi) and its median, the non-reasoning regime's line and band in
-    grey over its own span when `fc.other` is set, the tiers as dashed lines named in the
+    grey over its own span when `fc.other` is set, the releases each line was fitted on in
+    that regime's colour (`fc.fit_names` muted red, `fc.other.fit_names` muted purple; markers
+    and whiskers), the tiers as dashed lines named in the
     right margin, and the today line; no legend, the caption names the series. `window` fixes
     the x-range on every panel (the post uses 2023 to 2030); None starts at the first candidate
     and stops at `TREND_WINDOW_END` (2030), the crossover figures' right edge.
@@ -157,14 +164,27 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
                                      hovertemplate="%{x|%Y-%m}: %{y:.2f}<extra>"
                                                    + text["others"] + "</extra>"), row=i, col=1)
         dates = pd.to_datetime(tl["release_date"])
-        fig.add_trace(go.Scatter(
-            x=dates, y=tl["mean"], mode="markers",
-            marker=dict(color=MODEL_COLOR, size=style.marker, opacity=0.55, line=dict(width=0)),
-            error_y=dict(type="data", symmetric=False,
-                         array=tl["hdi_high"] - tl["mean"], arrayminus=tl["mean"] - tl["hdi_low"],
-                         thickness=style.errbar, width=0, color="rgba(32,163,158,0.35)"),
-            text=tl["name"], showlegend=False,
-            hovertemplate="%{text}<br>%{x|%Y-%m-%d}: %{y:.2f}<extra></extra>"), row=i, col=1)
+        # The measured cloud, then the fit sets over it in their regime's colour: the releases
+        # the reasoning line was fitted on (muted red) and those of the non-reasoning line
+        # (muted purple), so the eye can tell what each line rests on.
+        fit_sets = [(REASONING_FIT_COLOR, set(fc.fit_names or []))]
+        if other is not None:
+            fit_sets.append((OTHER_FIT_COLOR, set(other.fit_names or [])))
+        in_fit = tl["name"].isin(set().union(*(names for _, names in fit_sets)))
+        for col_, sub, alpha_m, alpha_e in (
+                [(MODEL_COLOR, tl[~in_fit], 0.55, 0.35)]
+                + [(c, tl[tl["name"].isin(n)], 0.9, 0.6) for c, n in fit_sets]):
+            if sub.empty:
+                continue
+            fig.add_trace(go.Scatter(
+                x=pd.to_datetime(sub["release_date"]), y=sub["mean"], mode="markers",
+                marker=dict(color=col_, size=style.marker, opacity=alpha_m, line=dict(width=0)),
+                error_y=dict(type="data", symmetric=False,
+                             array=sub["hdi_high"] - sub["mean"],
+                             arrayminus=sub["mean"] - sub["hdi_low"],
+                             thickness=style.errbar, width=0, color=_rgba(col_, alpha_e)),
+                text=sub["name"], showlegend=False,
+                hovertemplate="%{text}<br>%{x|%Y-%m-%d}: %{y:.2f}<extra></extra>"), row=i, col=1)
         fig.add_trace(go.Scatter(x=gx, y=fc.median, mode="lines", showlegend=False,
                                  name=text["trend"],
                                  line=dict(color=FORECAST_COLOR, width=style.trend, dash="dash"),

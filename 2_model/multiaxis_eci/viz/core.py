@@ -495,10 +495,15 @@ BENCH_COLOR = "#d63384"
 MODEL_COLOR = "#20a39e"
 
 
-def _rgba(rgb_str: str, alpha: float) -> str:
-    """'rgb(R,G,B)' → 'rgba(R,G,B,alpha)'. Plotly's sample_colorscale returns
-    rgb()-form strings; add_hrect needs rgba() to honor alpha."""
-    inner = rgb_str[rgb_str.index("(") + 1 : rgb_str.index(")")]
+def _rgba(color: str, alpha: float) -> str:
+    """'rgb(R,G,B)' or '#rrggbb' → 'rgba(R,G,B,alpha)'. Plotly's sample_colorscale returns
+    rgb()-form strings, the palette constants are hex; add_hrect and error bars need rgba() to
+    honor alpha."""
+    if color.startswith("#"):
+        h = color.lstrip("#")
+        inner = ",".join(str(int(h[i:i + 2], 16)) for i in (0, 2, 4))
+    else:
+        inner = color[color.index("(") + 1 : color.index(")")]
     return f"rgba({inner},{alpha})"
 
 
