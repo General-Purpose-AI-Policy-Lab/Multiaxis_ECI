@@ -74,7 +74,7 @@ LOW_OBS_THRESHOLD = 4
 # ── Informed-ability cap ────────────────────────────────────────────────────
 # The posterior-SD cap of `analysis.timelines.mirt_informed_mask` (history 0.6 -> 0.3
 # -> 0.4 -> 0.33 in its docstring). Since 2026-09-11 it no longer gates the K-axis
-# figures or the forecast candidates (`MIN_AXIS_COVERAGE` does); the K=1 frontier gap
+# figures or the forecast candidates (`MIN_AXIS_COVERAGE` does); the K=1 frontier tools
 # and the bimodality scan still pass it explicitly.
 INFORMED_SD_CAP = 0.33
 

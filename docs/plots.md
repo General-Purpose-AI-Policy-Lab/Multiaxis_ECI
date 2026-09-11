@@ -17,7 +17,7 @@ All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`),
 |---|---|---|
 | `mirt{tag}/figures/k{K}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit/fit.py --plots` | no |
 | `canonical/figures/` | `3_fit/fit.py --preset canonical` | no |
-| `comparisons/figures/` | `4_diagnostics/1_frontier_gap.py`, `2_plot_frontier_gap.py` | no |
+| `comparisons/figures/` | `4_diagnostics/1_country_frontier.py`, `2_plot_crossovers.py` | no |
 | `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |
 | `dashboard_stills/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |
@@ -160,8 +160,8 @@ computed on every draw of the posterior they describe, never on a plot-side subs
 models. On the dashboard that posterior is the whole fit, and a mode-restricted card is
 an addition to the whole-fit figures, not a replacement; in a fit's own figure folder it
 is the chain group the folder shows (see "Where figures go"). A K=1 fit has one axis
-with share 1 everywhere, so its timelines draw every dated model; the K=1 frontier gap
-keeps the posterior-SD cap `config.INFORMED_SD_CAP` as its own measured filter.
+with share 1 everywhere, so its timelines draw every dated model; the K=1 frontier tools
+keep the posterior-SD cap `config.INFORMED_SD_CAP` as their own measured filter.
 
 **What keeps a thin release out of the trend is the fit rule, not the gate.** The
 two-regime fit takes one effort per family and weights every point by its posterior SD,

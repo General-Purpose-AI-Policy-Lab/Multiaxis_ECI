@@ -41,11 +41,13 @@ def dot_dash(width: float) -> str:
     """A row of true dots for the today line: Plotly's named "dot" pattern stretches with the
     line width and prints as short dashes."""
     return f"{max(1.5, width):.1f}px,{max(3.0, 2 * width):.1f}px"
-# The releases each regime's line was fitted on: muted red for the reasoning fit set, muted
-# purple for the non-reasoning one (their markers and whiskers; every other release keeps
-# MODEL_COLOR).
+
+
+# The releases each regime's line was fitted on: muted red for the reasoning fit set, the
+# others' line colour for the non-reasoning one (their markers and whiskers; every other
+# release keeps MODEL_COLOR).
 REASONING_FIT_COLOR = "#c0504d"
-OTHER_FIT_COLOR = "#8064a2"
+OTHER_FIT_COLOR = OTHER_COLOR
 # Every crossover figure shares this x-range, so panels from different fits, chain groups
 # and scopes read against the same years.
 CROSSOVER_WINDOW = ("2015-01-01", "2035-01-01")

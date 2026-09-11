@@ -219,8 +219,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
             print(f"  streaming draws to {stream_path} (read mid-run with "
                   f"persistence.load_live_draws)", flush=True)
         else:
-            print(f"  WARNING: --stream-draws is nutpie-only; nothing is "
-                  f"streamed with sampler={sampler}", flush=True)
+            print(f"  note: draws are not streamed with sampler={sampler} (nutpie only)",
+                  flush=True)
     with model:
         idata = pm.sample(**sample_kw, **extra)
         # nutpie's zarr store writes the warmup draws whatever save_warmup says,
@@ -382,9 +382,12 @@ def run_canonical(args) -> None:
         # sum-to-zero log-alpha gauge), fewer divergences than `normal` on this
         # scope at unchanged abilities (rank corr 0.9988).
         censor_eps = load_boundary_eps(data) if args.censor_bounds else None
+        stream = args.stream_draws and args.sampler == "nutpie"
         trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
                                human_order=human_order, censor_eps=censor_eps,
-                               save_thin=args.save_thin)
+                               save_thin=args.save_thin,
+                               stream_path=(trace_path.parent / "live_draws.zarr"
+                                            if stream else None))
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
         if args.censor_bounds:
             trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
@@ -394,6 +397,12 @@ def run_canonical(args) -> None:
             trace.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
         save_trace(thin_trace(trace, args.save_thin), trace_path)
         print(f"   saved trace → {trace_path} (every {args.save_thin}th draw)")
+        if stream:
+            # Everything below reads the saved .nc through `trace` lazily; load it once,
+            # then the unthinned store (warmup included) can give its disk back.
+            for group in trace.groups():
+                getattr(trace, group).load()
+            shutil.rmtree(trace_path.parent / "live_draws.zarr", ignore_errors=True)
 
     print("\n── Convergence ──────────────────────────────────────────────────")
     summary = az.summary(trace, round_to=4)
@@ -618,6 +627,9 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_keep_isolated"] = json.dumps(True)
     censor_eps = load_boundary_eps(data) if args.censor_bounds else None
 
+    # Streaming is nutpie's zarr storage; the other backends keep their own traces.
+    stream = args.stream_draws and args.sampler == "nutpie"
+
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
     idata_k, conv_k = sample_mirt(data, spec.K, sample_kw,
                                   human_order=human_order, lineage=lineage,
@@ -634,7 +646,7 @@ def run_exploration(args, parser) -> None:
                                   checkpoint_path=spec.trace_path,
                                   save_thin=args.save_thin,
                                   stream_path=(results_dir / "live_draws.zarr"
-                                               if args.stream_draws else None),
+                                               if stream else None),
                                   spec_attrs=attrs)
     save_trace(thin_trace(idata_k, args.save_thin), spec.trace_path)
 
@@ -757,19 +769,13 @@ def run_exploration(args, parser) -> None:
                 known_se=args.known_se,
                 censor_eps=censor_eps,
                 stream_path=(results_dir / "live_draws_k1.zarr"
-                             if args.stream_draws else None),
+                             if stream else None),
                 spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
                             "mirt_loading_prior": "normal",
                             "mirt_link": "linear"})
             save_trace(thin_trace(idata_1d, args.save_thin), baseline_path)
             gof_report(idata_1d, "1D (K=1)", "k1")
 
-    if args.stream_draws:
-        # The thinned .nc files are the deliverables; the unthinned stores (warmup included)
-        # only kept the runs' RAM flat and would have survived a kill. Every table above
-        # read the streamed draws lazily from them, so they go last. Reclaim the disk.
-        for store in ("live_draws.zarr", "live_draws_k1.zarr"):
-            shutil.rmtree(results_dir / store, ignore_errors=True)
     print(f"\nOutputs → {results_dir}")
     if args.plots:
         # In-process: the spec travels with the trace, so no flag list to keep
@@ -781,6 +787,13 @@ def run_exploration(args, parser) -> None:
     else:
         print("Figures: run 4_diagnostics/3_plot_mirt.py --trace "
               f"{spec.trace_path}")
+    if stream:
+        # The thinned .nc files are the deliverables; the unthinned stores (warmup included)
+        # only kept the runs' RAM flat and would have survived a kill. A streamed idata is
+        # lazy, backed by its store, so everything that reads it (tables, --plots) runs
+        # first and the stores go last. Reclaim the disk.
+        for name in ("live_draws.zarr", "live_draws_k1.zarr"):
+            shutil.rmtree(results_dir / name, ignore_errors=True)
 
 
 def main():

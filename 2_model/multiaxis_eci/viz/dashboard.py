@@ -100,7 +100,8 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
                        axis_titles: dict | None = None,
                        human_labels: dict | None = None) -> dict:
     """Ability-timeline + loading figures for one posterior: per axis, the
-    measured timeline (SD<0.33, low-obs dropped), its all-models companion, and
+    measured timeline (the candidates evaluated on the axis, `candidate_mask`), its
+    all-models companion, and
     the loading forest, plus the all-axis loading heatmap.
 
     `build_fit_figures` and a MODE-RESTRICTED view (the same fit sliced to one

@@ -50,8 +50,8 @@ def candidate_mask(theta_canon: np.ndarray, k: int, data: ECIData, model_dates: 
                    sd_cap: float | None = None, drop_low_obs: bool = False) -> np.ndarray:
     """(M,) bool: the test-takers a timeline, a forecast or a frontier may draw on for axis k.
 
-    The one guard shared by the measured timelines, the forecast candidates, the frontier gap
-    and the post's forests: dated, not a human tier, and evaluated on the axis, i.e. its own
+    The one guard shared by the measured timelines, the forecast candidates, the K=1 frontier
+    tools and the post's forests: dated, not a human tier, and evaluated on the axis, i.e. its own
     `axis_coverage` (the axis shares of the benchmarks it was scored on) reaches
     `min_coverage` (config.MIN_AXIS_COVERAGE). Without `A_draws` (a K=1 fit) every scored
     release passes. That is the whole rule (user decision 2026-09-11): no posterior-SD cap, no

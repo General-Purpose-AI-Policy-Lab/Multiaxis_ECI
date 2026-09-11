@@ -264,7 +264,7 @@ def regime_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int, dat
                                  on_reason)
         # A near-flat line sends a crossing centuries away; the calendar range keeps the
         # summaries convertible (such dates read as 'before the data' / 'not this century').
-        star = np.clip(cross[np.isfinite(cross)], 1990.0, 2099.0)
+        star = np.clip(cross[~np.isnan(cross)], 1990.0, 2099.0)    # -inf reads as 'before 1990'
         defined = star.size / n
         frac_pos = float((b_r > 0).mean())
         if defined < 0.5 or star.size == 0:

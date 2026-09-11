@@ -119,12 +119,14 @@ def load_country_map() -> dict:
 def country_records(theta0: np.ndarray, mini: _MiniData, model_dates: pd.Series,
                     country_map: dict, country: str, *, sota_bypass: bool):
     """(candidate_names_by_date, is_record, n_candidates) for one country:
-    the timelines' candidates (`candidate_mask`: dated, non-human, measured on the axis,
-    SOTA families admitted regardless when sota_bypass) of that country;
+    the timelines' candidates (`candidate_mask`: dated, non-human, and under the
+    posterior-SD cap; `sota_bypass` lifts the cap for SOTA families) of that country;
     records = running max of posterior-median capability."""
     names_all = mini.mlookup.sort_values("model_idx")["model"].tolist()
-    keep = candidate_mask(theta0[:, :, None], 0, mini, model_dates, sd_cap=SD_CAP,
-                          sota_exempt=sota_bypass)
+    keep = candidate_mask(theta0[:, :, None], 0, mini, model_dates, sd_cap=SD_CAP)
+    if sota_bypass and mini.is_sota is not None:
+        keep = keep | (candidate_mask(theta0[:, :, None], 0, mini, model_dates)
+                       & np.asarray(mini.is_sota, dtype=bool))
 
     idx, dates = [], []
     for i, m in enumerate(names_all):

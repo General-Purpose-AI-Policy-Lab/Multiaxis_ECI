@@ -496,11 +496,13 @@ MODEL_COLOR = "#20a39e"
 
 
 def _rgba(color: str, alpha: float) -> str:
-    """'rgb(R,G,B)' or '#rrggbb' → 'rgba(R,G,B,alpha)'. Plotly's sample_colorscale returns
-    rgb()-form strings, the palette constants are hex; add_hrect and error bars need rgba() to
-    honor alpha."""
+    """'rgb(R,G,B)', '#rrggbb' or '#rgb' → 'rgba(R,G,B,alpha)'. Plotly's sample_colorscale
+    returns rgb()-form strings, the palette constants are hex; add_hrect and error bars need
+    rgba() to honor alpha."""
     if color.startswith("#"):
         h = color.lstrip("#")
+        if len(h) == 3:
+            h = "".join(c * 2 for c in h)
         inner = ",".join(str(int(h[i:i + 2], 16)) for i in (0, 2, 4))
     else:
         inner = color[color.index("(") + 1 : color.index(")")]
