@@ -86,6 +86,36 @@ def test_two_regime_forecast_and_crossings():
         two_regime_forecast(theta, 0, data, tl[tl["name"].str.startswith("llama")], top_k=2)
 
 
+def test_crossing_reads_the_higher_line_over_the_overlap():
+    """Where the others' line still runs above the first reasoning releases, the frontier is
+    the higher of the two: a tier the others' line reaches after the switch but before its
+    last release is dated on the others' line, not on the later reasoning line."""
+    rng = np.random.default_rng(3)
+    # Others: 2022-01 to 2026-01 (17 releases, every 3 months), 0.0 -> 1.6 (0.4 / year).
+    others = [(f"llama-{i}", pd.Timestamp("2022-01-01") + pd.DateOffset(months=3 * i), 0.1 * i)
+              for i in range(17)]
+    # Reasoning: from 2024-09, starting well below (0.2) and climbing 1.2 / year.
+    reason = [(f"o3-2025-01-01_v{i}_high", pd.Timestamp("2024-09-01") + pd.DateOffset(months=3 * i),
+               0.2 + 0.3 * i) for i in range(8)]
+    rows = others + reason
+    names = [n for n, _, _ in rows] + ["Average Human", "Top Performer"]
+    # Average Human at 1.3: the others' line gets there around 2025-04, the reasoning line
+    # only around 2025-08. Top Performer at 3.0: past both spans, reasoning line only (~2027-01).
+    level = np.array([m for _, _, m in rows] + [1.3, 3.0])
+    theta = level[None, :, None] + rng.normal(0, 0.05, (300, len(names), 1))
+    data = _Data(pd.DataFrame({"model": names, "model_idx": np.arange(1, len(names) + 1)}),
+                 np.array([False] * len(rows) + [True, True]))
+    tl = pd.DataFrame({"name": names[:len(rows)], "release_date": [d for _, d, _ in rows],
+                       "mean": np.median(theta[:, :len(rows), 0], 0)})
+    fc = two_regime_forecast(theta, 0, data, tl, top_k=2)
+    assert pd.Timestamp(fc.other.grid_dates[-1]) >= pd.Timestamp("2025-06-01")   # overlap exists
+    cx = regime_crossover_df(fc, theta, 0, data, axis_name="axis1", today="2026-09-10")
+    avg = cx[cx.tier == "Average Human"].iloc[0]
+    top = cx[cx.tier == "Top Performer"].iloc[0]
+    assert pd.Timestamp("2025-01-01") < avg.crossover_date_median < pd.Timestamp("2025-07-01")
+    assert pd.Timestamp("2026-08-01") < top.crossover_date_median < pd.Timestamp("2027-06-01")
+
+
 def test_family_best_keeps_one_effort_per_release():
     tl = pd.DataFrame({"name": ["gpt-5-2025-08-07_high", "gpt-5-2025-08-07", "gpt-5-2025-08-07_low",
                                 "claude-opus-4-7_max", "llama-3-70b"],

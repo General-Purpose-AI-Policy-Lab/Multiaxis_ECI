@@ -214,13 +214,16 @@ def regime_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int, dat
     """Per human tier, when the piecewise frontier reaches it, on the schema of
     `mirt_crossover_df`.
 
-    The frontier is the others' line before the switch (the first reasoning release) and the
-    reasoning line after it. Per sample of the reasoning line paired with a posterior draw of
-    the tier: if the line is below the tier at the switch, the crossing is on the reasoning
-    line (t* = switch + (h - level) / slope, none when the slope is not positive); otherwise
-    the tier was passed before the switch and the crossing is read on the others' line
-    (backcast before its first point when it was already above there). `p_passed_now` is the
-    probability the reasoning line exceeds the tier today.
+    The frontier is the others' line up to its last fitted release, the reasoning line from
+    the switch (the first reasoning release) onwards, and where the two overlap, the higher of
+    the two (user decision 2026-09-11: the non-reasoning frontier often stays above the first
+    reasoning releases for a while). Per sample of the reasoning line paired with a posterior
+    draw of the tier and a paired (intercept, slope) sample of the others' line, the crossing
+    is the earliest of: the reasoning line reaching the tier at or after the switch (the switch
+    itself when it is already above there; none when its slope is not positive), and the
+    others' line reaching the tier at or before its last release (backcast before its first
+    point when it was above there all along; none when it never reached the tier before its
+    end). `p_passed_now` is the probability the reasoning line exceeds the tier today.
     """
     today = pd.Timestamp(today) if today is not None else pd.Timestamp.today().normalize()
     t_now = float(_to_year(pd.DatetimeIndex([today]))[0])
@@ -229,6 +232,8 @@ def regime_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int, dat
     n = len(fc.slope)
     a_r, b_r, t_sw = fc.intercept, fc.slope, float(fc.switch_year)
     other = fc.other
+    if other is not None:
+        t_end_o = float(_to_year(pd.DatetimeIndex([pd.Timestamp(other.last_obs_date)]))[0])
     rows = []
     for i, m in enumerate(names):
         if not data.is_human[i]:
@@ -239,18 +244,24 @@ def regime_crossover_df(fc: ForecastResult, theta_draws: np.ndarray, k: int, dat
         level_sw = a_r + b_r * t_sw
         f_now = a_r + b_r * t_now
         p_now = float((f_now > h).mean())
+        # The reasoning line, from the switch on: the switch itself when already above.
         with np.errstate(divide="ignore", invalid="ignore"):
-            after = np.where(b_r > 0, (h - a_r) / b_r, np.nan)            # on the reasoning line
-        before_switch = level_sw >= h                                       # passed before the era
-        cross = np.where(before_switch, np.nan, after)
+            on_reason = np.where(b_r > 0, (h - a_r) / b_r, np.nan)
+        on_reason = np.where(level_sw >= h, t_sw, on_reason)
         if other is not None:
+            # The others' line, up to its last release: a line above the tier at its end
+            # reached it at (h - a) / b, or has been above all along when it is not rising.
             j = rng.choice(len(other.slope), size=n)          # paired (intercept, slope) samples
             a_o, b_o = other.intercept[j], other.slope[j]
             with np.errstate(divide="ignore", invalid="ignore"):
-                on_other = np.where(b_o > 0, (h - a_o) / b_o, np.nan)
-            cross = np.where(before_switch, np.minimum(on_other, t_sw), cross)
+                on_other = np.where(b_o > 0, (h - a_o) / b_o, -np.inf)
+            on_other = np.where(a_o + b_o * t_end_o >= h, on_other, np.nan)
+            cross = np.fmin(on_reason, on_other)               # the earliest, nan-tolerant
         else:
-            cross = np.where(before_switch, after, cross)                    # backcast on the line
+            # One line only: a tier already passed at the switch is backcast on that line.
+            with np.errstate(divide="ignore", invalid="ignore"):
+                cross = np.where(level_sw >= h, np.where(b_r > 0, (h - a_r) / b_r, -np.inf),
+                                 on_reason)
         # A near-flat line sends a crossing centuries away; the calendar range keeps the
         # summaries convertible (such dates read as 'before the data' / 'not this century').
         star = np.clip(cross[np.isfinite(cross)], 1990.0, 2099.0)
