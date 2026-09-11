@@ -130,3 +130,11 @@ def test_trend_fig_colours_fit_sets():
     assert by_colour[MODEL_COLOR] == {"e"}
     assert "192,80,77" in {tr.error_y.color for tr in fig.data if tr.mode == "markers"
                            and tr.marker.color == REASONING_FIT_COLOR}.pop()
+    # The others' median is carried on, without a band, from its last point to today.
+    from multiaxis_eci.viz.forecast import OTHER_COLOR
+    lines = [tr for tr in fig.data if tr.mode == "lines" and tr.line.color == OTHER_COLOR]
+    assert len(lines) == 2
+    ext = max(lines, key=lambda tr: pd.Timestamp(tr.x[-1]))
+    assert pd.Timestamp(ext.x[0]) == pd.Timestamp("2024-12-01")
+    assert pd.Timestamp(ext.x[-1]) == pd.Timestamp("2026-01-01")
+    assert ext.fill is None

@@ -15,6 +15,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from multiaxis_eci.analysis.forecast import _to_year
 from multiaxis_eci.viz.core import (
     FUTURE_COLOR,
     HUMAN_LEVEL_LABELS,
@@ -26,7 +27,20 @@ from multiaxis_eci.viz.core import (
 from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 FORECAST_COLOR = "#ff9500"        # frontier extrapolation (the reasoning regime)
-OTHER_COLOR = "#6e6e6e"           # the non-reasoning regime's line
+OTHER_COLOR = "#8064a2"           # the non-reasoning regime's line (the muted purple of its fit set)
+
+
+def trend_dash(width: float) -> str:
+    """Both projection lines share one short-dash pattern, scaled with the line width so the
+    post's thick lines keep the dashboard's proportions (a 6px dash on a 5px line reads as a
+    row of squares)."""
+    return f"{max(6.0, 2.7 * width):.1f}px,{max(4.0, 1.8 * width):.1f}px"
+
+
+def dot_dash(width: float) -> str:
+    """A row of true dots for the today line: Plotly's named "dot" pattern stretches with the
+    line width and prints as short dashes."""
+    return f"{max(1.5, width):.1f}px,{max(3.0, 2 * width):.1f}px"
 # The releases each regime's line was fitted on: muted red for the reasoning fit set, muted
 # purple for the non-reasoning one (their markers and whiskers; every other release keeps
 # MODEL_COLOR).
@@ -123,7 +137,8 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
     (the candidates' timeline frame: release_date, mean, hdi_low, hdi_high, name) and `hs` (the
     human tiers: name, mean, and hdi_low / hdi_high, which band the bottom and top tiers). Each panel draws the dated models with their intervals, the
     forecast band (fc.lo to fc.hi) and its median, the non-reasoning regime's line and band in
-    grey over its own span when `fc.other` is set, the releases each line was fitted on in
+    muted purple over its own span when `fc.other` is set, its median alone carried on as a
+    thin line up to today so the change of slope shows, the releases each line was fitted on in
     that regime's colour (`fc.fit_names` muted red, `fc.other.fit_names` muted purple; markers
     and whiskers), the tiers as dashed lines named in the
     right margin, and the today line; no legend, the caption names the series. `window` fixes
@@ -155,14 +170,24 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
             fig.add_trace(go.Scatter(x=gxo, y=other.lo, mode="lines", showlegend=False,
                                      line=dict(width=0), hoverinfo="skip"), row=i, col=1)
             fig.add_trace(go.Scatter(x=gxo, y=other.hi, mode="lines", fill="tonexty",
-                                     fillcolor=_rgba("rgb(110,110,110)", 0.15), showlegend=False,
+                                     fillcolor=_rgba(OTHER_COLOR, 0.12), showlegend=False,
                                      line=dict(width=0), hoverinfo="skip"), row=i, col=1)
             fig.add_trace(go.Scatter(x=gxo, y=other.median, mode="lines", showlegend=False,
                                      name=text["others"],
                                      line=dict(color=OTHER_COLOR, width=style.trend * 0.8,
-                                               dash="dot"),
+                                               dash=trend_dash(style.trend)),
                                      hovertemplate="%{x|%Y-%m}: %{y:.2f}<extra>"
                                                    + text["others"] + "</extra>"), row=i, col=1)
+            # The others' median alone, carried on from its last release to today (no band):
+            # the eye reads the change of slope against the reasoning line.
+            ext = pd.date_range(gxo.max(), _today(today), freq="MS")
+            if len(ext) >= 2:
+                ext_y = np.median(other.intercept[:, None]
+                                  + other.slope[:, None] * _to_year(ext)[None, :], axis=0)
+                fig.add_trace(go.Scatter(x=ext, y=ext_y, mode="lines", showlegend=False,
+                                         line=dict(color=OTHER_COLOR, width=style.trend * 0.5,
+                                                   dash=trend_dash(style.trend)), opacity=0.7,
+                                         hoverinfo="skip"), row=i, col=1)
         dates = pd.to_datetime(tl["release_date"])
         # The measured cloud, then the fit sets over it in their regime's colour: the releases
         # the reasoning line was fitted on (muted red) and those of the non-reasoning line
@@ -187,7 +212,8 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
                 hovertemplate="%{text}<br>%{x|%Y-%m-%d}: %{y:.2f}<extra></extra>"), row=i, col=1)
         fig.add_trace(go.Scatter(x=gx, y=fc.median, mode="lines", showlegend=False,
                                  name=text["trend"],
-                                 line=dict(color=FORECAST_COLOR, width=style.trend, dash="dash"),
+                                 line=dict(color=FORECAST_COLOR, width=style.trend,
+                                           dash=trend_dash(style.trend)),
                                  hovertemplate="%{x|%Y-%m}: %{y:.2f}<extra></extra>"),
                       row=i, col=1)
         # The y-range follows the data, not the projection: the models' intervals and the
@@ -227,7 +253,7 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
                         hovertemplate=f"{name_}: 80% interval [{y0:.2f}, {y1:.2f}]"
                                       "<extra></extra>"), row=i, col=1)
         fig.add_vline(x=today_s, row=i, col=1,
-                      line=dict(color=TODAY_COLOR, width=style.refline, dash="dot"))
+                      line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
         _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels)
         fig.update_yaxes(title_text=y_label or text["ability"], range=list(ylim), gridcolor="#eeeeee",
                          zeroline=False, row=i, col=1)
@@ -346,7 +372,7 @@ def crossover_panels_fig(cx: pd.DataFrame, axes: list[str], titles: dict | None 
                     else "top left", textfont=dict(size=style.font_note, color=col),
                     showlegend=False, hoverinfo="skip"), row=i, col=1)
         fig.add_vline(x=today_d.strftime("%Y-%m-%d"), row=i, col=1,
-                      line=dict(color=TODAY_COLOR, width=style.refline, dash="dot"))
+                      line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
         fig.update_yaxes(categoryorder="array", categoryarray=tiers, showgrid=False,
                          range=[-0.7, len(tiers) - 0.3], row=i, col=1)
         fig.update_xaxes(range=[x0.strftime("%Y-%m-%d"), x1.strftime("%Y-%m-%d")],
@@ -369,7 +395,7 @@ def crossover_panels_fig(cx: pd.DataFrame, axes: list[str], titles: dict | None 
         proxy(4, text["interval"].format(p=probs[0]), mode="lines",
               line=dict(color="#888", width=style.bar_thick))
     proxy(6, text["today"], mode="lines",
-          line=dict(color=TODAY_COLOR, width=style.refline, dash="dot"))
+          line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
     if clipped:
         proxy(7, text["clipped"], mode="markers", marker=dict(color="#888", size=9))
     fig.update_xaxes(title_text=text["crossing_axis"], title_font_size=style.font_tick,

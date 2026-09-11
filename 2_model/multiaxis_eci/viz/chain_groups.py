@@ -15,7 +15,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from multiaxis_eci.viz.core import MODEL_COLOR
-from multiaxis_eci.viz.forecast import CROSSOVER_WINDOW
+from multiaxis_eci.viz.forecast import CROSSOVER_WINDOW, dot_dash
 from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 # Okabe-Ito blue and vermillion: the two chain groups, on every figure of this module.
@@ -219,7 +219,7 @@ def crossover_compare_fig(cx_a: pd.DataFrame, cx_b: pd.DataFrame, axes: list[str
                 hovertemplate="<b>%{text}</b><br>" + lab + " %{x|%Y-%m-%d}<extra></extra>"),
                 row=i, col=1)
         fig.add_vline(x=today.strftime("%Y-%m-%d"), row=i, col=1,
-                      line=dict(color="#444", width=style.refline, dash="dot"))
+                      line=dict(color="#444", width=style.refline, dash=dot_dash(style.refline)))
         fig.update_yaxes(tickmode="array", tickvals=list(range(len(tiers))), ticktext=tiers,
                          range=[-0.7, len(tiers) - 0.3], row=i, col=1)
         fig.update_xaxes(range=[x0.strftime("%Y-%m-%d"), x1.strftime("%Y-%m-%d")],
