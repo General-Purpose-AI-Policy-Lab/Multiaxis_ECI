@@ -51,7 +51,7 @@ Main project fit with K=4, at full length (an exploration fit without `--draws` 
 python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --draws 10000 --tune 2000
 ```
 
-Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and 16,000 saved draws pin every median and interval the figures show.
+Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and 16,000 saved draws pin every median and interval the figures show. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default; `--no-stream-draws` restores the in-memory run), so the machine stays usable during a ten-hour fit; the store is deleted once the thinned trace is saved.
 
 The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical/`:
 

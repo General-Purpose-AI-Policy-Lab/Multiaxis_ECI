@@ -193,8 +193,10 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         # repo touches warmup_posterior.
         nsk.setdefault("save_warmup", False)
         if stream_path is not None:
-            # Draws stream to disk as they are produced, so a kill, an OOM or a
-            # power cut costs the unfinished tail instead of the whole run. The
+            # Draws stream to disk as they are produced (nutpie's zarr storage
+            # replaces its in-RAM arrow store, and the returned arrays are lazy),
+            # so the run's memory stays flat whatever the draw count, and a kill,
+            # an OOM or a power cut costs the unfinished tail instead of the whole run. The
             # arrays are pre-allocated at full shape and filled in order, which
             # is what makes an in-progress store readable
             # (persistence.load_live_draws trims the NaN tail).
@@ -238,9 +240,9 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
             idata.posterior.attrs.update(spec_attrs)
         if checkpoint_path is not None:
             # Crash insurance: bank the raw draws BEFORE the memory-heavy
-            # log-likelihood pass. nutpie holds every draw in RAM, so a kill in
-            # post-processing erases the whole run — it cost a finished
-            # 10-hour 12x26,000 fit on 2026-08-10 (OOM while a concurrent
+            # log-likelihood pass. Without the zarr stream nutpie holds every draw
+            # in RAM, so a kill in post-processing erases the whole run — it cost a
+            # finished 10-hour 12x26,000 fit on 2026-08-10 (OOM while a concurrent
             # fit was saving). Overwritten by the full save on success.
             save_trace(thin_trace(idata, save_thin), checkpoint_path)
             print(f"  raw trace checkpointed to {checkpoint_path}", flush=True)
@@ -754,12 +756,20 @@ def run_exploration(args, parser) -> None:
                 ceiling_noise=args.ceiling_noise,
                 known_se=args.known_se,
                 censor_eps=censor_eps,
+                stream_path=(results_dir / "live_draws_k1.zarr"
+                             if args.stream_draws else None),
                 spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
                             "mirt_loading_prior": "normal",
                             "mirt_link": "linear"})
             save_trace(thin_trace(idata_1d, args.save_thin), baseline_path)
             gof_report(idata_1d, "1D (K=1)", "k1")
 
+    if args.stream_draws:
+        # The thinned .nc files are the deliverables; the unthinned stores (warmup included)
+        # only kept the runs' RAM flat and would have survived a kill. Every table above
+        # read the streamed draws lazily from them, so they go last. Reclaim the disk.
+        for store in ("live_draws.zarr", "live_draws_k1.zarr"):
+            shutil.rmtree(results_dir / store, ignore_errors=True)
     print(f"\nOutputs → {results_dir}")
     if args.plots:
         # In-process: the spec travels with the trace, so no flag list to keep
@@ -848,13 +858,19 @@ def main():
                         help="write every n-th draw to the trace file (default "
                              f"config.SAVE_THIN = {config.SAVE_THIN}); convergence and the "
                              "tables use the full run. 1 keeps everything.")
-    parser.add_argument("--stream-draws", action="store_true",
-                        help="[exploration] write every draw to "
-                             "<fit>/live_draws.zarr as it is sampled, so a "
-                             "killed run keeps what it had. Read a partial store "
-                             "with persistence.load_live_draws. nutpie only; costs "
-                             "the warmup draws in disk (nutpie's store ignores "
-                             "save_warmup)")
+    parser.add_argument("--stream-draws", dest="stream_draws", action="store_true",
+                        default=True,
+                        help="(default) nutpie writes every draw to <fit>/live_draws.zarr "
+                             "as it is sampled instead of holding the run in RAM: a "
+                             "10,000 x 8 K=4 run then needs a few hundred MB while it "
+                             "samples rather than 13 GB (2026-09-11), and a killed run "
+                             "keeps what it had (persistence.load_live_draws reads a "
+                             "partial store). The store, warmup included, is deleted once "
+                             "the thinned trace is saved; it needs about 8 GB of free disk "
+                             "for the flagship shape while the run lasts. nutpie only")
+    parser.add_argument("--no-stream-draws", dest="stream_draws", action="store_false",
+                        help="[exploration] keep every draw in RAM until the end instead "
+                             "(nutpie's arrow store)")
     parser.add_argument("--human-merge", action="store_true",
                         help="instead use config.HUMAN_ORDER_MERGED (exploration, or "
                              "--preset canonical → <data generation>/canonical_humanmerge/): "

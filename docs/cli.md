@@ -21,7 +21,7 @@ unmarked to both.
 | `--sampler {pymc,nutpie,numpyro}` | NUTS backend. Default `nutpie` |
 | `--target-accept X` | `[expl]` default 0.95. Raise toward 0.99 if divergences appear |
 | `--seed N` | `[expl]` override seed 42. Nutpie is deterministic given seed + data + model, so a multi-run recipe must vary this |
-| `--stream-draws` | `[expl]` nutpie writes every draw to `<fit>/live_draws.zarr` as it lands, so a killed run keeps what it had. Read a partial store with `multiaxis_eci.persistence.load_live_draws` |
+| `--stream-draws` / `--no-stream-draws` | on by default: nutpie writes every draw to `<fit>/live_draws.zarr` as it lands instead of holding the run in RAM (a 10,000 x 8 K=4 run sat at 13 GB in memory on 2026-09-11; streamed, it needs a few hundred MB while sampling and about 8 GB of free disk, warmup included). A killed run keeps what it had (`persistence.load_live_draws` reads a partial store); the store is deleted once the thinned trace is saved. `--no-stream-draws` keeps the old in-RAM behaviour |
 
 **Model**
 
