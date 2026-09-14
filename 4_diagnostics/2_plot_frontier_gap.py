@@ -38,6 +38,7 @@ from multiaxis_eci.viz.frontier_gap import (  # noqa: E402
     summary_table_fig,
 )
 from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
+from multiaxis_eci.viz.style import POST  # noqa: E402
 
 # (quantity, group role, label, unit, signed)
 TABLE_ROWS = [
@@ -75,15 +76,29 @@ def fmt(s: dict, signed: bool, digits: int = 1) -> str:
     return f"{f.format(s['median'])} [{f.format(s['hdi80_low'])}, {f.format(s['hdi80_high'])}]"
 
 
-def benchmark_classes_md() -> str:
-    """The benchmarks of the canonical scope by access class, as the fits saw them."""
+def benchmarks_by_class() -> dict[str, list[str]]:
+    """The benchmarks of the canonical scope per access class, as the fits saw them; `all` is
+    the whole scope, the two `open_problems` benchmarks included (they join no class)."""
     from multiaxis_eci.data import BENCHMARKS_FILE, load_excluded_benchmarks, read_scores
     table = pd.read_csv(BENCHMARKS_FILE)
     in_scope = set(read_scores()["benchmark"]) - load_excluded_benchmarks()
+    out = {"all": sorted(in_scope)}
+    for cls in ("public", "semi_private", "private", "open_problems"):
+        out[cls] = sorted(n for n in table.loc[table["access"] == cls, "name"] if n in in_scope)
+    return out
+
+
+def scope_captions(by_class: dict[str, list[str]]) -> dict[str, str]:
+    """Scope captions carrying how many benchmarks each one was fitted on, the number that
+    decides how much a scope's reading can be trusted: "Public benchmarks (46)"."""
+    return {s: f"{t} ({len(by_class[s])})" if s in by_class else t
+            for s, t in SCOPE_TITLES.items()}
+
+
+def benchmark_classes_md(by_class: dict[str, list[str]]) -> str:
     lines = ["# Benchmarks by access class (canonical scope, curated exclusions applied)", ""]
     for cls in ("public", "semi_private", "private", "open_problems"):
-        names = sorted(n for n in table.loc[table["access"] == cls, "name"] if n in in_scope)
-        lines += [f"## {cls} ({len(names)})", ""] + [f"- {n}" for n in names] + [""]
+        lines += [f"## {cls} ({len(by_class[cls])})", ""] + [f"- {n}" for n in by_class[cls]] + [""]
     return "\n".join(lines)
 
 
@@ -120,7 +135,7 @@ def build_table(results: dict, scopes: list[str], kind: str) -> tuple[pd.DataFra
     return pd.DataFrame(cells), pd.DataFrame(long)
 
 
-def save_en_fr(fig, name: str, figures_dir: Path) -> None:
+def save_en_fr(fig, name: str, figures_dir: Path, *, scale: int = 2) -> None:
     """The English render, then its French twin under `figures/fr/`.
 
     Both get the PNG and the interactive twin (`html/` beside each); the French one also gets
@@ -129,10 +144,10 @@ def save_en_fr(fig, name: str, figures_dir: Path) -> None:
     the record names the months-behind figure places are not translated, and its layout, worked
     out in pixels, carries over untouched.
     """
-    save_fig(fig, name, figures_dir)
+    save_fig(fig, name, figures_dir, scale=scale)
     fr_dir = figures_dir / "fr"
     fr = translate_fig(fig)
-    save_fig(fr, f"{name}_fr", fr_dir)
+    save_fig(fr, f"{name}_fr", fr_dir, scale=scale)
     save_svg(fr, fr_dir / f"{name}_fr.png")
 
 
@@ -162,14 +177,22 @@ def main():
     stem = f"frontier_gap_{kind}"
     y_range = tuple(float(v) for v in args.y_range.split(",")) if args.y_range else None
 
+    by_class = benchmarks_by_class()
+    captions = scope_captions(by_class)
+
     fig = frontier_panels_fig(results, scopes, today=args.today, group_titles=titles, y_range=y_range,
+                              scope_titles=captions,
                               title=f"{titles[leader]} vs {titles[follower]} (ECI-H), by benchmark access")
     save_en_fr(fig, f"{stem}_panels", figures_dir)
 
-    fig = lag_fig(results, scopes, today=args.today, label_scope="all",
+    # The months-behind figure is the write-up's headline and is read flat: it is laid out at the
+    # POST scale (type 2.3x, markers 1.9x) and written at scale 1, so it lands at the same ~2,200
+    # pixels as the other figures with type that needs no zooming.
+    fig = lag_fig(results, scopes, today=args.today, label_scope="all", scope_titles=captions,
+                  style=POST,
                   follower_title=titles[follower].lower(), leader_title=titles[leader].lower(),
                   title=f"How far behind the {titles[leader].lower()} frontier are {titles[follower].lower()}?")
-    save_en_fr(fig, f"{stem}_lag", figures_dir)
+    save_en_fr(fig, f"{stem}_lag", figures_dir, scale=1)
 
     cx_all = []
     for s in scopes:
@@ -193,7 +216,7 @@ def main():
     save_svg(fr, figures_dir / "fr" / f"{stem}_table_fr.png")
     print(f"wrote {figures_dir / stem}_{{panels,lag,table}}.png (+ fr/, fr/svg/), "
           f"{cmp_dir / stem}_{{table.csv,table.md,crossovers.csv}}")
-    (cmp_dir / f"{stem}_benchmark_classes.md").write_text(benchmark_classes_md())
+    (cmp_dir / f"{stem}_benchmark_classes.md").write_text(benchmark_classes_md(by_class))
     pd.set_option("display.width", 250)
     print(cells.to_string(index=False))
 

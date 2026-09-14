@@ -66,7 +66,7 @@ TODAY=2026-09-11 5_outputs/open_closed_frontier/make_plots.sh                   
 
 ## Files
 
-- `frontier_gap_openness_lag.{png,html}`: months behind the closed frontier per open record and scope. The `.html` twins of both figures are the interactive versions, rebuilt by `make_plots.sh`; `.gitignore` keeps them out of the repository (inlined Plotly, megabytes each) as it does for the blog post's
+- `frontier_gap_openness_lag.{png,html}`: months behind the closed frontier per open record and scope, laid out at the print scale (`viz.style.POST`) so it reads flat without zooming. Every scope caption carries the number of benchmarks the scope was fitted on. The `.html` twins of both figures are the interactive versions, rebuilt by `make_plots.sh`; `.gitignore` keeps them out of the repository (inlined Plotly, megabytes each) as it does for the blog post's
 - `frontier_gap_openness_panels.{png,html}`: both groups' candidates, records and trend lines per scope, one ECI-H range. The panels open at the first candidate of either group, so the closed frontier's own first measured day is on the figure — it is what the early lags are dated from
 - `frontier_gap_openness_table.{png,csv,md}`: the summary table above (the CSV holds every quantity numerically)
 - `frontier_gap_openness_<scope>_records.csv`: every open record with its level, its lag and the closed models that first beat it; `_summary.csv`: the per-scope quantities

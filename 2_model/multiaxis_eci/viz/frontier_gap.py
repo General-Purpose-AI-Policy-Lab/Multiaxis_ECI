@@ -37,7 +37,8 @@ PANELS_HORIZON = "2027-07-01"
 def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                         window: tuple[str, str] | None = None, today=None,
                         title: str | None = None, group_titles: dict | None = None,
-                        y_range: tuple[float, float] | None = None) -> go.Figure:
+                        y_range: tuple[float, float] | None = None,
+                        scope_titles: dict | None = None) -> go.Figure:
     """One stacked panel per scope: both groups' candidates in ECI-H (records as diamonds with
     their 80% interval, the rest as dots), each group's trend line with its 80% band, the human
     tiers named in the right margin and the today line. One y-range for every panel, read off
@@ -48,12 +49,13 @@ def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle 
     very point the early months-behind figures are dated from."""
     today_s = _today(today).strftime("%Y-%m-%d")
     group_titles = group_titles or {}
+    scope_titles = scope_titles or SCOPE_TITLES
     if window is None:
         first = min(pd.Timestamp(g.tl["release_date"].min()) for s in scopes
                     for g in (results[s].leader, results[s].follower) if len(g.tl))
         window = ((first - pd.Timedelta(days=120)).strftime("%Y-%m-%d"), PANELS_HORIZON)
     fig = make_subplots(rows=len(scopes), cols=1, shared_xaxes=True, vertical_spacing=0.07,
-                        subplot_titles=[SCOPE_TITLES.get(s, s) for s in scopes])
+                        subplot_titles=[scope_titles.get(s, s) for s in scopes])
     fig.update_annotations(font_size=style.font_axis)
     w0, w1 = pd.Timestamp(window[0]), pd.Timestamp(window[1])
 
@@ -64,7 +66,13 @@ def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle 
             for g in (r.leader, r.follower):
                 inside = g.tl[(g.tl["release_date"] >= w0) & (g.tl["release_date"] <= w1)]
                 if len(inside):
+                    # The cloud's weak tail may fall off the bottom of the panel: the 2%
+                    # quantile keeps a handful of early small models from flattening the rest.
+                    # A frontier record never falls off, interval included — it is the subject.
                     lo_.append(float(inside["mean"].quantile(0.02)))
+                    recs_in = inside[inside["is_record"]]
+                    if len(recs_in):
+                        lo_.append(float(recs_in["hdi_low"].min()))
                     hi_.append(float(inside["hdi_high"].max()))
             lo_.append(float(r.humans["mean"].min())); hi_.append(float(r.humans["mean"].max()))
         lo, hi = min(lo_), max(hi_)
@@ -159,7 +167,10 @@ MARKER_KEY = (("backcast", "diamond-open", "crossing dated back"),
 
 
 def _label_font(style: FigureStyle) -> int:
-    return max(style.font_note - 3, 8)
+    """Type size of the record names. Read off `font_tier`, the scale's margin-label size, rather
+    than off `font_note`: the names are the figure's third register, not a footnote, and at the
+    POST scale a footnote's size would be the one thing on the panel still asking to be zoomed."""
+    return max(int(round(style.font_tier * 0.85)), 8)
 
 
 def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
@@ -194,7 +205,8 @@ def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
 def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             window: tuple[str, str] | None = None, today=None, smooth_months: float = 6.0,
             label_scope: str = "all", title: str | None = None,
-            follower_title: str = "open-weights", leader_title: str = "closed") -> go.Figure:
+            follower_title: str = "open-weights", leader_title: str = "closed",
+            scope_titles: dict | None = None) -> go.Figure:
     """Months behind the leader's frontier, per follower record and access scope: a dot with its
     50% interval per record, and a Gaussian-smoothed curve (bandwidth `smooth_months`) with its
     80% band across posterior draws per scope, named at its right end. The records of
@@ -205,6 +217,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     to come off a plotting area whose size is known.
     """
     today_d = _today(today)
+    scope_titles = scope_titles or SCOPE_TITLES
     curves = {s: _lag_curve(results[s], smooth_months, today_d) for s in scopes}
     drawn = [s for s in scopes if curves[s] is not None]
     if not drawn:
@@ -239,7 +252,10 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     span = max(y_hi - y_lo, 1.0)
 
     height = int(style.height_per_row * 1.8) + 60
-    margin = dict(l=int(style.font_tick * 5), r=int(style.font_tier * 14),
+    # The right margin holds the scope names, which now carry their benchmark count: measured off
+    # the longest of them, with a tenth in hand for the French renders' own wording.
+    name_px = GLYPH_W * style.font_tier * max(len(scope_titles.get(s, s)) for s in drawn)
+    margin = dict(l=int(style.font_tick * 5), r=int(1.1 * name_px + style.font_tier * 1.5),
                   t=int(style.font_title * 5.2) if title else int(style.font_legend * 4),
                   b=int(style.font_tick * 6),
                   autoexpand=False)                # these margins ARE the plotting area
@@ -268,7 +284,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         r = results[s]
         df = r.lag_df
         col = SCOPE_COLORS.get(s, "#555")
-        name = SCOPE_TITLES.get(s, s)
+        name = scope_titles.get(s, s)
         grid_d, med, lo, hi = curves[s]
         cens = df["censored"].astype(bool) if "censored" in df else pd.Series(False, index=df.index)
         back = df["backcast"].astype(bool) if "backcast" in df else pd.Series(False, index=df.index)

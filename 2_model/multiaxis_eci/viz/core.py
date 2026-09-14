@@ -88,13 +88,18 @@ def two_column_layout(fig: go.Figure, col_domains, panel_titles, n_panels: int =
         ann.x = sum(col_domains[i % 2]) / 2
 
 
-def save_fig(fig: go.Figure, name: str, figures_dir: Path) -> None:
-    """One PNG in `figures_dir`, its interactive twin in `figures_dir/html/`."""
+def save_fig(fig: go.Figure, name: str, figures_dir: Path, *, scale: int = 2) -> None:
+    """One PNG in `figures_dir`, its interactive twin in `figures_dir/html/`.
+
+    `scale` is the pixel multiplier: 2 for a figure laid out at the DASHBOARD scale, which is
+    read on screen and zoomed into; 1 for one already laid out at the POST scale, whose type is
+    sized for a flat share at about 2,000 pixels and would only double into a huge file.
+    """
     html_dir = figures_dir / "html"
     html_dir.mkdir(parents=True, exist_ok=True)
     fig.write_html(html_dir / f"{name}.html")
     try:
-        fig.write_image(figures_dir / f"{name}.png", scale=2)
+        fig.write_image(figures_dir / f"{name}.png", scale=scale)
     except Exception as e:
         print(f"  PNG export skipped for {name} ({type(e).__name__}: {e})")
 
