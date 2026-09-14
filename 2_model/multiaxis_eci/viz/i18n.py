@@ -126,6 +126,7 @@ FR_TABLE: list[tuple[str, str]] = [
     ("public benchmarks", "benchmarks publics"),
     ("all benchmarks", "tous les benchmarks"),
     ("crossing dated back", "croisement rétrodaté"),
+    ("crossing measured", "croisement mesuré"),
     ("lower bound", "borne inférieure"),
     # Hover fragments: the longest form of each first
     ("first closed model above:", "premier modèle fermé au-dessus :"),

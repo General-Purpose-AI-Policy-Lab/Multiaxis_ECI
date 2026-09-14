@@ -162,7 +162,8 @@ LEADER_COLOR = "#c2c2c2"
 LABEL_COLOR = "#444444"
 # The hollow markers mean the same thing in every scope, so their key is drawn in neutral grey.
 KEY_COLOR = "#666666"
-MARKER_KEY = (("backcast", "diamond-open", "crossing dated back"),
+MARKER_KEY = (("", "circle", "crossing measured"),
+              ("backcast", "diamond-open", "crossing dated back"),
               ("censored", "triangle-up-open", "lower bound"))
 
 
@@ -263,7 +264,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     name_px = GLYPH_W * style.font_tier * max(len(scope_titles.get(s, s)) for s in drawn)
     lead_px = _leader_px(style)
     margin = dict(l=int(style.font_tick * 5), r=int(lead_px + 1.1 * name_px + style.font_tier),
-                  t=int(style.font_title * 3.6) if title else int(style.font_legend * 2.5),
+                  t=int(style.font_title * 2.8) if title else int(style.font_legend * 1.4),
                   b=int(style.font_tick * 6),
                   autoexpand=False)                # these margins ARE the plotting area
     plot_w = style.width - margin["l"] - margin["r"]
@@ -285,7 +286,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     from_px_x = lambda px: w0 + pd.Timedelta(days=px / plot_w * (w1 - w0).days)        # noqa: E731
 
     fig = go.Figure()
-    ends = []            # (value at the right end, name, colour) per scope, for the margin names
+    ends = []            # (value, name, colour, where the line ends) per scope, for the margin
     shapes_seen = set()  # which marker shapes the data actually uses, for the key below
     for s in drawn:
         r = results[s]
@@ -331,16 +332,21 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         points(df[cens], "triangle-up-open",
                "at least %{y:.1f} months behind (bound in %{customdata[0]:.0f}% of draws)", "censored")
         if np.isfinite(med[-1]):
-            ends.append((float(med[-1]), name, col))
+            # Where the line actually stops, in paper units: the curves end at today, well short
+            # of the panel's right edge, and the leader has to start there to touch its line.
+            x_end = (pd.Timestamp(grid_d[-1]) - w0).days / max((w1 - w0).days, 1)
+            ends.append((float(med[-1]), name, col, x_end))
 
     # The scopes read off their colour, the hollow markers off their shape: one grey key entry per
     # shape the data uses, after the four scope lines, rather than a coloured entry per scope.
     for key, symbol, text in MARKER_KEY:
         if key in shapes_seen:
+            filled = not symbol.endswith("-open")
             fig.add_trace(go.Scatter(
                 x=[None], y=[None], mode="markers", name=text, hoverinfo="skip",
                 marker=dict(symbol=symbol, size=style.marker + 1, color=KEY_COLOR,
-                            line=dict(width=1.5, color=KEY_COLOR))))
+                            line=dict(width=1.0 if filled else 1.5,
+                                      color="white" if filled else KEY_COLOR))))
     if label_scope in drawn:
         _record_labels(fig, results[label_scope].lag_df, style, to_px_x, from_px_x, plot_w,
                        band_top)
@@ -364,8 +370,11 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     ticks = np.arange(np.ceil(band_top / step) * step, np.floor(top / step) * step + step / 2, step)
     fig.update_yaxes(title_text=f"Months behind the {leader_title} frontier (ECI-H)",
                      range=list(y_range), tickvals=ticks, gridcolor="#eeeeee", zeroline=False)
+    # The marker key goes in the right margin, above the scope names and flush with them: what a
+    # dot and a hollow diamond mean is read beside the lines, not in a band over the panel.
     fig.update_layout(template="plotly_white", width=style.width, height=height, margin=margin,
-                      legend=dict(orientation="h", yanchor="bottom", y=1.005, xanchor="left",
+                      legend=dict(orientation="v", yanchor="top", y=1.0, xanchor="left",
+                                  x=1.0 + lead_px / plot_w, bgcolor="rgba(0,0,0,0)",
                                   font=dict(size=style.font_legend)))
     if title:
         fig.update_layout(title=dict(text=title, x=0.5, y=0.975, yanchor="top"))
@@ -405,8 +414,8 @@ def _line_end_labels(fig: go.Figure, ends: list, style: FigureStyle,
 
     With no legend above the panel these names ARE the figure's key, so they are given room:
     where curves finish together the names spread far enough to read as separate lines, and a
-    leader always runs from the panel's edge to the name, since every name sits clear of the
-    edge whether it had to move or not.
+    leader always runs from the end of the line itself — not from the panel's edge, which the
+    curves stop well short of — to the name, whether the name had to move or not.
     """
     if not ends:
         return
@@ -416,10 +425,10 @@ def _line_end_labels(fig: go.Figure, ends: list, style: FigureStyle,
     ys = _spread_labels(np.array([e[0] for e in ends], dtype=float), gap,
                         y_range[0] + 0.02 * span, y_range[1] - 0.02 * span)
     lead = _leader_px(style) / plot_w                       # the leader's run, in paper units
-    for (level, name, col), y in zip(ends, ys):
+    for (level, name, col, x_end), y in zip(ends, ys):
         fig.add_annotation(x=1.0 + lead, xref="paper", y=y, text=name, showarrow=False,
                            xanchor="left", font=dict(size=style.font_tier, color=col))
-        fig.add_shape(type="line", xref="paper", x0=1.0, x1=1.0 + 0.8 * lead, y0=level, y1=y,
+        fig.add_shape(type="line", xref="paper", x0=x_end, x1=1.0 + 0.8 * lead, y0=level, y1=y,
                       line=dict(color=col, width=max(1.0, style.refline * 0.8)), opacity=0.85)
 
 
