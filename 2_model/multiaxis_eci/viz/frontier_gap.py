@@ -166,6 +166,11 @@ MARKER_KEY = (("backcast", "diamond-open", "crossing dated back"),
               ("censored", "triangle-up-open", "lower bound"))
 
 
+def _leader_px(style: FigureStyle) -> float:
+    """Run of the leader between the panel's edge and a scope name in the right margin."""
+    return 2.0 * style.font_tier
+
+
 def _label_font(style: FigureStyle) -> int:
     """Type size of the record names. Read off `font_tier`, the scale's margin-label size, rather
     than off `font_note`: the names are the figure's third register, not a footnote, and at the
@@ -252,11 +257,13 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     span = max(y_hi - y_lo, 1.0)
 
     height = int(style.height_per_row * 1.8) + 60
-    # The right margin holds the scope names, which now carry their benchmark count: measured off
-    # the longest of them, with a tenth in hand for the French renders' own wording.
+    # The right margin holds the scope names, which carry their benchmark count, and the leaders
+    # that tie each one to its line: measured off the longest name, with a tenth in hand for the
+    # French renders' own wording. Above the panel only the marker key is left, one row.
     name_px = GLYPH_W * style.font_tier * max(len(scope_titles.get(s, s)) for s in drawn)
-    margin = dict(l=int(style.font_tick * 5), r=int(1.1 * name_px + style.font_tier * 1.5),
-                  t=int(style.font_title * 5.2) if title else int(style.font_legend * 4),
+    lead_px = _leader_px(style)
+    margin = dict(l=int(style.font_tick * 5), r=int(lead_px + 1.1 * name_px + style.font_tier),
+                  t=int(style.font_title * 3.6) if title else int(style.font_legend * 2.5),
                   b=int(style.font_tick * 6),
                   autoexpand=False)                # these margins ARE the plotting area
     plot_w = style.width - margin["l"] - margin["r"]
@@ -291,8 +298,9 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         fig.add_trace(go.Scatter(x=list(grid_d) + list(grid_d[::-1]), y=list(hi) + list(lo[::-1]),
                                  fill="toself", fillcolor=_rgba(col, 0.10), line=dict(width=0),
                                  hoverinfo="skip", showlegend=False))
+        # No legend entry: the scope is named at the end of its own line, in the right margin.
         fig.add_trace(go.Scatter(x=grid_d, y=med, mode="lines", name=name, legendgroup=s,
-                                 line=dict(color=col, width=style.trend),
+                                 showlegend=False, line=dict(color=col, width=style.trend),
                                  hovertemplate="%{x|%Y-%m}: %{y:.1f} months<extra>" + name + "</extra>"))
 
         def points(sub, symbol, hover, key, scope=s, col=col, name=name):
@@ -336,7 +344,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     if label_scope in drawn:
         _record_labels(fig, results[label_scope].lag_df, style, to_px_x, from_px_x, plot_w,
                        band_top)
-    _line_end_labels(fig, ends, style, y_range, plot_h)
+    _line_end_labels(fig, ends, style, y_range, plot_w, plot_h)
     fig.add_hline(y=0, line=dict(color="#999", width=style.refline))
     fig.add_vline(x=today_d.strftime("%Y-%m-%d"),
                   line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
@@ -350,9 +358,9 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                      dtick="M12" if span_years > 5 else "M6",
                      tickformat="%Y" if span_years > 5 else "%Y-%m",
                      tickangle=0, gridcolor="#f4f4f4")
-    # Ticks (and their gridlines) every two months, and only where there is data: the band of
+    # Ticks (and their gridlines) every four months, and only where there is data: the band of
     # names below carries none.
-    step = 2.0
+    step = 4.0
     ticks = np.arange(np.ceil(band_top / step) * step, np.floor(top / step) * step + step / 2, step)
     fig.update_yaxes(title_text=f"Months behind the {leader_title} frontier (ECI-H)",
                      range=list(y_range), tickvals=ticks, gridcolor="#eeeeee", zeroline=False)
@@ -392,22 +400,27 @@ def _record_labels(fig: go.Figure, df: pd.DataFrame, style: FigureStyle, to_px_x
 
 
 def _line_end_labels(fig: go.Figure, ends: list, style: FigureStyle,
-                     y_range: tuple[float, float], plot_h: float) -> None:
-    """Each scope named in the right margin, level with its curve's last value; where two curves
-    finish together the names spread just enough to stay apart, joined by a thin leader."""
+                     y_range: tuple[float, float], plot_w: float, plot_h: float) -> None:
+    """Each scope named in the right margin, level with its curve's last value.
+
+    With no legend above the panel these names ARE the figure's key, so they are given room:
+    where curves finish together the names spread far enough to read as separate lines, and a
+    leader always runs from the panel's edge to the name, since every name sits clear of the
+    edge whether it had to move or not.
+    """
     if not ends:
         return
     ends = sorted(ends, key=lambda e: -e[0])
     span = y_range[1] - y_range[0]
-    gap = 1.35 * style.font_tier / plot_h * span
+    gap = 1.8 * style.font_tier / plot_h * span
     ys = _spread_labels(np.array([e[0] for e in ends], dtype=float), gap,
                         y_range[0] + 0.02 * span, y_range[1] - 0.02 * span)
+    lead = _leader_px(style) / plot_w                       # the leader's run, in paper units
     for (level, name, col), y in zip(ends, ys):
-        fig.add_annotation(x=1.008, xref="paper", y=y, text=name, showarrow=False, xanchor="left",
-                           font=dict(size=style.font_tier, color=col))
-        if abs(y - level) > 0.25 * gap:
-            fig.add_shape(type="line", xref="paper", x0=1.0, x1=1.007, y0=level, y1=y,
-                          line=dict(color=col, width=max(1, style.refline / 2)), opacity=0.8)
+        fig.add_annotation(x=1.0 + lead, xref="paper", y=y, text=name, showarrow=False,
+                           xanchor="left", font=dict(size=style.font_tier, color=col))
+        fig.add_shape(type="line", xref="paper", x0=1.0, x1=1.0 + 0.8 * lead, y0=level, y1=y,
+                      line=dict(color=col, width=max(1.0, style.refline * 0.8)), opacity=0.85)
 
 
 def summary_table_fig(cells: pd.DataFrame, title: str, *, width: int = 1500,
