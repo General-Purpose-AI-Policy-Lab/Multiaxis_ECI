@@ -297,6 +297,16 @@ def run_canonical(args) -> None:
     # its own folder suffix: canonical/ stays the plain index.
     human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
                    else config.HUMAN_ORDER if args.human_prior else None)
+    # Every flag that changes the data the fit sees has to reach the folder name. docs/cli.md
+    # states the contract — "a fit's flags become one tag, and the tag names the results folder
+    # and the trace, so the two cannot drift apart" — and a scope flag that left no tag wrote
+    # its trace straight over canonical/ (2026-09-14).
+    if args.include_all_benchmarks:
+        scope_tag += "_allbenchmarks"
+    if args.drop_zero_scores:
+        scope_tag += "_nozeros"
+    if args.eci_data_only:
+        scope_tag += "_ecidata"
     if args.no_humans:
         scope_tag += "_nohumans"
     if args.keep_isolated:
@@ -842,7 +852,8 @@ def main():
     parser.add_argument("--raw-c", action="store_true",
                         help="[canonical] report raw C instead of anchored ECI")
     parser.add_argument("--include-all-benchmarks", action="store_true",
-                        help="[canonical] keep the curated-excluded benchmarks in the fit")
+                        help="[canonical] keep the curated-excluded benchmarks in the fit; "
+                             "results go to canonical_allbenchmarks/")
     parser.add_argument("--no-humans", action="store_true",
                         help="[canonical] leave the human baselines out of the fit, so the index "
                              "is a pure model-vs-model scale (ECI-H's two anchors are models, so "
