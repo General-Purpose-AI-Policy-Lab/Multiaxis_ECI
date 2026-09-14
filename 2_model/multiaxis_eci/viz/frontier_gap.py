@@ -241,7 +241,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     height = int(style.height_per_row * 1.8) + 60
     margin = dict(l=int(style.font_tick * 5), r=int(style.font_tier * 14),
                   t=int(style.font_title * 5.2) if title else int(style.font_legend * 4),
-                  b=int(style.font_tick * 12),      # room for the vertical two-month ticks
+                  b=int(style.font_tick * 6),
                   autoexpand=False)                # these margins ARE the plotting area
     plot_w = style.width - margin["l"] - margin["r"]
     plot_h = height - margin["t"] - margin["b"]
@@ -327,10 +327,16 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     fig.add_annotation(x=today_d, y=1.0, yref="paper", text="today", showarrow=False,
                        xanchor="right", xshift=-4, yanchor="top",
                        font=dict(size=style.font_note, color=TODAY_COLOR))
+    # Dates by the year, horizontal: the record names below are the vertical text on this figure.
+    # A window of a couple of years (the single-scope figures) gets its months instead.
+    span_years = (w1 - w0).days / 365.25
     fig.update_xaxes(title_text=f"Release date of the {follower_title} record", range=list(window),
-                     dtick="M2", tickformat="%Y-%m", tickangle=LABEL_ANGLE, gridcolor="#f4f4f4")
-    # Ticks (and their gridlines) only where there is data: the name band below carries none.
-    step = 5.0
+                     dtick="M12" if span_years > 5 else "M6",
+                     tickformat="%Y" if span_years > 5 else "%Y-%m",
+                     tickangle=0, gridcolor="#f4f4f4")
+    # Ticks (and their gridlines) every two months, and only where there is data: the band of
+    # names below carries none.
+    step = 2.0
     ticks = np.arange(np.ceil(band_top / step) * step, np.floor(top / step) * step + step / 2, step)
     fig.update_yaxes(title_text=f"Months behind the {leader_title} frontier (ECI-H)",
                      range=list(y_range), tickvals=ticks, gridcolor="#eeeeee", zeroline=False)
