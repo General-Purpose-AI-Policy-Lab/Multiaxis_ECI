@@ -28,19 +28,30 @@ SCOPE_COLORS = {"all": "#0072B2", "public": "#009E73", "semi_private": "#E69F00"
                 "private": "#CC79A7"}
 SCOPE_TITLES = {"all": "All benchmarks", "public": "Public benchmarks",
                 "semi_private": "Semi-private benchmarks", "private": "Private benchmarks"}
-DEFAULT_WINDOW = ("2021-01-01", "2027-07-01")     # the panels: from the first closed records to the projection
+# The panels run to the projection's horizon; they start at the first candidate of either group,
+# so the reader sees every release the lag is read against — the closed frontier's own first
+# measured day included, which is what the early lags are dated from.
+PANELS_HORIZON = "2027-07-01"
 
 
 def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
-                        window: tuple[str, str] = DEFAULT_WINDOW, today=None,
+                        window: tuple[str, str] | None = None, today=None,
                         title: str | None = None, group_titles: dict | None = None,
                         y_range: tuple[float, float] | None = None) -> go.Figure:
     """One stacked panel per scope: both groups' candidates in ECI-H (records as diamonds with
     their 80% interval, the rest as dots), each group's trend line with its 80% band, the human
     tiers named in the right margin and the today line. One y-range for every panel, read off
-    the candidates inside the window, so the panels compare at a glance."""
+    the candidates inside the window, so the panels compare at a glance.
+
+    `window` defaults to the first candidate of any scope through `PANELS_HORIZON`: a panel that
+    cut its early releases would hide the closed frontier's first measured day, which is the
+    very point the early months-behind figures are dated from."""
     today_s = _today(today).strftime("%Y-%m-%d")
     group_titles = group_titles or {}
+    if window is None:
+        first = min(pd.Timestamp(g.tl["release_date"].min()) for s in scopes
+                    for g in (results[s].leader, results[s].follower) if len(g.tl))
+        window = ((first - pd.Timedelta(days=120)).strftime("%Y-%m-%d"), PANELS_HORIZON)
     fig = make_subplots(rows=len(scopes), cols=1, shared_xaxes=True, vertical_spacing=0.07,
                         subplot_titles=[SCOPE_TITLES.get(s, s) for s in scopes])
     fig.update_annotations(font_size=style.font_axis)
@@ -131,12 +142,12 @@ def _kernel_curves(years: np.ndarray, lags: np.ndarray, grid: np.ndarray,
         return np.where(den > 1.5, num / den, np.nan)
 
 
-# Record names are set at this angle, reading up to the right: releases crowd into 2024-2026 and
-# only the diagonal keeps a dozen names side by side in that stretch.
-LABEL_ANGLE = 30.0
-# Width of a glyph as a fraction of the font size, for the collision boxes below. Plotly measures
-# text in the browser and we cannot, so this is the average of the default sans over the model
-# names we set; erring high only spaces the names out a little more than needed.
+# Record names hang under the zero line, set vertically: a dozen releases of the same season fit
+# side by side that way, and every name starts on the same line so the band reads as one list.
+LABEL_ANGLE = 90.0
+# Width of a glyph as a fraction of the font size. Plotly measures text in the browser and we
+# cannot, so this is the average of the default sans over the model names we set; it sizes the
+# band the names hang in and the room each one needs beside its neighbour.
 GLYPH_W = 0.55
 # The hairline from a name back to the interval bar it belongs to, and the colour of the names.
 LEADER_COLOR = "#c2c2c2"
@@ -147,55 +158,22 @@ MARKER_KEY = (("backcast", "diamond-open", "crossing dated back"),
               ("censored", "triangle-up-open", "lower bound"))
 
 
-def _rotated_bbox(w: float, h: float, up: bool) -> tuple[float, float, float, float]:
-    """(dx0, dx1, dy0, dy1): the pixels a `w` x `h` text box turned `LABEL_ANGLE` counterclockwise
-    takes around its anchor, in a y-up frame. A name above its dot is anchored at its bottom left
-    and runs up to the right; one below is anchored at its top right and runs down to the left."""
-    c, s = np.cos(np.radians(LABEL_ANGLE)), np.sin(np.radians(LABEL_ANGLE))
-    if up:
-        return -s * h, c * w, 0.0, s * w + c * h
-    return -c * w, s * h, -(s * w + c * h), 0.0
+def _label_font(style: FigureStyle) -> int:
+    return max(style.font_note - 3, 8)
 
 
-def _overlap(a: tuple, b: tuple) -> float:
-    """Area two (x0, x1, y0, y1) boxes share."""
-    dx = min(a[1], b[1]) - max(a[0], b[0])
-    dy = min(a[3], b[3]) - max(a[2], b[2])
-    return dx * dy if dx > 0 and dy > 0 else 0.0
+def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    """The records that carry a lag, in release order, with the name each one is labelled by."""
+    rows = df[df["lag_months_median"].notna()].sort_values("release_date")
+    return rows, [("≥ " if bool(r.get("censored", False)) else "") + pretty_model_name(r["name"])
+                  for _, r in rows.iterrows()]
 
 
-def _stack_labels(anchors: list, boxes: list, ups: list, bounds: tuple[float, float], *,
-                  obstacles: list | None = None, pad: float = 6.0, step: float = 5.0,
-                  max_push: float = 200.0, dot_cost: float = 0.2) -> list[float]:
-    """Vertical offsets (pixels) that keep the rotated record names off one another and off the
-    dots already drawn.
-
-    Names are placed in release order: each starts `pad` off the end of its interval bar and is
-    pushed further from its dot until its box clears the names already placed, the `obstacles`
-    (every scope's markers) and the edges of `bounds` (the plotting area, y-up). Where nothing is
-    free the least-costly offset wins, so a crowded name is spread, never dropped; grazing a
-    marker costs `dot_cost` of what covering another name costs, because a name over a name is
-    the one thing that cannot be read.
-    """
-    placed, obstacles, offsets = [], list(obstacles or ()), []
-    for (x, y), (dx0, dx1, dy0, dy1), up in zip(anchors, boxes, ups):
-        best, best_cost, d = None, None, pad
-        while d <= max_push:
-            off = d if up else -d
-            box = (x + dx0, x + dx1, y + off + dy0, y + off + dy1)
-            if bounds[0] <= box[2] and box[3] <= bounds[1]:
-                cost = (sum(_overlap(box, b) for b in placed)
-                        + dot_cost * sum(_overlap(box, b) for b in obstacles))
-                if cost == 0.0:
-                    best, best_cost = off, 0.0
-                    break
-                if best_cost is None or cost < best_cost:
-                    best, best_cost = off, cost
-            d += step
-        best = (pad if up else -pad) if best is None else best
-        offsets.append(best)
-        placed.append((x + dx0, x + dx1, y + best + dy0, y + best + dy1))
-    return offsets
+def _label_band_px(texts: list[str], font: int) -> float:
+    """Pixels the name band needs: the longest name, plus the air between it and the data."""
+    if not texts:
+        return 0.0
+    return GLYPH_W * font * max(len(t) for t in texts) + 1.8 * font
 
 
 def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
@@ -222,8 +200,9 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     80% band across posterior draws per scope, named at its right end. The records of
     `label_scope` are named beside their dot, the names spread so they do not cover one another.
 
-    The y-range and the plotting area are fixed here rather than left to Plotly, because the name
-    placement works in pixels and has to know where the panel's edges are.
+    The y-range and the plotting area are fixed here rather than left to Plotly (the margins are
+    declared `autoexpand=False`), because the name band is measured in pixels and its height has
+    to come off a plotting area whose size is known.
     """
     today_d = _today(today)
     curves = {s: _lag_curve(results[s], smooth_months, today_d) for s in scopes}
@@ -248,7 +227,8 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                   (today_d + pd.Timedelta(days=200)).strftime("%Y-%m-%d"))
     w0, w1 = pd.Timestamp(window[0]), pd.Timestamp(window[1])
 
-    # One y-range over everything drawn (interval bars and bands), with air above for the names.
+    # One y-range over everything drawn (interval bars and bands), with air above; the names get
+    # a band of their own under the data, so the data region is what is left of the panel.
     vals = [0.0]
     for s in drawn:
         _, _, lo, hi = curves[s]
@@ -257,21 +237,32 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                  float(d["lag_hdi50_high"].max())]
     y_lo, y_hi = float(np.nanmin(vals)), float(np.nanmax(vals))
     span = max(y_hi - y_lo, 1.0)
-    y_range = (y_lo - 0.06 * span, y_hi + 0.12 * span)
 
     height = int(style.height_per_row * 1.8) + 60
     margin = dict(l=int(style.font_tick * 5), r=int(style.font_tier * 14),
                   t=int(style.font_title * 5.2) if title else int(style.font_legend * 4),
-                  b=int(style.font_tick * 6))
+                  b=int(style.font_tick * 12),      # room for the vertical two-month ticks
+                  autoexpand=False)                # these margins ARE the plotting area
     plot_w = style.width - margin["l"] - margin["r"]
     plot_h = height - margin["t"] - margin["b"]
+
+    # The names hang from `band_top`, below both the zero line and the lowest thing drawn. Their
+    # band is measured in pixels, so the y-range is solved for it: the data keeps the rest.
+    font_lab = _label_font(style)
+    band_px = 0.0
+    if label_scope in drawn:
+        band_px = _label_band_px(_record_names(results[label_scope].lag_df)[1], font_lab)
+    band_px = min(band_px, 0.45 * plot_h)
+    top = y_hi + 0.10 * span
+    band_top = min(0.0, y_lo) - 0.03 * span
+    scale = (plot_h - band_px) / max(top - band_top, 1e-9)          # pixels per month
+    y_range = (band_top - band_px / scale, top)
+
     to_px_x = lambda t: (pd.Timestamp(t) - w0).days / max((w1 - w0).days, 1) * plot_w  # noqa: E731
-    to_px_y = lambda v: (v - y_range[0]) / (y_range[1] - y_range[0]) * plot_h          # noqa: E731
-    px_to_y = (y_range[1] - y_range[0]) / plot_h
+    from_px_x = lambda px: w0 + pd.Timedelta(days=px / plot_w * (w1 - w0).days)        # noqa: E731
 
     fig = go.Figure()
     ends = []            # (value at the right end, name, colour) per scope, for the margin names
-    obstacles = []       # every scope's markers in pixels, so no record name lands on a dot
     shapes_seen = set()  # which marker shapes the data actually uses, for the key below
     for s in drawn:
         r = results[s]
@@ -317,14 +308,6 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                "at least %{y:.1f} months behind (bound in %{customdata[0]:.0f}% of draws)", "censored")
         if np.isfinite(med[-1]):
             ends.append((float(med[-1]), name, col))
-        half = style.marker + 3
-        obstacles += [(to_px_x(d) - half, to_px_x(d) + half, to_px_y(v) - half, to_px_y(v) + half)
-                      for d, v in zip(df["release_date"], df["lag_months_median"])
-                      if np.isfinite(v)]
-        # The curve itself is an obstacle too, sampled along its length: a name across a trend
-        # line hides the very thing the figure is about.
-        obstacles += [(to_px_x(d) - 6, to_px_x(d) + 6, to_px_y(v) - 5, to_px_y(v) + 5)
-                      for d, v in zip(grid_d[::2], med[::2]) if np.isfinite(v)]
 
     # The scopes read off their colour, the hollow markers off their shape: one grey key entry per
     # shape the data uses, after the four scope lines, rather than a coloured entry per scope.
@@ -335,8 +318,8 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                 marker=dict(symbol=symbol, size=style.marker + 1, color=KEY_COLOR,
                             line=dict(width=1.5, color=KEY_COLOR))))
     if label_scope in drawn:
-        _record_labels(fig, results[label_scope].lag_df, style, to_px_x, to_px_y, px_to_y,
-                       (plot_w, plot_h), obstacles)
+        _record_labels(fig, results[label_scope].lag_df, style, to_px_x, from_px_x, plot_w,
+                       band_top)
     _line_end_labels(fig, ends, style, y_range, plot_h)
     fig.add_hline(y=0, line=dict(color="#999", width=style.refline))
     fig.add_vline(x=today_d.strftime("%Y-%m-%d"),
@@ -344,12 +327,13 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     fig.add_annotation(x=today_d, y=1.0, yref="paper", text="today", showarrow=False,
                        xanchor="right", xshift=-4, yanchor="top",
                        font=dict(size=style.font_note, color=TODAY_COLOR))
-    span_years = (w1 - w0).days / 365.25
     fig.update_xaxes(title_text=f"Release date of the {follower_title} record", range=list(window),
-                     dtick="M12" if span_years > 5 else "M6", tickformat="%Y" if span_years > 5 else "%Y-%m",
-                     gridcolor="#f4f4f4")
+                     dtick="M2", tickformat="%Y-%m", tickangle=LABEL_ANGLE, gridcolor="#f4f4f4")
+    # Ticks (and their gridlines) only where there is data: the name band below carries none.
+    step = 5.0
+    ticks = np.arange(np.ceil(band_top / step) * step, np.floor(top / step) * step + step / 2, step)
     fig.update_yaxes(title_text=f"Months behind the {leader_title} frontier (ECI-H)",
-                     range=list(y_range), dtick=5, gridcolor="#eeeeee", zeroline=False)
+                     range=list(y_range), tickvals=ticks, gridcolor="#eeeeee", zeroline=False)
     fig.update_layout(template="plotly_white", width=style.width, height=height, margin=margin,
                       legend=dict(orientation="h", yanchor="bottom", y=1.005, xanchor="left",
                                   font=dict(size=style.font_legend)))
@@ -358,48 +342,31 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     return apply_fonts(fig, style)
 
 
-def _record_labels(fig: go.Figure, df: pd.DataFrame, style: FigureStyle,
-                   to_px_x, to_px_y, px_to_y: float, plot: tuple[float, float],
-                   obstacles: list) -> None:
-    """Name every record of the labelled scope beside its dot: names take alternate sides, one
-    that would run off an edge takes the other, and `_stack_labels` spreads them off each other
-    and off `obstacles` (the markers of every scope). A hairline joins a name that had to move
-    to the end of its interval bar."""
-    rows = df[df["lag_months_median"].notna()].sort_values("release_date")
+def _record_labels(fig: go.Figure, df: pd.DataFrame, style: FigureStyle, to_px_x, from_px_x,
+                   plot_w: float, band_top: float) -> None:
+    """Name every record of the labelled scope in the band under the data.
+
+    Every name hangs from `band_top`, set vertically and top-aligned, so the band reads as one
+    list however the releases crowd. Names are spread along x only far enough to stay off each
+    other (`_spread_labels`, the rule the scope names follow in the right margin), and a grey
+    hairline runs from the foot of each record's interval bar down to the name it belongs to.
+    """
+    rows, texts = _record_names(df)
     if not len(rows):
         return
-    plot_w, plot_h = plot
-    font = max(style.font_note - 3, 8)
-    texts = [("≥ " if bool(r.get("censored", False)) else "") + pretty_model_name(r["name"])
-             for _, r in rows.iterrows()]
-    sizes = [(GLYPH_W * font * len(t), 1.15 * font) for t in texts]
-    xs = [to_px_x(r["release_date"]) for _, r in rows.iterrows()]
-    tops = rows["lag_hdi50_high"].to_numpy(dtype=float)
-    bots = rows["lag_hdi50_low"].to_numpy(dtype=float)
-    ups = []
-    for k, (x, (w, h)) in enumerate(zip(xs, sizes)):
-        up = k % 2 == 0
-        # A name above its dot runs up to the right, one below runs down to the left: near an
-        # edge, take the side that keeps the name on the panel instead of in the margin.
-        if up and x + _rotated_bbox(w, h, True)[1] > plot_w:
-            up = False
-        elif not up and x + _rotated_bbox(w, h, False)[0] < 0.0:
-            up = True
-        ups.append(up)
-    anchors = [(x, to_px_y(t if up else b)) for x, t, b, up in zip(xs, tops, bots, ups)]
-    boxes = [_rotated_bbox(w, h, up) for (w, h), up in zip(sizes, ups)]
-    offsets = _stack_labels(anchors, boxes, ups, (0.0, plot_h), obstacles=obstacles)
-    for (_, r), text, up, top, bot, off in zip(rows.iterrows(), texts, ups, tops, bots, offsets):
-        base = top if up else bot
-        y = base + off * px_to_y
-        fig.add_annotation(x=r["release_date"], y=y, text=text, showarrow=False,
-                           textangle=-LABEL_ANGLE, yanchor="bottom" if up else "top",
-                           xanchor="left" if up else "right", font=dict(size=font, color=LABEL_COLOR))
-        if abs(off) > 14.0:
-            # Grey, not the scope's hue: a leader must not read as one more interval bar.
-            fig.add_shape(type="line", x0=r["release_date"], x1=r["release_date"], y0=base, y1=y,
-                          line=dict(color=LEADER_COLOR, width=max(1.0, style.refline * 0.7),
-                                    dash="dot"))
+    font = _label_font(style)
+    xs = np.array([to_px_x(r["release_date"]) for _, r in rows.iterrows()], dtype=float)
+    # `_spread_labels` takes positions in descending order: the releases run the other way.
+    gap = 1.5 * font
+    xs_out = _spread_labels(xs[::-1], gap, 0.0, plot_w)[::-1]
+    for (_, r), text, x_px in zip(rows.iterrows(), texts, xs_out):
+        x_lab = from_px_x(float(x_px))
+        fig.add_annotation(x=x_lab, y=band_top, text=text, showarrow=False, textangle=LABEL_ANGLE,
+                           xanchor="center", yanchor="top", font=dict(size=font, color=LABEL_COLOR))
+        fig.add_shape(type="line", x0=r["release_date"], y0=float(r["lag_hdi50_low"]),
+                      x1=x_lab, y1=band_top,
+                      line=dict(color=LEADER_COLOR, width=max(1.0, style.refline * 0.7),
+                                dash="dot"))
 
 
 def _line_end_labels(fig: go.Figure, ends: list, style: FigureStyle,
