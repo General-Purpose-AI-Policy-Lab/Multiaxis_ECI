@@ -295,7 +295,7 @@ def group_crossovers(gf: GroupFrontier, E: np.ndarray, data, *, today, probs=(0.
     schema (axis = the group label), the first mass in the crossover_hdi columns and the second in
     hdi80_low / hdi80_high."""
     fc = gf.forecast()
-    if fc is None:
+    if fc is None or not data.is_human.any():   # no human tiers, nothing to cross
         return pd.DataFrame()
     E3 = E[:, :, None]
     out = regime_crossover_df(fc, E3, 0, data, axis_name=gf.label, today=today, hdi_prob=probs[0])

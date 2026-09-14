@@ -4,7 +4,9 @@ Two modes:
 
   python 3_fit/fit.py --preset canonical
       The headline ECI-H pipeline: K=1, "pt1" loading prior, curated
-      benchmark exclusions, humans as test-takers. Produces the anchored ECI-H
+      benchmark exclusions, humans as test-takers. No human ordering prior
+      unless one is asked for; every analysis asks for --human-merge.
+      Produces the anchored ECI-H
       scale, SOTA table, forests, timeline, PPC/GoF and figures under
       5_outputs/<data generation>/canonical/ (figures in its figures/ folder).
 
@@ -287,11 +289,16 @@ def run_canonical(args) -> None:
                           "the reference eci_data.csv names don't match "
                           "0_input/benchmarks.csv")
 
+    if args.no_humans and (args.human_merge or args.human_prior):
+        raise ValueError("--no-humans and the ordered-human priors cannot compose: there are no "
+                         "human test-takers left to order.")
     scope_tag = f"canonical_{access}" if access else "canonical"
     # The ordered-human prior is a MODEL choice on top of the scope, so it gets
     # its own folder suffix: canonical/ stays the plain index.
     human_order = (config.HUMAN_ORDER_MERGED if args.human_merge
                    else config.HUMAN_ORDER if args.human_prior else None)
+    if args.no_humans:
+        scope_tag += "_nohumans"
     if args.keep_isolated:
         scope_tag += "_keepiso"
     if args.censor_bounds:
@@ -336,6 +343,7 @@ def run_canonical(args) -> None:
     data = load_eci_data(eci_data_only=args.eci_data_only,
                          drop_isolated_families=not args.keep_isolated,
                          drop_low_obs_models=False,
+                         fit_humans=not args.no_humans,
                          include_all_benchmarks=args.include_all_benchmarks,
                          drop_benchmarks=access_drop)
     if args.drop_zero_scores:
@@ -835,6 +843,13 @@ def main():
                         help="[canonical] report raw C instead of anchored ECI")
     parser.add_argument("--include-all-benchmarks", action="store_true",
                         help="[canonical] keep the curated-excluded benchmarks in the fit")
+    parser.add_argument("--no-humans", action="store_true",
+                        help="[canonical] leave the human baselines out of the fit, so the index "
+                             "is a pure model-vs-model scale (ECI-H's two anchors are models, so "
+                             "it survives). Compose it with --include-all-benchmarks to put the "
+                             "'intentionally easy for humans' exclusions back: they are excluded "
+                             "for what they do to the human tiers, which are gone here. Results "
+                             "go to canonical_nohumans/")
     parser.add_argument("--access", choices=list(ACCESS_SCOPES), default=None,
                         help="[canonical] fit one access class of benchmarks only "
                              "(the `access` column of 0_input/benchmarks.csv: public, "
@@ -866,8 +881,11 @@ def main():
                         help="IRF link: linear 2PL (default) or the log-logistic "
                              "mu = 1/(1+(theta.A)^-alpha)")
     parser.add_argument("--human-prior", action="store_true",
-                        help="order human tiers by config.HUMAN_ORDER (exploration, "
-                             "or --preset canonical → <data generation>/canonical_humanprior/)")
+                        help="order human tiers by the FLAT config.HUMAN_ORDER: the High School "
+                             "branch stays incomparable with the adult spine (exploration, or "
+                             "--preset canonical → <data generation>/canonical_humanprior/). A "
+                             "sensitivity variant of --human-merge, which supersedes it; analyses "
+                             "use --human-merge.")
     parser.add_argument("--save-thin", type=int, default=config.SAVE_THIN,
                         help="write every n-th draw to the trace file (default "
                              f"config.SAVE_THIN = {config.SAVE_THIN}); convergence and the "
@@ -886,14 +904,17 @@ def main():
                         help="[exploration] keep every draw in RAM until the end instead "
                              "(nutpie's arrow store)")
     parser.add_argument("--human-merge", action="store_true",
-                        help="instead use config.HUMAN_ORDER_MERGED (exploration, or "
-                             "--preset canonical → <data generation>/canonical_humanmerge/): "
-                             "the same tiers with the High School branch merged "
-                             "into the adult spine (Domain Expert beats both a "
-                             "Skilled Generalist and a High School Qualifier, Top "
-                             "Performer beats both a Domain Expert and a High "
-                             "School Top Performer) via a max over parents. "
-                             "Supersedes --human-prior")
+                        help="config.HUMAN_ORDER_MERGED (exploration, or --preset canonical → "
+                             "<data generation>/canonical_humanmerge/): the same tiers with the "
+                             "High School branch merged into the adult spine (Domain Expert beats "
+                             "both a Skilled Generalist and a High School Qualifier, Top Performer "
+                             "beats both a Domain Expert and a High School Top Performer) via a max "
+                             "over parents. THE ORDER EVERY ANALYSIS USES (decision 2026-09-14): the "
+                             "two orders encode the same tiers and the merged one states two more "
+                             "edges, so the flat --human-prior is a sensitivity run, not an "
+                             "alternative. Left off the default on purpose, so that no fit imposes a "
+                             "human order without saying so in its folder name. Supersedes "
+                             "--human-prior")
     parser.add_argument("--lineage-prior", action="store_true",
                         help="[exploration] soft release-chain prior: each release's "
                              "mean step over its predecessor is positive, but a node "

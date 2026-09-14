@@ -5,7 +5,9 @@ and the human-tier crossings of each line. See analysis.frontier_gap.
 
 Runs on one benchmark access scope: the fit on all benchmarks (canonical/) or on one access class
 (canonical_public/, canonical_semi_private/, canonical_private/, from
-`3_fit/fit.py --preset canonical --access CLASS`). Outputs land in the data generation's
+`3_fit/fit.py --preset canonical --access CLASS`). Analyses fit those with --human-merge, which
+lands them in canonical*_humanmerge/; --access names the plain folders, so point --results-dir at
+the merged one (5_outputs/open_closed_frontier/make_plots.sh does it via SCOPE_SUFFIX). Outputs land in the data generation's
 comparisons/ as frontier_gap_<group>_<scope>_*; 2_plot_frontier_gap.py then puts the scopes
 side by side.
 
@@ -54,12 +56,16 @@ class _MiniData:
     n_obs_per_model: np.ndarray
 
 
-def load_matched(trace_path: Path, scope: str, allow_stale: bool):
+def load_matched(trace_path: Path, scope: str, allow_stale: bool, *, fit_humans: bool = True,
+                 include_all_benchmarks: bool = False):
     """Trace + rebuilt data on one common model list; theta0 is (S, n_common). A trace/data
-    mismatch raises unless --allow-stale (name-intersection join)."""
+    mismatch raises unless --allow-stale (name-intersection join). `fit_humans` and
+    `include_all_benchmarks` have to repeat the fit's own flags, or the rebuilt scope will not
+    be the one the trace was sampled on."""
     trace = load_trace(trace_path)
-    drop = None if scope == "all" else access_scope_drop_list(False, scope)
-    data = load_eci_data(drop_benchmarks=drop)
+    drop = None if scope == "all" else access_scope_drop_list(include_all_benchmarks, scope)
+    data = load_eci_data(drop_benchmarks=drop, fit_humans=fit_humans,
+                         include_all_benchmarks=include_all_benchmarks)
     theta_all = capability_draws(trace)                                  # (S, n_trace)
     trace_names = trace.posterior["theta"].coords["model"].values.tolist()
     data_names = data.mlookup.sort_values("model_idx")["model"].tolist()
@@ -95,6 +101,12 @@ def main():
     ap.add_argument("--results-dir", default=None, help="folder holding trace.nc (overrides --access's)")
     ap.add_argument("--allow-stale", action="store_true",
                     help="join trace and data by model name instead of refusing a mismatch")
+    ap.add_argument("--no-humans", action="store_true",
+                    help="the trace was fitted without the human baselines "
+                         "(3_fit/fit.py --no-humans): rebuild the same scope. No human tiers, so "
+                         "no tier lines on the panels and no crossing dates")
+    ap.add_argument("--include-all-benchmarks", action="store_true",
+                    help="the trace kept the curated-excluded benchmarks (--include-all-benchmarks)")
     ap.add_argument("--fit-start", default=config.FORECAST_KW["fit_start"],
                     help="trend lines use frontier points released on or after this date "
                          f"(default {config.FORECAST_KW['fit_start']})")
@@ -106,13 +118,19 @@ def main():
                          "the K=1 reading of the K-axis coverage rule, one benchmark alone is "
                          "not a full unit of evidence)")
     ap.add_argument("--today", default=None, help="pin the 'today' of the gap and the figures")
+    ap.add_argument("--out-dir", default=None,
+                    help="where the tables, draws and figures land (default: the data "
+                         "generation's comparisons/). Give a variant fit its own folder, or it "
+                         "overwrites the canonical scope's outputs under the same stem")
     args = ap.parse_args()
 
     folder, caption = SCOPES[args.access]
     results_dir = Path(args.results_dir) if args.results_dir else config.RESULTS_DIR / folder
     trace_path = results_dir / "trace.nc"
     print(f"Loading {trace_path} ...", flush=True)
-    mini, theta0 = load_matched(trace_path, args.access, args.allow_stale)
+    mini, theta0 = load_matched(trace_path, args.access, args.allow_stale,
+                                fit_humans=not args.no_humans,
+                                include_all_benchmarks=args.include_all_benchmarks)
     print(f"  {mini.n_models} models ({int(mini.is_human.sum())} human tiers, "
           f"{int(mini.is_sota.sum())} SOTA members), {theta0.shape[0]} draws")
 
@@ -127,12 +145,13 @@ def main():
     res = scope_gap(E, mini, model_dates, keep, scope=args.access, kind=args.group,
                     fit_start=args.fit_start, top_k=args.top_k, today=args.today)
 
-    paths = save_scope(res, config.COMPARISONS_DIR)
+    out_dir = Path(args.out_dir) if args.out_dir else config.COMPARISONS_DIR
+    paths = save_scope(res, out_dir)
     for p in paths:
         print(f"wrote {p}")
 
     titles = GROUP_TITLES[args.group]
-    figures_dir = config.COMPARISONS_DIR / config.FIGURES_DIRNAME
+    figures_dir = out_dir / config.FIGURES_DIRNAME
     stem = f"frontier_gap_{args.group}_{args.access}"
     fig = frontier_panels_fig({args.access: res}, [args.access], today=args.today,
                               group_titles=titles,

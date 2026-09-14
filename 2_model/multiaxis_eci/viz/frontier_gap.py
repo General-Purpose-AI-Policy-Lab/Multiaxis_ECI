@@ -74,7 +74,9 @@ def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle 
                     if len(recs_in):
                         lo_.append(float(recs_in["hdi_low"].min()))
                     hi_.append(float(inside["hdi_high"].max()))
-            lo_.append(float(r.humans["mean"].min())); hi_.append(float(r.humans["mean"].max()))
+            if len(r.humans):        # a fit without the human baselines has no tiers to fit in
+                lo_.append(float(r.humans["mean"].min()))
+                hi_.append(float(r.humans["mean"].max()))
         lo, hi = min(lo_), max(hi_)
         pad = 0.06 * (hi - lo)
         y_range = (lo - pad, hi + 2.5 * pad)
@@ -119,7 +121,8 @@ def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle 
                 row=i, col=1)
         fig.add_vline(x=today_s, row=i, col=1,
                       line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
-        _tier_labels(fig, r.humans, i, "y" if i == 1 else f"y{i}", y_range, style, {})
+        if len(r.humans):
+            _tier_labels(fig, r.humans, i, "y" if i == 1 else f"y{i}", y_range, style, {})
         fig.update_yaxes(title_text="ECI-H", range=list(y_range), gridcolor="#eeeeee",
                          zeroline=False, row=i, col=1)
     fig.update_xaxes(range=[window[0], window[1]], dtick="M12", tickformat="%Y",
