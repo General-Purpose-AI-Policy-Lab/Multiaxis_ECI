@@ -179,10 +179,21 @@ def _label_font(style: FigureStyle) -> int:
     return max(int(round(style.font_tier * 0.85)), 8)
 
 
+def _record_label(raw: str) -> str:
+    """The name a record is written under: `pretty_model_name` without the effort suffix.
+
+    The band is as tall as its longest name, so an effort in parentheses — "(thinking)",
+    "(unknown)", "(max)" — costs the panel that height for something the hover, the records CSV
+    and the summary table all carry. One effort per family reaches the frontier, so the shorter
+    name still names exactly one record.
+    """
+    return pretty_model_name(raw.split("_", 1)[0])
+
+
 def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     """The records that carry a lag, in release order, with the name each one is labelled by."""
     rows = df[df["lag_months_median"].notna()].sort_values("release_date")
-    return rows, [("≥ " if bool(r.get("censored", False)) else "") + pretty_model_name(r["name"])
+    return rows, [("≥ " if bool(r.get("censored", False)) else "") + _record_label(r["name"])
                   for _, r in rows.iterrows()]
 
 
