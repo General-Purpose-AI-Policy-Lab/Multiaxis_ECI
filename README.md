@@ -10,6 +10,8 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 3. **Agentic Capabilities** (GBAEval, Remote Labor Index, SWE-Bench Pro)
 4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
+Those are the published fit's axes (`5_outputs/pre_pipeline/`), and the two figures below are its renders. The K=4 flagship refitted on the 2026-09-08 pipeline build reads its axes differently: Legacy QA folds into the agentic axis and a World Knowledge axis takes the fourth slot (Fluid Intelligence & Mathematics, Domain Knowledge, Agentic Capabilities & Legacy QA, World Knowledge, in `5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`). Refitting renames the axes, which is why no axis name is ever hard-coded.
+
 
 <img src="6_writeups/blogpost/figures/loadings_axes_humanmerge.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
 

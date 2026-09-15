@@ -179,7 +179,10 @@ verdict row is appended to the data generation's `comparisons/chain_verdicts.csv
 
 Three refinements: `--fig` also renders the per-chain diagnostic figure,
 `--match-thresh X` overrides the loading-match threshold behind the basin
-assignment, and `--out-csv PATH` redirects the verdict row.
+assignment (default `MATCH_THRESH` = 0.8 since 2026-09-14, raised from 0.6,
+which sat on top of the K=4 flagship's data and made the mode count flip
+between two runs of the same configuration), and `--out-csv PATH` redirects
+the verdict row.
 
 `--write-modes` persists the split to
 `<fit>/mirt_modes_<trace-stem>.json` and stops, loading no data, so a

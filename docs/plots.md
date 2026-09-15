@@ -16,7 +16,7 @@ All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`),
 | destination | written by | tracked? |
 |---|---|---|
 | `mirt{tag}/figures/k{K}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit/fit.py --plots` | no |
-| `canonical/figures/` | `3_fit/fit.py --preset canonical` | no |
+| `canonical_humanmerge/figures/` | `3_fit/fit.py --preset canonical --human-merge` (the order every analysis passes; without the flag, `canonical/figures/`) | no |
 | `comparisons/figures/` | `4_diagnostics/1_frontier_gap.py`, `2_plot_frontier_gap.py` | no |
 | `5_outputs/open_closed_frontier/` (+ `fr/`, `fr/svg/`) | `5_outputs/open_closed_frontier/make_plots.sh` (copies the frontier-gap deliverables out of `comparisons/`) | **yes**, except `*.html` |
 | `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |

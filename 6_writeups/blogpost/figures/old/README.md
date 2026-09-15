@@ -10,4 +10,6 @@ Also here: the page renders of `docs/make_prior_graph.py`'s prior_graph.pdf
 (`prior_graph-*.png`, source material for the diagrams that
 `make_prior_diagrams.py` now draws directly) and the pre-envelope 80%-HDI
 preview of the trend figure (`forecast_trend_plotly_hdi80.*`, redundant since
-the main `forecast_trend_plotly` moved to 80% intervals).
+the main trend figure moved to 80% intervals). File names here keep the retired
+`_plotly` / `_draft` tokens on purpose: one level up they were dropped on
+2026-09-15, every figure now carrying the tag of the fit it reads.

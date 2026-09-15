@@ -1,8 +1,10 @@
 # 4. Diagnostics
 
 Post-fit tools, all command-line scripts. They read a fitted trace (the
-canonical one at `5_outputs/<data generation>/canonical/trace.nc`, from
-`python 3_fit/fit.py --preset canonical`; exploration traces in the `mirt*/` folders beside it).
+canonical one at `5_outputs/<data generation>/canonical_humanmerge/trace.nc`, from
+`python 3_fit/fit.py --preset canonical --human-merge`, the human tier order every analysis
+passes since 2026-09-14; a run without it writes to plain `canonical/`. Exploration traces
+sit in the `mirt*/` folders beside it).
 
 The four numbered scripts are the reproduction path, in order. The rest is a
 toolbox with no order to it, reached for when a fit looks wrong. The curated-data
