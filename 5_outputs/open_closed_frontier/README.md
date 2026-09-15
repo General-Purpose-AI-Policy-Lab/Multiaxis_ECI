@@ -57,11 +57,18 @@ What the numbers say:
 
 ```bash
 python 1_curated/3_build_model_openness.py                                   # after a sync
-python 3_fit/fit.py --preset canonical                                       # canonical/, full length
-python 3_fit/fit.py --preset canonical --access public       --chains 4 --draws 2000 --tune 2000
-python 3_fit/fit.py --preset canonical --access semi_private --chains 4 --draws 2000 --tune 2000
-python 3_fit/fit.py --preset canonical --access private      --chains 4 --draws 2000 --tune 2000
-TODAY=2026-09-11 5_outputs/open_closed_frontier/make_plots.sh                      # steps 1-2 on the four scopes, copies here
+python 3_fit/fit.py --preset canonical --human-merge                         # canonical_humanmerge/, full length
+python 3_fit/fit.py --preset canonical --access public       --human-merge --chains 4 --draws 2000 --tune 2000
+python 3_fit/fit.py --preset canonical --access semi_private --human-merge --chains 4 --draws 2000 --tune 2000
+python 3_fit/fit.py --preset canonical --access private      --human-merge --chains 4 --draws 2000 --tune 2000
+SCOPE_SUFFIX=_humanmerge TODAY=2026-09-14 5_outputs/open_closed_frontier/make_plots.sh   # steps 1-2 on the four scopes, copies here
+```
+
+`--human-merge` is the human tier order every analysis passes (decision 2026-09-14). The figures
+currently committed here predate it: they come from the 2026-09-11 fits in `canonical/` and
+`canonical_<CLASS>/`, which carry no human ordering prior. Dropping `SCOPE_SUFFIX` reproduces those.
+
+```bash
 ```
 
 ## Files

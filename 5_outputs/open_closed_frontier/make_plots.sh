@@ -4,23 +4,31 @@
 # copy of the deliverables into this folder — English at the top level, French under fr/ with the
 # vector twins the lab's site embeds in fr/svg/.
 #
-# Prerequisites: the four K=1 fits of the current data generation,
-#   python 3_fit/fit.py --preset canonical                                   # canonical/ (full length)
-#   python 3_fit/fit.py --preset canonical --access public       --chains 4 --draws 2000 --tune 2000
-#   python 3_fit/fit.py --preset canonical --access semi_private --chains 4 --draws 2000 --tune 2000
-#   python 3_fit/fit.py --preset canonical --access private      --chains 4 --draws 2000 --tune 2000
+# Prerequisites: the four K=1 fits of the current data generation, with the human tier order every
+# analysis passes (--human-merge, decision 2026-09-14),
+#   python 3_fit/fit.py --preset canonical --human-merge                     # canonical_humanmerge/ (full length)
+#   python 3_fit/fit.py --preset canonical --access public       --human-merge --chains 4 --draws 2000 --tune 2000
+#   python 3_fit/fit.py --preset canonical --access semi_private --human-merge --chains 4 --draws 2000 --tune 2000
+#   python 3_fit/fit.py --preset canonical --access private      --human-merge --chains 4 --draws 2000 --tune 2000
 # and the openness labels: python 1_curated/3_build_model_openness.py (after a sync).
+#
+# SCOPE_SUFFIX names the fit folders to read: empty (default) is the plain canonical*/ set the
+# committed figures came from, SCOPE_SUFFIX=_humanmerge reads the merged refits once they exist.
+#   SCOPE_SUFFIX=_humanmerge TODAY=2026-09-14 5_outputs/open_closed_frontier/make_plots.sh
 set -e
 cd "$(dirname "$0")/../.."
 PY=.venv/bin/python
 OUT=5_outputs/open_closed_frontier
 GROUP=${GROUP:-openness}          # GROUP=country make_plots.sh for the US vs CN cut
 TODAY=${TODAY:-}                  # TODAY=2026-09-11 pins the today line
+SCOPE_SUFFIX=${SCOPE_SUFFIX:-}    # _humanmerge reads the canonical*_humanmerge/ fits instead
 T=(); [[ -n "$TODAY" ]] && T=(--today "$TODAY")
 GEN=$($PY -c "import sys; sys.path.insert(0, '2_model'); from multiaxis_eci import config; print(config.RESULTS_DIR)")
 
 for A in all public semi_private private; do
-  $PY 4_diagnostics/1_frontier_gap.py --access $A --group $GROUP $T
+  D=(); [[ -n "$SCOPE_SUFFIX" ]] && \
+    D=(--results-dir "$GEN/canonical$([[ $A == all ]] || echo _$A)$SCOPE_SUFFIX")
+  $PY 4_diagnostics/1_frontier_gap.py --access $A --group $GROUP $T $D
 done
 $PY 4_diagnostics/2_plot_frontier_gap.py --group $GROUP $T
 

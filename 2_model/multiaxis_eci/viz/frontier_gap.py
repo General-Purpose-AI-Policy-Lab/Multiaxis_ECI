@@ -276,8 +276,13 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     # that tie each one to its line: measured off the longest name, with a tenth in hand for the
     # French renders' own wording. Above the panel only the marker key is left, one row.
     name_px = GLYPH_W * style.font_tier * max(len(scope_titles.get(s, s)) for s in drawn)
+    # The marker key sits in that margin too, and on a single-scope panel it is the longer of the
+    # two: "All benchmarks" alone would size a margin the key then overflows.
+    key_px = (GLYPH_W * style.font_legend * max(len(t) for _, _, t in MARKER_KEY)
+              + 3.0 * style.font_legend)
     lead_px = _leader_px(style)
-    margin = dict(l=int(style.font_tick * 5), r=int(lead_px + 1.1 * name_px + style.font_tier),
+    margin = dict(l=int(style.font_tick * 5),
+                  r=int(lead_px + 1.1 * max(name_px, key_px) + style.font_tier),
                   t=int(style.font_title * 2.8) if title else int(style.font_legend * 1.4),
                   b=int(style.font_tick * 6),
                   autoexpand=False)                # these margins ARE the plotting area
