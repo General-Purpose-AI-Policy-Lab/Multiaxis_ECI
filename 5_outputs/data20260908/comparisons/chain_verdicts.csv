@@ -4,5 +4,6 @@ canonical_data20260907,results/canonical_data20260907/trace.nc,8,4587,148.77,2.2
 censor_humanmerge_short,results/canonical_censor_humanmerge_data20260908/trace.nc,4,5122,515.61,5.21,1.5959,1.6209,3,1.013,ISLANDS,3
 canonical_data20260908,results/canonical_data20260908/trace.nc,8,71,2.07,0.17,1.002,1.0026,,1.002,CONVERGED,
 canonical_humanmerge_data20260908,results/canonical_humanmerge_data20260908/trace.nc,8,431,2.04,0.071,1.0016,1.0016,,1.0016,CONVERGED,
-k4_main,results/mirt_humanmerge_lineageprior_lineagebm_data20260908/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,241,20.9,0.8,1.1479,1.1018,1 6,1.0972,ISLANDS,
-k4_long,5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,44,23.43,0.802,1.1419,1.1188,1 6,1.0924,ISLANDS,
+k4_long,5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,1258,26.48,0.836,1.1024,1.094,0 1 3 4,1.0172,ISLANDS,
+k4_main,5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm_short2000x8/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,241,20.9,0.8,1.1479,1.1018,0 1 3 6,1.04,ISLANDS,
+k4_nolineage,5_outputs/data20260908/mirt_humanmerge/trace_mirt_k4_humanmerge.nc,8,2453,1777.21,2.384,3.4104,4.0851,1 2 3 4 5 6 7,,ISLANDS,

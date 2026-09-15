@@ -1,0 +1,81 @@
+{
+  "confirmed": true,
+  "how": "Names carried over from the short 2000x8 fit of the same configuration (hand-named 2026-09-10 from its majority chains 2,4,5,7) after checking that axis k of this fit is axis k there: loadings correlate 0.985 to 0.9997 per axis and factor scores 0.996 to 0.9996, and each axis still carries its signature among its top benchmarks by share. Confirmed on the long fit 2026-09-14. A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
+  "axes": {
+    "axis1": {
+      "title": "Fluid Intelligence & Mathematics",
+      "title_fr": "Intelligence fluide et mathématiques",
+      "signature": [
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "OTIS Mock AIME 2024-2025"
+      ],
+      "top_benchmarks": [
+        "DeepSWE",
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "OTIS Mock AIME 2024-2025",
+        "MCP Atlas",
+        "CritPt",
+        "MATH Level 5",
+        "AudioMultiChallenge"
+      ]
+    },
+    "axis2": {
+      "title": "Domain Knowledge",
+      "title_fr": "Connaissances de domaine",
+      "signature": [
+        "WMDP Biology",
+        "WMDP Chemistry"
+      ],
+      "top_benchmarks": [
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "CyberGym",
+        "MMLU Pro Biology",
+        "MMLU",
+        "GDPval",
+        "CyScenarioBench",
+        "GSM8K"
+      ]
+    },
+    "axis3": {
+      "title": "Agentic Capabilities & Legacy QA",
+      "title_fr": "Capacités agentiques et QA classiques",
+      "signature": [
+        "OSWorld",
+        "GBAEval",
+        "OpenBookQA",
+        "ARC AI2"
+      ],
+      "top_benchmarks": [
+        "OSWorld",
+        "OpenBookQA",
+        "ARC AI2",
+        "PostTrainBench v1.1",
+        "CTI-REALM",
+        "MirrorCode",
+        "PIQA",
+        "HellaSwag"
+      ]
+    },
+    "axis4": {
+      "title": "World Knowledge",
+      "title_fr": "Connaissances du monde",
+      "signature": [
+        "SimpleQA Verified",
+        "DeepResearch Bench"
+      ],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "DeepResearch Bench",
+        "Balrog",
+        "EBR-bench",
+        "SimpleBench",
+        "HellaSwag",
+        "TriviaQA",
+        "OpenBookQA"
+      ]
+    }
+  }
+}

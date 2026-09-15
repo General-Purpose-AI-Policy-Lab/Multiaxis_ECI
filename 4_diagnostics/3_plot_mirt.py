@@ -14,7 +14,7 @@ iterating on one freshly-fit trace without rebuilding the whole dashboard.
 
 Run:
   python 4_diagnostics/3_plot_mirt.py \
-      --trace 5_outputs/<data>/mirt_humanprior/trace_mirt_k3_humanprior.nc
+      --trace 5_outputs/<data>/mirt_humanmerge/trace_mirt_k3_humanmerge.nc
   python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/<data>/
 
 A multi-GB trace goes through `--thin` (the flagship uses

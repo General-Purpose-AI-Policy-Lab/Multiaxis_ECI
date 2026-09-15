@@ -81,8 +81,17 @@ THRESHOLDS = {
 
 # min matched-loading correlation for "same solution as the reference chain".
 # Same-solution chains reach ~0.7 even on a weak axis; a genuine island sits
-# well below (0.49 in the floors report) — 0.6 splits the two clusters.
-MATCH_THRESH = 0.6
+# well below (0.49 in the floors report), which is what 0.6 was calibrated on.
+# Raised to 0.8 on 2026-09-14: on the K=4 flagship fit 0.6 sat right on top of
+# the data. The long fit's non-majority chains have a worst internal pair of
+# 0.674 and the short fit's 0.42, so 0.6 read one grab-bag mode on one and two
+# on the other and the count moved between two runs of the SAME configuration
+# for no other reason. 0.8 is above both and reports 3 modes on both, with the
+# same majority group either way (the tight [2,5,6,7] / [2,4,5,7] bundle, whose
+# worst internal pair is 0.90). It is a stricter reading: a mode is now chains
+# that agree closely, and chains that merely fail to contradict each other are
+# split out rather than pooled.
+MATCH_THRESH = 0.8
 
 
 def _load_matching_data(idata):

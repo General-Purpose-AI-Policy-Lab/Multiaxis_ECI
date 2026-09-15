@@ -11,9 +11,9 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
 
-<img src="6_writeups/blogpost/figures/loadings_axes_plotly_draft.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
+<img src="6_writeups/blogpost/figures/loadings_axes_humanmerge.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
 
-<img src="6_writeups/blogpost/figures/forecast_trend_plotly_majority.png" width="560" alt="Frontier trend per axis (majority chains): one line for reasoning models, one for the others, with human tiers">
+<img src="6_writeups/blogpost/figures/forecast_trend_majority.png" width="560" alt="Frontier trend per axis (majority chains): one line for reasoning models, one for the others, with human tiers">
 
 Scope of the published fits: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions. On the pipeline build of 2026-09-08, without the isolated families, the same scopes hold 5,307 / 802 / 97 and 4,461 / 727 / 89 (see the Data section).
 
@@ -53,11 +53,13 @@ python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --draws 100
 
 Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and 16,000 saved draws pin every median and interval the figures show. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default; `--no-stream-draws` restores the in-memory run), so the machine stays usable during a ten-hour fit; the store is deleted once the thinned trace is saved.
 
-The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical/`:
+The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical_humanmerge/`:
 
 ```bash
-python 3_fit/fit.py --preset canonical
+python 3_fit/fit.py --preset canonical --human-merge
 ```
+
+`--human-merge` is the human tier order every analysis uses (decision 2026-09-14). It is deliberately not a default: no fit imposes an order on the human tiers without saying so in its folder name. The flat `--human-prior` is a sensitivity variant, and a run with neither writes to plain `canonical/`.
 
 ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2024-10-22) = 130 and GPT-5 (2025-08-07, medium) = 150, matching the scale of Epoch's dashboard. Every other flag, where a fit's output lands, and the plot / diagnose / dashboard commands: [docs/cli.md](docs/cli.md).
 

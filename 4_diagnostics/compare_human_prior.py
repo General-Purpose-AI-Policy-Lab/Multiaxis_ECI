@@ -27,6 +27,12 @@ HISTORICAL: the trace pairs in `PAIRS` were fitted under the retired
 `noard_aqmatrix` grammar, which no current 3_fit/fit.py flag set can regenerate.
 The script skips gracefully when the traces are absent (any fresh clone), and
 is kept as the record of how the human-prior confirmation was run.
+
+The `ordered` side of every pair is the FLAT config.HUMAN_ORDER — the only order
+that existed when this ran. It is a record of ordered-vs-independent, not of
+flat-vs-merged, and it is the last live reader of the flat order: since
+2026-09-14 every analysis passes --human-merge, and --human-prior is a
+sensitivity variant. Nothing here needs re-running for that decision.
 """
 from __future__ import annotations
 

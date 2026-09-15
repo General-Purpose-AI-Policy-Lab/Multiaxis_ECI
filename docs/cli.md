@@ -30,8 +30,8 @@ unmarked to both.
 | `--K N` | `[expl]` latent dimension. Default 4 |
 | `--loading-prior {normal,signed,pt1,bifactor}` | `[expl]` default `normal`, non-negative. `signed` allows a contrast axis and is rotation-invariant; `pt1` is `normal` under product-to-one loadings per axis (Epoch's identification); `bifactor` is a dense general column plus horseshoe specifics, `--K >= 2` |
 | `--link {linear,loglog}` | `[expl]` `linear` is the 2PL; `loglog` is a disjunctive best-axis family |
-| `--human-prior` | order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order. Also accepted by `--preset canonical`, which then writes to `canonical_humanprior/` under the data generation's folder |
-| `--human-merge` | instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents. Also accepted by `--preset canonical` (`canonical_humanmerge/`) |
+| `--human-prior` | order human tiers by `multiaxis_eci.config.HUMAN_ORDER`, a tree partial order leaving the High School branch incomparable with the adult spine. A sensitivity variant of `--human-merge`, not an alternative to it. Also accepted by `--preset canonical`, which then writes to `canonical_humanprior/` under the data generation's folder |
+| `--human-merge` | instead use `multiaxis_eci.config.HUMAN_ORDER_MERGED`, which merges the High School branch into the adult spine via a max over parents. **The order every analysis passes** (decision 2026-09-14); left out of the defaults so that a fit never imposes a human order without saying so in its folder name. Also accepted by `--preset canonical` (`canonical_humanmerge/`) |
 | `--lineage-prior` | `[expl]` soft vendor release-chain prior: each release's mean step over its predecessor is positive, but a node can regress |
 | `--lineage-bm` | `[expl]` with `--lineage-prior`: index the chain by time, so each step scales with the release gap in years |
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
@@ -68,7 +68,7 @@ unmarked to both.
 
 | flag | effect |
 |---|---|
-| `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI-H deliverables to `5_outputs/<data generation>/canonical/` |
+| `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI-H deliverables to `5_outputs/<data generation>/canonical/` — analyses add `--human-merge`, which moves them to `canonical_humanmerge/` |
 | `--skip-sampling` | `[canon]` reuse that folder's `trace.nc`. Must match the current data shape |
 | `--raw-c` | `[canon]` report raw C instead of anchored ECI-H |
 | `--skip-baseline` / `--refit-baseline` | `[expl]` skip or force the K=1 baseline fit |

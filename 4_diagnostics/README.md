@@ -36,7 +36,7 @@ trace as a card, then build.
 | `align_mirt.py` | Per-draw rotation-alignment comparison on an existing signed trace |
 | `residual_corr.py` | Is 1D capability sufficient? Observed minus model-implied benchmark correlations (see below) |
 | `ppca_explained_variance.py` | PPCA scree / explained-variance report on logit scores |
-| `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit |
+| `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit. Historical: archived traces, flat `HUMAN_ORDER`, not re-runnable and not affected by the 2026-09-14 move to `--human-merge` for analyses |
 | `forecast_only.py` | Re-render only the frontier-forecast figures of one dashboard card |
 | `plot_lineage.py` | Reference render of the lineage prior's structure, as a multi-page PDF |
 

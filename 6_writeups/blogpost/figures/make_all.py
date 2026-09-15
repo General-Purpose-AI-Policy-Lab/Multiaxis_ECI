@@ -18,7 +18,7 @@ settings are the ones the rest of the repo uses. Nothing is hand-copied.
 
 Every figure is a `multiaxis_eci.viz` builder at the `POST` scale: the same code
 draws the dashboard cards and the per-fit figure folders, so the post cannot
-drift from the outputs. The `*_lw_plotly` names are the post's own file names.
+drift from the outputs. The `*_lw` names are the post's own file names.
 
 The forecast cache is `lw_forecast_cache_80.pkl` in the flagship's results folder, next to the
 trace it was computed from, not in the temp dir: it is derived from one specific
@@ -83,7 +83,7 @@ def compute(view, data, raw) -> dict:
 
     `analysis.axis_forecast_inputs` (FORECAST_KW, envelope basis, 80% intervals) with the
     post's fixed horizon. The crossover figure reads only the ForecastResult
-    (slope/intercept draws) out of this, through `make_trend_plotly.forecast`'s cache.
+    (slope/intercept draws) out of this, through `make_trend.forecast`'s cache.
     """
     from multiaxis_eci.analysis import axis_forecast_inputs
 
@@ -120,7 +120,7 @@ def forests(out_dir: Path) -> Path:
     fig = forest_grid_fig(frames, [AXIS_TITLES[n] for n in view.names], title=None,
                           style=POST, collapse_frontier=True,
                           col_domains=[(0.0, 0.27), (0.73, 0.96)])
-    return save_print(fig, out_dir / "forests_axes_lw_plotly")
+    return save_print(fig, out_dir / "forests_axes_lw")
 
 
 def loadings(out_dir: Path, top_n: int = 20) -> Path:
@@ -135,7 +135,7 @@ def loadings(out_dir: Path, top_n: int = 20) -> Path:
     ldf = loadings_table(view.require_A(), bench, hdi=(2.5, 97.5))
     fig = loadings_grid_fig(ldf, AXIS_TITLES, top_n=top_n, x_title="loading", style=POST,
                             col_domains=[(0.0, 0.30), (0.70, 0.96)])
-    return save_print(fig, out_dir / "loadings_axes_lw_plotly")
+    return save_print(fig, out_dir / "loadings_axes_lw")
 
 
 def axis_timelines(out_dir: Path) -> Path:
@@ -173,7 +173,7 @@ def axis_timelines(out_dir: Path) -> Path:
     # and Plotly otherwise reads the axis as numeric and drops the date strings.
     grid.update_xaxes(type="date", title_text="Release date")
     grid.update_yaxes(title_text="ability")
-    return save_print(grid, out_dir / "timelines_axes_lw_plotly")
+    return save_print(grid, out_dir / "timelines_axes_lw")
 
 
 def main() -> None:
@@ -187,19 +187,19 @@ def main() -> None:
     args = p.parse_args()
 
     if args.what in ("all", "crossover"):
-        import make_crossover_plotly
+        import make_crossover
         print("crossover:")
         # Reads lw_crossover_50_80.csv beside the trace when it exists;
         # --cached refuses the trace-opening rebuild.
-        make_crossover_plotly.main(out_dir=args.out, cached=args.cached)
+        make_crossover.main(out_dir=args.out, cached=args.cached)
     if args.what in ("all", "trend"):
-        import make_trend_plotly
+        import make_trend
         print("trend:")
-        make_trend_plotly.main(out_dir=args.out, cached=args.cached)
+        make_trend.main(out_dir=args.out, cached=args.cached)
     if args.what in ("all", "timeline"):
-        import make_timeline_plotly
+        import make_timeline
         print("timeline:")
-        make_timeline_plotly.main(make_timeline_plotly.DEFAULT_RESULTS, "_draft",
+        make_timeline.main(make_timeline.DEFAULT_RESULTS, "_humanmerge",
                                   out_dir=args.out)
     # The three per-axis figures read the trace (one load, shared by all three).
     for what, fn in (("forests", forests), ("loadings", loadings),

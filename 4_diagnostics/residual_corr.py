@@ -43,7 +43,7 @@ OUT_DIR = config.DIAGNOSTICS_DIR
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Load trace + data ─────────────────────────────────────────────────────
-trace = az.from_netcdf(config.RESULTS_DIR / "canonical" / "trace.nc")
+trace = az.from_netcdf(config.RESULTS_DIR / "canonical_humanmerge" / "trace.nc")
 data = load_eci_data()
 
 C_mean = capability_draws(trace).mean(axis=0)                        # (M,)
@@ -60,7 +60,7 @@ B = data.n_benchmarks
 if (C_mean.shape[0], D_mean.shape[0]) != (M, B):
     raise RuntimeError(
         f"Trace shape (M={C_mean.shape[0]}, B={D_mean.shape[0]}) does not match "
-        f"data shape (M={M}, B={B}). Re-run `python 3_fit/fit.py --preset canonical` "
+        f"data shape (M={M}, B={B}). Re-run `python 3_fit/fit.py --preset canonical --human-merge` "
         f"with the same flags that produced the data you want to analyze."
     )
 

@@ -19,7 +19,7 @@ Usage:
 
 `--cached` skips every figure that would need to open the 13 GB trace
 (keeps: crossovers, the pooled trend, the 1D timelines). `--only` names a
-subset: timeline, timeline_humanmerge, trend, trend_majority, trend_minority,
+subset: timeline, timeline_nohumanorder, trend, trend_majority, trend_minority,
 crossover, crossover_majority, crossover_minority, crossover_majority95,
 crossover_minority95, forests, forests_minority, loadings, human_modes,
 split_takers, pit. `--post` is the subset the French post embeds (what
@@ -46,7 +46,7 @@ FR_DIR = HERE / "fr"
 
 # The figures the French post embeds, i.e. the set `fr/` tracks (the pooled
 # trend/crossover and the minority trend are English-post appendix renders).
-POST = {"timeline", "timeline_humanmerge", "trend_majority",
+POST = {"timeline", "timeline_nohumanorder", "trend_majority",
         "crossover_majority", "crossover_minority", "crossover_majority95",
         "crossover_minority95", "forests", "forests_minority", "loadings",
         "human_modes", "split_takers", "pit"}
@@ -95,56 +95,58 @@ def main(cached_only: bool = False, only: set[str] | None = None) -> None:
         return not (cached_only and needs_trace)
 
     if want("timeline"):
-        import make_timeline_plotly
-        _patched(make_timeline_plotly).main(make_timeline_plotly.DEFAULT_RESULTS, "_draft",
+        import make_timeline
+        _patched(make_timeline).main(make_timeline.DEFAULT_RESULTS, "_humanmerge",
                                             out_dir=FR_DIR)
-    if want("timeline_humanmerge"):
-        # The --human-merge variant of Figure 1 (canonical_humanmerge/ of the data generation).
-        import make_timeline_plotly
-        _patched(make_timeline_plotly).main(make_timeline_plotly.DEFAULT_RESULTS.parent / "canonical_humanmerge",
-                                            "_humanmerge", out_dir=FR_DIR)
+    if want("timeline_nohumanorder"):
+        # Sensitivity twin of Figure 1: the same timeline on the fit with NO human ordering
+        # prior (canonical/). The two swapped roles on 2026-09-15, when figure 1 moved to
+        # canonical_humanmerge/; this render is what used to be the main one.
+        import make_timeline
+        _patched(make_timeline).main(make_timeline.DEFAULT_RESULTS.parent / "canonical",
+                                            "_nohumanorder", out_dir=FR_DIR)
     if want("trend"):
-        import make_trend_plotly
-        _patched(make_trend_plotly).main(tag="", out_dir=FR_DIR, cached=True)
+        import make_trend
+        _patched(make_trend).main(tag="", out_dir=FR_DIR, cached=True)
     for tag, chains in (("majority", [2, 4, 5, 6, 7, 9]),
                         ("minority", [0, 1, 3, 8])):
         if want(f"trend_{tag}", needs_trace=True):
-            import make_trend_plotly
-            _patched(make_trend_plotly).main(tag=f"_{tag}", out_dir=FR_DIR,
+            import make_trend
+            _patched(make_trend).main(tag=f"_{tag}", out_dir=FR_DIR,
                                              chains=chains)
     if want("crossover"):
-        import make_crossover_plotly
-        _patched(make_crossover_plotly).main(out_dir=FR_DIR, cached=True)
+        import make_crossover
+        _patched(make_crossover).main(out_dir=FR_DIR, cached=True)
     for tag, chains, probs in (("majority", [2, 4, 5, 6, 7, 9], (0.5, 0.8)),
                                ("minority", [0, 1, 3, 8], (0.5, 0.8)),
                                ("majority95", [2, 4, 5, 6, 7, 9], (0.95,)),
                                ("minority95", [0, 1, 3, 8], (0.95,))):
         if want(f"crossover_{tag}"):
-            import make_crossover_plotly
-            _patched(make_crossover_plotly).main(tag=f"_{tag}", out_dir=FR_DIR,
+            import make_crossover
+            _patched(make_crossover).main(tag=f"_{tag}", out_dir=FR_DIR,
                                                  cached=True, chains=chains,
                                                  probs=probs)
     if want("forests", needs_trace=True):
-        import make_forests_plotly
-        _patched(make_forests_plotly).main(tag="_draft", out_dir=FR_DIR)
+        import make_forests
+        _patched(make_forests).main(tag="_humanmerge", out_dir=FR_DIR)
     if want("forests_minority", needs_trace=True):
-        import make_forests_plotly
-        _patched(make_forests_plotly).main(
-            tag="_draft", out_dir=FR_DIR,
-            chains=make_forests_plotly.MINORITY_CHAINS)
+        import make_forests
+        _patched(make_forests).main(
+            tag="_humanmerge", out_dir=FR_DIR,
+            chains=make_forests.MINORITY_CHAINS)
     if want("loadings", needs_trace=True):
-        import make_loadings_plotly
-        _patched(make_loadings_plotly,
-                 extra=[(" (obsolète)", "")]).main(tag="_draft", out_dir=FR_DIR)
+        import make_loadings
+        _patched(make_loadings,
+                 extra=[(" (obsolète)", "")]).main(tag="_humanmerge", out_dir=FR_DIR)
     if want("human_modes", needs_trace=True):
-        import make_human_modes_plotly
-        _patched(make_human_modes_plotly).main(out_dir=FR_DIR)
+        import make_human_modes
+        _patched(make_human_modes).main(out_dir=FR_DIR)
     if want("split_takers", needs_trace=True):
-        import make_split_takers_plotly
-        _patched(make_split_takers_plotly).main(out_dir=FR_DIR)
+        import make_split_takers
+        _patched(make_split_takers).main(out_dir=FR_DIR)
     if want("pit", needs_trace=True):
-        import make_pit_plotly
-        _patched(make_pit_plotly).main(out_dir=FR_DIR)
+        import make_pit
+        _patched(make_pit).main(out_dir=FR_DIR)
 
 
 if __name__ == "__main__":

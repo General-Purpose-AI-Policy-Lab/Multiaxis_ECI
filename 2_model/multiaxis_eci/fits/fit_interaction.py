@@ -22,9 +22,9 @@ mode-restricted there.
 
 Run:
   python fits/fit_interaction.py --prior-check
-  python fits/fit_interaction.py --human-prior --lineage-prior
+  python fits/fit_interaction.py --human-merge --lineage-prior
   python fits/fit_interaction.py --loading-prior normal \\
-      --floors --human-prior --lineage-prior --gamma-pooling pooled
+      --floors --human-merge --lineage-prior --gamma-pooling pooled
 """
 from __future__ import annotations
 
@@ -50,6 +50,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
 from multiaxis_eci.config import (  # noqa: E402
     FIGURES_DIRNAME,
     HUMAN_ORDER,
+    HUMAN_ORDER_MERGED,
     SAMPLE_KW,
     SG_MODEL_NAME,
 )
@@ -158,7 +159,13 @@ def main():
                     help="fixed-c 3PL: clip below-floor scores up to each "
                          "benchmark's chance floor and set mu = c + (1-c)*sigmoid "
                          "(floors from the view's lower_bound column)")
-    ap.add_argument("--human-prior", action="store_true")
+    ap.add_argument("--human-prior", action="store_true",
+                    help="the FLAT config.HUMAN_ORDER, a sensitivity variant of "
+                         "--human-merge; tag token _hp")
+    ap.add_argument("--human-merge", action="store_true",
+                    help="config.HUMAN_ORDER_MERGED, the High School branch merged into the "
+                         "adult spine — the tier order every analysis passes (2026-09-14); "
+                         "tag token _hm. Supersedes --human-prior")
     ap.add_argument("--lineage-prior", action="store_true")
     ap.add_argument("--drop-low-obs", action="store_true")
     ap.add_argument("--no-sg", action="store_true",
@@ -189,7 +196,8 @@ def main():
         data = clip_scores_to_floors(data, floor_c)
         print(f"--floors: fixed-c 3PL; clipped {n_before} below-floor scores up "
               f"to their benchmark chance floor")
-    human_order = HUMAN_ORDER if args.human_prior else None
+    human_order = (HUMAN_ORDER_MERGED if args.human_merge
+                   else HUMAN_ORDER if args.human_prior else None)
     lineage_struct = None
     if args.lineage_prior:
         from multiaxis_eci.lineage import build_lineage_structure
@@ -241,7 +249,7 @@ def main():
     gptag = {"benchmark": "", "pooled": "_gpooled", "none": "_gnone"}[args.gamma_pooling]
     tag = ("_interaction" + gptag
            + ("_normal" if args.loading_prior == "normal" else "")
-           + ("_hp" if human_order else "") + ("_lp" if lineage_struct is not None else "")
+           + ("_hm" if args.human_merge else "_hp" if human_order else "") + ("_lp" if lineage_struct is not None else "")
            + ("_noSG" if args.no_sg else "") + ("_noSGgpqa" if args.no_sg_gpqa else "")
            + ("_floors" if args.floors else ""))
     save_trace(idata, RESULTS_DIR / f"trace_mirt{tag}.nc")

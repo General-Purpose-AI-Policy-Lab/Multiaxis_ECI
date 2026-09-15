@@ -17,7 +17,7 @@ Data scope scored on:
 
 | fit | type | K | free_loadings | R2 | RMSE | MAE | PIT_var | eta_rhat | divergences | max_phi |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| K=4 · pooled · merge · flagship | exploratory | 4 | 388 | 0.9606 | 0.0457 | 0.0304 | 0.0474 | 1.142 | 44 | 0.91 |
+| K=4 · pooled · merge · flagship | exploratory | 4 | 388 | 0.9607 | 0.0457 | 0.0304 | 0.0474 | 1.102 | 1258 | 0.894 |
 
 Columns: `type`; `free_loadings` = free loading cells (complexity); `R2`/`RMSE`/
 `MAE` = fit; `PIT_var` = calibration (ideal 0.083, below = under-confident);
@@ -28,7 +28,7 @@ draws, ESS and divergences for every card whose trace is still on disk.
 
 ## Convergence
 
-`eta_rhat` is 1.142 on the one card, against a ≤ 1.01 target. High R² is not trust: read
+`eta_rhat` is 1.102 on the one card, against a ≤ 1.01 target. High R² is not trust: read
 `cmp_convergence` beside `cmp_gof`, and the ESS column of
 `mode_eval_table.csv`.
 

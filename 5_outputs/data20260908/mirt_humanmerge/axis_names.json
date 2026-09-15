@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "AISI CTF Suites - Technical Non-Expert",
+        "DeepSWE",
+        "CritPt",
+        "VPCT",
+        "The Agent Company",
+        "OTIS Mock AIME 2024-2025"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "Chess Puzzles",
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "OEIS Open Lite",
+        "InterCode-CTF",
+        "MMLU Pro Chemistry",
+        "MMLU Pro Biology",
+        "AISI CTF Suites - Expert"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GSM8K",
+        "WinoGrande",
+        "PIQA",
+        "MMLU",
+        "HellaSwag",
+        "OSWorld",
+        "CyScenarioBench",
+        "OpenBookQA"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "ARC AI2",
+        "TriviaQA",
+        "PRBench",
+        "OpenBookQA",
+        "FrontierMath Erdos",
+        "AudioMultiChallenge",
+        "HellaSwag"
+      ]
+    }
+  }
+}

@@ -3,7 +3,7 @@
 Driver for models/mirt_sparse.py. Three pure anchors form an identity block
 (ARC-AGI-2 -> reasoning, MMLU -> knowledge, OS World (Screenshot) -> agentic); a
 regularized ("Finnish") horseshoe estimates every other benchmark's per-axis
-gates. Discrimination is fixed a=1. --human-prior / --lineage-prior add the theta
+gates. Discrimination is fixed a=1. --human-merge / --lineage-prior add the theta
 ordering priors.
 
 What it does:
@@ -16,7 +16,7 @@ What it does:
 
 Run:
   python fits/fit_sparse.py --prior-check
-  python fits/fit_sparse.py --human-prior --lineage-prior
+  python fits/fit_sparse.py --human-merge --lineage-prior
 """
 from __future__ import annotations
 
@@ -41,6 +41,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
 from multiaxis_eci.config import (  # noqa: E402
     FIGURES_DIRNAME,
     HUMAN_ORDER,
+    HUMAN_ORDER_MERGED,
     RH_TAU_SCALE,
     SAMPLE_KW,
     SG_MODEL_NAME,
@@ -104,7 +105,13 @@ def main():
     ap.add_argument("--gate-tau0", type=float, default=RH_TAU_SCALE,
                     help="global horseshoe scale on the gates; smaller = stronger sparsity")
     ap.add_argument("--sampler", default="nutpie", choices=["pymc", "nutpie", "numpyro"])
-    ap.add_argument("--human-prior", action="store_true")
+    ap.add_argument("--human-prior", action="store_true",
+                    help="the FLAT config.HUMAN_ORDER, a sensitivity variant of "
+                         "--human-merge; tag token _hp")
+    ap.add_argument("--human-merge", action="store_true",
+                    help="config.HUMAN_ORDER_MERGED, the High School branch merged into the "
+                         "adult spine — the tier order every analysis passes (2026-09-14); "
+                         "tag token _hm. Supersedes --human-prior")
     ap.add_argument("--lineage-prior", action="store_true")
     ap.add_argument("--drop-low-obs", action="store_true")
     ap.add_argument("--no-sg", action="store_true",
@@ -129,7 +136,8 @@ def main():
         gpqa = [b for b in data.blookup["benchmark"] if "GPQA" in b]
         data = drop_model_benchmark_cells(data, SG_MODEL_NAME, gpqa)
         print(f"--no-sg-gpqa: dropped {n0 - data.n_obs} '{SG_MODEL_NAME}' GPQA cells {gpqa}")
-    human_order = HUMAN_ORDER if args.human_prior else None
+    human_order = (HUMAN_ORDER_MERGED if args.human_merge
+                   else HUMAN_ORDER if args.human_prior else None)
     lineage = build_lineage_structure(data.mlookup) if args.lineage_prior else None
 
     print(f"\nSPARSE-GATE NON-COMP MIRT  K={K}  axes={AXES}")
@@ -160,7 +168,7 @@ def main():
 
     idata.posterior.attrs["mirt_axis_names"] = json.dumps(AXES)
     idata.posterior.attrs["mirt_sparse_anchors"] = json.dumps(ANCHORS)
-    tag = ("_sparse" + ("_hp" if human_order else "") + ("_lp" if lineage is not None else "")
+    tag = ("_sparse" + ("_hm" if args.human_merge else "_hp" if human_order else "") + ("_lp" if lineage is not None else "")
            + ("_noSG" if args.no_sg else "") + ("_noSGgpqa" if args.no_sg_gpqa else ""))
     save_trace(idata, RESULTS_DIR / f"trace_mirt{tag}.nc")
 

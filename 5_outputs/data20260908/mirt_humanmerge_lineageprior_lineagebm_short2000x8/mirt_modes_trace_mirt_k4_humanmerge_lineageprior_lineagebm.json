@@ -2,7 +2,7 @@
  "trace": "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc",
  "n_chains": 8,
  "K": 4,
- "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.6) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
  "chain_delta_logp": [
   -18.0,
   -9.6,
