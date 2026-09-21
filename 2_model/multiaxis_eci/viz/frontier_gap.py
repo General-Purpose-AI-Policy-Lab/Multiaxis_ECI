@@ -406,14 +406,15 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     by_year = span_years > 2.5
     fig.update_xaxes(title_text=f"Release date of the {follower_title} record", range=list(window),
                      dtick="M12" if by_year else "M6", tickformat="%Y" if by_year else "%Y-%m",
-                     tickangle=0, gridcolor="#dcdcdc")
+                     tickangle=0, gridcolor="#f4f4f4")
     # Ticks (and their gridlines) every four months, and only where there is data: the band of
-    # names below carries none.
+    # names below carries none. These are the rules a lag is read against, so they are the ones
+    # that carry; the dates stay faint behind them.
     step = 4.0
     ticks = np.arange(np.ceil(band_top / step) * step, np.floor(top / step) * step + step / 2, step)
     # Two lines: at the write-up's type scale the caption is longer than the panel is tall.
     fig.update_yaxes(title_text=f"Months behind the {leader_title}<br>frontier (ECI-H)",
-                     range=list(y_range), tickvals=ticks, gridcolor="#eeeeee", zeroline=False)
+                     range=list(y_range), tickvals=ticks, gridcolor="#d8d8d8", zeroline=False)
     # The marker key goes in the right margin, above the scope names and flush with them: what a
     # dot and a hollow diamond mean is read beside the lines, not in a band over the panel.
     fig.update_layout(template="plotly_white", width=style.width, height=height, margin=margin,
