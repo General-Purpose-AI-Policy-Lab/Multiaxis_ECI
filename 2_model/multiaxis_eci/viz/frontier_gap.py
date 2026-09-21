@@ -179,7 +179,7 @@ def _label_font(style: FigureStyle) -> int:
     """Type size of the record names. Read off `font_tier`, the scale's margin-label size, rather
     than off `font_note`: the names are the figure's third register, not a footnote, and at the
     POST scale a footnote's size would be the one thing on the panel still asking to be zoomed."""
-    return max(int(round(style.font_tier * 0.85)), 8)
+    return max(int(round(style.font_tier * 0.78)), 8)
 
 
 def _record_label(raw: str) -> str:
@@ -200,11 +200,17 @@ def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
                   for _, r in rows.iterrows()]
 
 
+# Glyphs are narrower down a vertical name than GLYPH_W's allowance for a horizontal row of
+# them, and the band's height is dead space wherever it overshoots: measured over the model
+# names we set, 0.5 covers the longest without leaving a hand's width of white under it.
+BAND_GLYPH_W = 0.5
+
+
 def _label_band_px(texts: list[str], font: int) -> float:
     """Pixels the name band needs: the longest name, plus the air between it and the data."""
     if not texts:
         return 0.0
-    return GLYPH_W * font * max(len(t) for t in texts) + 1.8 * font
+    return BAND_GLYPH_W * font * max(len(t) for t in texts) + 1.0 * font
 
 
 def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
@@ -254,20 +260,31 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                           title=dict(text=title, x=0.5) if title else None)
         return apply_fonts(fig, style)
     if window is None:
-        # No cut in time: the axis starts a little before the first record of any scope.
-        first = min(pd.Timestamp(results[s].lag_df["release_date"].min()) for s in drawn)
+        # The axis opens a little before the first record of the scope the figure names. Another
+        # scope may hold an older one — GPT-J on public benchmarks, August 2021, sits eighteen
+        # months before anything else — and stretching the axis for a single point costs every
+        # other point the room it needs. Records left of the window are off the figure, not out
+        # of the series: they stay in the records CSV and in the curves.
+        base = label_scope if label_scope in drawn else drawn[0]
+        first = pd.Timestamp(results[base].lag_df["release_date"].min())
         window = ((first - pd.Timedelta(days=120)).strftime("%Y-%m-%d"),
                   (today_d + pd.Timedelta(days=200)).strftime("%Y-%m-%d"))
     w0, w1 = pd.Timestamp(window[0]), pd.Timestamp(window[1])
 
-    # One y-range over everything drawn (interval bars and bands), with air above; the names get
-    # a band of their own under the data, so the data region is what is left of the panel.
+    # One y-range over everything the window actually shows (interval bars and bands), with air
+    # above; the names get a band of their own under the data, so the data region is what is left
+    # of the panel. Records outside the window are left out of it too — reserving height for a
+    # point that is off the left edge only flattens the ones on screen.
     vals = [0.0]
     for s in drawn:
-        _, _, lo, hi = curves[s]
+        grid_d, _, lo, hi = curves[s]
+        inside = (pd.DatetimeIndex(grid_d) >= w0) & (pd.DatetimeIndex(grid_d) <= w1)
+        if inside.any():
+            vals += [np.nanmin(lo[inside]), np.nanmax(hi[inside])]
         d = results[s].lag_df
-        vals += [np.nanmin(lo), np.nanmax(hi), float(d["lag_hdi50_low"].min()),
-                 float(d["lag_hdi50_high"].max())]
+        d = d[(d["release_date"] >= w0) & (d["release_date"] <= w1)]
+        if len(d):
+            vals += [float(d["lag_hdi50_low"].min()), float(d["lag_hdi50_high"].max())]
     y_lo, y_hi = float(np.nanmin(vals)), float(np.nanmax(vals))
     span = max(y_hi - y_lo, 1.0)
 
@@ -375,13 +392,15 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                   line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
     fig.add_annotation(x=today_d, y=1.0, yref="paper", text="today", showarrow=False,
                        xanchor="right", xshift=-4, yanchor="top",
-                       font=dict(size=style.font_note, color=TODAY_COLOR))
+                       font=dict(size=style.font_tier, color=TODAY_COLOR))
     # Dates by the year, horizontal: the record names below are the vertical text on this figure.
     # A window of a couple of years (the single-scope figures) gets its months instead.
+    # One label per year past two and a half of them: horizontal "2025-07" labels every six
+    # months run into each other well before the axis is five years long.
     span_years = (w1 - w0).days / 365.25
+    by_year = span_years > 2.5
     fig.update_xaxes(title_text=f"Release date of the {follower_title} record", range=list(window),
-                     dtick="M12" if span_years > 5 else "M6",
-                     tickformat="%Y" if span_years > 5 else "%Y-%m",
+                     dtick="M12" if by_year else "M6", tickformat="%Y" if by_year else "%Y-%m",
                      tickangle=0, gridcolor="#f4f4f4")
     # Ticks (and their gridlines) every four months, and only where there is data: the band of
     # names below carries none.
