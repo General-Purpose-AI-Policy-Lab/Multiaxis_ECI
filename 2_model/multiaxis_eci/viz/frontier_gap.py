@@ -387,7 +387,8 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     # names below carries none.
     step = 4.0
     ticks = np.arange(np.ceil(band_top / step) * step, np.floor(top / step) * step + step / 2, step)
-    fig.update_yaxes(title_text=f"Months behind the {leader_title} frontier (ECI-H)",
+    # Two lines: at the write-up's type scale the caption is longer than the panel is tall.
+    fig.update_yaxes(title_text=f"Months behind the {leader_title}<br>frontier (ECI-H)",
                      range=list(y_range), tickvals=ticks, gridcolor="#eeeeee", zeroline=False)
     # The marker key goes in the right margin, above the scope names and flush with them: what a
     # dot and a hollow diamond mean is read beside the lines, not in a band over the panel.

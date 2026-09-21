@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -187,11 +188,13 @@ def main():
 
     # The months-behind figure is the write-up's headline and is read flat: it is laid out at the
     # POST scale (type 2.3x, markers 1.9x) and written at scale 1, so it lands at the same ~2,200
-    # pixels as the other figures with type that needs no zooming.
+    # pixels as the other figures. A quarter over POST on top of that, because this one is the
+    # figure people open on its own, and it carries no title: the write-up's heading asks the
+    # question right above it, and a title inside the frame only repeats it.
+    big = replace(POST, font_axis=45, font_tick=38, font_legend=38, font_tier=33, font_note=24)
     fig = lag_fig(results, scopes, today=args.today, label_scope="all", scope_titles=captions,
-                  style=POST,
-                  follower_title=titles[follower].lower(), leader_title=titles[leader].lower(),
-                  title=f"How far behind the {titles[leader].lower()} frontier are {titles[follower].lower()}?")
+                  style=big, title=None,
+                  follower_title=titles[follower].lower(), leader_title=titles[leader].lower())
     save_en_fr(fig, f"{stem}_lag", figures_dir, scale=1)
 
     cx_all = []
