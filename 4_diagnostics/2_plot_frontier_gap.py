@@ -191,7 +191,7 @@ def main():
     # pixels as the other figures. A quarter over POST on top of that, because this one is the
     # figure people open on its own, and it carries no title: the write-up's heading asks the
     # question right above it, and a title inside the frame only repeats it.
-    big = replace(POST, font_axis=45, font_tick=38, font_legend=38, font_tier=33, font_note=24)
+    big = replace(POST, font_axis=40, font_tick=34, font_legend=38, font_tier=33, font_note=24)
     fig = lag_fig(results, scopes, today=args.today, label_scope="all", scope_titles=captions,
                   style=big, title=None,
                   follower_title=titles[follower].lower(), leader_title=titles[leader].lower())

@@ -201,10 +201,12 @@ def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
                   for _, r in rows.iterrows()]
 
 
-# Glyphs are narrower down a vertical name than GLYPH_W's allowance for a horizontal row of
-# them, and the band's height is dead space wherever it overshoots: measured over the model
-# names we set, 0.5 covers the longest without leaving a hand's width of white under it.
-BAND_GLYPH_W = 0.46
+# Height of a vertical name, as a fraction of the font size per character. Measured by rendering
+# the longest names we set and reading their ink: 0.50 to 0.56, depending on which characters the
+# name happens to hold. A count of characters is therefore only a proxy, and the reserve has to
+# cover the widest of the ratios — under it the tail of a name runs out of the band and lands on
+# the date axis, which is what 0.46 did to "Kimi k2 Thinking Turbo".
+BAND_GLYPH_W = 0.57
 
 
 def _label_band_px(texts: list[str], font: int) -> float:
@@ -404,7 +406,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     by_year = span_years > 2.5
     fig.update_xaxes(title_text=f"Release date of the {follower_title} record", range=list(window),
                      dtick="M12" if by_year else "M6", tickformat="%Y" if by_year else "%Y-%m",
-                     tickangle=0, gridcolor="#f4f4f4")
+                     tickangle=0, gridcolor="#dcdcdc")
     # Ticks (and their gridlines) every four months, and only where there is data: the band of
     # names below carries none.
     step = 4.0
