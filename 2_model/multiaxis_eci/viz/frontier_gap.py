@@ -171,8 +171,9 @@ MARKER_KEY = (("", "circle", "crossing measured"),
 
 
 def _leader_px(style: FigureStyle) -> float:
-    """Run of the leader between the panel's edge and a scope name in the right margin."""
-    return 2.0 * style.font_tier
+    """Run of the leader between the end of a line and its name in the right margin. Short: the
+    name belongs to the line, and every pixel of leader is a pixel the panel does not get."""
+    return 0.9 * style.font_tier
 
 
 def _label_font(style: FigureStyle) -> int:
@@ -203,14 +204,14 @@ def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
 # Glyphs are narrower down a vertical name than GLYPH_W's allowance for a horizontal row of
 # them, and the band's height is dead space wherever it overshoots: measured over the model
 # names we set, 0.5 covers the longest without leaving a hand's width of white under it.
-BAND_GLYPH_W = 0.5
+BAND_GLYPH_W = 0.46
 
 
 def _label_band_px(texts: list[str], font: int) -> float:
     """Pixels the name band needs: the longest name, plus the air between it and the data."""
     if not texts:
         return 0.0
-    return BAND_GLYPH_W * font * max(len(t) for t in texts) + 1.0 * font
+    return BAND_GLYPH_W * font * max(len(t) for t in texts) + 0.4 * font
 
 
 def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
@@ -267,8 +268,10 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         # of the series: they stay in the records CSV and in the curves.
         base = label_scope if label_scope in drawn else drawn[0]
         first = pd.Timestamp(results[base].lag_df["release_date"].min())
+        # ... and closes on the first of January after today, so the axis ends on a labelled
+        # year rather than trailing off a few months past the last one.
         window = ((first - pd.Timedelta(days=120)).strftime("%Y-%m-%d"),
-                  (today_d + pd.Timedelta(days=200)).strftime("%Y-%m-%d"))
+                  f"{today_d.year + 1}-01-01")
     w0, w1 = pd.Timestamp(window[0]), pd.Timestamp(window[1])
 
     # One y-range over everything the window actually shows (interval bars and bands), with air
@@ -288,7 +291,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     y_lo, y_hi = float(np.nanmin(vals)), float(np.nanmax(vals))
     span = max(y_hi - y_lo, 1.0)
 
-    height = int(style.height_per_row * 1.8) + 60
+    height = int(style.height_per_row * 1.55) + 60
     # The right margin holds the scope names, which carry their benchmark count, and the leaders
     # that tie each one to its line: measured off the longest name, with a tenth in hand for the
     # French renders' own wording. Above the panel only the marker key is left, one row.
@@ -301,7 +304,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     margin = dict(l=int(style.font_tick * 5),
                   r=int(lead_px + 1.1 * max(name_px, key_px) + style.font_tier),
                   t=int(style.font_title * 2.8) if title else int(style.font_legend * 1.4),
-                  b=int(style.font_tick * 6),
+                  b=int(style.font_tick * 1.6 + style.font_axis * 2.2),
                   autoexpand=False)                # these margins ARE the plotting area
     plot_w = style.width - margin["l"] - margin["r"]
     plot_h = height - margin["t"] - margin["b"]
@@ -314,7 +317,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         band_px = _label_band_px(_record_names(results[label_scope].lag_df)[1], font_lab)
     band_px = min(band_px, 0.45 * plot_h)
     top = y_hi + 0.10 * span
-    band_top = min(0.0, y_lo) - 0.03 * span
+    band_top = min(0.0, y_lo) - 0.015 * span
     scale = (plot_h - band_px) / max(top - band_top, 1e-9)          # pixels per month
     y_range = (band_top - band_px / scale, top)
 
