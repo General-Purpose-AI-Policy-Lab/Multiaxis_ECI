@@ -23,12 +23,13 @@ The eight chains of this fit fall into three posterior modes (see [Limitations](
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines). Abilities are in human units: the Average Human at 0 and the Top Performer at 1 on every axis.
 
-<p>
-<img src="docs/figures/forecast_axis1.png" width="49%" alt="Axis 1, Fluid Intelligence and Mathematics: frontier forecast against human tiers, one line for reasoning models and one for the others">
-<img src="docs/figures/forecast_axis2.png" width="49%" alt="Axis 2, Domain Knowledge: frontier forecast against human tiers">
-<img src="docs/figures/forecast_axis3.png" width="49%" alt="Axis 3, Agentic Capabilities and Legacy QA: frontier forecast against human tiers">
-<img src="docs/figures/forecast_axis4.png" width="49%" alt="Axis 4, World Knowledge: frontier forecast against human tiers">
-</p>
+<img src="docs/figures/forecast_axis1.png" width="760" alt="Axis 1, Fluid Intelligence and Mathematics: frontier forecast against human tiers, one line for reasoning models and one for the others">
+
+<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Domain Knowledge: frontier forecast against human tiers">
+
+<img src="docs/figures/forecast_axis3.png" width="760" alt="Axis 3, Agentic Capabilities and Legacy QA: frontier forecast against human tiers">
+
+<img src="docs/figures/forecast_axis4.png" width="760" alt="Axis 4, World Knowledge: frontier forecast against human tiers">
 
 The 20 benchmarks with the largest share of each axis, their loadings (median and 95% interval) and that share:
 
