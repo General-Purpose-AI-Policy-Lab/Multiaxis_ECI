@@ -10,12 +10,22 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 3. **Agentic Capabilities** (GBAEval, Remote Labor Index, SWE-Bench Pro)
 4. **Legacy QA** (OpenBookQA, ARC (AI2), BoolQ and other largely saturated question-answering sets).
 
-Those are the published fit's axes (`5_outputs/pre_pipeline/`), and the two figures below are its renders. The K=4 flagship refitted on the 2026-09-08 pipeline build reads its axes differently: Legacy QA folds into the agentic axis and a World Knowledge axis takes the fourth slot (Fluid Intelligence & Mathematics, Domain Knowledge, Agentic Capabilities & Legacy QA, World Knowledge, in `5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`). Refitting renames the axes, which is why no axis name is ever hard-coded.
+Those are the published fit's axes (`5_outputs/pre_pipeline/`). The figures below come from the K=4 flagship refitted on the 2026-09-08 pipeline build, drawn on its majority chains (the eight chains fall into three posterior modes and the figures follow the largest, chains 2, 5, 6 and 7; see [docs/plots.md](docs/plots.md)), and that fit reads its axes differently: Legacy QA folds into the agentic axis and a World Knowledge axis takes the fourth slot. Its axes are **Fluid Intelligence & Mathematics** (ARC-AGI-2, ARC-AGI, OTIS Mock AIME), **Domain Knowledge** (WMDP Biology and Chemistry), **Agentic Capabilities & Legacy QA** (OSWorld, GBAEval, OpenBookQA, ARC (AI2)) and **World Knowledge** (SimpleQA Verified, DeepResearch Bench), named in `5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/axis_names.json`. Refitting renames the axes, which is why no axis name is ever hard-coded.
 
+Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines). Abilities are in human units, the Average Human at 0 and the Top Performer at 1.
 
-<img src="6_writeups/blogpost/figures/loadings_axes_humanmerge.png" width="560" alt="The 20 benchmarks that best define each axis (loadings, median and 95% interval)">
+<p>
+<img src="docs/figures/forecast_axis1.png" width="49%" alt="Axis 1, Fluid Intelligence and Mathematics: frontier forecast against human tiers, one line for reasoning models and one for the others">
+<img src="docs/figures/forecast_axis2.png" width="49%" alt="Axis 2, Domain Knowledge: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis3.png" width="49%" alt="Axis 3, Agentic Capabilities and Legacy QA: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis4.png" width="49%" alt="Axis 4, World Knowledge: frontier forecast against human tiers">
+</p>
 
-<img src="6_writeups/blogpost/figures/forecast_trend_majority.png" width="560" alt="Frontier trend per axis (majority chains): one line for reasoning models, one for the others, with human tiers">
+The 20 benchmarks with the largest share of each axis, their loadings (median and 95% interval) and that share:
+
+<img src="docs/figures/loadings_per_axis.png" width="760" alt="The 20 benchmarks that best define each axis of the 2026-09-08 flagship (loadings, median and 95% interval, coloured by axis share)">
+
+`python docs/make_readme_figures.py` redraws these five figures from the current flagship trace, with the builders of the per-fit folders.
 
 Scope of the published fits: 4,923 observations, 829 test-takers, 96 benchmarks at K=4; 4,184 / 781 / 88 for the canonical K=1 index, which also applies the curated exclusions. On the pipeline build of 2026-09-08, without the isolated families, the same scopes hold 5,307 / 802 / 97 and 4,461 / 727 / 89 (see the Data section).
 
@@ -76,7 +86,7 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 ├── 6_writeups/          # step 6: the research post (blogpost), the dashboard's card registry
 ├── internal_evals/      # the lab's own scoring runs (LAB-Bench cloning through OpenRouter); needs OPENROUTER_API_KEY
 ├── archive/             # kept for the record, not maintained: notebooks (one-off investigations), results_old (superseded fits)
-├── docs/                # model math, CLI reference, figure catalogue
+├── docs/                # model math, CLI reference, figure catalogue, the README's figures (figures/, make_readme_figures.py)
 ├── tests/               # fast unit tests + golden logp locks
 └── index.html           # the all-fits dashboard (tracked, served as is)
 ```

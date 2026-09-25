@@ -78,7 +78,7 @@ unmarked to both.
 
 Everything a fit or a diagnostic writes lives under `5_outputs/`, whose first level is the data generation: `data<YYYYMMDD>`, the build date of the pipeline tables in `0_input/provenance.json` (`config.DATA_TAG`). Fits on two data generations therefore never overwrite each other. `5_outputs/pre_pipeline/` holds the fits published with the post, on the pre-pipeline dataset, kept as they were.
 
-Inside a generation, one folder per fit holds its tables, its trace and its figures (`figures/` for the PNGs, `figures/html/` for the interactive twins, `figures/fr/` for the French versions); `comparisons/` holds the cross-fit tables (frontier gap, chain verdicts) with their own `figures/`; `diagnostics/` the one-off diagnostic outputs.
+Inside a generation, one folder per fit holds its tables, its trace and its figures (`figures/` for the PNGs, `figures/html/` for the interactive twins, `figures/fr/` for the French versions, `figures/fr/svg/` for their untitled vector twins); `comparisons/` holds the cross-fit tables (frontier gap, chain verdicts) with their own `figures/`; `diagnostics/` the one-off diagnostic outputs.
 
 A fit's flags become one tag, and the tag names the results folder and the trace, so the two cannot drift apart. A default contributes no token, so the K=4 command above reduces to:
 
