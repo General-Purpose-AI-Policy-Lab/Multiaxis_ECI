@@ -62,6 +62,14 @@ FR_TABLE: list[tuple[str, str]] = [
     ("Skilled Generalist", "Généraliste Qualifié"),
     ("Domain Expert", "Expert du Domaine"),
     ("Top Performer", "Meilleur Performeur"),
+    # Trend legend and subtitle (the per-fit panels), before "models" and "AI models"
+    ("Frontier forecast against human tiers",
+     "Prévision de la frontière face aux niveaux humains"),
+    ("Non-reasoning models (frontier)", "Modèles sans raisonnement (frontière)"),
+    ("Reasoning models (frontier)", "Modèles de raisonnement (frontière)"),
+    ("Non-frontier AI models", "Modèles d'IA non-frontière"),
+    ("Projected trend", "Tendance projetée"),
+    ("Projected frontier", "Frontière projetée"),
     # Crossover legend
     ("already behind us", "déjà derrière nous"),
     ("still ahead", "encore à venir"),
@@ -150,6 +158,8 @@ FR_TABLE: list[tuple[str, str]] = [
     ("median", "médiane"),
     ("models", "modèles"),
     ("probability", "probabilité"),   # BEFORE "ability", its substring
+    ("Ability: ", "Capacité : "),     # BEFORE "Ability", with the French colon spacing
+    ("Ability", "Capacité"),
     ("ability", "capacité"),
     ("today", "aujourd'hui"),
     ("Axis ", "Axe "),
@@ -157,7 +167,10 @@ FR_TABLE: list[tuple[str, str]] = [
 
 
 
-def translate_text(s: str, extra: list[tuple[str, str]] | None = None) -> str:
+def translate_text(s: str, extra: list[tuple[str, str]] | None = None,
+                   first: list[tuple[str, str]] | None = None) -> str:
+    for a, b in first or ():
+        s = s.replace(a, b)
     for en, fr in FR_TABLE:
         s = s.replace(en, fr)
     for a, b in extra or ():
@@ -165,23 +178,26 @@ def translate_text(s: str, extra: list[tuple[str, str]] | None = None) -> str:
     return s
 
 
-def _walk(node, extra):
+def _walk(node, extra, first):
     if isinstance(node, str):
-        return translate_text(node, extra)
+        return translate_text(node, extra, first)
     if isinstance(node, dict):
-        return {k: _walk(v, extra) for k, v in node.items()}
+        return {k: _walk(v, extra, first) for k, v in node.items()}
     if isinstance(node, (list, tuple)):
-        return [_walk(v, extra) for v in node]
+        return [_walk(v, extra, first) for v in node]
     if isinstance(node, np.ndarray):
         # String data arrays (the forests' y categories) must translate WITH the layout's
         # categoryarray, or the categories split and every row loses its label.
         if node.dtype.kind in ("U", "S", "O"):
-            return [_walk(v, extra) for v in node.tolist()]
+            return [_walk(v, extra, first) for v in node.tolist()]
         return node
     return node
 
 
-def translate_fig(fig: go.Figure, extra: list[tuple[str, str]] | None = None) -> go.Figure:
-    """A COPY of `fig` with every string field passed through `FR_TABLE`, then through
-    `extra` (figure-specific replacements applied after the table)."""
-    return go.Figure(_walk(fig.to_plotly_json(), extra))
+def translate_fig(fig: go.Figure, extra: list[tuple[str, str]] | None = None, *,
+                  first: list[tuple[str, str]] | None = None) -> go.Figure:
+    """A COPY of `fig` with every string field passed through `first` (a fit's own axis
+    titles, which the table's generic axis names would otherwise translate half-way:
+    "Axis 1: Fluid Intelligence & Mathematics"), then `FR_TABLE`, then `extra`
+    (figure-specific replacements applied after the table)."""
+    return go.Figure(_walk(fig.to_plotly_json(), extra, first))

@@ -157,14 +157,17 @@ def align_to_reference_loadings(view, data, loadings_csv: Path):
 def axis_title_translations(results_dir: Path) -> list[tuple[str, str]]:
     """(English title, French title) pairs for the French renders, from the optional
     `title_fr` field of `axis_names.json`: `Axis 2: Domain Knowledge` -> `Axe 2 : Connaissances
-    de domaine`. Empty when the file is missing, unconfirmed or carries no French titles."""
+    de domaine`, then the bare titles (`Domain Knowledge` -> `Connaissances de domaine`, as an
+    ability caption carries them), after every full title so none is split. Empty when the
+    file is missing, unconfirmed or carries no French titles."""
     doc = read_axis_names(results_dir)
     if not doc or not doc.get("confirmed"):
         return []
-    out = []
+    full, bare = [], []
     for name, entry in doc.get("axes", {}).items():
         title, fr = entry.get("title"), entry.get("title_fr")
         if title and fr:
             k = name[4:] if name.startswith("axis") else name
-            out.append((f"{bare_axis_title(name)}: {title}", f"Axe {k} : {fr}"))
-    return out
+            full.append((f"{bare_axis_title(name)}: {title}", f"Axe {k} : {fr}"))
+            bare.append((title, fr))
+    return full + bare

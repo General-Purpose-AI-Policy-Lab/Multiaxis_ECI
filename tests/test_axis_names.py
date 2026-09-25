@@ -73,7 +73,8 @@ def test_template_then_titles(tmp_path, capsys):
     from multiaxis_eci.analysis import axis_title_translations
     doc["axes"]["axis1"]["title_fr"] = "Fluide"
     path.write_text(json.dumps(doc))
-    assert axis_title_translations(tmp_path) == [("Axis 1: Fluid", "Axe 1 : Fluide")]
+    assert axis_title_translations(tmp_path) == [("Axis 1: Fluid", "Axe 1 : Fluide"),
+                                                 ("Fluid", "Fluide")]
     # A signature that no longer holds: the lax reader falls back and warns, the
     # strict one refuses, so a title cannot migrate to another axis unnoticed.
     doc["axes"]["axis2"]["signature"] = ["b0"]

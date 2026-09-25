@@ -227,3 +227,61 @@ def test_trend_fig_colours_fit_sets():
     assert pd.Timestamp(ext.x[0]) == pd.Timestamp("2024-12-01")
     assert pd.Timestamp(ext.x[-1]) == pd.Timestamp("2026-01-01")
     assert ext.fill is None
+
+
+def test_trend_standalone_explains_itself():
+    """The per-fit panel is read without a caption: a regime-grouped legend in the
+    bottom-right corner, a labelled today line, no tier intervals, the title set left."""
+    import pandas as pd
+
+    from multiaxis_eci.analysis.forecast import ForecastResult
+    from multiaxis_eci.viz import frontier_trend_fig, translate_fig
+
+    grid = pd.date_range("2024-01-01", "2030-01-01", freq="MS").values
+    n = len(grid)
+    other = ForecastResult(grid_dates=grid[:12], median=np.zeros(12), lo=-np.ones(12),
+                           hi=np.ones(12), slope=np.ones(3), intercept=np.zeros(3),
+                           frontier_names=["a"], last_obs_date=pd.Timestamp("2024-12-01"),
+                           fit_names=["a"], fit_basis="regimes", kind="line")
+    fc = ForecastResult(grid_dates=grid, median=np.linspace(0, 2, n), lo=np.linspace(-1, 1, n),
+                        hi=np.linspace(1, 3, n), slope=np.ones(3), intercept=np.zeros(3),
+                        frontier_names=["a", "b"], last_obs_date=pd.Timestamp("2026-01-01"),
+                        fit_names=["b"], fit_basis="regimes", kind="line", other=other,
+                        switch_year=2025.0)
+    tl = pd.DataFrame({"name": list("abc"),
+                       "release_date": pd.to_datetime(["2024-01-01", "2025-06-01", "2025-03-01"]),
+                       "mean": [0.1, 1.0, 0.3], "hdi_low": [0, 0.8, -5.0],
+                       "hdi_high": [0.2, 1.2, 0.5]})
+    hs = pd.DataFrame({"name": ["Average Human", "Top Performer"], "mean": [0.0, 1.0],
+                       "hdi_low": [-3.0, 0.8], "hdi_high": [0.2, 4.0]})
+    fig = frontier_trend_fig({"axis1": dict(fc=fc, tl=tl, hs=hs)}, ["axis1"],
+                             title="Axis 1: Fluid Intelligence & Mathematics",
+                             subtitle="Frontier forecast against human tiers",
+                             today="2026-01-01", standalone=True)
+    assert fig.layout.showlegend and fig.layout.legend.xanchor == "right"
+    shown = [t.name for t in fig.data if t.showlegend is not False and t.x == (None,)]
+    assert shown == ["Reasoning models (frontier)", "Projected trend",
+                     "Non-reasoning models (frontier)", "Projected trend",
+                     "Non-frontier AI models"]
+    # No tier whisker (a square marker) and the cloud's whiskers hidden, so the cloud's
+    # -5 lower bound no longer sets the range.
+    assert not any(getattr(t.marker, "symbol", None) == "square" for t in fig.data)
+    assert fig.layout.yaxis.range[0] > -1
+    assert "today" in [a.text for a in fig.layout.annotations]
+    assert fig.layout.title.xanchor == "left"
+    fr = translate_fig(fig, first=[("Axis 1: Fluid Intelligence & Mathematics",
+                                    "Axe 1 : Intelligence fluide et mathématiques")])
+    assert fr.layout.title.text == "Axe 1 : Intelligence fluide et mathématiques"
+    assert fr.layout.title.subtitle.text == "Prévision de la frontière face aux niveaux humains"
+    legend_fr = [t.name for t in fr.data if t.showlegend is not False and t.x == (None,)]
+    assert legend_fr == ["Modèles de raisonnement (frontière)", "Tendance projetée",
+                         "Modèles sans raisonnement (frontière)", "Tendance projetée",
+                         "Modèles d'IA non-frontière"]
+    # The document twin keeps the bottom and top tiers' intervals, as whiskers near the
+    # panel's right edge.
+    doc = frontier_trend_fig({"axis1": dict(fc=fc, tl=tl, hs=hs)}, ["axis1"], today="2026-01-01",
+                             standalone=True, tier_intervals=True)
+    assert sum(getattr(t.marker, "symbol", None) == "square" for t in doc.data) == 2
+    from multiaxis_eci.viz.core import _untitled
+    assert _untitled(fig).layout.title.text is None
+    assert _untitled(fig).layout.margin.t < fig.layout.margin.t

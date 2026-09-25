@@ -40,6 +40,11 @@ POST = FigureStyle(font_title=42, font_axis=36, font_tick=30, font_legend=30, fo
                    font_note=19, marker=13, marker_median=17, errbar=2.6, bar_thick=11.0,
                    bar_thin=4.0, trend=5.0, refline=2.2, width=2200, height_per_row=800,
                    name="post")
+# A figure read on its own, on screen or dropped into a document as an SVG: the dashboard's
+# layout with larger type, so the tick labels, the tier names and the legend read unzoomed.
+READABLE = FigureStyle(font_title=24, font_axis=19, font_tick=17, font_legend=17, font_tier=17,
+                       font_note=16, marker=9, marker_median=12, width=1200, height_per_row=540,
+                       name="readable")
 
 
 def apply_fonts(fig: go.Figure, style: FigureStyle) -> go.Figure:

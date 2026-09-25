@@ -81,7 +81,8 @@ from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 PLOT_VARS = ("A", "theta", "theta_pos", "tau_A", "D", "phi_b", "alpha", "ceiling_d")
 
 # The figures a write-up would embed, rendered in French too (`fr/`): the
-# per-axis timelines and forecasts, the forests, the loadings, the PIT.
+# per-axis timelines and forecasts, the forests, the loadings, the PIT. Each also gets
+# its vector twin under `fr/svg/`, untitled (the document it goes into sets the caption).
 MAIN_FIGURE_PREFIXES = {"timeline", "forecast"}
 MAIN_FIGURES = {"forests_per_axis", "forests_per_family", "loadings_per_axis", "gof_pit",
                 "axes_timeline_compare"}
@@ -162,7 +163,9 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     idata_1d = (spec.open_posterior(keep=PLOT_VARS, thin=thin, path=base)
                 if base.exists() and base != trace_path else None)
 
-    fr_extra = axis_title_translations(results_dir)
+    # Applied before the generic table, which would otherwise translate the axis title
+    # half-way ("Axe 1 : Intelligence fluide & Mathematics").
+    fr_titles = axis_title_translations(results_dir)
 
     def render(idata, view, figures_dir: Path, suffix: str, note: str, fr_dir: Path) -> dict:
         """The figure set for one posterior (the fit, or one chain group), saved
@@ -184,7 +187,11 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                                        return_mean=True)
         gof = compute_gof(yrep, data, mu)
         figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
-                                 forecast=forecast, axis_titles=axis_titles)
+                                 forecast=forecast, axis_titles=axis_titles,
+                                 doc_variants=True)
+        # A figure's document twin (`key__svg`) is not a figure of its own: it only replaces
+        # the French SVG of `key`.
+        svg_twins = {k[:-len("__svg")]: figs.pop(k) for k in list(figs) if k.endswith("__svg")}
         figs["pit_ecdf"] = pit_ecdf_fig(gof.pit)
 
         # ── signed extras: the rotation-method comparison (four independent
@@ -255,6 +262,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                 }).sort_values("delta_r2")
                 figs["r2_delta_per_bench"] = per_bench_r2_delta_fig(bench_df)
 
+        # The French renders are the write-up's figures: taken before the chain-group note,
+        # which stays on the English diagnostics (the file name still says the group).
+        fr_figs = {name: translate_fig(fig, first=fr_titles) for name, fig in figs.items()
+                   if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES}
         if note:
             for fig in figs.values():
                 t = fig.layout.title.text
@@ -267,9 +278,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                                       margin_t=max(fig.layout.margin.t or 0, 110))
         for name, fig in figs.items():
             save_fig(fig, figure_filename(name) + suffix, figures_dir)
-            if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES:
-                save_fig(translate_fig(fig, fr_extra), figure_filename(name) + suffix + "_fr",
-                         fr_dir)
+            if name in fr_figs:
+                twin = svg_twins.get(name)
+                save_fig(fr_figs[name], figure_filename(name) + suffix + "_fr", fr_dir, svg=True,
+                         svg_fig=translate_fig(twin, first=fr_titles) if twin else None)
         print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
               f"MAE={gof.metrics['mae']:.3f}")
         print(f"figures → {figures_dir}")

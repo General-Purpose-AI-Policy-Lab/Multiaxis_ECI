@@ -88,8 +88,28 @@ def two_column_layout(fig: go.Figure, col_domains, panel_titles, n_panels: int =
         ann.x = sum(col_domains[i % 2]) / 2
 
 
-def save_fig(fig: go.Figure, name: str, figures_dir: Path, *, scale: int = 2) -> None:
-    """One PNG in `figures_dir`, its interactive twin in `figures_dir/html/`.
+def _untitled(fig: go.Figure) -> go.Figure:
+    """A COPY of `fig` without its title and subtitle, the top margin shrunk by the room they
+    took (about 1.6 line heights each), so the plot moves up instead of leaving a blank band."""
+    out = go.Figure(fig)
+    title = out.layout.title
+    if not title.text:
+        return out
+    block = 1.6 * (title.font.size or 17)
+    if title.subtitle.text:
+        block += 1.6 * (title.subtitle.font.size or 12)
+    top = out.layout.margin.t if out.layout.margin.t is not None else 100
+    out.update_layout(title=dict(text=None, subtitle=dict(text=None)),
+                      margin_t=max(30, int(top - block)))
+    return out
+
+
+def save_fig(fig: go.Figure, name: str, figures_dir: Path, *, scale: int = 2,
+             svg: bool = False, svg_fig: go.Figure | None = None) -> None:
+    """One PNG in `figures_dir`, its interactive twin in `figures_dir/html/` and, with `svg`,
+    its vector twin in `figures_dir/svg/`, without the title and subtitle: the SVG goes into a
+    document that sets its own caption. `svg_fig` is the figure to write there when the
+    document's version differs from the PNG's.
 
     `scale` is the pixel multiplier: 2 for a figure laid out at the DASHBOARD scale, which is
     read on screen and zoomed into; 1 for one already laid out at the POST scale, whose type is
@@ -100,8 +120,11 @@ def save_fig(fig: go.Figure, name: str, figures_dir: Path, *, scale: int = 2) ->
     fig.write_html(html_dir / f"{name}.html")
     try:
         fig.write_image(figures_dir / f"{name}.png", scale=scale)
+        if svg:
+            (figures_dir / "svg").mkdir(exist_ok=True)
+            _untitled(svg_fig or fig).write_image(figures_dir / "svg" / f"{name}.svg")
     except Exception as e:
-        print(f"  PNG export skipped for {name} ({type(e).__name__}: {e})")
+        print(f"  image export skipped for {name} ({type(e).__name__}: {e})")
 
 
 # Print defaults, applied per property only where the figure left it unset, so a

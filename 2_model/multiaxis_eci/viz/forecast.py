@@ -24,6 +24,7 @@ from multiaxis_eci.viz.core import (
     _rgba,
     human_tier_palette,
 )
+from multiaxis_eci.viz.i18n import translate_text
 from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 FORECAST_COLOR = "#ff9500"        # frontier extrapolation (the reasoning regime)
@@ -54,18 +55,28 @@ CROSSOVER_WINDOW = ("2015-01-01", "2035-01-01")
 # Every trend panel stops at 2030 (the horizon of the projection); its start follows the data (the post fixes 2023).
 TREND_WINDOW_END = "2030-01-01"
 TODAY_COLOR = "#444"
+# The standalone figure's type: one sans family, ink for text, a muted ink for secondary text.
+FONT_FAMILY = "Helvetica Neue, Helvetica, Arial, sans-serif"
+INK = "#1f2933"
+INK_MUTED = "#52606d"
 
 # Every string these figures draw, per language (English default, French for the
 # `fr/` renders); tier names come from core.HUMAN_LEVEL_LABELS.
 FORECAST_TEXT = {
     "en": {"trend": "Projected frontier", "others": "non-reasoning models", "release": "Release date",
-           "ability": "ability",
+           "ability": "ability", "models": "Non-frontier AI models",
+           "reasoning": "Reasoning models (frontier)",
+           "non_reasoning": "Non-reasoning models (frontier)", "projected": "Projected trend",
            "crossing_axis": "Crossing date", "behind": "already behind us",
            "ahead": "still ahead", "median": "median", "interval": "{p:.0%} interval",
            "thick": "{p:.0%} interval (thick)", "thin": "{p:.0%} interval (thin)",
            "today": "today", "clipped": "continues past the window (date shown)"},
     "fr": {"trend": "Frontière projetée", "others": "modèles sans raisonnement",
            "release": "Date de sortie", "ability": "capacité",
+           "models": "Modèles d'IA non-frontière",
+           "reasoning": "Modèles de raisonnement (frontière)",
+           "non_reasoning": "Modèles sans raisonnement (frontière)",
+           "projected": "Tendance projetée",
            "crossing_axis": "Date de croisement", "behind": "déjà derrière nous",
            "ahead": "encore à venir", "median": "médiane", "interval": "intervalle à {p:.0%}",
            "thick": "intervalle à {p:.0%} (épais)", "thin": "intervalle à {p:.0%} (fin)",
@@ -98,12 +109,14 @@ def _spread_labels(levels: np.ndarray, gap: float, lo: float, hi: float) -> np.n
 
 
 def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, float],
-                 style: FigureStyle, labels: dict, gap_frac: float | None = None) -> None:
+                 style: FigureStyle, labels: dict, gap_frac: float | None = None,
+                 quiet: bool = False) -> None:
     """Dashed tier lines in Blues (strongest darkest) plus their names in the right margin.
 
     A name sits level with its line whenever the neighbours leave room; where tiers crowd, the
     crowded names spread just enough to stay legible and a thin leader joins each displaced
-    name to its line.
+    name to its line. `quiet` draws thin solid lines, so the trend is the only dashed line,
+    and writes the names in ink, since the palest blues are hard to read as text.
     """
     rows = hs.sort_values("mean", ascending=False).reset_index(drop=True)
     colors = human_tier_palette(len(rows))
@@ -117,11 +130,13 @@ def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, 
     ys = _spread_labels(levels, gap, ylim[0] + 0.02 * span, ylim[1] - 0.02 * span)
     for (_, r), y, col in zip(rows.iterrows(), ys, colors):
         level = float(r["mean"])
-        fig.add_hline(y=level, row=row, col=1,
-                      line=dict(color=col, width=style.refline, dash="dash"), opacity=0.75)
+        fig.add_hline(y=level, row=row, col=1, opacity=0.55 if quiet else 0.75,
+                      line=dict(color=col, width=style.refline * (0.8 if quiet else 1),
+                                dash="solid" if quiet else "dash"))
         text = labels.get(r["name"], r["name"])
         fig.add_annotation(x=1.008, y=y, xref="paper", yref=yref, text=text, showarrow=False,
-                           xanchor="left", font=dict(size=style.font_tier, color=col))
+                           xanchor="left",
+                           font=dict(size=style.font_tier, color=INK_MUTED if quiet else col))
         if abs(y - level) > 0.25 * gap:
             # A thin leader from the line's end to the displaced name, drawn in the margin.
             fig.add_shape(type="line", xref="paper", yref=yref, x0=1.0, y0=level, x1=1.007,
@@ -132,7 +147,9 @@ def _tier_labels(fig, hs: pd.DataFrame, row: int, yref: str, ylim: tuple[float, 
 def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = None, *,
                        style: FigureStyle = DASHBOARD, window: tuple[str, str] | None = None,
                        today=None, lang: str = "en", human_labels: dict | None = None,
-                       title: str | None = None, y_label: str | None = None) -> go.Figure:
+                       title: str | None = None, subtitle: str | None = None,
+                       y_label: str | None = None, standalone: bool = False,
+                       tier_intervals: bool | None = None) -> go.Figure:
     """The frontier trend per axis, one stacked panel each. `y_label` names the ability scale.
 
     `per_axis[name]` holds `fc` (a ForecastResult: grid_dates, lo, median, hi, slope), `tl`
@@ -146,7 +163,17 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
     right margin, and the today line; no legend, the caption names the series. `window` fixes
     the x-range on every panel (the post uses 2023 to 2030); None starts at the first candidate
     and stops at `TREND_WINDOW_END` (2030), the crossover figures' right edge.
+
+    `standalone=True` is for a figure read without a caption (the per-fit folders). A legend in
+    the bottom-right corner (each regime's frontier points and line, then the non-frontier
+    cloud) names the point colours and the two lines; the today line is labelled;
+    the method's details go (the bottom and top tiers' intervals, the cloud's whiskers); the
+    tier lines turn thin and solid, so the trend is the only dashed line; the title is set left
+    with `subtitle` under it, in one sans family. `tier_intervals` draws the bottom and top
+    tiers' intervals anyway (None: only when not standalone).
     """
+    if tier_intervals is None:
+        tier_intervals = not standalone
     text = FORECAST_TEXT[lang]
     labels = HUMAN_LEVEL_LABELS[lang] if human_labels is None else human_labels
     titles = titles or {}
@@ -200,15 +227,19 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         in_fit = tl["name"].isin(set().union(*(names for _, names in fit_sets)))
         # The rest of the cloud is faint: since the gate is the coverage rule alone it holds
         # every effort of every family, several hundred points per axis.
-        for col_, sub, alpha_m, alpha_e in (
-                [(MODEL_COLOR, tl[~in_fit], 0.3, 0.18)]
-                + [(c, tl[tl["name"].isin(n)], 0.9, 0.6) for c, n in fit_sets]):
+        # Standalone, the cloud loses its whiskers (several hundred of them only read as noise)
+        # and the fit sets' whiskers fade, each fitted point ringed in white over the cloud.
+        cloud = [(MODEL_COLOR, tl[~in_fit], 0.3, 0.0 if standalone else 0.18, False)]
+        fitted = [(c, tl[tl["name"].isin(n)], 0.95 if standalone else 0.9,
+                   0.35 if standalone else 0.6, standalone) for c, n in fit_sets]
+        for col_, sub, alpha_m, alpha_e, ring in cloud + fitted:
             if sub.empty:
                 continue
             fig.add_trace(go.Scatter(
                 x=pd.to_datetime(sub["release_date"]), y=sub["mean"], mode="markers",
-                marker=dict(color=col_, size=style.marker, opacity=alpha_m, line=dict(width=0)),
-                error_y=dict(type="data", symmetric=False,
+                marker=dict(color=col_, size=style.marker + (1 if ring else 0), opacity=alpha_m,
+                            line=dict(width=1 if ring else 0, color="white")),
+                error_y=dict(type="data", symmetric=False, visible=alpha_e > 0,
                              array=sub["hdi_high"] - sub["mean"],
                              arrayminus=sub["mean"] - sub["hdi_low"],
                              thickness=style.errbar, width=0, color=_rgba(col_, alpha_e)),
@@ -226,13 +257,15 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         # Tier intervals are wide on a K-axis fit (a tier is scored on a handful of
         # benchmarks); they are drawn, but they do not set the range either.
         has_hdi = {"hdi_low", "hdi_high"} <= set(hs.columns)
-        lo = min(float(tl["hdi_low"].min()), float(hs["mean"].min()))
-        hi = max(float(tl["hdi_high"].max()), float(hs["mean"].max()))
+        # Standalone, the cloud's whiskers are not drawn, so only its points set the range.
+        drawn = tl[in_fit] if standalone else tl
+        lo = min(float(drawn["hdi_low"].min()), float(tl["mean"].min()), float(hs["mean"].min()))
+        hi = max(float(drawn["hdi_high"].max()), float(tl["mean"].max()), float(hs["mean"].max()))
         pad = 0.06 * (hi - lo)
         # More air above than below: the trend and its band leave the panel through the top,
         # and the topmost tier name needs room.
         ylim = (lo - pad, hi + 3 * pad)
-        if has_hdi and len(hs):
+        if tier_intervals and has_hdi and len(hs):
             # The bottom and top tiers of the axis carry their 80% interval, so the ladder's
             # bounds read as the uncertain quantities they are: a faint band when it is
             # narrower than a quarter of the panel, otherwise (a tier scored on a handful of
@@ -258,8 +291,16 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
                                       "<extra></extra>"), row=i, col=1)
         fig.add_vline(x=today_s, row=i, col=1,
                       line=dict(color=TODAY_COLOR, width=style.refline, dash=dot_dash(style.refline)))
-        _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels)
-        fig.update_yaxes(title_text=y_label or text["ability"], range=list(ylim), gridcolor="#eeeeee",
+        if standalone:
+            # At the top, left of the line: the cloud and the legend sit lower, the band right.
+            fig.add_annotation(x=today_s, y=ylim[1], xref=f"x{'' if i == 1 else i}",
+                               yref=f"y{'' if i == 1 else i}", text=text["today"],
+                               showarrow=False, xanchor="right", yanchor="top", xshift=-5,
+                               yshift=-4, font=dict(size=style.font_note, color=INK_MUTED))
+        _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels,
+                     quiet=standalone)
+        fig.update_yaxes(title_text=y_label or text["ability"], range=list(ylim),
+                         gridcolor="#f0f0f0" if standalone else "#eeeeee",
                          zeroline=False, row=i, col=1)
         x_min = dates.min() if x_min is None else min(x_min, dates.min())
         x_max = gx.max() if x_max is None else max(x_max, gx.max())
@@ -268,13 +309,60 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
     fig.update_xaxes(range=list(window), dtick="M12", tickformat="%Y", gridcolor="#f4f4f4",
                      showticklabels=True)
     fig.update_xaxes(title_text=text["release"], row=len(axes), col=1)
-    fig.update_layout(showlegend=False, template="plotly_white", width=style.width,
+    if standalone:
+        # Legend-only traces (no data), so the drawn traces keep their hover. One flat list,
+        # each regime's frontier points followed by its line, then the rest of the cloud; it
+        # sits in the bottom-right corner, which the rising cloud and trend leave empty.
+        dash = trend_dash(style.trend)
+        entries = [(text["reasoning"], dict(mode="markers", marker=dict(
+                        color=REASONING_FIT_COLOR, size=style.marker))),
+                   (text["projected"], dict(mode="lines", line=dict(
+                        color=FORECAST_COLOR, width=style.trend, dash=dash)))]
+        if any(getattr(per_axis[a]["fc"], "other", None) is not None for a in axes):
+            entries += [(text["non_reasoning"], dict(mode="markers", marker=dict(
+                            color=OTHER_FIT_COLOR, size=style.marker))),
+                        (text["projected"], dict(mode="lines", line=dict(
+                            color=OTHER_COLOR, width=style.trend * 0.8, dash=dash)))]
+        entries.append((text["models"], dict(mode="markers", marker=dict(
+            color=_rgba(MODEL_COLOR, 0.45), size=style.marker))))
+        for label, kw in entries:
+            fig.add_trace(go.Scatter(x=[None], y=[None], name=label, hoverinfo="skip", **kw),
+                          row=1, col=1)
+        fig.update_layout(legend=dict(
+            x=0.99, xanchor="right", y=0.02 if len(axes) == 1 else 0.0, yanchor="bottom",
+            traceorder="normal", bgcolor="rgba(255,255,255,0.92)", bordercolor="#e4e7eb",
+            borderwidth=1, font=dict(color=INK_MUTED)))
+        fig.update_layout(font=dict(family=FONT_FAMILY, color=INK))
+        fig.update_xaxes(showline=True, linecolor="#cbd2d9", ticks="outside", tickcolor="#cbd2d9",
+                         ticklen=4, tickfont_color=INK_MUTED, gridcolor="#f5f5f5")
+        fig.update_yaxes(tickfont_color=INK_MUTED)
+    # The right margin holds the tier names. Standalone it is sized to the longest name, in
+    # English or French (the fr/ renders translate it afterwards), at ~0.55 em per character;
+    # otherwise the fixed room the post's layout was tuned on.
+    right = int(style.font_tier * 21)
+    if standalone:
+        names_ = [labels.get(n, n) for a in axes for n in per_axis[a]["hs"]["name"]]
+        longest = max((len(t) for n in names_ for t in (n, translate_text(n))), default=10)
+        right = int(style.font_tier * (0.55 * longest + 1.5))
+    fig.update_layout(showlegend=standalone, template="plotly_white", width=style.width,
                       height=style.height_per_row * len(axes) + (100 if title else 60),
-                      margin=dict(l=int(style.font_tick * 5), r=int(style.font_tier * 21),
-                                  t=100 if title else 70, b=int(style.font_tick * 4)))
-    if title:
+                      margin=dict(l=int(style.font_tick * 5), r=right,
+                                  t=(92 if subtitle else 64) if standalone and title
+                                  else 100 if title else 70,
+                                  b=int(style.font_tick * 4)))
+    if title and standalone:
+        # Set left, over the plot's left edge, the subtitle under it in the muted ink.
+        fig.update_layout(title=dict(
+            text=title, x=0, xref="paper", xanchor="left", y=0.975, yanchor="top",
+            font=dict(weight=600, color=INK),
+            subtitle=dict(text=subtitle, font=dict(size=style.font_axis, color=INK_MUTED))
+            if subtitle else None))
+    elif title:
         fig.update_layout(title=dict(text=title, x=0.5))
-    return apply_fonts(fig, style)
+    apply_fonts(fig, style)
+    if standalone:                                                  # after apply_fonts
+        fig.update_layout(title_font_size=style.font_title)
+    return fig
 
 
 def crossover_panels_fig(cx: pd.DataFrame, axes: list[str], titles: dict | None = None, *,

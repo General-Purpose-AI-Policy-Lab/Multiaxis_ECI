@@ -21,6 +21,7 @@ from multiaxis_eci.viz.forecast import (
     crossover_panels_fig,
     frontier_trend_fig,
 )
+from multiaxis_eci.viz.style import READABLE
 from multiaxis_eci.viz.gof import (
     benchmark_icc_fig,
     benchmark_obs_vs_pred_fig,
@@ -177,8 +178,15 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     return figs
 
 
+# The tiers the document version of the trend panel keeps: one per rung of the ladder plus
+# the committee of domain experts; the other committees and the high-school tiers are left
+# to the full figure.
+DOC_TIERS = ("Average Human", "Skilled Generalist", "Domain Expert",
+             "Committee of Domain Experts", "Top Performer")
+
+
 def forecast_figures(view, data, raw, names, th_fc,
-                     axis_titles: dict | None = None) -> dict:
+                     axis_titles: dict | None = None, doc_variants: bool = False) -> dict:
     """Frontier-projection figure set: per axis the trend panel and the crossover
     panel.
 
@@ -187,19 +195,20 @@ def forecast_figures(view, data, raw, names, th_fc,
     fit_basis or the candidate gate. `th_fc` is the ability array to forecast on, in the frame the
     caller's timelines already use. `axis_titles` swaps display text only,
     same convention as `build_axis_figures`.
+
+    `doc_variants` adds, per trend panel `key`, a `key + "__svg"` twin for the SVG a document
+    embeds: the `DOC_TIERS` only, with the bottom and top tiers' intervals drawn.
     """
     figs = {}
     K = view.K
     titles = axis_titles or {}
     from multiaxis_eci.analysis import axis_forecast_inputs, crossover_table
     from multiaxis_eci.analysis.scale import (
-        ability_label,
         human_unit_affine,
         rescale_forecast,
         rescale_frame,
     )
     affine = human_unit_affine(th_fc, data)
-    y_label = ability_label(affine)
     for k in range(K):
         disp = titles.get(names[k], names[k])
         # The candidates evaluated on the axis (`candidate_mask`,
@@ -218,9 +227,20 @@ def forecast_figures(view, data, raw, names, th_fc,
                   "tl": rescale_frame(inputs["tl"], k, affine),
                   "hs": rescale_frame(inputs["hs"], k, affine)}
         slug = _slug(names[k])
+        # Read without a caption, so the figure explains itself (`standalone`). The ability
+        # caption names the axis (the SVG twin has no title) and leaves out the scale's
+        # anchors: the tier lines already mark Average Human at 0 and Top Performer at 1.
+        kind = titles.get(names[k], "").partition(": ")[2]
+        trend = dict(title=disp, subtitle="Frontier forecast against human tiers",
+                     y_label=f"Ability: {kind}" if kind else "Ability", standalone=True,
+                     style=READABLE)
         figs[f"forecast_{k+1}_{slug}"] = frontier_trend_fig(
-            {names[k]: inputs}, [names[k]], {names[k]: disp},
-            title=f"Forecast: {disp} (80% intervals)", y_label=y_label)
+            {names[k]: inputs}, [names[k]], {names[k]: disp}, **trend)
+        if doc_variants:
+            hs = inputs["hs"]
+            doc = {**inputs, "hs": hs[hs["name"].isin(DOC_TIERS)]}
+            figs[f"forecast_{k+1}_{slug}__svg"] = frontier_trend_fig(
+                {names[k]: doc}, [names[k]], {names[k]: disp}, tier_intervals=True, **trend)
         figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
             cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
             title=f"Forecast: {disp} (crossing dates)")
@@ -228,7 +248,8 @@ def forecast_figures(view, data, raw, names, th_fc,
 
 
 def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
-                      forecast: bool = False, axis_titles: dict | None = None) -> dict:
+                      forecast: bool = False, axis_titles: dict | None = None,
+                      doc_variants: bool = False) -> dict:
     """Canonical per-fit MIRT figure set, gated by fit family (comp / nc).
 
     Returns a name→go.Figure dict instead of writing files, so the dashboard
@@ -307,7 +328,8 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     # timelines above; gated on humans being in the fit (nothing to cross otherwise).
     if forecast and not view.is_nc and K > 1 and data.is_human.any():
         th_fc = signed_frames["oblique"].theta if is_signed else view.theta
-        figs.update(forecast_figures(view, data, raw, names, th_fc, axis_titles=titles))
+        figs.update(forecast_figures(view, data, raw, names, th_fc, axis_titles=titles,
+                                     doc_variants=doc_variants))
 
     figs.update(load_figs)          # held back above — legacy page position
 
