@@ -6,7 +6,7 @@ Every figure renders lazily (only the visible fit is live in the DOM).
 
 Registered cards (2):
 
-- K=4 · full exploration scope · positive loadings · raw rank-tracked axes (no rotation) · human-merge+lineage(BM) priors · 3PL floors · pooled noise; THE forecasting base (the blog post's fit)  ·  *exploratory*
+- K=4 · full exploration scope · positive loadings · raw rank-tracked axes (no rotation) · human-merge+lineage(BM) priors · 3PL floors · pooled noise; THE forecasting base (the current flagship)  ·  *exploratory*
 - K=2 demo · positive loadings · 3PL floors (default) · 4x400 (red-team walkthrough)  ·  *exploratory*
 
 Data scope scored on:

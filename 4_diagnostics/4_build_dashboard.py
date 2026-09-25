@@ -101,13 +101,15 @@ FITS = [
      "spec": FLAGSHIP,
      "trace_path": FLAGSHIP_TRACE,
      # The card renders the flagship fit of the CURRENT data generation
-     # (analysis.FLAGSHIP_TRACE); the tracked index.html was built on the
+     # (analysis.FLAGSHIP_TRACE; on the 2026-09-08 build, 5,307 obs / 802
+     # takers / 97 benchmarks, 8x10,000 draws, three modes). The blog post's
      # 2026-08 run (4,923 obs / 829 takers / 96 benchmarks, 10x12,000 draws,
-     # one basin, R² 0.9643), now under 5_outputs/pre_pipeline/.
+     # one basin, R² 0.9643) is under 5_outputs/pre_pipeline/ and on the
+     # blogpost-frozen branch.
      "label": "K=4 · full exploration scope · positive loadings · "
               "raw rank-tracked axes (no rotation) · "
               "human-merge+lineage(BM) priors · 3PL floors · pooled noise; "
-              "THE forecasting base (the blog post's fit)",
+              "THE forecasting base (the current flagship)",
      "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
      "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True},
