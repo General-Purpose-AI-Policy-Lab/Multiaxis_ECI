@@ -25,21 +25,20 @@ granite-4.0-1b,open,weights on Hugging Face (ibm-granite; Apache 2.0)
 granite-4.0-350m,open,weights on Hugging Face (ibm-granite; Apache 2.0)
 granite-4.0-h-small,open,weights on Hugging Face (ibm-granite; Apache 2.0)
 granite-4.0-micro,open,weights on Hugging Face (ibm-granite; Apache 2.0)
-grok-2,closed,API only at release (2024-08); weights published a year later (2025-08); classed by its state at release
+grok-2,closed,"API only at release (2024-08-13); weights published a year later (2025-08), beyond the 30-day window of the rule"
 grok-code-fast-1,closed,API only
 internlm-20b,open,weights on Hugging Face (internlm)
 internlm-7b,open,weights on Hugging Face (internlm)
 internlm-chat-20b,open,weights on Hugging Face (internlm)
-kimi-k2p5,open,Kimi K2.5; weights on Hugging Face (moonshotai)
 laguna-m.1,open,weights on Hugging Face (poolside; Apache 2.0; 2026-04)
 mistral-small-2402,closed,Mistral Small 24.02 was API only (the open Mistral Small line starts with Small 3 in 2025)
 open_llama_7b,open,weights on Hugging Face (openlm-research; Apache 2.0)
 opt-13b,open,weights on Hugging Face (facebook; research license)
 qwen3-4b-instruct-2507,open,weights on Hugging Face (Qwen)
 qwen3-coder-next,open,weights on Hugging Face (Qwen/Qwen3-Coder-Next; 2026-02)
-qwen3.5-flash,closed,API only (Alibaba Cloud Model Studio)
-qwen3.5-plus,closed,API only (Alibaba Cloud Model Studio)
-qwen3.6-flash,closed,API only (Alibaba Cloud Model Studio)
+qwen3.5-flash,open,hosted version of the open-weights Qwen3.5-35B-A3B (Qwen 3.5 medium series announcement); hosted versions of open weights are open
+qwen3.5-plus,open,"hosted version of the open-weights Qwen3.5-397B-A17B (Qwen: ""the hosted version corresponding to Qwen3.5-397B-A17B"", with 1M context and built-in tools); hosted versions of open weights are open"
+qwen3.6-flash,open,hosted version of the open-weights Qwen3.6-35B-A3B (served as qwen3.6-flash on Alibaba Cloud Model Studio); hosted versions of open weights are open
 qwen3.6-max-preview,closed,API only (Alibaba Cloud Model Studio)
 qwen3.7-plus,closed,API only (Alibaba Cloud Model Studio)
 seed-oss-36b-instruct,open,weights on Hugging Face (ByteDance-Seed; Apache 2.0)
@@ -87,3 +86,5 @@ swe-1.7,closed,product only (Windsurf)
 text-ada-001,closed,API only
 text-davinci-003,closed,API only
 tiny-recursion-model,open,code and weights on GitHub (SamsungSAILMontreal)
+codestral-2501,closed,"API and IDE plugins only; weights for on-premises deployment to enterprise customers, never downloadable (Mistral, 2025-01-13; Epoch lists it open, from the older Codestral-22B)"
+glm-5.3_max,open,"API on 2026-08-14, weights on Hugging Face on 2026-08-28 (zai-org, GLM-5.3 License): 14 days, inside the 30-day window"

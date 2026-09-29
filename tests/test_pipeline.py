@@ -399,7 +399,10 @@ class TestEraFilter:
         past = load_eci_data(max_release_date=cutoff)
         assert past.n_models < data.n_models
         present = set(past.mlookup["model"])
-        assert past.is_human.sum() == data.is_human.sum()
+        # Humans are kept, but a tier whose every baseline sits on a benchmark no pre-cutoff model
+        # was scored on leaves with it: Top Performer's last baseline in the curated scope is
+        # EBR-bench (first model 2025-08) since GeoBench joined the exclusions (2026-09-29).
+        assert past.is_human.sum() >= data.is_human.sum() - 1
         # a pre-cutoff staple survives; the post-cutoff ECI anchor is gone
         assert ANCHOR_LOW[0] in present            # Claude 3.5 Sonnet, 2024-10
         assert ANCHOR_HIGH[0] not in present       # GPT-5, 2025-08

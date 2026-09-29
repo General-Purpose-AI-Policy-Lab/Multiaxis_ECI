@@ -3,8 +3,14 @@ closed ones by default (`--group openness`), US against CN as the older cut (`--
 
 Every quantity is computed on one benchmark access scope at a time (the trace of a fit on all
 benchmarks, or on the public / semi-private / private class only), so the scopes can be compared
-afterwards: the same code runs on each trace and the ECI-H scale is pinned by the same two
-anchors in every fit.
+afterwards: the same code runs on each trace. The all-benchmarks fit reads ECI-H off the two
+anchors; a class fit is linked onto that scale (`link_to_reference`): per draw, the affine map
+that gives the well-measured leader models of the frontier labs (`LINK_ORGANIZATIONS`) the mean
+and spread of their all-benchmarks ECI-H. Two anchors hold too few scores inside a class to pin
+its scale (Claude 3.5 Sonnet has 2 private scores); linking through the follower would copy its
+all-benchmarks level onto every class, the difference the scopes are compared for; and other
+closed labs' non-frontier models may be tuned to some benchmarks and not others, so they would
+bend the scale of the class they do well in.
 
 Frontier of a group: the running maximum of posterior-median ECI-H over the group's candidates
 by release date (`regimes.frontier_topk` with k = 1), one effort per family, the best on the
@@ -23,14 +29,25 @@ readings of the gap:
    https://www.lesswrong.com/posts/rJcCrXyEsJKmmDpWG/how-far-behind-are-open-models), with
    ECI-H in place of per-benchmark score thresholds. A record the leader has never matched
    (open ahead) has no lag. A level the frontier already exceeded on its first measured day
-   (the closed models scored before it were never run in the scope) is dated back at the
-   frontier's early growth rate (`BACKCAST_WINDOW_YEARS`), the envelope forecast's convention;
-   the fraction of such draws is reported per record, and a record that needs the assumption in
-   more than `MAX_DATED_BACK_FRAC` of draws is dropped from the series.
-2. `line_gap`: one straight line per group fitted on the posterior medians of its frontier
-   (top-`top_k` points released since `fit_start`, `regimes.weighted_line_fit`, each point
-   weighted by its posterior SD), giving the gap in ECI-H points and the lag in months (gap over
-   the follower's slope) at a date, today by default.
+   (the closed models scored before it were never run in the scope) is read, in a class scope,
+   off the all-benchmarks fit's leader frontier, whose scale the class is linked onto and whose
+   field opens years earlier (`borrowed`: a crossing measured, in another scope); where that is
+   not available (the all-benchmarks scope itself, before davinci) it is dated back at the
+   frontier's early growth rate (`BACKCAST_WINDOW_YEARS`), the envelope forecast's convention.
+   The fractions of both are reported per record, and a record that needs the dating-back
+   assumption in more than `MAX_DATED_BACK_FRAC` of draws is dropped from the series. In a class
+   scope, a follower record also has to be a frontier model overall: within `RECORD_FRONTIER_TOL`
+   ECI-H of the follower's record of its date on all benchmarks (`off_frontier_records`), or it
+   is only the best of the few follower models the class happened to score.
+2. `line_gap`: one straight line per group fitted on the posterior medians of its records
+   released since `fit_start` (top-`top_k`, 1 by default: the diamonds of the panels;
+   `regimes.weighted_line_fit` on centred medians, each point weighted by its posterior SD plus
+   a common dispersion, grid and priors on the ECI-H scale, `LINE_S_GRID`, `LINE_PRIOR_SD`),
+   giving the gap in ECI-H points and the lag in months at a date,
+   today by default. The lag is the backward-looking one, as in 1.: gap over the leader's slope,
+   how long ago the leader's line stood where the follower's stands now. The forward reading (gap
+   over the follower's slope, how long until the follower's line reaches the leader's level of
+   today) is kept alongside; the two differ whenever the slopes do.
 3. `crossovers`: when each group's line reaches every human tier (`regimes.regime_crossover_df`
    on the single line).
 """
@@ -52,10 +69,31 @@ from multiaxis_eci.analysis.regimes import (
     weighted_line_fit,
 )
 from multiaxis_eci.analysis.stats import post_stats
-from multiaxis_eci.data import MODEL_OPENNESS_FILE, MODELS_FILE, load_model_openness
+from multiaxis_eci.data import MODEL_OPENNESS_FILE, MODELS_FILE, load_model_openness, model_family
 
 # Smallest posterior SD (ECI-H points) a frontier point carries in the line fits.
 SD_FLOOR = 0.5
+# The line fits' common dispersion grid, in ECI-H points. `weighted_line_fit`'s default grid (0 to
+# 0.5) is in ability units, the scale of the forecast it was written for; ECI-H runs about twenty
+# times wider, and on that grid the points' own SDs would weigh alone: the anchor (SD 0, floored)
+# would outweigh a thinly-measured recent record a hundred times over and the bands shrink to
+# nothing. Records sit a few ECI-H points off any straight line.
+LINE_S_GRID = (0.0, 1.0, 2.0, 4.0, 7.0, 10.0, 15.0)
+# Its priors, on the same scale: the medians are centred before the fit (the default prior on the
+# intercept is centred on 0 with an SD of 10, an ability-scale prior that would pull a line at
+# ECI-H 140 down to nothing), and intercept and slope get SDs wide against ECI-H.
+LINE_PRIOR_SD = (200.0, 200.0)
+# Frontier points the lines are fitted on: the running top-1, the records (user, 2026-09-29).
+LINE_TOP_K = 1
+# A class scope's follower record counts (lag and line) only when the model stands within this many
+# ECI-H of the follower's record of its date on all benchmarks (user, 2026-09-29): in 2024 the open
+# "records" on private benchmarks were Llama 3.1 8B and Pixtral 12B, the open models the class
+# scored, not the open frontier (Llama 3.1 405B, 15 points higher on all benchmarks).
+RECORD_FRONTIER_TOL = 5.0
+# A class fit's scale is linked through the leader's candidates from these organizations with at
+# least LINK_MIN_OBS scores in the scope.
+LINK_ORGANIZATIONS = ("Anthropic", "Google DeepMind", "Google Research", "OpenAI")
+LINK_MIN_OBS = 4
 # (leader, follower): the gap is leader minus follower, the lag is the follower's.
 GROUP_PAIRS = {"openness": ("closed", "open"), "country": ("US", "CN")}
 GROUP_TITLES = {"openness": {"closed": "Closed models", "open": "Open-weights models"},
@@ -79,6 +117,60 @@ def group_labels(kind: str, names: list[str]) -> dict[str, str]:
         cmap = dict(zip(df["model_version"], df["country"]))
         return {m: cmap[m] for m in names if cmap.get(m) in ("US", "CN")}
     raise ValueError(f"unknown group kind {kind!r}")
+
+
+def linking_members(names: list[str], candidates: np.ndarray, n_obs: np.ndarray,
+                    kind: str = "openness") -> np.ndarray:
+    """(n,) bool: the models a class fit is linked through, the leader group's candidates from
+    LINK_ORGANIZATIONS with at least LINK_MIN_OBS scores in the scope (closed OpenAI, Anthropic
+    and Google models; gpt-oss and Gemma, open, are not among them)."""
+    org = pd.read_csv(MODELS_FILE, dtype=str).drop_duplicates("model_version") \
+        .set_index("model_version")["organization"]
+    labels = group_labels(kind, names)
+    leader = GROUP_PAIRS[kind][0]
+    return np.array([bool(candidates[i]) and n_obs[i] >= LINK_MIN_OBS
+                     and labels.get(m) == leader and org.get(m) in LINK_ORGANIZATIONS
+                     for i, m in enumerate(names)])
+
+
+def off_frontier_records(group: GroupFrontier, reference: GroupFrontier,
+                         tol: float = RECORD_FRONTIER_TOL) -> frozenset:
+    """The records of `group` (a class scope) whose release stands more than `tol` ECI-H below
+    the same group's record of its date in `reference` (the all-benchmarks scope), both read on
+    the reference's posterior medians: the best of the models the class scored, not a frontier
+    model. A release is its best effort on the reference (`data.model_family`), so kimi-k3_max is
+    judged as Kimi K3, whichever effort holds the reference's record. A release the reference
+    does not hold is kept."""
+    ref = reference.tl.assign(family=reference.tl["name"].map(model_family))
+    level = ref.groupby("family")["mean"].max()
+    ref_recs = ref[ref["is_record"]]
+    out = set()
+    for _, r in group.tl[group.tl["is_record"]].iterrows():
+        fam = model_family(r["name"])
+        if fam not in level.index:
+            continue
+        front = ref_recs.loc[ref_recs["release_date"] <= r["release_date"], "mean"]
+        if len(front) and level[fam] < front.max() - tol:
+            out.add(r["name"])
+    return frozenset(out)
+
+
+def link_to_reference(theta: np.ndarray, names: list[str], members: np.ndarray,
+                      reference: pd.Series) -> tuple[np.ndarray, np.ndarray, int]:
+    """Mean-sigma linking of a class fit onto the all-benchmarks ECI-H: per draw, the affine
+    (a, b) that gives the linking models' abilities `theta[:, members]` the mean and the standard
+    deviation of their posterior-median ECI-H in `reference` (name -> ECI-H of the all-benchmarks
+    fit). `members` (n,) is `linking_members`; those absent from `reference` are skipped. b is positive by construction, so the
+    ordering of the models is the fit's own in every draw. Returns a, b (S,) and the number of
+    linking models."""
+    use = np.array([bool(members[i]) and m in reference.index for i, m in enumerate(names)])
+    if use.sum() < 3:
+        raise ValueError(f"only {int(use.sum())} linking model(s) in the reference fit")
+    target = reference.reindex(np.asarray(names)[use]).to_numpy(float)
+    T = theta[:, use]
+    b = target.std() / T.std(axis=1)
+    a = target.mean() - b * T.mean(axis=1)
+    return a, b, int(use.sum())
 
 
 @dataclass
@@ -108,10 +200,12 @@ class GroupFrontier:
 
 def build_group_frontier(E: np.ndarray, names: list[str], model_dates: pd.Series,
                          members: np.ndarray, label: str, *, fit_start: str,
-                         top_k: int = 2, hdi_prob: float = 0.8) -> GroupFrontier:
+                         top_k: int = LINE_TOP_K, hdi_prob: float = 0.8,
+                         not_records: frozenset = frozenset()) -> GroupFrontier:
     """One group's candidates (`members`, (n,) bool over `names`, already restricted to the
     timelines' candidates), its records, its trend line and its per-draw envelope, from the
-    per-draw ECI-H array `E` (S, n)."""
+    per-draw ECI-H array `E` (S, n). `not_records` are running maxima that do not count as
+    records (`off_frontier_records`)."""
     idx = np.flatnonzero(members)
     rows = []
     for i in idx:
@@ -131,9 +225,10 @@ def build_group_frontier(E: np.ndarray, names: list[str], model_dates: pd.Series
     best = one_per_org_day(family_best(tl)) if len(tl) else tl
     per_day = (best.sort_values("mean", ascending=False).drop_duplicates("release_date")
                    .sort_values("release_date", kind="stable")) if len(tl) else tl
-    records = frontier_topk(per_day, 1) if len(tl) else []
+    records = [m for m in frontier_topk(per_day, 1) if m not in not_records] if len(tl) else []
     tl["is_record"] = tl["name"].isin(records)
-    fit_pts = (best[best["name"].isin(frontier_topk(best, top_k))
+    front = records if top_k == 1 else (frontier_topk(best, top_k) if len(tl) else [])
+    fit_pts = (best[best["name"].isin(front)
                     & (best["release_date"] >= pd.Timestamp(fit_start))] if len(tl) else tl)
     tl["in_fit"] = tl["name"].isin(fit_pts["name"])
     fit = None
@@ -141,10 +236,12 @@ def build_group_frontier(E: np.ndarray, names: list[str], model_dates: pd.Series
         # The two anchors have no posterior spread in ECI-H by construction (130 and 150 in every
         # draw); a zero SD would make the line's noise matrix singular, so every point keeps at
         # least SD_FLOOR of spread.
+        y = fit_pts["mean"].to_numpy()
         fit = weighted_line_fit(_to_year(pd.DatetimeIndex(fit_pts["release_date"])),
-                                fit_pts["mean"].to_numpy(),
-                                np.maximum(fit_pts["sd"].to_numpy(), SD_FLOOR),
-                                fit_pts["name"].tolist())
+                                y - y.mean(), np.maximum(fit_pts["sd"].to_numpy(), SD_FLOOR),
+                                fit_pts["name"].tolist(), s_grid=LINE_S_GRID,
+                                prior_sd=LINE_PRIOR_SD)
+        fit.a = fit.a + y.mean()
     if len(tl):
         order = tl["idx"].to_numpy()
         env_E = np.maximum.accumulate(E[:, order], axis=1)
@@ -167,7 +264,8 @@ MAX_DATED_BACK_FRAC = 2.0 / 3.0
 
 
 def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
-                 probs: tuple[float, float] = (0.5, 0.8)) -> tuple[pd.DataFrame, np.ndarray]:
+                 probs: tuple[float, float] = (0.5, 0.8),
+                 reference: GroupFrontier | None = None) -> tuple[pd.DataFrame, np.ndarray]:
     """Per follower record, the months since the leader's frontier reached its level, per draw.
 
     In each draw, the crossing is the release date of the FIRST leader candidate (by release
@@ -177,6 +275,13 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
     most frequent ones with their share of draws, so a wide interval can be read (DeepSeek V3
     0324 on private benchmarks is GPT-4 0613's equal: in half the draws GPT-4 0613 beat it in
     June 2023, in the other half the first closed model above it came a year later).
+
+    `borrowed` (class scopes, `reference` given): the frontier already exceeded the level on its
+    first measured day, and the crossing is read off `reference`, the all-benchmarks fit's leader
+    frontier, whose field opens earlier: in each draw the first reference candidate at or above
+    the level (the two posteriors are independent, the reference draws are paired at random),
+    no later than the class's first day. Its scale is the class's own, the class fit being linked
+    onto it through the leader's models. A borrowed crossing is a measured one.
 
     `backcast`: the frontier already
     exceeded the level on its first measured day (the closed models that carried it there were
@@ -204,23 +309,44 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
         with np.errstate(divide="ignore", invalid="ignore"):
             early_rate = (M[:, iw] - F0) / span if span > 0 else np.zeros(S)
         leader_names = leader.tl["name"].to_numpy()                        # (F,) by release date
+    use_ref = has_leader and reference is not None and reference.env_E.shape[1] > 0
+    if use_ref:
+        R = reference.env_E
+        pick = np.random.default_rng(0).choice(R.shape[0], size=S, replace=R.shape[0] < S)
+        MR, yR = R[pick], reference.env_years.astype(float)                  # (S, FR), (FR,)
     for r, rec in recs.iterrows():
         level = E[:, int(rec["idx"])]                                        # (S,)
         t_r = float(_to_year(pd.DatetimeIndex([rec["release_date"]]))[0])
-        backcast = censored = np.zeros(S, dtype=bool)
+        backcast = censored = borrowed = np.zeros(S, dtype=bool)
         if has_leader:
             reached = M >= level[:, None]                                    # (S, F)
             any_ = reached.any(axis=1)
             first = np.argmax(reached, axis=1)                               # first row at/above
             cross = years[first]
-            who = pd.Series(leader_names[first[any_]]).value_counts(normalize=True)
-            first_above = "; ".join(f"{m} ({f:.0%})" for m, f in who.head(3).items())
+            who_names = leader_names[first].astype(object)
             on_day_one = any_ & (first <= i0) & (level < F0)
+            t_ref = np.full(S, np.nan)
+            if use_ref:
+                r_reached = MR >= level[:, None]
+                r_first = np.argmax(r_reached, axis=1)
+                # The reference is usable where it reached the level after its own first day
+                # (else it would need dating back too).
+                r_ok = r_reached.any(axis=1) & ~((r_first == 0) & (level < MR[:, 0]))
+                borrowed = on_day_one & r_ok
+                t_ref = np.minimum(yR[r_first], d0)
+                # A borrowed crossing is the reference model's (the class's first-day model when
+                # the reference reached the level no earlier).
+                ref_names = reference.tl["name"].to_numpy()[r_first]
+                who_names = np.where(borrowed & (yR[r_first] < d0), ref_names, who_names)
             with np.errstate(divide="ignore", invalid="ignore"):
                 t_back = d0 - (F0 - level) / early_rate
-            backcast = on_day_one & (early_rate > 0)
-            censored = on_day_one & ~(early_rate > 0)
-            cross = np.where(backcast, t_back, np.where(censored, d0, cross))
+            rest = on_day_one & ~borrowed
+            backcast = rest & (early_rate > 0)
+            censored = rest & ~(early_rate > 0)
+            cross = np.where(borrowed, t_ref,
+                             np.where(backcast, t_back, np.where(censored, d0, cross)))
+            who = pd.Series(who_names[any_]).value_counts(normalize=True)
+            first_above = "; ".join(f"{m} ({f:.0%})" for m, f in who.head(3).items())
             lag = np.where(any_, (t_r - cross) * 12.0, np.nan)
         else:
             lag = np.full(S, np.nan)
@@ -229,6 +355,7 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
         finite = lag[np.isfinite(lag)]
         row = {"name": rec["name"], "release_date": rec["release_date"],
                "level_eci_median": rec["mean"], "frac_undefined": float(np.mean(~np.isfinite(lag))),
+               "frac_borrowed": float(borrowed.mean()),
                "frac_backcast": float(backcast.mean()), "backcast": bool(backcast.mean() > 0.5),
                "frac_censored": float(censored.mean()), "censored": bool(censored.mean() > 0.5),
                "first_leader_above": first_above,
@@ -242,7 +369,7 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
             row[f"lag_hdi{tag}_low"], row[f"lag_hdi{tag}_high"] = float(lo), float(hi)
         rows.append(row)
     cols = ["name", "release_date", "level_eci_median", "lag_months_median", "frac_undefined",
-            "frac_backcast", "backcast", "frac_censored", "censored", "first_leader_above"] \
+            "frac_borrowed", "frac_backcast", "backcast", "frac_censored", "censored", "first_leader_above"] \
         + [f"lag_hdi{int(round(p * 100))}_{s}" for p in probs for s in ("low", "high")]
     df = pd.DataFrame(rows, columns=cols)
     # Records that need the dating-back assumption in most draws are dropped: their lag measures
@@ -253,17 +380,21 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
 
 def line_gap(leader: GroupFrontier, follower: GroupFrontier, at) -> dict[str, np.ndarray]:
     """Samples of the leader-minus-follower gap (ECI-H) at date `at`, the follower's lag in
-    months (gap over its slope, NaN when the slope is not positive) and the slope difference.
-    The two lines are independent posteriors, paired sample by sample."""
+    months, backward-looking (gap over the leader's slope: how long ago the leader's line stood at
+    the follower's level of `at`) and forward-looking (gap over the follower's slope: how long
+    until the follower's line reaches the leader's level of `at`), NaN where the slope divided by
+    is not positive, and the slope difference. The two lines are independent posteriors, paired
+    sample by sample."""
     t = float(_to_year(pd.DatetimeIndex([pd.Timestamp(at)]))[0])
     n = min(len(leader.fit.a), len(follower.fit.a))
     gl, gf = leader.fit.at([t])[:n, 0], follower.fit.at([t])[:n, 0]
     gap = gl - gf
-    bf = follower.fit.b[:n]
+    bl, bf = leader.fit.b[:n], follower.fit.b[:n]
     with np.errstate(divide="ignore", invalid="ignore"):
-        lag = np.where(bf > 0, 12.0 * gap / bf, np.nan)
-    return {"gap_eci": gap, "lag_months": lag, "slope_diff": leader.fit.b[:n] - bf,
-            "level_leader": gl, "level_follower": gf}
+        lag = np.where(bl > 0, 12.0 * gap / bl, np.nan)
+        lag_forward = np.where(bf > 0, 12.0 * gap / bf, np.nan)
+    return {"gap_eci": gap, "lag_months": lag, "lag_months_forward": lag_forward,
+            "slope_diff": bl - bf, "level_leader": gl, "level_follower": gf}
 
 
 def summarize(x: np.ndarray, probs: tuple[float, ...] = (0.5, 0.8)) -> dict[str, float]:
@@ -321,6 +452,7 @@ class ScopeGap:
     line_last: dict             # line_gap samples at the follower's last record
     crossovers: pd.DataFrame
     summary: pd.DataFrame       # one row per quantity
+    off_frontier: frozenset = frozenset()   # follower running maxima not counted as records
 
     def summary_rows(self, probs=(0.5, 0.8)) -> pd.DataFrame:
         rows = []
@@ -335,6 +467,7 @@ class ScopeGap:
         if self.line:
             add("gap_today", f"{self.leader.label}-{self.follower.label}", self.line["gap_eci"], "ECI-H")
             add("lag_today", self.follower.label, self.line["lag_months"], "months")
+            add("lag_today_forward", self.follower.label, self.line["lag_months_forward"], "months")
             add("slope_diff", f"{self.leader.label}-{self.follower.label}", self.line["slope_diff"],
                 "ECI-H per year")
         if self.line_last:
@@ -353,7 +486,9 @@ class ScopeGap:
 
 def scope_gap(E: np.ndarray, data, model_dates: pd.Series, keep: np.ndarray, *, scope: str,
               kind: str = "openness", fit_start: str = config.FORECAST_KW["fit_start"],
-              top_k: int = config.FORECAST_KW["top_k"], today=None, hdi_prob: float = 0.8) -> ScopeGap:
+              top_k: int = LINE_TOP_K, today=None, hdi_prob: float = 0.8,
+              reference: GroupFrontier | None = None,
+              reference_follower: GroupFrontier | None = None) -> ScopeGap:
     """Everything one scope yields. `E` (S, n) is per-draw ECI-H, `keep` (n,) the timelines'
     candidate mask; a kept candidate without a group label raises (fix the curated file)."""
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
@@ -372,7 +507,15 @@ def scope_gap(E: np.ndarray, data, model_dates: pd.Series, keep: np.ndarray, *, 
         groups[lab] = build_group_frontier(E, names, model_dates, members, lab,
                                            fit_start=fit_start, top_k=top_k, hdi_prob=hdi_prob)
     leader, follower = groups[leader_lab], groups[follower_lab]
-    lag_df, lag_draws = frontier_lag(follower, leader, E)
+    drop = frozenset()
+    if reference_follower is not None:
+        drop = off_frontier_records(follower, reference_follower)
+        if drop:
+            members = np.array([keep[i] and labels.get(m) == follower_lab for i, m in enumerate(names)])
+            follower = build_group_frontier(E, names, model_dates, members, follower_lab,
+                                            fit_start=fit_start, top_k=top_k, hdi_prob=hdi_prob,
+                                            not_records=drop)
+    lag_df, lag_draws = frontier_lag(follower, leader, E, reference=reference)
     line = line_last = {}
     if leader.fit is not None and follower.fit is not None:
         line = line_gap(leader, follower, today)
@@ -382,7 +525,7 @@ def scope_gap(E: np.ndarray, data, model_dates: pd.Series, keep: np.ndarray, *, 
     out = ScopeGap(scope=scope, kind=kind, leader=leader, follower=follower,
                    humans=human_tiers(E, names, data.is_human, hdi_prob), lag_df=lag_df,
                    lag_draws=lag_draws, line=line, line_last=line_last, crossovers=cx,
-                   summary=pd.DataFrame())
+                   summary=pd.DataFrame(), off_frontier=drop)
     out.summary = out.summary_rows()
     return out
 

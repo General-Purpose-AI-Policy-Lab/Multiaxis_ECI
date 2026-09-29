@@ -1,9 +1,14 @@
 """Open-weights or closed, one label per model of 0_input/models.csv -> 1_curated/model_openness.csv.
 
-A model is `open` when its weights can be downloaded (Epoch's "Open weights" classes, whatever
-the licence), `closed` when it is reachable through an API or a hosted product only, or never
-released. The state at release counts: grok-2 is closed although its weights came out a year
-later. Sources, in order:
+A model is `open` when its weights can be downloaded at release or shortly after (Epoch's "Open
+weights" classes, whatever the licence), `closed` when it is reachable through an API or a hosted
+product only, or never released. "Shortly after" is a 30-day window: weights published within
+30 days of the release date make the model open (GLM-5.3, 14 days), later ones do not (grok-2,
+closed although its weights came out a year later). A month is below the resolution of the lags the
+frontier diagnostics read, so the release date stays the model's first public day either way. A
+hosted version of open weights (Qwen3.5-Plus serves Qwen3.5-397B-A17B) is open: the model it
+serves can be downloaded. Both rules are applied by hand, in the overrides, since Epoch's
+`accessibility` is today's state and carries neither the date nor the hosting. Sources, in order:
 
   1. Epoch's model metadata (`accessibility`), read from the pipeline checkout's
      0_input/feed/epoch/model_metadata.csv, matched on the pipeline's model_version and on the
@@ -79,7 +84,9 @@ def main() -> None:
                     help="benchmark-data-pipeline checkout (default: the sibling directory)")
     args = ap.parse_args()
 
-    models = pd.read_csv(MODELS_FILE, dtype=str)
+    # One label per model_version: several model_ids can share one (run variants, harnesses), and a
+    # repeated version would repeat its row in the output.
+    models = pd.read_csv(MODELS_FILE, dtype=str).drop_duplicates("model_version")
     labels = epoch_labels(Path(args.pipeline), models)
     over = pd.read_csv(OVERRIDES, dtype=str)
     bad = over[~over["openness"].isin(["open", "closed"])]

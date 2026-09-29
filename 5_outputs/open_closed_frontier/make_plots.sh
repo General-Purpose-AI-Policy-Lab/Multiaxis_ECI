@@ -9,19 +9,20 @@
 #   python 3_fit/fit.py --preset canonical --human-merge                     # canonical_humanmerge/ (full length)
 #   python 3_fit/fit.py --preset canonical --access public       --human-merge --chains 4 --draws 2000 --tune 2000
 #   python 3_fit/fit.py --preset canonical --access semi_private --human-merge --chains 4 --draws 2000 --tune 2000
-#   python 3_fit/fit.py --preset canonical --access private      --human-merge --chains 4 --draws 2000 --tune 2000
+#   python 3_fit/fit.py --preset canonical --access private      --human-merge --chains 4 --draws 2000 --tune 2000 \
+#       --anchors claude-3-7-sonnet-20250219,gpt-5-2025-08-07_medium   # Claude 3.5 Sonnet has no private score left
 # and the openness labels: python 1_curated/3_build_model_openness.py (after a sync).
 #
 # SCOPE_SUFFIX names the fit folders to read. _humanmerge (the default) is the merged tier order,
 # the one every analysis reads and the one the committed figures come from; SCOPE_SUFFIX= (empty)
 # reads the plain canonical*/ set, which is now only a sensitivity check.
-#   SCOPE_SUFFIX= TODAY=2026-09-11 5_outputs/open_closed_frontier/make_plots.sh   # without the order
+#   SCOPE_SUFFIX= TODAY=2026-09-29 5_outputs/open_closed_frontier/make_plots.sh   # without the order
 set -e
 cd "$(dirname "$0")/../.."
 PY=.venv/bin/python
 OUT=5_outputs/open_closed_frontier
 GROUP=${GROUP:-openness}          # GROUP=country make_plots.sh for the US vs CN cut
-TODAY=${TODAY:-}                  # TODAY=2026-09-11 pins the today line
+TODAY=${TODAY:-}                  # TODAY=2026-09-29 pins the today line
 SCOPE_SUFFIX=${SCOPE_SUFFIX-_humanmerge}   # the merged tier order; SCOPE_SUFFIX= reads plain canonical*/
 T=(); [[ -n "$TODAY" ]] && T=(--today "$TODAY")
 GEN=$($PY -c "import sys; sys.path.insert(0, '2_model'); from multiaxis_eci import config; print(config.RESULTS_DIR)")

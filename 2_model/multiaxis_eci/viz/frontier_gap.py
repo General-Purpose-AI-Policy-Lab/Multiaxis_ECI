@@ -3,6 +3,8 @@ benchmark access scope, the months-behind figure in the manner of Ihle (2026), t
 table and the crossover panels (reusing viz.forecast.crossover_panels_fig)."""
 from __future__ import annotations
 
+import re
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -183,6 +185,15 @@ def _label_font(style: FigureStyle) -> int:
     return max(int(round(style.font_tier * 0.78)), 8)
 
 
+# Records drawn but not named on the months-behind figure: releases of little note beside a named
+# neighbour at the same level (StableBeluga2, a Llama 2 70B fine-tune two days after it;
+# DeepSeek V3.1 Terminus, a week before V3.2-Exp), which only crowd the name band.
+UNLABELLED_RECORDS = {"StableBeluga2", "internlm-20b", "DeepSeek-V3.1-Terminus"}
+# Names the generic prettifier gets wrong or makes longer than they need to be.
+RECORD_LABELS = {"Llama-2-70b-hf": "Llama 2 70B", "Mixtral-8x7B-v0.1": "Mixtral 8x7B",
+                 "LLaMA-65B": "LLaMA 65B", "qwen3.5-397b-a17b": "Qwen3.5 397B"}
+
+
 def _record_label(raw: str) -> str:
     """The name a record is written under: `pretty_model_name` without the effort suffix.
 
@@ -191,12 +202,19 @@ def _record_label(raw: str) -> str:
     and the summary table all carry. One effort per family reaches the frontier, so the shorter
     name still names exactly one record.
     """
-    return pretty_model_name(raw.split("_", 1)[0])
+    if raw in RECORD_LABELS:
+        return RECORD_LABELS[raw]
+    name = pretty_model_name(raw.split("_", 1)[0])
+    # Vendor casing the generic prettifier misses: DeepSeek, and version tokens (K2, V3.2).
+    name = re.sub(r"\bDeepseek\b", "DeepSeek", name)
+    return re.sub(r"\b([kv])(\d[\d.]*)\b", lambda m: m.group(1).upper() + m.group(2), name)
 
 
 def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-    """The records that carry a lag, in release order, with the name each one is labelled by."""
-    rows = df[df["lag_months_median"].notna()].sort_values("release_date")
+    """The records that carry a lag and a name (not in UNLABELLED_RECORDS), in release order, with
+    the name each one is labelled by."""
+    rows = df[df["lag_months_median"].notna() & ~df["name"].isin(UNLABELLED_RECORDS)] \
+        .sort_values("release_date")
     return rows, [("≥ " if bool(r.get("censored", False)) else "") + _record_label(r["name"])
                   for _, r in rows.iterrows()]
 
@@ -348,7 +366,10 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         def points(sub, symbol, hover, key, scope=s, col=col, name=name):
             if not len(sub):
                 return
-            shapes_seen.add(key)
+            # A shape joins the key only when the window shows it: gpt-j's dated-back crossing
+            # (2021) is drawn off the left edge and would otherwise key a marker nobody sees.
+            if ((sub["release_date"] >= w0) & (sub["release_date"] <= w1)).any():
+                shapes_seen.add(key)
             fig.add_trace(go.Scatter(
                 x=sub["release_date"], y=sub["lag_months_median"], mode="markers",
                 legendgroup=scope, name=f"{name}: records", showlegend=False,
@@ -379,9 +400,10 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             ends.append((float(med[-1]), name, col, x_end))
 
     # The scopes read off their colour, the hollow markers off their shape: one grey key entry per
-    # shape the data uses, after the four scope lines, rather than a coloured entry per scope.
+    # shape the data uses, after the four scope lines, rather than a coloured entry per scope. When
+    # every visible crossing is measured there is nothing to tell apart, and no key at all.
     for key, symbol, text in MARKER_KEY:
-        if key in shapes_seen:
+        if key in shapes_seen and shapes_seen - {""}:
             filled = not symbol.endswith("-open")
             fig.add_trace(go.Scatter(
                 x=[None], y=[None], mode="markers", name=text, hoverinfo="skip",

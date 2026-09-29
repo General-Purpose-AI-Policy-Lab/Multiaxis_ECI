@@ -1,0 +1,573 @@
+obs_idx,model,benchmark,score,pit
+0,DeepSeek-R1,CritPt,0.011,0.4785
+3,DeepSeek-V3.2-Exp_thinking,CritPt,0.0285714285714286,0.614
+4,Inkling_xhigh,CritPt,0.0542857142857143,0.638
+8,MiniMax-M2.7,CritPt,0.0057142857142857,0.335
+9,MiniMax-M3,CritPt,0.0371428571428571,0.546
+12,claude-fable-5-1_high,CritPt,0.302857142857143,0.406
+13,claude-fable-5-1_low,CritPt,0.277142857142857,0.6795
+14,claude-fable-5-1_max,CritPt,0.297142857142857,0.3675
+15,claude-fable-5-1_medium,CritPt,0.291428571428571,0.6065
+16,claude-fable-5-1_xhigh,CritPt,0.311428571428571,0.694
+17,claude-fable-5_max,CritPt,0.2857142857,0.442
+19,claude-opus-4-20250514,CritPt,0.003,0.18
+20,claude-opus-4-7_max,CritPt,0.12,0.504
+21,claude-opus-4-8_max,CritPt,0.208571428571429,0.658
+22,claude-opus-5_high,CritPt,0.282857142857143,0.399
+23,claude-opus-5_low,CritPt,0.231428571428571,0.6785
+24,claude-opus-5_max,CritPt,0.291428571,0.6355
+25,claude-opus-5_medium,CritPt,0.268571428571429,0.6815
+26,claude-opus-5_xhigh,CritPt,0.277142857142857,0.6185
+27,claude-sonnet-4-20250514,CritPt,0.0028571428571428,0.1865
+28,claude-sonnet-4-5-20250929,CritPt,0.0114285714285714,0.2445
+29,claude-sonnet-4-6_max,CritPt,0.0314285714285714,0.2045
+30,claude-sonnet-5_high,CritPt,0.0114285714285714,0.069
+31,claude-sonnet-5_max,CritPt,0.168571428571429,0.774
+32,deepseek-v4-flash-0731_max,CritPt,0.165714285714286,0.8535
+33,deepseek-v4-flash_high,CritPt,0.0342857142857143,0.6215
+34,deepseek-v4-flash_max,CritPt,0.0714285714285714,0.7985
+35,deepseek-v4-pro-0813_max,CritPt,0.18,0.8525
+36,deepseek-v4-pro_high,CritPt,0.1,0.8785
+37,deepseek-v4-pro_max,CritPt,0.128571428571429,0.9105
+38,gemini-2.5-pro,CritPt,0.02,0.4925
+39,gemini-3-pro-preview,CritPt,0.069,0.5795
+40,gemini-3.1-flash-lite,CritPt,0.0114285714285714,0.241
+41,gemini-3.1-pro-preview,CritPt,0.177142857142857,0.872
+43,gemini-3.5-flash_high,CritPt,0.131428571428571,0.692
+44,gemini-3.6-flash_high,CritPt,0.105714285714286,0.6255
+45,gemini-3.7-flash_high,CritPt,0.142857142857143,0.5655
+46,gemini-3.7-flash_low,CritPt,0.0571428571428571,0.5355
+47,gemini-3.7-flash_medium,CritPt,0.0942857142857143,0.5855
+48,gemini-3.8-flash_high,CritPt,0.182857142857143,0.6665
+49,gemini-3.8-flash_low,CritPt,0.04,0.4725
+50,gemini-3.8-flash_medium,CritPt,0.122857142857143,0.6355
+52,gemma-4-31b-it,CritPt,0.0142857142857143,0.2825
+53,glm-4.7,CritPt,0.0171020408163265,0.4325
+54,glm-5.1,CritPt,0.0457142857142857,0.516
+55,glm-5.2_max,CritPt,0.208571428571429,0.9195
+56,glm-5.2_none,CritPt,0.0314285714285714,0.293
+57,glm-5.3-flash,CritPt,0.154285714285714,0.6525
+58,glm-5.3_max,CritPt,0.191428571428571,0.842
+62,gpt-5-2025-08-07_high,CritPt,0.126,0.7725
+65,gpt-5.1-2025-11-13_high,CritPt,0.0485714285714286,0.5135
+66,gpt-5.4-2026-03-05_xhigh,CritPt,0.2342857143,0.808
+67,gpt-5.4-mini-2026-03-17_xhigh,CritPt,0.1,0.7355
+68,gpt-5.4-nano-2026-03-17_xhigh,CritPt,0.0925306122448979,0.594
+69,gpt-5.4-pro-2026-03-05_xhigh,CritPt,0.3,0.887
+71,gpt-5.5-pro_xhigh,CritPt,0.305714285714286,0.697
+72,gpt-5.5_high,CritPt,0.254285714285714,0.758
+73,gpt-5.5_low,CritPt,0.08,0.5715
+74,gpt-5.5_medium,CritPt,0.185714285714286,0.668
+75,gpt-5.5_none,CritPt,0.0142857142857143,0.098
+76,gpt-5.5_xhigh,CritPt,0.271428571428571,0.7055
+77,gpt-5.6-luna_high,CritPt,0.165714285714286,0.868
+78,gpt-5.6-luna_low,CritPt,0.0257142857142857,0.261
+79,gpt-5.6-luna_max,CritPt,0.206,0.6015
+80,gpt-5.6-luna_medium,CritPt,0.0485714285714286,0.5025
+81,gpt-5.6-luna_none,CritPt,0.0028571428571428,0.021
+82,gpt-5.6-luna_xhigh,CritPt,0.205714285714286,0.665
+83,gpt-5.6-sol_high,CritPt,0.257142857142857,0.5485
+84,gpt-5.6-sol_low,CritPt,0.148571428571429,0.647
+85,gpt-5.6-sol_max,CritPt,0.323,0.672
+86,gpt-5.6-sol_medium,CritPt,0.228571428571429,0.681
+87,gpt-5.6-sol_none,CritPt,0.0514285714285714,0.5015
+88,gpt-5.6-sol_xhigh,CritPt,0.286,0.707
+89,gpt-5.6-terra_high,CritPt,0.228571428571429,0.69
+90,gpt-5.6-terra_low,CritPt,0.0942857142857143,0.606
+91,gpt-5.6-terra_max,CritPt,0.3,0.779
+92,gpt-5.6-terra_medium,CritPt,0.174285714285714,0.6675
+93,gpt-5.6-terra_none,CritPt,0.02,0.412
+94,gpt-5.6-terra_xhigh,CritPt,0.271428571428571,0.679
+95,gpt-6-astra_high,CritPt,0.288571428571429,0.171
+96,gpt-6-astra_low,CritPt,0.262857142857143,0.311
+97,gpt-6-astra_max,CritPt,0.317142857142857,0.291
+98,gpt-6-astra_medium,CritPt,0.291428571428571,0.099
+99,gpt-6-astra_none,CritPt,0.197142857142857,0.2105
+100,gpt-6-astra_xhigh,CritPt,0.314285714285714,0.2375
+101,gpt-oss-120b_high,CritPt,0.0114285714285714,0.2865
+103,gpt-oss-20b_high,CritPt,0.0142857142857143,0.436
+105,grok-4.3_high,CritPt,0.08,0.6645
+107,grok-4.5_high,CritPt,0.154285714285714,0.8335
+108,grok-4.6_high,CritPt,0.171428571428571,0.78
+109,grok-4.6_low,CritPt,0.0571428571428571,0.525
+110,grok-4.6_medium,CritPt,0.177142857142857,0.676
+111,grok-4.6_xhigh,CritPt,0.197142857142857,0.8675
+112,inkling-small,CritPt,0.0828571428571429,0.7155
+113,kimi-k2.5,CritPt,0.0314285714285714,0.537
+114,kimi-k2.6,CritPt,0.08,0.5065
+115,kimi-k2.7-code,CritPt,0.1,0.702
+116,kimi-k3_low,CritPt,0.0314285714285714,0.452
+117,kimi-k3_max,CritPt,0.234,0.8795
+118,mercury-2,CritPt,0.0084897959183673,0.319
+119,mimo-v2.5,CritPt,0.0371428571428571,0.435
+120,mimo-v2.5-pro,CritPt,0.04,0.396
+123,muse-spark,CritPt,0.11330612244898,0.7015
+124,muse-spark-1.1,CritPt,0.151,0.602
+125,muse-spark-1.2_xhigh,CritPt,0.177142857142857,0.8945
+126,nemotron-3-super,CritPt,0.0314285714285714,0.6805
+127,nemotron-3-ultra,CritPt,0.0314285714285714,0.613
+128,o3-2025-04-16_high,CritPt,0.0139999999999999,0.226
+129,o3-mini-2025-01-31_high,CritPt,0.0028571428571428,0.192
+130,o4-mini-2025-04-16_high,CritPt,0.006,0.077
+132,qwen3.6-27b_none,CritPt,0.0085714285714285,0.131
+133,qwen3.6-35b-a3b,CritPt,0.0028571428571428,0.2025
+135,qwen3.6-plus,CritPt,0.0285714285714286,0.3395
+136,qwen3.7-max,CritPt,0.134285714285714,0.658
+137,qwen3.7-plus,CritPt,0.0914285714285714,0.8935
+140,qwen3.8-27b_none,CritPt,0.0028571428571428,0.2865
+141,qwen3.8-27b_xhigh,CritPt,0.0542857142857143,0.5215
+142,qwen3.8-max,CritPt,0.2,0.68
+143,Inkling,FrontierCode,0.14,0.472
+144,MiniMax-M3,FrontierCode,0.147,0.1705
+145,claude-fable-5,FrontierCode,0.5348,0.4155
+146,claude-fable-5-1_medium,FrontierCode,0.5091,0.6505
+147,claude-opus-4-6,FrontierCode,0.2664,0.1715
+148,claude-opus-4-7,FrontierCode,0.3854,0.543
+149,claude-opus-4-8,FrontierCode,0.465,0.586
+150,claude-opus-5_max,FrontierCode,0.5338,0.7495
+151,claude-sonnet-4-6,FrontierCode,0.2431,0.46
+152,claude-sonnet-5,FrontierCode,0.4273,0.6485
+153,deepseek-v4-flash-0731,FrontierCode,0.188,0.1115
+154,deepseek-v4-pro_none,FrontierCode,0.1764,0.3945
+155,gemini-3.6-flash,FrontierCode,0.3437,0.608
+156,gemini-3.7-flash,FrontierCode,0.4359,0.7205
+157,glm-5.2_none,FrontierCode,0.245,0.44
+158,gpt-5.4-mini-2026-03-17,FrontierCode,0.2704,0.502
+159,gpt-5.5,FrontierCode,0.4296,0.6295
+160,gpt-5.6-luna,FrontierCode,0.3981,0.6175
+161,gpt-5.6-sol,FrontierCode,0.4749,0.673
+162,gpt-5.6-terra,FrontierCode,0.4131,0.6555
+163,gpt-6-astra_max,FrontierCode,0.5326,0.4195
+164,grok-4.5,FrontierCode,0.4244,0.967
+165,grok-4.6,FrontierCode,0.4801000000000001,0.799
+166,kimi-k2.7-code,FrontierCode,0.3006,0.558
+167,kimi-k3,FrontierCode,0.4417,0.4395
+168,mistral-medium-2604,FrontierCode,0.08,0.071
+169,qwen3.7-plus,FrontierCode,0.102,0.1475
+170,Inkling_xhigh,FrontierMath Tier 4 v2,0.048780487804878,0.509
+171,claude-fable-5-1_max,FrontierMath Tier 4 v2,0.8780487804878049,0.38
+172,claude-fable-5_max,FrontierMath Tier 4 v2,0.8780487804878049,0.7075
+173,claude-opus-4-1-20250805_32K,FrontierMath Tier 4 v2,0.024390243902439,0.8995
+174,claude-opus-4-5-20251101_32K,FrontierMath Tier 4 v2,0.048780487804878,0.469
+175,claude-opus-4-6_max,FrontierMath Tier 4 v2,0.2682926829268293,0.318
+176,claude-opus-4-7_max,FrontierMath Tier 4 v2,0.3170731707317073,0.2725
+177,claude-opus-4-8_max,FrontierMath Tier 4 v2,0.5609756097560976,0.4345
+178,claude-opus-5_max,FrontierMath Tier 4 v2,0.7317073170731707,0.2115
+179,claude-sonnet-4-5-20250929_32K,FrontierMath Tier 4 v2,0.024390243902439,0.567
+180,claude-sonnet-5_max,FrontierMath Tier 4 v2,0.2926829268292683,0.353
+181,deepseek-v4-flash-0731_max,FrontierMath Tier 4 v2,0.2439024390243902,0.639
+182,deepseek-v4-pro-0813_max,FrontierMath Tier 4 v2,0.2682926829268293,0.431
+183,deepseek-v4-pro_max,FrontierMath Tier 4 v2,0.024390243902439,0.0365
+185,gemini-3-flash-preview,FrontierMath Tier 4 v2,0.1707317073170731,0.671
+186,gemini-3.1-pro-preview,FrontierMath Tier 4 v2,0.2682926829268293,0.621
+188,gemini-3.5-flash_high,FrontierMath Tier 4 v2,0.2682926829268293,0.519
+189,gemini-3.6-flash_high,FrontierMath Tier 4 v2,0.2195121951219512,0.548
+190,gemini-3.7-flash_high,FrontierMath Tier 4 v2,0.3658536585365853,0.373
+191,glm-5.2_max,FrontierMath Tier 4 v2,0.2926829268292683,0.7195
+192,glm-5.3-flash_max,FrontierMath Tier 4 v2,0.1707317073170731,0.477
+193,glm-5.3_max,FrontierMath Tier 4 v2,0.2926829268292683,0.2605
+194,gpt-5-2025-08-07_high,FrontierMath Tier 4 v2,0.2195121951219512,0.7225
+195,gpt-5-mini-2025-08-07_high,FrontierMath Tier 4 v2,0.1219512195121951,0.728
+196,gpt-5-nano-2025-08-07_high,FrontierMath Tier 4 v2,0.024390243902439,0.717
+197,gpt-5-pro-2025-10-06_high,FrontierMath Tier 4 v2,0.1951219512195122,0.573
+198,gpt-5.2-2025-12-11_xhigh,FrontierMath Tier 4 v2,0.317,0.5645
+199,gpt-5.2-pro-2025-12-11_xhigh,FrontierMath Tier 4 v2,0.46,0.5025
+200,gpt-5.4-2026-03-05_xhigh,FrontierMath Tier 4 v2,0.49,0.377
+201,gpt-5.4-mini-2026-03-17_xhigh,FrontierMath Tier 4 v2,0.0975609756097561,0.269
+202,gpt-5.4-nano-2026-03-17_high,FrontierMath Tier 4 v2,0.1219512195121951,0.7245
+203,gpt-5.4-pro-2026-03-05_xhigh,FrontierMath Tier 4 v2,0.5853658536585366,0.324
+204,gpt-5.5-instant,FrontierMath Tier 4 v2,0.024390243902439,0.52
+205,gpt-5.5-pro_xhigh,FrontierMath Tier 4 v2,0.7804878048780488,0.458
+206,gpt-5.5_xhigh,FrontierMath Tier 4 v2,0.725,0.5595
+207,gpt-5.6-luna_max,FrontierMath Tier 4 v2,0.6097560975609756,0.4335
+208,gpt-5.6-sol_max,FrontierMath Tier 4 v2,0.8292682926829268,0.5095
+209,gpt-5.6-sol_promax,FrontierMath Tier 4 v2,0.8048780487804879,0.4745
+210,gpt-5.6-terra_max,FrontierMath Tier 4 v2,0.7073170731707317,0.3895
+211,gpt-6-astra_high,FrontierMath Tier 4 v2,0.951219512195122,0.6535
+212,gpt-6-astra_low,FrontierMath Tier 4 v2,0.8780487804878049,0.6025
+213,gpt-6-astra_max,FrontierMath Tier 4 v2,0.951219512195122,0.739
+214,gpt-6-astra_medium,FrontierMath Tier 4 v2,0.975609756097561,0.8015
+215,gpt-6-astra_none,FrontierMath Tier 4 v2,0.8292682926829268,0.6115
+216,gpt-6-astra_xhigh,FrontierMath Tier 4 v2,0.951219512195122,0.6825
+217,grok-4.20-0309-reasoning,FrontierMath Tier 4 v2,0.1707317073170731,0.8415
+218,grok-4.3_high,FrontierMath Tier 4 v2,0.1463414634146341,0.8295
+219,grok-4.5_high,FrontierMath Tier 4 v2,0.2439024390243902,0.642
+220,grok-4.6_xhigh,FrontierMath Tier 4 v2,0.3170731707317073,0.4765
+221,inkling-small_xhigh,FrontierMath Tier 4 v2,0.1707317073170731,0.7925
+222,kimi-k2.6,FrontierMath Tier 4 v2,0.2564102564102564,0.806
+223,kimi-k2.7-code,FrontierMath Tier 4 v2,0.1219512195121951,0.3075
+224,kimi-k3_max,FrontierMath Tier 4 v2,0.3902439024390244,0.287
+226,o4-mini-2025-04-16_high,FrontierMath Tier 4 v2,0.048780487804878,0.457
+227,qwen3.7-max,FrontierMath Tier 4 v2,0.3414634146341463,0.695
+228,qwen3.8-max_xhigh,FrontierMath Tier 4 v2,0.4634146341463415,0.497
+229,Inkling_xhigh,FrontierMath Tiers 1-3 v2,0.3333333333333333,0.423
+230,claude-fable-5-1_max,FrontierMath Tiers 1-3 v2,0.9017543859649124,0.2125
+231,claude-fable-5_max,FrontierMath Tiers 1-3 v2,0.8701754385964913,0.1245
+232,claude-opus-4-1-20250805_32K,FrontierMath Tiers 1-3 v2,0.1263157894736842,0.3665
+233,claude-opus-4-5-20251101_32K,FrontierMath Tiers 1-3 v2,0.343859649122807,0.525
+234,claude-opus-4-6_max,FrontierMath Tiers 1-3 v2,0.6596491228070176,0.6205
+235,claude-opus-4-7_max,FrontierMath Tiers 1-3 v2,0.7017543859649122,0.654
+236,claude-opus-4-8_max,FrontierMath Tiers 1-3 v2,0.8,0.5845
+237,claude-opus-5_max,FrontierMath Tiers 1-3 v2,0.856140350877193,0.2685
+238,claude-sonnet-4-5-20250929_32K,FrontierMath Tiers 1-3 v2,0.2385964912280701,0.4765
+239,claude-sonnet-5_max,FrontierMath Tiers 1-3 v2,0.656140350877193,0.441
+240,deepseek-v4-flash-0731_max,FrontierMath Tiers 1-3 v2,0.5754385964912281,0.401
+241,deepseek-v4-pro-0813_max,FrontierMath Tiers 1-3 v2,0.6456140350877193,0.5835
+242,deepseek-v4-pro_max,FrontierMath Tiers 1-3 v2,0.4526315789473684,0.8675
+243,gemini-2.5-pro,FrontierMath Tiers 1-3 v2,0.2456140350877192,0.7695
+244,gemini-3-flash-preview,FrontierMath Tiers 1-3 v2,0.512280701754386,0.505
+245,gemini-3.1-flash-lite_high,FrontierMath Tiers 1-3 v2,0.2771929824561403,0.525
+246,gemini-3.1-flash-lite_low,FrontierMath Tiers 1-3 v2,0.2245614035087719,0.5
+247,gemini-3.1-flash-lite_minimal,FrontierMath Tiers 1-3 v2,0.2140350877192982,0.4995
+248,gemini-3.1-pro-preview,FrontierMath Tiers 1-3 v2,0.5964912280701754,0.369
+249,gemini-3.5-flash-lite_high,FrontierMath Tiers 1-3 v2,0.2596491228070175,0.841
+250,gemini-3.5-flash_high,FrontierMath Tiers 1-3 v2,0.6280701754385964,0.547
+251,gemini-3.6-flash_high,FrontierMath Tiers 1-3 v2,0.5894736842105263,0.59
+252,gemini-3.7-flash_high,FrontierMath Tiers 1-3 v2,0.7157894736842105,0.603
+253,glm-5.1,FrontierMath Tiers 1-3 v2,0.3684210526315789,0.404
+254,glm-5.1_none,FrontierMath Tiers 1-3 v2,0.2491228070175438,0.4955
+255,glm-5.2_low,FrontierMath Tiers 1-3 v2,0.5473684210526316,0.506
+256,glm-5.2_max,FrontierMath Tiers 1-3 v2,0.592057761732852,0.282
+257,glm-5.2_none,FrontierMath Tiers 1-3 v2,0.4245614035087719,0.523
+258,glm-5.3-flash_max,FrontierMath Tiers 1-3 v2,0.5578947368421052,0.5905
+259,glm-5.3_max,FrontierMath Tiers 1-3 v2,0.6877192982456141,0.635
+261,gpt-4-turbo-2024-04-09,FrontierMath Tiers 1-3 v2,0.0070175438596491,0.1215
+262,gpt-4.1-2025-04-14,FrontierMath Tiers 1-3 v2,0.0596491228070175,0.257
+263,gpt-4.1-mini-2025-04-14,FrontierMath Tiers 1-3 v2,0.0666666666666666,0.285
+264,gpt-4o-2024-08-06,FrontierMath Tiers 1-3 v2,0.0035087719298245,0.13
+265,gpt-4o-mini-2024-07-18,FrontierMath Tiers 1-3 v2,0.0070175438596491,0.2765
+266,gpt-5-2025-08-07_high,FrontierMath Tiers 1-3 v2,0.5543859649122806,0.471
+267,gpt-5-2025-08-07_low,FrontierMath Tiers 1-3 v2,0.3719298245614035,0.4865
+268,gpt-5-2025-08-07_minimal,FrontierMath Tiers 1-3 v2,0.1824561403508772,0.553
+269,gpt-5-mini-2025-08-07_high,FrontierMath Tiers 1-3 v2,0.4666666666666667,0.7145
+270,gpt-5-mini-2025-08-07_low,FrontierMath Tiers 1-3 v2,0.1824561403508772,0.465
+271,gpt-5-mini-2025-08-07_minimal,FrontierMath Tiers 1-3 v2,0.0596491228070175,0.445
+272,gpt-5-nano-2025-08-07_high,FrontierMath Tiers 1-3 v2,0.2,0.4445
+273,gpt-5-nano-2025-08-07_low,FrontierMath Tiers 1-3 v2,0.0596491228070175,0.43
+274,gpt-5-nano-2025-08-07_minimal,FrontierMath Tiers 1-3 v2,0.0175438596491228,0.364
+275,gpt-5-pro-2025-10-06_high,FrontierMath Tiers 1-3 v2,0.5578947368421052,0.5385
+276,gpt-5.2-2025-12-11_xhigh,FrontierMath Tiers 1-3 v2,0.674,0.6755
+277,gpt-5.2-pro-2025-12-11_xhigh,FrontierMath Tiers 1-3 v2,0.74,0.511
+278,gpt-5.4-2026-03-05_xhigh,FrontierMath Tiers 1-3 v2,0.7859649122807018,0.7245
+279,gpt-5.4-mini-2026-03-17_low,FrontierMath Tiers 1-3 v2,0.2456140350877192,0.501
+280,gpt-5.4-mini-2026-03-17_none,FrontierMath Tiers 1-3 v2,0.1719298245614035,0.504
+281,gpt-5.4-mini-2026-03-17_xhigh,FrontierMath Tiers 1-3 v2,0.512280701754386,0.715
+282,gpt-5.4-nano-2026-03-17_high,FrontierMath Tiers 1-3 v2,0.4491228070175438,0.601
+283,gpt-5.4-nano-2026-03-17_low,FrontierMath Tiers 1-3 v2,0.2035087719298245,0.4965
+284,gpt-5.4-nano-2026-03-17_none,FrontierMath Tiers 1-3 v2,0.0456140350877193,0.231
+285,gpt-5.4-pro-2026-03-05_xhigh,FrontierMath Tiers 1-3 v2,0.8245614035087719,0.662
+286,gpt-5.5-instant,FrontierMath Tiers 1-3 v2,0.2631578947368421,0.565
+287,gpt-5.5-pro_xhigh,FrontierMath Tiers 1-3 v2,0.8771929824561403,0.5255
+288,gpt-5.5_xhigh,FrontierMath Tiers 1-3 v2,0.8526315789473684,0.5625
+289,gpt-5.6-luna_low,FrontierMath Tiers 1-3 v2,0.4140350877192982,0.524
+290,gpt-5.6-luna_max,FrontierMath Tiers 1-3 v2,0.8210526315789474,0.616
+291,gpt-5.6-luna_none,FrontierMath Tiers 1-3 v2,0.3964912280701754,0.6335
+292,gpt-5.6-sol_max,FrontierMath Tiers 1-3 v2,0.8912280701754386,0.475
+293,gpt-5.6-terra_max,FrontierMath Tiers 1-3 v2,0.8596491228070176,0.595
+294,gpt-6-astra_max,FrontierMath Tiers 1-3 v2,0.936842105263158,0.482
+295,grok-4.20-0309-reasoning,FrontierMath Tiers 1-3 v2,0.4491228070175438,0.335
+296,grok-4.3_high,FrontierMath Tiers 1-3 v2,0.4280701754385965,0.3415
+297,grok-4.5_high,FrontierMath Tiers 1-3 v2,0.5719298245614035,0.351
+298,grok-4.6_xhigh,FrontierMath Tiers 1-3 v2,0.6596491228070176,0.4705
+299,inkling-small_xhigh,FrontierMath Tiers 1-3 v2,0.4631578947368421,0.312
+300,kimi-k2.6,FrontierMath Tiers 1-3 v2,0.5719298245614035,0.5055
+301,kimi-k2.7-code,FrontierMath Tiers 1-3 v2,0.5403508771929825,0.726
+302,kimi-k3_max,FrontierMath Tiers 1-3 v2,0.721830985915493,0.4965
+303,o1-2024-12-17_high,FrontierMath Tiers 1-3 v2,0.1473684210526315,0.3695
+304,o1-2024-12-17_low,FrontierMath Tiers 1-3 v2,0.0842105263157894,0.4835
+305,o1-2024-12-17_medium,FrontierMath Tiers 1-3 v2,0.1017543859649122,0.439
+306,o3-2025-04-16_high,FrontierMath Tiers 1-3 v2,0.3333333333333333,0.516
+307,o3-2025-04-16_low,FrontierMath Tiers 1-3 v2,0.1929824561403508,0.476
+308,o3-2025-04-16_medium,FrontierMath Tiers 1-3 v2,0.2982456140350877,0.472
+309,o3-mini-2025-01-31_high,FrontierMath Tiers 1-3 v2,0.1859649122807017,0.6435
+310,o3-mini-2025-01-31_low,FrontierMath Tiers 1-3 v2,0.0385964912280701,0.431
+311,o3-mini-2025-01-31_medium,FrontierMath Tiers 1-3 v2,0.1052631578947368,0.473
+312,o4-mini-2025-04-16_high,FrontierMath Tiers 1-3 v2,0.3614035087719298,0.597
+313,o4-mini-2025-04-16_low,FrontierMath Tiers 1-3 v2,0.1614035087719298,0.493
+314,o4-mini-2025-04-16_medium,FrontierMath Tiers 1-3 v2,0.287719298245614,0.478
+315,qwen3.6-27b,FrontierMath Tiers 1-3 v2,0.3508771929824561,0.471
+316,qwen3.6-27b_none,FrontierMath Tiers 1-3 v2,0.3403508771929824,0.5545
+317,qwen3.6-35b-a3b,FrontierMath Tiers 1-3 v2,0.175438596491228,0.5815
+318,qwen3.6-35b-a3b_none,FrontierMath Tiers 1-3 v2,0.2035087719298245,0.564
+319,qwen3.6-plus,FrontierMath Tiers 1-3 v2,0.3824561403508772,0.5335
+320,qwen3.6-plus_none,FrontierMath Tiers 1-3 v2,0.3228070175438596,0.4865
+321,qwen3.7-max,FrontierMath Tiers 1-3 v2,0.6456140350877193,0.4405
+322,qwen3.7-plus_none,FrontierMath Tiers 1-3 v2,0.343859649122807,0.502
+323,qwen3.8-max_xhigh,FrontierMath Tiers 1-3 v2,0.7473684210526316,0.522
+324,Inkling_xhigh,MCP Atlas,0.76,0.876
+325,claude-fable-5,MCP Atlas,0.833,0.306
+326,claude-fable-5-1,MCP Atlas,0.872,0.769
+327,claude-haiku-4-5-20251001,MCP Atlas,0.402,0.066
+328,claude-opus-4-5-20251101_high,MCP Atlas,0.698,0.497
+329,claude-opus-4-6_max,MCP Atlas,0.768,0.559
+330,claude-opus-4-7_max,MCP Atlas,0.7909999999999999,0.6255
+331,claude-opus-4-8_max,MCP Atlas,0.8220000000000001,0.605
+332,claude-opus-5_xhigh,MCP Atlas,0.858,0.6465
+333,claude-sonnet-4-5-20250929_thinking,MCP Atlas,0.595,0.39
+334,claude-sonnet-4-6,MCP Atlas,0.695,0.5565
+335,gemini-3-flash-preview,MCP Atlas,0.62,0.1495
+336,gemini-3-pro-preview,MCP Atlas,0.703,0.5225
+337,gemini-3.1-flash-lite_high,MCP Atlas,0.5710000000000001,0.2835
+338,gemini-3.1-pro-preview_high,MCP Atlas,0.782,0.7235
+339,gemini-3.5-flash_high,MCP Atlas,0.836,0.8735
+340,glm-4.7,MCP Atlas,0.581,0.3715
+341,glm-5.1,MCP Atlas,0.7559999999999999,0.8235
+342,glm-5.2,MCP Atlas,0.778,0.616
+343,gpt-5.1-2025-11-13_high,MCP Atlas,0.501,0.0415
+344,gpt-5.2-2025-12-11_xhigh,MCP Atlas,0.6759999999999999,0.1855
+345,gpt-5.4-2026-03-05_xhigh,MCP Atlas,0.706,0.1595
+346,gpt-5.4-mini-2026-03-17_xhigh,MCP Atlas,0.5670000000000001,0.073
+347,gpt-5.5_xhigh,MCP Atlas,0.753,0.2045
+348,gpt-5.6-sol,MCP Atlas,0.818,0.559
+349,inkling-small,MCP Atlas,0.792,0.8845
+350,kimi-k2.5,MCP Atlas,0.644,0.5485
+351,kimi-k3_max,MCP Atlas,0.823,0.71
+352,muse-spark,MCP Atlas,0.8220000000000001,0.8845
+353,muse-spark-1.1,MCP Atlas,0.8809999999999999,0.915
+354,o3-pro-2025-06-10,MCP Atlas,0.445,0.2525
+355,DeepSeek-R1,METR Time Horizons,0.519251,0.3995
+356,DeepSeek-R1-0528,METR Time Horizons,0.537826,0.363
+357,DeepSeek-V3,METR Time Horizons,0.473627,0.4085
+358,DeepSeek-V3-0324,METR Time Horizons,0.495813,0.362
+359,claude-3-5-sonnet-20240620,METR Time Horizons,0.401502,0.191
+360,claude-3-5-sonnet-20241022,METR Time Horizons,0.452356,0.162
+361,claude-3-opus-20240229,METR Time Horizons,0.294753,0.1725
+362,claude-opus-4-1-20250805,METR Time Horizons,0.615713,0.442
+363,claude-opus-4-1-20250805_16K,METR Time Horizons,0.668069,0.7045
+364,claude-opus-4-20250514,METR Time Horizons,0.615452,0.6395
+365,claude-opus-4-20250514_16K,METR Time Horizons,0.639292,0.641
+366,claude-opus-4-5-20251101,METR Time Horizons,0.73007,0.4865
+367,claude-opus-4-5-20251101_16K,METR Time Horizons,0.74969,0.6615
+368,claude-opus-4-6,METR Time Horizons,0.788644,0.683
+369,claude-sonnet-4-20250514_16K,METR Time Horizons,0.619725,0.54
+370,claude-sonnet-4-5-20250929_16K,METR Time Horizons,0.673842,0.6815
+371,gemini-2.5-pro-preview-06-05,METR Time Horizons,0.5544,0.4995
+372,gemini-3-pro-preview,METR Time Horizons,0.709822,0.597
+373,gemini-3.1-pro-preview,METR Time Horizons,0.77035,0.6855
+374,gpt-4-0613,METR Time Horizons,0.293044,0.324
+375,gpt-4-turbo-2024-04-09,METR Time Horizons,0.367357,0.7055
+376,gpt-4o-2024-08-06,METR Time Horizons,0.338424,0.7405
+377,gpt-4o-2024-11-20,METR Time Horizons,0.407636,0.3285
+378,gpt-5-2025-08-07_high,METR Time Horizons,0.693697,0.319
+379,gpt-5-2025-08-07_medium,METR Time Horizons,0.696053,0.5025
+380,gpt-5.1-codex-max,METR Time Horizons,0.708301,0.721
+381,gpt-5.2-2025-12-11_high,METR Time Horizons,0.752875,0.5485
+382,gpt-5.3-codex,METR Time Horizons,0.745439,0.296
+383,gpt-5.4-2026-03-05,METR Time Horizons,0.743443,0.5545
+384,gpt-5.4-2026-03-05_xhigh,METR Time Horizons,0.743443,0.209
+385,gpt-oss-120b,METR Time Horizons,0.56634,0.4215
+386,grok-4-0709,METR Time Horizons,0.665803,0.713
+387,kimi-k2-thinking,METR Time Horizons,0.591943,0.503
+388,o1-2024-12-17_medium,METR Time Horizons,0.510512,0.505
+389,o1-preview-2024-09-12,METR Time Horizons,0.451441,0.099
+390,o3-2025-04-16,METR Time Horizons,0.636235,0.455
+391,o3-2025-04-16_medium,METR Time Horizons,0.654376,0.633
+392,o4-mini-2025-04-16_medium,METR Time Horizons,0.639269,0.57
+393,qwen2-72b-instruct,METR Time Horizons,0.298999,0.348
+394,qwen2.5-72b-instruct,METR Time Horizons,0.357771,0.4
+395,claude-fable-5_high,MirrorCode,0.638888888888889,0.878
+396,claude-opus-4-7_high,MirrorCode,0.3111111111111111,0.7255
+397,gemini-3.1-pro-preview_high,MirrorCode,0.0888888888888888,0.321
+398,gpt-5.4-2026-03-05_high,MirrorCode,0.1555555555555555,0.536
+399,gpt-5.5_high,MirrorCode,0.1,0.093
+400,gpt-5.6-sol_high,MirrorCode,0.2,0.238
+401,gpt-6-astra_high,MirrorCode,0.467,0.6245
+403,MiniMax-M2.7,ProofBench,0.03,0.5735
+404,MiniMax-M3,ProofBench,0.18,0.711
+406,claude-fable-5_max,ProofBench,0.95,0.8275
+407,claude-opus-4-5-20251101,ProofBench,0.36,0.5105
+408,claude-opus-4-6_max,ProofBench,0.5,0.6665
+409,claude-opus-4-7_max,ProofBench,0.54,0.6255
+410,claude-opus-4-8_max,ProofBench,0.6900000000000001,0.5795
+411,claude-opus-5_max,ProofBench,0.99,0.9905
+412,claude-sonnet-4-5-20250929,ProofBench,0.19,0.7535
+413,claude-sonnet-4-6_max,ProofBench,0.45,0.7775
+414,claude-sonnet-5_max,ProofBench,0.77,0.965
+415,deepseek-v4-flash-0731,ProofBench,0.56,0.855
+416,deepseek-v4-pro-0813,ProofBench,0.5,0.593
+417,deepseek-v4-pro_max,ProofBench,0.16,0.489
+418,gemini-3-flash-preview,ProofBench,0.15,0.212
+419,gemini-3-pro-preview,ProofBench,0.2,0.4325
+420,gemini-3.1-pro-preview,ProofBench,0.26,0.238
+421,gemini-3.5-flash-lite,ProofBench,0.13,0.795
+422,gemini-3.5-flash_high,ProofBench,0.31,0.3285
+423,gemini-3.6-flash,ProofBench,0.36,0.499
+424,gemini-3.7-flash,ProofBench,0.58,0.5395
+425,gemini-3.8-flash,ProofBench,0.48,0.5735
+426,glm-4.7,ProofBench,0.06,0.512
+427,glm-5.1,ProofBench,0.22222,0.6925
+428,glm-5.2_max,ProofBench,0.35,0.4175
+429,glm-5.3-flash_max,ProofBench,0.21,0.29
+430,glm-5.3_max,ProofBench,0.49,0.564
+431,gpt-5-2025-08-07_high,ProofBench,0.18,0.201
+432,gpt-5-mini-2025-08-07_high,ProofBench,0.09,0.208
+433,gpt-5-nano-2025-08-07_high,ProofBench,0.12,0.772
+434,gpt-5.1-codex-max,ProofBench,0.09,0.289
+435,gpt-5.2-2025-12-11_xhigh,ProofBench,0.15,0.042
+436,gpt-5.4-2026-03-05_xhigh,ProofBench,0.56,0.412
+437,gpt-5.4-mini-2026-03-17_xhigh,ProofBench,0.21,0.4235
+438,gpt-5.4-nano-2026-03-17_high,ProofBench,0.05,0.099
+439,gpt-5.5_xhigh,ProofBench,0.5,0.0925
+440,gpt-5.6-luna_max,ProofBench,0.6,0.3075
+441,gpt-5.6-sol_max,ProofBench,0.8300000000000001,0.4525
+442,gpt-5.6-terra_xhigh,ProofBench,0.74,0.5155
+443,gpt-6-astra,ProofBench,0.99,0.78
+444,grok-4.20-0309-reasoning,ProofBench,0.14,0.2675
+445,grok-4.3_high,ProofBench,0.11,0.241
+446,grok-4.5_high,ProofBench,0.31,0.4315
+447,grok-4.6,ProofBench,0.51,0.388
+448,inkling-small,ProofBench,0.06,0.1865
+449,kimi-k2.6,ProofBench,0.16,0.1255
+450,kimi-k3,ProofBench,0.87,0.7105
+451,mimo-v2.5,ProofBench,0.16,0.5455
+452,mimo-v2.5-pro,ProofBench,0.22,0.5735
+453,mistral-medium-2604,ProofBench,0.09,0.772
+454,muse-spark,ProofBench,0.17,0.242
+455,muse-spark-1.1,ProofBench,0.39,0.271
+456,muse-spark-1.2,ProofBench,0.43,0.5915
+457,nemotron-3-ultra,ProofBench,0.02,0.3375
+458,qwen3.7-max,ProofBench,0.26,0.1585
+459,qwen3.8-27b,ProofBench,0.16,0.4855
+460,qwen3.8-max,ProofBench,0.58,0.479
+461,claude-fable-5,Remote Labor Index,0.161,0.7535
+462,claude-opus-4-5-20251101,Remote Labor Index,0.0375,0.507
+463,claude-opus-4-5-20251101_thinking,Remote Labor Index,0.0375,0.585
+464,claude-opus-4-6,Remote Labor Index,0.0417,0.4405
+465,claude-opus-4-8,Remote Labor Index,0.0833,0.597
+466,claude-sonnet-4-5-20250929,Remote Labor Index,0.0208,0.5915
+467,gemini-2.5-pro-preview-06-05,Remote Labor Index,0.0083,0.341
+468,gemini-3-pro-preview,Remote Labor Index,0.0125,0.075
+469,gemini-3.7-flash,Remote Labor Index,0.05,0.4345
+470,gpt-5-2025-08-07,Remote Labor Index,0.0167,0.636
+471,gpt-5.2-2025-12-11,Remote Labor Index,0.0208,0.4835
+472,gpt-5.2-2025-12-11_medium,Remote Labor Index,0.0250199999999999,0.39
+473,gpt-5.5,Remote Labor Index,0.0625,0.5455
+474,DeepSeek-R1,WeirdML v2,0.3649,0.4625
+475,DeepSeek-R1-0528,WeirdML v2,0.4163,0.5305
+476,DeepSeek-V3-0324,WeirdML v2,0.3608,0.574
+477,DeepSeek-V3.2-Exp_thinking,WeirdML v2,0.3948,0.372
+478,Inkling_high,WeirdML v2,0.3229,0.4085
+479,Llama-3.1-8B-Instruct,WeirdML v2,0.0173,0.0515
+480,Llama-3.3-70B-Instruct,WeirdML v2,0.1444,0.2605
+481,Llama-4-Maverick-17B-128E-Instruct,WeirdML v2,0.2447,0.367
+482,MiniMax-M2.7,WeirdML v2,0.3695,0.3995
+483,Qwen3-235B-A22B-Thinking-2507,WeirdML v2,0.4104,0.5755
+484,claude-3-5-haiku-20241022,WeirdML v2,0.3073,0.4345
+485,claude-3-5-sonnet-20240620,WeirdML v2,0.3097,0.6325
+486,claude-3-5-sonnet-20241022,WeirdML v2,0.3997,0.677
+487,claude-3-opus-20240229,WeirdML v2,0.1921999999999999,0.6105
+488,claude-fable-5-1_high,WeirdML v2,0.923,0.8215
+489,claude-fable-5-1_max,WeirdML v2,0.929,0.867
+490,claude-fable-5_high,WeirdML v2,0.8785,0.3575
+491,claude-fable-5_max,WeirdML v2,0.9194,0.8905
+492,claude-haiku-4-5-20251001,WeirdML v2,0.454,0.7905
+493,claude-haiku-4-5-20251001_16K,WeirdML v2,0.4415,0.4545
+494,claude-opus-4-1-20250805_16K,WeirdML v2,0.4586,0.311
+495,claude-opus-4-20250514_16K,WeirdML v2,0.4372,0.345
+496,claude-opus-4-5-20251101_16K,WeirdML v2,0.6374000000000001,0.4025
+497,claude-opus-4-6,WeirdML v2,0.779,0.805
+498,claude-opus-4-6_high,WeirdML v2,0.7795000000000001,0.602
+499,claude-opus-4-7,WeirdML v2,0.7640000000000001,0.573
+500,claude-opus-4-7_high,WeirdML v2,0.7644,0.452
+501,claude-opus-4-7_max,WeirdML v2,0.7545000000000001,0.6655
+502,claude-opus-4-8_medium,WeirdML v2,0.7604000000000001,0.5675
+503,claude-opus-4-8_none,WeirdML v2,0.7045,0.533
+504,claude-opus-4-8_xhigh,WeirdML v2,0.8289,0.624
+505,claude-opus-5,WeirdML v2,0.8634000000000001,0.677
+506,claude-opus-5_high,WeirdML v2,0.9159,0.811
+507,claude-opus-5_max,WeirdML v2,0.9178,0.9455
+508,claude-sonnet-4-20250514,WeirdML v2,0.4388,0.5575
+509,claude-sonnet-4-20250514_16K,WeirdML v2,0.4611,0.408
+510,claude-sonnet-4-5-20250929,WeirdML v2,0.467,0.3505
+511,claude-sonnet-4-5-20250929_16K,WeirdML v2,0.4771,0.336
+512,claude-sonnet-4-6_medium,WeirdML v2,0.6607,0.501
+513,claude-sonnet-5_high,WeirdML v2,0.6878000000000001,0.8175
+514,deepseek-v4-flash-0731_high,WeirdML v2,0.5705,0.483
+515,deepseek-v4-flash-0731_max,WeirdML v2,0.6296,0.275
+516,deepseek-v4-flash_high,WeirdML v2,0.4376,0.4005
+517,deepseek-v4-flash_max,WeirdML v2,0.4563,0.358
+518,deepseek-v4-pro-0813_max,WeirdML v2,0.6622,0.279
+519,deepseek-v4-pro_high,WeirdML v2,0.4653,0.32
+520,deepseek-v4-pro_max,WeirdML v2,0.489,0.1505
+521,gemini-2.5-pro_16K,WeirdML v2,0.5403,0.483
+522,gemini-3-flash-preview,WeirdML v2,0.616,0.422
+523,gemini-3-pro-preview,WeirdML v2,0.6993,0.8545
+524,gemini-3.1-flash-lite,WeirdML v2,0.5219,0.5975
+525,gemini-3.1-pro-preview,WeirdML v2,0.7206999999999999,0.6955
+526,gemini-3.5-flash-lite_high,WeirdML v2,0.39,0.2565
+527,gemini-3.5-flash_high,WeirdML v2,0.6264000000000001,0.1725
+528,gemini-3.6-flash_high,WeirdML v2,0.561,0.073
+529,gemma-4-26b-a4b,WeirdML v2,0.3517,0.497
+530,gemma-4-31b-it,WeirdML v2,0.5226,0.56
+531,glm-5.1,WeirdML v2,0.5710000000000001,0.5415
+532,glm-5.2_high,WeirdML v2,0.6731,0.518
+533,glm-5.2_max,WeirdML v2,0.7012,0.5925
+534,glm-5.3_max,WeirdML v2,0.7540000000000001,0.6875
+535,gpt-3.5-turbo-0125,WeirdML v2,0.0348,0.2025
+536,gpt-4-0613,WeirdML v2,0.1236,0.3795
+537,gpt-4-turbo-2024-04-09,WeirdML v2,0.1801,0.722
+538,gpt-4.1-2025-04-14,WeirdML v2,0.3904,0.9115
+539,gpt-4.1-mini-2025-04-14,WeirdML v2,0.3761,0.8695
+540,gpt-4.1-nano-2025-04-14,WeirdML v2,0.1898,0.294
+541,gpt-4o-2024-11-20,WeirdML v2,0.2512,0.4835
+542,gpt-4o-mini-2024-07-18,WeirdML v2,0.1176,0.472
+543,gpt-5-2025-08-07,WeirdML v2,0.3977,0.362
+544,gpt-5-2025-08-07_high,WeirdML v2,0.6070000000000001,0.2305
+545,gpt-5-mini-2025-08-07_high,WeirdML v2,0.5267000000000001,0.175
+546,gpt-5-nano-2025-08-07_high,WeirdML v2,0.3806,0.2375
+547,gpt-5-nano-2025-08-07_low,WeirdML v2,0.2589,0.4775
+548,gpt-5-pro-2025-10-06_high,WeirdML v2,0.6039,0.259
+549,gpt-5.1-2025-11-13_high,WeirdML v2,0.6077,0.7075
+550,gpt-5.2-2025-12-11_low,WeirdML v2,0.496,0.466
+551,gpt-5.2-2025-12-11_medium,WeirdML v2,0.6344,0.6125
+552,gpt-5.2-2025-12-11_none,WeirdML v2,0.496,0.477
+553,gpt-5.2-2025-12-11_xhigh,WeirdML v2,0.7219,0.5705
+554,gpt-5.3-codex,WeirdML v2,0.793,0.732
+555,gpt-5.3-codex_xhigh,WeirdML v2,0.779,0.5765
+556,gpt-5.4-2026-03-05_none,WeirdML v2,0.5744,0.4975
+557,gpt-5.4-2026-03-05_xhigh,WeirdML v2,0.777,0.5435
+558,gpt-5.4-mini-2026-03-17_high,WeirdML v2,0.603,0.4885
+559,gpt-5.4-mini-2026-03-17_none,WeirdML v2,0.379,0.378
+560,gpt-5.4-nano-2026-03-17_high,WeirdML v2,0.4922999999999999,0.1
+561,gpt-5.4-nano-2026-03-17_none,WeirdML v2,0.3796,0.9395
+562,gpt-5.4-pro-2026-03-05_none,WeirdML v2,0.5744,0.505
+563,gpt-5.5_high,WeirdML v2,0.8390000000000001,0.759
+564,gpt-5.5_none,WeirdML v2,0.6715000000000001,0.7515
+565,gpt-5.5_xhigh,WeirdML v2,0.8491,0.6845
+566,gpt-5.6-luna_high,WeirdML v2,0.6086,0.334
+567,gpt-5.6-sol_high,WeirdML v2,0.8876000000000001,0.8285
+568,gpt-5.6-sol_max,WeirdML v2,0.8697,0.6125
+569,gpt-5.6-sol_promax,WeirdML v2,0.8943000000000001,0.8065
+570,gpt-5.6-terra_high,WeirdML v2,0.7827,0.483
+571,gpt-6-astra_high,WeirdML v2,0.9287,0.773
+572,gpt-oss-120b_high,WeirdML v2,0.4817,0.53
+573,gpt-oss-120b_medium,WeirdML v2,0.4188,0.4385
+574,gpt-oss-20b_high,WeirdML v2,0.4093,0.418
+575,gpt-oss-20b_medium,WeirdML v2,0.3683,0.4335
+576,grok-4-0709,WeirdML v2,0.4573,0.3315
+577,grok-4.3,WeirdML v2,0.4989,0.682
+578,grok-4.5,WeirdML v2,0.4643,0.202
+579,grok-4.6_high,WeirdML v2,0.6729,0.379
+580,kimi-k2-thinking,WeirdML v2,0.4279,0.4325
+581,kimi-k2.5,WeirdML v2,0.456,0.3775
+582,kimi-k2.6,WeirdML v2,0.5586,0.0705
+583,kimi-k2.7-code,WeirdML v2,0.5412,0.1135
+584,kimi-k3_max,WeirdML v2,0.8257,0.899
+585,mercury-2,WeirdML v2,0.432,0.497
+586,mistral-medium-2508,WeirdML v2,0.3313,0.474
+587,mistral-medium-2604,WeirdML v2,0.4371,0.665
+588,muse-spark-1.2_xhigh,WeirdML v2,0.603,0.3025
+589,nemotron-3-super,WeirdML v2,0.3801,0.376
+590,nemotron-3-ultra,WeirdML v2,0.4345,0.4685
+591,o1-2024-12-17_high,WeirdML v2,0.4608,0.8115
+592,o1-preview-2024-09-12,WeirdML v2,0.4756,0.798
+593,o3-2025-04-16_high,WeirdML v2,0.5242,0.49
+594,o3-mini-2025-01-31_high,WeirdML v2,0.437,0.6825
+595,o3-pro-2025-06-10_high,WeirdML v2,0.5821000000000001,0.484
+596,o4-mini-2025-04-16_high,WeirdML v2,0.5256000000000001,0.424
+597,qwen2-72b-instruct,WeirdML v2,0.113,0.335
+598,qwen2.5-72b-instruct,WeirdML v2,0.1597,0.3645
+599,qwen3-coder-next,WeirdML v2,0.344,0.503
+600,qwen3.6-35b-a3b,WeirdML v2,0.3449,0.2485
+601,Committee of Domain Experts,FrontierMath Tiers 1-3 v2,0.35,0.275
+602,Committee of Domain Experts,METR Time Horizons,0.8301,0.998

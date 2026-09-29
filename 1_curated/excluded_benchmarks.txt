@@ -13,3 +13,16 @@ PIQA
 SimpleBench
 VPCT
 WinoGrande
+
+# Mainly visual benchmarks (user decision, 2026-09-29): the input is images, photos or
+# screenshots the task cannot be done without. They advantage humans (the baselines sit at or
+# above the best models) and advantage the vision models of a few labs, and open-weights models,
+# often text-only, are rarely scored on them; on private benchmarks two of them (VISTA, GeoBench)
+# placed Gemini 2.5 Pro of March 2025 above every 2026 model. OSWorld (GUI screenshots, but a core
+# agentic skill, humans since overtaken) and the partly visual TutorBench, GDP.pdf, EBR-bench and
+# HLE stay in.
+Visual Task Assessment (VISTA)
+GeoBench
+BlueprintBench 2
+VisualToolBench
+EnigmaEval

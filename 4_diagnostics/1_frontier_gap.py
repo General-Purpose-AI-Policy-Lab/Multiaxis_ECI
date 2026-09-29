@@ -11,6 +11,11 @@ the merged one (5_outputs/open_closed_frontier/make_plots.sh does it via SCOPE_S
 comparisons/ as frontier_gap_<group>_<scope>_*; 2_plot_frontier_gap.py then puts the scopes
 side by side.
 
+ECI-H: the all-benchmarks scope reads it off the two anchors; a class scope is linked onto the
+all-benchmarks fit of the same data generation through its closed OpenAI, Anthropic and Google models
+(`analysis.frontier_gap.link_to_reference`; --link-reference names that fit's folder, by default
+the class folder with the class removed from its name).
+
   python 4_diagnostics/1_frontier_gap.py [--access all|public|semi_private|private] [--group openness|country]
 """
 from __future__ import annotations
@@ -28,8 +33,17 @@ sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis.frontier_gap import (  # noqa: E402
+    GROUP_PAIRS,
     GROUP_TITLES,
+    LINE_TOP_K,
+    LINK_MIN_OBS,
+    LINK_ORGANIZATIONS,
+    RECORD_FRONTIER_TOL,
     SCOPES,
+    build_group_frontier,
+    group_labels,
+    link_to_reference,
+    linking_members,
     save_scope,
     scope_gap,
 )
@@ -91,6 +105,29 @@ def load_matched(trace_path: Path, scope: str, allow_stale: bool, *, fit_humans:
     return mini, theta0
 
 
+def reference_frontiers(ref_dir: Path, args, model_dates: pd.Series, n_draws: int = 4000):
+    """Both groups' frontiers on the all-benchmarks fit in `ref_dir` (its anchors' ECI-H, its
+    candidates by the same rule), on `n_draws` of its draws: the leader's is what a class scope
+    reads a crossing off when its own leader field was not measured yet, the follower's what the
+    class's follower records are checked against."""
+    mini, theta = load_matched(ref_dir / "trace.nc", "all", args.allow_stale,
+                               fit_humans=not args.no_humans,
+                               include_all_benchmarks=args.include_all_benchmarks)
+    pick = np.random.default_rng(0).choice(theta.shape[0], size=min(n_draws, theta.shape[0]),
+                                           replace=False)
+    theta = theta[np.sort(pick)]
+    tr = eci_transform(theta, mini)
+    E = tr.a[:, None] + tr.b[:, None] * theta
+    keep = candidate_mask(theta[:, :, None], 0, mini, model_dates) \
+        & (mini.n_obs_per_model >= args.min_obs)
+    names = mini.mlookup.sort_values("model_idx")["model"].tolist()
+    labels = group_labels(args.group, names)
+    return tuple(build_group_frontier(E, names, model_dates,
+                                      keep & np.array([labels.get(m) == g for m in names]), g,
+                                      fit_start=args.fit_start, top_k=args.top_k)
+                 for g in GROUP_PAIRS[args.group])
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -110,13 +147,18 @@ def main():
     ap.add_argument("--fit-start", default=config.FORECAST_KW["fit_start"],
                     help="trend lines use frontier points released on or after this date "
                          f"(default {config.FORECAST_KW['fit_start']})")
-    ap.add_argument("--top-k", type=int, default=config.FORECAST_KW["top_k"],
+    ap.add_argument("--top-k", type=int, default=LINE_TOP_K,
                     help="a release joins the trend fit when it is in the running top-k of "
-                         f"medians at its date (default {config.FORECAST_KW['top_k']})")
+                         f"medians at its date (default {LINE_TOP_K}: the records)")
     ap.add_argument("--min-obs", type=int, default=2,
                     help="a candidate needs at least this many scores in the scope (default 2: "
                          "the K=1 reading of the K-axis coverage rule, one benchmark alone is "
                          "not a full unit of evidence)")
+    ap.add_argument("--link-reference", default=None,
+                    help="class scopes: folder of the all-benchmarks fit whose ECI-H the class is "
+                         "linked onto through its closed OpenAI, Anthropic and Google models (default: the class folder with "
+                         "'_<class>' removed from its name, e.g. canonical_private_humanmerge -> "
+                         "canonical_humanmerge)")
     ap.add_argument("--today", default=None, help="pin the 'today' of the gap and the figures")
     ap.add_argument("--out-dir", default=None,
                     help="where the tables, draws and figures land (default: the data "
@@ -134,16 +176,40 @@ def main():
     print(f"  {mini.n_models} models ({int(mini.is_human.sum())} human tiers, "
           f"{int(mini.is_sota.sum())} SOTA members), {theta0.shape[0]} draws")
 
-    transform = eci_transform(theta0, mini)
-    E = transform.a[:, None] + transform.b[:, None] * theta0                 # (S, n) ECI-H per draw
     model_dates, _ = _release_dates(pd.read_csv(PROCESSED_FILE))
     # The repository's candidate rule (dated, not a human tier, evaluated on the axis), plus the
     # K=1 reading of "one full unit of evidence": at least --min-obs scores in the scope.
     keep = candidate_mask(theta0[:, :, None], 0, mini, model_dates)
     keep &= mini.n_obs_per_model >= args.min_obs
     print(f"  candidates: {int(keep.sum())} (dated, non-human, at least {args.min_obs} scores)")
+    if args.access == "all":
+        transform = eci_transform(theta0, mini)
+        a, b = transform.a, transform.b
+    else:
+        ref_dir = (Path(args.link_reference) if args.link_reference
+                   else results_dir.with_name(results_dir.name.replace(f"_{args.access}", "", 1)))
+        reference = pd.read_csv(ref_dir / "all_models_eci.csv").set_index("name")["mean"]
+        names = mini.mlookup.sort_values("model_idx")["model"].tolist()
+        members = linking_members(names, keep, mini.n_obs_per_model, args.group)
+        a, b, n_link = link_to_reference(theta0, names, members, reference)
+        print(f"  ECI-H linked onto {ref_dir.name} through {n_link} candidates of "
+              f"{', '.join(LINK_ORGANIZATIONS)} with at least {LINK_MIN_OBS} scores")
+    E = a[:, None] + b[:, None] * theta0                                     # (S, n) ECI-H per draw
+    ref_leader = ref_follower = None
+    if args.access != "all":
+        # Crossings the class's leader field reached before it was first measured are read off
+        # the all-benchmarks fit's leader frontier, on the scale the class is linked onto; the
+        # class's follower records have to be frontier models on that fit too.
+        ref_leader, ref_follower = reference_frontiers(ref_dir, args, model_dates)
+        print(f"  crossings before the class's first measured day read off the {ref_leader.label} "
+              f"frontier of {ref_dir.name} ({len(ref_leader.tl)} candidates)")
     res = scope_gap(E, mini, model_dates, keep, scope=args.access, kind=args.group,
-                    fit_start=args.fit_start, top_k=args.top_k, today=args.today)
+                    fit_start=args.fit_start, top_k=args.top_k, today=args.today,
+                    reference=ref_leader, reference_follower=ref_follower)
+    if res.off_frontier:
+        print(f"  {res.follower.label} running maxima not counted as records (more than "
+              f"{RECORD_FRONTIER_TOL:g} ECI-H under the {res.follower.label} record of their date on "
+              f"all benchmarks): {', '.join(sorted(res.off_frontier))}")
 
     out_dir = Path(args.out_dir) if args.out_dir else config.COMPARISONS_DIR
     paths = save_scope(res, out_dir)

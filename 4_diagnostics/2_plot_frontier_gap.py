@@ -38,6 +38,7 @@ from multiaxis_eci.viz.frontier_gap import (  # noqa: E402
     lag_fig,
     summary_table_fig,
 )
+from multiaxis_eci.viz.frontier_gap_print import lag_fig_print, save_print  # noqa: E402
 from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 from multiaxis_eci.viz.style import POST  # noqa: E402
 
@@ -47,7 +48,7 @@ TABLE_ROWS = [
     ("slope", "follower", "{follower} frontier slope", "ECI-H / yr", True),
     ("slope_diff", None, "Slope difference ({leader} - {follower})", "ECI-H / yr", True),
     ("gap_today", None, "Gap today ({leader} - {follower} trend lines)", "ECI-H", True),
-    ("lag_today", None, "Lag today (gap / {follower} slope)", "months", False),
+    ("lag_today", None, "Lag today (gap / {leader} slope)", "months", False),
     ("envelope_lag_latest_record", None, "Lag of the latest {follower} record", "months", False),
     ("envelope_lag_last_12m_mean", None, "Mean lag of the last 12 months' {follower} records",
      "months", False),
@@ -112,8 +113,16 @@ def markdown_table(df: pd.DataFrame) -> str:
     return "\n".join(lines) + "\n"
 
 
+# The displayed table: the lags in months only, headline first, one column per scope and no
+# differences between scopes. The long CSV keeps every quantity and every difference.
+SHOWN_ROWS = [("envelope_lag_last_12m_mean", "Mean lag of the last 12 months' {follower} records"),
+              ("envelope_lag_latest_record", "Lag of the latest {follower} record"),
+              ("lag_today", "Lag today on the trend lines (gap / {leader} slope)")]
+
+
 def build_table(results: dict, scopes: list[str], kind: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Cells (strings, median [80% interval]) and the long numeric frame behind them."""
+    """Cells (strings, median [80% interval]) of the displayed table (`SHOWN_ROWS`, months) and
+    the long numeric frame of every quantity, the differences between scopes included."""
     leader, follower = GROUP_PAIRS[kind]
     titles = GROUP_TITLES[kind]
     names = {"leader": titles[leader], "follower": titles[follower]}
@@ -132,8 +141,22 @@ def build_table(results: dict, scopes: list[str], kind: str) -> tuple[pd.DataFra
                 d = summarize(x[:n] - base[:n])
                 row[f"Δ {SCOPE_TITLES[s].split()[0].lower()} - all"] = fmt(d, True)
                 long.append({"scope": s, "quantity": f"{key}_minus_all", "unit": unit, **d})
+        # Private against public, Ihle's comparison: two fits on disjoint benchmarks, so the two
+        # posteriors are independent and their difference is read draw against draw.
+        if "private" in results and "public" in results:
+            xp, xq = DRAWS[key](results["private"]), DRAWS[key](results["public"])
+            if xp is not None and xq is not None:
+                n = min(len(xp), len(xq))
+                d = summarize(xp[:n] - xq[:n])
+                row["Δ private - public"] = fmt(d, True)
+                long.append({"scope": "private", "quantity": f"{key}_minus_public", "unit": unit, **d})
         cells.append(row)
-    return pd.DataFrame(cells), pd.DataFrame(long)
+    shown = []
+    for key, label in SHOWN_ROWS:
+        summ = {SCOPE_TITLES[s]: fmt(summarize(DRAWS[key](results[s])), False)
+                if DRAWS[key](results[s]) is not None else "n/a" for s in scopes}
+        shown.append({"": label.format(**names), **summ})
+    return pd.DataFrame(shown), pd.DataFrame(long)
 
 
 def save_en_fr(fig, name: str, figures_dir: Path, *, scale: int = 2) -> None:
@@ -196,6 +219,13 @@ def main():
                   style=big, title=None,
                   follower_title=titles[follower].lower(), leader_title=titles[leader].lower())
     save_en_fr(fig, f"{stem}_lag", figures_dir, scale=1)
+    # The French render people print is drawn again in the lab's house style (matplotlib, the
+    # lab's marks in the corners), over the translated Plotly PNG and SVG; the interactive twin
+    # stays the translated Plotly figure.
+    fr_fig = lag_fig_print(results, scopes, today=args.today, label_scope="all",
+                           counts={s: len(by_class[s]) for s in scopes if s in by_class})
+    save_print(fr_fig, figures_dir / "fr" / f"{stem}_lag_fr.png",
+               figures_dir / "fr" / "svg" / f"{stem}_lag_fr.svg")
 
     cx_all = []
     for s in scopes:
@@ -209,8 +239,8 @@ def main():
     cells, long = build_table(results, scopes, kind)
     long.to_csv(cmp_dir / f"{stem}_table.csv", index=False)
     (cmp_dir / f"{stem}_table.md").write_text(markdown_table(cells))
-    fig = summary_table_fig(cells, f"{titles[leader]} vs {titles[follower]}: median [80% interval]",
-                            width=1700)
+    fig = summary_table_fig(cells, "Months behind the closed frontier, median [80% interval]",
+                            width=1500)
     # A table is not a plot: it has no HTML twin worth keeping, so it skips save_en_fr.
     fig.write_image(str(figures_dir / f"{stem}_table.png"), scale=2)
     fr = translate_fig(fig)

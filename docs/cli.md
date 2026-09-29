@@ -71,6 +71,7 @@ unmarked to both.
 | `--preset canonical` | K=1, pt1 loading prior, curated exclusions, humans in, full ECI-H deliverables to `5_outputs/<data generation>/canonical/` — analyses add `--human-merge`, which moves them to `canonical_humanmerge/` |
 | `--skip-sampling` | `[canon]` reuse that folder's `trace.nc`. Must match the current data shape |
 | `--raw-c` | `[canon]` report raw C instead of anchored ECI-H |
+| `--anchors LOW,HIGH` | `[canon]` the two anchor models (130 and 150) instead of `config.ANCHOR_LOW` / `ANCHOR_HIGH`, for an `--access` fit in which an anchor has no score left (private: Claude 3.5 Sonnet, whose two private scores were visual benchmarks). The folder name does not change; the frontier-gap analysis links class fits onto the all-benchmarks scale and does not read them |
 | `--skip-baseline` / `--refit-baseline` | `[expl]` skip or force the K=1 baseline fit |
 | `--plots` | `[expl]` render the fit's figures in-process |
 
@@ -104,25 +105,31 @@ python 4_diagnostics/2_plot_frontier_gap.py
 `1_frontier_gap.py` reads one canonical trace, the fit on all benchmarks
 (`canonical/`) or on one access class (`canonical_<CLASS>/`, from `3_fit/fit.py
 --preset canonical --access CLASS`), and compares the two groups' frontiers in
-ECI-H: records per group, the months every open record trails the closed
-frontier of the same posterior draw (a record whose crossing has to be dated
-back from the closed field's first measured day in more than two thirds of the
-draws is left out: `analysis.frontier_gap.MAX_DATED_BACK_FRAC`), one trend line
-per group (frontier points
-released since `--fit-start`, default `2024-10-01`, in the running top-`--top-k`,
-default 2) with the gap and the lag it implies, and each line's human-tier
-crossings. `--group country` compares US and CN instead; `--results-dir DIR`
+ECI-H. The all-benchmarks scope reads ECI-H off the anchors; a class scope is linked
+onto the all-benchmarks fit through its closed OpenAI, Anthropic and Google models
+(`--link-reference DIR`, by default the class folder without its class). Per open record,
+the months since the first closed model at or above it, per posterior draw; a level the
+class's closed field already exceeded when first measured is read off the all-benchmarks
+closed frontier, and in the all-benchmarks scope, where nothing precedes it, dated back
+(a record that needs this in more than two thirds of the draws is left out:
+`analysis.frontier_gap.MAX_DATED_BACK_FRAC`). In a class, an open record counts only
+within `RECORD_FRONTIER_TOL` (5) ECI-H of the open record of its date on all benchmarks.
+One trend line per group through its records (`--top-k`, default 1) released since
+`--fit-start` (default `2024-10-01`), and the lag it implies today, gap over the closed
+slope. `--group country` compares US and CN instead; `--results-dir DIR`
 overrides the trace folder; `--min-obs N` (default 2) is the K=1 reading of the
 coverage rule, a candidate needs that many scores in the scope; `--allow-stale`
 joins a trace that predates the data snapshot by model name instead of refusing;
 `--today DATE` pins the today line.
 Outputs land in the data generation's `comparisons/` as
 `frontier_gap_<group>_<scope>_*`. `2_plot_frontier_gap.py` draws every scope it
-finds side by side (panels, the months-behind figure, the
-summary table with each scope's change against all benchmarks; the crossing dates stay in CSV) with no trace
-loaded; `--y-range LO,HI` pins the panels' axis. Every figure is also written in French
-under `comparisons/figures/fr/` (`<stem>_fr.png`, the vector twin in `fr/svg/`), the
-`viz.i18n` string walk over the finished English figure. The write-up's
+finds side by side (panels, the months-behind figure, the table of the three lags per
+scope; every quantity and the differences between scopes in its CSV, the crossing dates
+in theirs) with no trace loaded; `--y-range LO,HI` pins the panels' axis. Every figure is
+also written in French under `comparisons/figures/fr/` (`<stem>_fr.png`, the vector twin
+in `fr/svg/`), the `viz.i18n` string walk over the finished English figure, except the
+months-behind figure, drawn again in the lab's print style (`viz.frontier_gap_print`,
+matplotlib, the lab's marks). The write-up's
 `5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes and copies
 the deliverables, French included, into that folder.
 

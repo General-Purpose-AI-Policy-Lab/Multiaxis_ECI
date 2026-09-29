@@ -327,6 +327,15 @@ def run_canonical(args) -> None:
     access_drop = (access_scope_drop_list(args.include_all_benchmarks, access)
                    if access else None)
 
+    if args.anchors:
+        # A class fit can lose an anchor's every score (Claude 3.5 Sonnet has none left on private
+        # benchmarks once the visual ones are out). Its own tables then read ECI-H off two other
+        # models; the frontier-gap analysis links class fits onto the all-benchmarks scale and
+        # does not read these anchors.
+        low, high = (m.strip() for m in args.anchors.split(","))
+        config.ANCHOR_LOW, config.ANCHOR_HIGH = (low, config.ANCHOR_LOW[1]), (high, config.ANCHOR_HIGH[1])
+        print(f"── --anchors: ECI-H pinned by {low} = {config.ANCHOR_LOW[1]:.0f}, "
+              f"{high} = {config.ANCHOR_HIGH[1]:.0f} ──")
     if args.raw_c:
         config.RAW_C_MODE = True
         print("── --raw-c mode: ECI-H = C (no affine anchor rescaling) ───────────")
@@ -851,6 +860,10 @@ def main():
                              "reference ECI dataset) instead of the processed file")
     parser.add_argument("--raw-c", action="store_true",
                         help="[canonical] report raw C instead of anchored ECI")
+    parser.add_argument("--anchors", default=None, metavar="LOW,HIGH",
+                        help="[canonical] the two ECI anchor models (130 and 150) instead of "
+                             "config.ANCHOR_LOW / ANCHOR_HIGH, for a class fit (--access) in "
+                             "which an anchor has no score left")
     parser.add_argument("--include-all-benchmarks", action="store_true",
                         help="[canonical] keep the curated-excluded benchmarks in the fit; "
                              "results go to canonical_allbenchmarks/")
