@@ -9,7 +9,7 @@ loaded.
   frontier_gap_<group>_table       the summary table (PNG, CSV and Markdown), with the change of
                                    every quantity against the all-benchmarks scope
 
-  python 4_diagnostics/2_plot_frontier_gap.py [--group openness|country] [--today YYYY-MM-DD]
+  python 4_diagnostics/2_plot_frontier_gap.py [--group openness|country] [--today YYYY-MM-DD] [--print-scopes all,private]
 """
 from __future__ import annotations
 
@@ -180,6 +180,9 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--group", default="openness", choices=list(GROUP_TITLES))
     ap.add_argument("--today", default=None, help="pin the today line (default: the wall clock)")
+    ap.add_argument("--print-scopes", default=None, metavar="S1,S2",
+                    help="the scopes the French print figure draws, e.g. all,private "
+                         "(default: every scope found)")
     ap.add_argument("--y-range", default=None, metavar="LO,HI",
                     help="fix the panels' ECI-H range (default: read off the candidates)")
     args = ap.parse_args()
@@ -222,8 +225,12 @@ def main():
     # The French render people print is drawn again in the lab's house style (matplotlib, the
     # lab's marks in the corners), over the translated Plotly PNG and SVG; the interactive twin
     # stays the translated Plotly figure.
-    fr_fig = lag_fig_print(results, scopes, today=args.today, label_scope="all",
-                           counts={s: len(by_class[s]) for s in scopes if s in by_class})
+    print_scopes = args.print_scopes.split(",") if args.print_scopes else scopes
+    unknown = [s for s in print_scopes if s not in results]
+    if unknown:
+        raise SystemExit(f"--print-scopes: no result for {unknown} (have {scopes})")
+    fr_fig = lag_fig_print(results, print_scopes, today=args.today, label_scope="all", group=kind,
+                           counts={s: len(by_class[s]) for s in print_scopes if s in by_class})
     save_print(fr_fig, figures_dir / "fr" / f"{stem}_lag_fr.png",
                figures_dir / "fr" / "svg" / f"{stem}_lag_fr.svg")
 

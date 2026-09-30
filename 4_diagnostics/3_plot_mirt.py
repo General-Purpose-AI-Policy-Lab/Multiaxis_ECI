@@ -302,7 +302,16 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         view = prepare_fit(sub, data)
         if K >= 2 and view.A is not None:
             if ref.exists():
-                view = align_to_reference_loadings(view, data, ref)
+                try:
+                    view = align_to_reference_loadings(view, data, ref)
+                except SystemExit as err:
+                    if suffix == "_majority":
+                        raise
+                    # A minority carrying another solution has no place on the fit's display
+                    # frame: its figures would title the wrong axes. The majority's stand alone.
+                    print(f"  minority chains {chains}: not on the fit's axes ({str(err).splitlines()[0]}); "
+                          "minority figures and the chain-group comparison skipped")
+                    return figures_dir
             else:
                 print(f"  WARNING: {ref} missing; chain groups rendered in their own axis "
                       "order, so axis k may differ between the two folders")

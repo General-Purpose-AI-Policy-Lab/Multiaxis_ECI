@@ -1,0 +1,2 @@
+fit,trace,n_chains,divergences,logp_spread_nats,dspread_max,eta_rhat_all,D_rhat_all,island_chains,eta_rhat_majority,verdict,recommended_drop_chains
+k4_main,/Users/jeremyandreolettigpaipolicylab/Documents/Recherche/Forecasting-pipeline/Multiaxis_ECI/5_outputs/data20260930/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc,8,15,20.66,0.971,1.2061,1.1157,1 2 3 4 5 6,1.0527,ISLANDS,

@@ -26,3 +26,5 @@ GeoBench
 BlueprintBench 2
 VisualToolBench
 EnigmaEval
+# Furniture Assembly (Epoch, photos of IKEA builds) joins them on the same rule (2026-09-29 refresh).
+Furniture Assembly

@@ -129,9 +129,10 @@ in theirs) with no trace loaded; `--y-range LO,HI` pins the panels' axis. Every 
 also written in French under `comparisons/figures/fr/` (`<stem>_fr.png`, the vector twin
 in `fr/svg/`), the `viz.i18n` string walk over the finished English figure, except the
 months-behind figure, drawn again in the lab's print style (`viz.frontier_gap_print`,
-matplotlib, the lab's marks). The write-up's
-`5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes and copies
-the deliverables, French included, into that folder.
+matplotlib, the lab's marks); `--print-scopes all,private` keeps only those curves in it.
+The write-ups' `5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes
+and copies the deliverables, French included, into that folder (`GROUP=country` into
+`5_outputs/us_cn_frontier/`, whose own `make_plots.sh` sets it with `PRINT_SCOPES=all,private`).
 
 ## Plot a fit
 

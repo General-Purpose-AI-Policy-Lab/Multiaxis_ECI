@@ -2,8 +2,8 @@
 the lab's house style (navy ink, 11 pt body, a solid date axis with outward ticks and no label, no
 vertical axis, horizontal grid only, text written on the curves with a white halo, a handful of
 well-known models named, the lab's marks in the corners). Same data as `frontier_gap.lag_fig`:
-one dot per open-weights record with its 50% interval, one smoothed curve per access scope with
-its 80% band. The interactive twin stays the Plotly figure.
+one dot per follower record (open-weights models, or Chinese models with `group="country"`) with its
+50% interval, one smoothed curve per access scope with its 80% band. The interactive twin stays the Plotly figure.
 
 What one adjusts (texts, colours, named models and their offsets, sizes) is a named constant below.
 """
@@ -34,6 +34,9 @@ HALO = [withStroke(linewidth=3, foreground="white")]
 FIGSIZE = (6.2, 3.7)         # inches: wider than a page column, reduced at layout
 CORPS = 11                   # body size, as the report's boxes (Times 11 on a 170 x 237 mm page)
 Y_PAS = 4                    # months between horizontal grid lines
+# Top of the vertical axis per group, None to follow the data: the country figure stops at 24 months
+# for legibility, the few early intervals above it run off the top (user, 2026-09-30).
+Y_MAX = {"openness": None, "country": 24}
 # The house style as rcParams, applied while the figure is drawn and while it is saved (tick labels
 # are made at draw time, so a style applied only while building would miss them).
 STYLE = {"font.family": "sans-serif", "font.sans-serif": ["Helvetica Neue", "Arial", "DejaVu Sans"],
@@ -46,16 +49,20 @@ STYLE = {"font.family": "sans-serif", "font.sans-serif": ["Helvetica Neue", "Ari
          "axes.unicode_minus": True}
 
 # ── Texts (French) ────────────────────────────────────────────────────────────────────────────
-Y_LABEL = "Mois de retard sur la frontière\ndes modèles fermés"
+# The vertical caption names the leader group whose frontier the lag is read off.
+Y_LABEL = {"openness": "Mois de retard sur la frontière\ndes modèles fermés",
+           "country": "Mois de retard sur la frontière\ndes modèles américains"}
 SCOPES_FR = {"all": "Tous les benchmarks", "public": "Benchmarks publics",
              "semi_private": "Benchmarks semi-privés", "private": "Benchmarks privés"}
 AUJOURDHUI = "aujourd’hui"
-# A few records everyone knows, named beside their dot on all benchmarks: name -> (text, offset in
-# points from the dot, horizontal and vertical alignment). Positions chosen by eye.
-MODELES = {"LLaMA-65B": ("LLaMA 65B", (0, 7), "center", "bottom"),
-           "Llama-3.1-405B": ("Llama 3.1 405B", (-6, 0), "right", "center"),
-           "DeepSeek-R1": ("DeepSeek R1", (0, -7), "center", "top"),
-           "kimi-k3": ("Kimi K3", (0, -8), "center", "top")}
+# A few records everyone knows, named beside their dot on all benchmarks, per group: name -> (text,
+# offset in points from the dot, horizontal and vertical alignment). Positions chosen by eye.
+MODELES = {"openness": {"LLaMA-65B": ("LLaMA 65B", (0, 7), "center", "bottom"),
+                        "Llama-3.1-405B": ("Llama 3.1 405B", (-6, 0), "right", "center"),
+                        "DeepSeek-R1": ("DeepSeek R1", (0, -7), "center", "top"),
+                        "kimi-k3": ("Kimi K3", (0, -8), "center", "top")},
+           "country": {"DeepSeek-R1": ("DeepSeek R1", (6, 0), "left", "center"),
+                       "kimi-k3": ("Kimi K3", (-6, 0), "right", "center")}}
 MARQUE_LOGO = ("GPAI", "Policy Lab")  # top right, after a bracket
 MARQUE_SITE = "gpaipolicylab.org"     # bottom left
 MARQUE_COPYRIGHT = "©"                # bottom right
@@ -85,9 +92,11 @@ def _spread(ys: list[float], gap: float) -> list[float]:
 
 
 def lag_fig_print(results: dict, scopes: list[str], *, today=None, counts: dict | None = None,
-                  smooth_months: float = 6.0, label_scope: str = "all", brand: bool = True):
+                  smooth_months: float = 6.0, label_scope: str = "all", brand: bool = True,
+                  group: str = "openness"):
     """The months-behind figure in the house style, French texts. `counts` gives each scope's
-    number of benchmarks for its name ("Benchmarks privés (13)"). Returns the matplotlib figure."""
+    number of benchmarks for its name ("Benchmarks privés (13)"); `group` picks the vertical caption
+    (`openness` or `country`). Returns the matplotlib figure."""
     today_d = _today(today)
     curves = {s: _lag_curve(results[s], smooth_months, today_d) for s in scopes}
     drawn = [s for s in scopes if curves[s] is not None]
@@ -117,13 +126,15 @@ def lag_fig_print(results: dict, scopes: list[str], *, today=None, counts: dict 
 
         # The range hugs what is drawn (a month of air), the grid keeps its round steps inside it
         y_lo, y_hi = min(lows) - 1, max(highs) + 2
+        if Y_MAX.get(group) is not None:
+            y_hi = min(y_hi, Y_MAX[group])
         ax.set_ylim(y_lo, y_hi)
         ax.set_xlim(w0, w1)
-        ax.set_yticks(np.arange(np.ceil(y_lo / Y_PAS) * Y_PAS, y_hi, Y_PAS))
+        ax.set_yticks(np.arange(np.ceil(y_lo / Y_PAS) * Y_PAS, y_hi + 1e-9, Y_PAS))  # a capped top keeps its tick
         ax.axhline(0, color="#b0b0b0", lw=0.8, zorder=1)
         ax.xaxis.set_major_locator(mdates.YearLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-        ax.set_ylabel(Y_LABEL)
+        ax.set_ylabel(Y_LABEL[group])
 
         # Today: a dotted rule, named at its foot (the lab's marks hold the top right corner)
         ax.axvline(today_d, color=GRIS, lw=0.8, ls=(0, (1, 2)), zorder=1)
@@ -144,7 +155,7 @@ def lag_fig_print(results: dict, scopes: list[str], *, today=None, counts: dict 
 
         # A few well-known records named beside their dot
         df = results[label_scope].lag_df.set_index("name")
-        for key, (text, (dx, dy), ha, va) in MODELES.items():
+        for key, (text, (dx, dy), ha, va) in MODELES[group].items():
             if key in df.index and np.isfinite(df.at[key, "lag_months_median"]):
                 ax.annotate(text, (df.at[key, "release_date"], df.at[key, "lag_months_median"]),
                             xytext=(dx, dy), textcoords="offset points", ha=ha, va=va,

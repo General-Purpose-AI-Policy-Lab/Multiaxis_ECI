@@ -59,6 +59,15 @@ Chess Puzzles,qwen3-14b,False,0.04,0.0496,0.0496,2025-04-29,old/weak
 Chess Puzzles,qwen3-4b-instruct-2507,False,0.04,0.0496,0.0496,2025-08-06,frontier
 Chess Puzzles,qwen3-max-2025-09-23,False,0.04,0.0496,0.0496,2025-09-24,frontier
 Chess Puzzles,qwen3.6-35b-a3b_none,False,0.04,0.0496,0.0496,2026-04-14,frontier
+Furniture Assembly,qwen3.8-max-0902_xhigh,False,0.2,0.3,0.3,2026-09-01,frontier
+Furniture Assembly,grok-4.7_xhigh,False,0.2083333333333333,0.3,0.3,2026-09-21,frontier
+Furniture Assembly,kimi-k2.6,False,0.2166666666666666,0.3,0.3,2026-04-20,frontier
+Furniture Assembly,grok-4.5_high,False,0.225,0.3,0.3,2026-07-08,frontier
+Furniture Assembly,gemini-3.6-flash_high,False,0.2333333333333333,0.3,0.3,2026-07-21,frontier
+Furniture Assembly,gemini-3.1-pro-preview_high,False,0.2666666666666666,0.3,0.3,2026-02-19,frontier
+Furniture Assembly,gemini-3.7-flash_high,False,0.2666666666666666,0.3,0.3,2026-08-13,frontier
+Furniture Assembly,claude-opus-4-5-20251101_64K,False,0.2833333333333333,0.3,0.3,2025-11-24,frontier
+Furniture Assembly,claude-opus-4-6_max,False,0.2833333333333333,0.3,0.3,2026-02-05,frontier
 GPQA Diamond,deepseek-r1-0528-qwen3-8b,False,0.0928030303030303,0.25,0.25,2025-05-29,old/weak
 GPQA Diamond,granite-4.0-350m,False,0.1123737373737373,0.25,0.25,2025-10-28,frontier
 GPQA Diamond,open-mistral-7b,False,0.132260101010101,0.25,0.25,2023-09-27,old/weak
@@ -80,12 +89,6 @@ GPQA Main Chemistry,Mixtral-8x7B-Instruct-v0.1,False,0.208,0.25,0.25,2023-12-11,
 GPQA Main Chemistry,gpt-3.5-turbo-0125,False,0.2189999999999999,0.25,0.25,2024-01-25,old/weak
 GPQA Main Chemistry,Llama-3.1-8B-Instruct,False,0.23,0.25,0.25,2024-07-23,old/weak
 GPQA Main Chemistry,claude-3-sonnet-20240229,False,0.246,0.25,0.25,2024-02-29,old/weak
-HLE,gpt-4o-2024-11-20,False,0.0272,0.048,0.048,2024-11-20,old/weak
-HLE,amazon.nova-lite-v1:0,False,0.0364,0.048,0.048,2024-12-03,old/weak
-HLE,claude-3-5-sonnet-20241022,False,0.0408,0.048,0.048,2024-10-22,old/weak
-HLE,amazon.nova-pro-v1:0,False,0.044,0.048,0.048,2024-12-03,old/weak
-HLE,mistral-medium-2505,False,0.0452,0.048,0.048,2025-05-07,old/weak
-HLE,gemini-1.5-pro-002,False,0.046,0.048,0.048,2024-09-24,old/weak
 LAB-Bench Cloning,gemini-1.0-pro-001,False,0.121,0.2,0.2,2023-12-13,old/weak
 LAB-Bench Cloning,Mixtral-8x7B-Instruct-v0.1,False,0.152,0.2,0.2,2023-12-11,old/weak
 LAB-Bench Cloning,claude-3-haiku-20240307,False,0.152,0.2,0.2,2024-03-07,old/weak

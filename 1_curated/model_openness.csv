@@ -201,11 +201,12 @@ claude-haiku-4-5-20251001_32K,closed,epoch:API access
 claude-haiku-4-5-20251001_8K,closed,epoch:API access
 claude-haiku-4-5-20251001_low,closed,epoch:API access
 claude-haiku-4-5-20251001_thinking,closed,family:claude-haiku-4-5-20251001
+claude-haiku-4-5-20251001_xhigh,closed,family:claude-haiku-4-5-20251001
 claude-instant-1.1,closed,epoch:API access
 claude-instant-1.2,closed,epoch:API access
 claude-mythos-5,closed,override
 claude-mythos-preview,closed,override
-claude-mythos-preview-early,closed,epoch:Unreleased
+claude-mythos-preview-early,closed,override
 claude-opus-4-1-20250805,closed,epoch:API access
 claude-opus-4-1-20250805_16K,closed,epoch:API access
 claude-opus-4-1-20250805_24K,closed,epoch:API access
@@ -256,6 +257,9 @@ claude-opus-4-8_medium,closed,epoch:API access
 claude-opus-4-8_none,closed,epoch:API access
 claude-opus-4-8_xhigh,closed,epoch:API access
 claude-opus-5,closed,epoch:API access
+claude-opus-5-5,closed,family:claude-opus-5-5_max
+claude-opus-5-5_max,closed,epoch:API access
+claude-opus-5-5_xhigh,closed,epoch:API access
 claude-opus-5_high,closed,epoch:API access
 claude-opus-5_low,closed,epoch:API access
 claude-opus-5_max,closed,epoch:API access
@@ -288,6 +292,7 @@ claude-sonnet-4-6_low,closed,epoch:API access
 claude-sonnet-4-6_max,closed,epoch:API access
 claude-sonnet-4-6_medium,closed,epoch:API access
 claude-sonnet-5,closed,epoch:API access
+claude-sonnet-5-5_max,closed,epoch:API access
 claude-sonnet-5_high,closed,epoch:API access
 claude-sonnet-5_low,closed,epoch:API access
 claude-sonnet-5_max,closed,epoch:API access
@@ -329,6 +334,9 @@ deepseek-v4-pro_high,open,epoch:Open weights (unrestricted)
 deepseek-v4-pro_max,open,epoch:Open weights (unrestricted)
 deepseek-v4-pro_none,open,epoch:Open weights (unrestricted)
 deepseek-v4-pro_xhigh,open,family:deepseek-v4-pro_high
+deepseek-v4.1-flash,open,epoch:Open weights (unrestricted)
+deepseek-v4.1-flash_high,open,epoch:Open weights (unrestricted)
+deepseek-v4.1-flash_max,open,epoch:Open weights (unrestricted)
 devstral-small-2512,open,epoch:Open weights (unrestricted)
 dolly-v2-12b,open,epoch:Open weights (unrestricted)
 falcon-11b,open,epoch:Open weights (restricted use)
@@ -456,6 +464,7 @@ glm-5.2_medium,open,epoch:Open weights (unrestricted)
 glm-5.2_minimal,open,epoch:Open weights (unrestricted)
 glm-5.2_none,open,epoch:Open weights (unrestricted)
 glm-5.2_xhigh,open,family:glm-5.2_high
+glm-5.3,open,override
 glm-5.3-flash,open,epoch:Open weights (unrestricted)
 glm-5.3-flash_max,open,epoch:Open weights (unrestricted)
 glm-5.3_max,open,override
@@ -536,7 +545,6 @@ gpt-5.4-mini-2026-03-17_low,closed,epoch:API access
 gpt-5.4-mini-2026-03-17_medium,closed,epoch:API access
 gpt-5.4-mini-2026-03-17_none,closed,epoch:API access
 gpt-5.4-mini-2026-03-17_xhigh,closed,epoch:API access
-gpt-5.4-nano-2026-03-17,closed,epoch:API access
 gpt-5.4-nano-2026-03-17_high,closed,epoch:API access
 gpt-5.4-nano-2026-03-17_low,closed,epoch:API access
 gpt-5.4-nano-2026-03-17_medium,closed,epoch:API access
@@ -587,7 +595,11 @@ gpt-6-astra_low,closed,epoch:API access
 gpt-6-astra_max,closed,epoch:API access
 gpt-6-astra_medium,closed,epoch:API access
 gpt-6-astra_none,closed,epoch:API access
+gpt-6-astra_promax,closed,epoch:API access
 gpt-6-astra_xhigh,closed,epoch:API access
+gpt-6-luna_max,closed,epoch:API access
+gpt-6-sol,closed,family:gpt-6-sol_max
+gpt-6-sol_max,closed,epoch:API access
 gpt-j-6b,open,epoch:Open weights (unrestricted)
 gpt-neo-2.7B,open,epoch:Open weights (unrestricted)
 gpt-neox-20b,open,epoch:Open weights (unrestricted)
@@ -641,8 +653,11 @@ grok-4.6_high,closed,epoch:API access
 grok-4.6_low,closed,epoch:API access
 grok-4.6_medium,closed,epoch:API access
 grok-4.6_xhigh,closed,epoch:API access
+grok-4.7,closed,epoch:API access
+grok-4.7_xhigh,closed,epoch:API access
 grok-build-0.1,closed,epoch:API access
 grok-code-fast-1,closed,override
+hy4-preview,open,epoch:Open weights (unrestricted)
 inkling-small,open,epoch:Open weights (unrestricted)
 inkling-small_high,open,epoch:Open weights (unrestricted)
 inkling-small_low,open,epoch:Open weights (unrestricted)
@@ -672,6 +687,7 @@ magistral-medium-2509,closed,epoch:API access
 magistral-small-2506,open,epoch:Open weights (unrestricted)
 magistral-small-2509,open,epoch:Open weights (unrestricted)
 mercury-2,closed,epoch:API access
+mercury-2.5,closed,epoch:API access
 mimo-v2-flash,open,epoch:Open weights (unrestricted)
 mimo-v2-pro,closed,epoch:API access
 mimo-v2-pro_high,closed,epoch:API access
@@ -705,8 +721,13 @@ muse-spark-1.1_medium,closed,epoch:API access
 muse-spark-1.1_xhigh,closed,epoch:API access
 muse-spark-1.2,closed,epoch:API access
 muse-spark-1.2_xhigh,closed,epoch:API access
+muse-spark-1.3,closed,epoch:API access
+muse-spark-1.3_high,closed,epoch:API access
+muse-spark-1.3_max,closed,epoch:API access
+muse-spark-1.3_xhigh,closed,epoch:API access
 nemotron-3-super,open,epoch:Open weights (unrestricted)
 nemotron-3-ultra,open,epoch:Open weights (unrestricted)
+nemotron-3-ultra_thinking,open,family:nemotron-3-ultra
 nova-2.0-pro-preview,closed,epoch:API access
 nova-2.0-pro-preview_low,closed,epoch:API access
 nova-2.0-pro-preview_medium,closed,epoch:API access
@@ -807,14 +828,18 @@ qwen3.7-max,closed,epoch:API access
 qwen3.7-max_none,closed,epoch:API access
 qwen3.7-max_xhigh,closed,family:qwen3.7-max
 qwen3.7-plus,closed,override
-qwen3.7-plus_none,closed,family:qwen3.7-plus
+qwen3.7-plus_none,closed,epoch:API access
+qwen3.8-2.4t-a95b_xhigh,open,override
 qwen3.8-27b,open,epoch:Open weights (unrestricted)
 qwen3.8-27b_low,open,epoch:Open weights (unrestricted)
 qwen3.8-27b_medium,open,epoch:Open weights (unrestricted)
 qwen3.8-27b_none,open,epoch:Open weights (unrestricted)
 qwen3.8-27b_xhigh,open,epoch:Open weights (unrestricted)
-qwen3.8-max,closed,epoch:API access
-qwen3.8-max_xhigh,closed,epoch:API access
+qwen3.8-flash_xhigh,closed,epoch:API access
+qwen3.8-max,open,override
+qwen3.8-max-0902,closed,epoch:API access
+qwen3.8-max-0902_xhigh,closed,epoch:API access
+qwen3.8-max_xhigh,open,override
 qwq-plus,closed,epoch:API access
 reka-flash-3,open,epoch:Open weights (unrestricted)
 seed-oss-36b-instruct,open,override
@@ -824,8 +849,10 @@ starcoder2-15b,open,epoch:Open weights (restricted use)
 starcoder2-3b,open,epoch:Open weights (restricted use)
 starcoder2-7b,open,epoch:Open weights (restricted use)
 step-3.7-flash,open,epoch:Open weights (unrestricted)
+step-5-preview,closed,epoch:API access
 swe-1.6,closed,epoch:Hosted access (no API)
 swe-1.7,closed,override
+swe-2_max,closed,epoch:Hosted access (no API)
 text-ada-001,closed,override
 text-babbage-001,closed,epoch:API access
 text-curie-001,closed,epoch:API access

@@ -20,8 +20,10 @@
 set -e
 cd "$(dirname "$0")/../.."
 PY=.venv/bin/python
-OUT=5_outputs/open_closed_frontier
-GROUP=${GROUP:-openness}          # GROUP=country make_plots.sh for the US vs CN cut
+GROUP=${GROUP:-openness}          # GROUP=country for the US vs CN cut (5_outputs/us_cn_frontier/make_plots.sh)
+OUT=5_outputs/$([[ $GROUP == country ]] && echo us_cn_frontier || echo open_closed_frontier)
+PRINT_SCOPES=${PRINT_SCOPES:-}    # PRINT_SCOPES=all,private: the curves of the French print figure
+P=(); [[ -n "$PRINT_SCOPES" ]] && P=(--print-scopes "$PRINT_SCOPES")
 TODAY=${TODAY:-}                  # TODAY=2026-09-29 pins the today line
 SCOPE_SUFFIX=${SCOPE_SUFFIX-_humanmerge}   # the merged tier order; SCOPE_SUFFIX= reads plain canonical*/
 T=(); [[ -n "$TODAY" ]] && T=(--today "$TODAY")
@@ -32,7 +34,7 @@ for A in all public semi_private private; do
     D=(--results-dir "$GEN/canonical$([[ $A == all ]] || echo _$A)$SCOPE_SUFFIX")
   $PY 4_diagnostics/1_frontier_gap.py --access $A --group $GROUP $T $D
 done
-$PY 4_diagnostics/2_plot_frontier_gap.py --group $GROUP $T
+$PY 4_diagnostics/2_plot_frontier_gap.py --group $GROUP $T $P
 
 F=$GEN/comparisons/figures
 mkdir -p "$OUT/fr/svg"

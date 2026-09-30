@@ -88,3 +88,8 @@ text-davinci-003,closed,API only
 tiny-recursion-model,open,code and weights on GitHub (SamsungSAILMontreal)
 codestral-2501,closed,"API and IDE plugins only; weights for on-premises deployment to enterprise customers, never downloadable (Mistral, 2025-01-13; Epoch lists it open, from the older Codestral-22B)"
 glm-5.3_max,open,"API on 2026-08-14, weights on Hugging Face on 2026-08-28 (zai-org, GLM-5.3 License): 14 days, inside the 30-day window"
+glm-5.3,open,"same release as glm-5.3_max (effort unrecorded, refresh of 2026-09-29): API on 2026-08-14, weights on Hugging Face on 2026-08-28, inside the 30-day window"
+claude-mythos-preview-early,closed,"unreleased early checkpoint of Claude Mythos Preview (Epoch listed it as Unreleased until the 2026-09-29 refresh)"
+qwen3.8-max,open,"API on 2026-08-03, weights on Hugging Face as Qwen3.8-2.4T-A95B on 2026-08-12 (Qwen3.8-Max License): 9 days, inside the 30-day window"
+qwen3.8-2.4t-a95b_xhigh,open,"the open-weight checkpoint of Qwen3.8-Max, released on Hugging Face on 2026-08-12"
+qwen3.8-max_xhigh,open,"same release as qwen3.8-max: weights on 2026-08-12, 9 days after the API"

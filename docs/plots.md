@@ -19,6 +19,7 @@ All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`),
 | `canonical_humanmerge/figures/` | `3_fit/fit.py --preset canonical --human-merge` (the order every analysis passes; without the flag, `canonical/figures/`) | no |
 | `comparisons/figures/` | `4_diagnostics/1_frontier_gap.py`, `2_plot_frontier_gap.py` | no |
 | `5_outputs/open_closed_frontier/` (+ `fr/`, `fr/svg/`) | `5_outputs/open_closed_frontier/make_plots.sh` (copies the frontier-gap deliverables out of `comparisons/`) | **yes**, except `*.html` |
+| `5_outputs/us_cn_frontier/` (+ `fr/`, `fr/svg/`) | `5_outputs/us_cn_frontier/make_plots.sh` (the same script with `GROUP=country`, French print figure on all and private benchmarks) | **yes**, except `*.html` |
 | `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |
 | `dashboard_stills/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |
