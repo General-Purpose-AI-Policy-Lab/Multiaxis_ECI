@@ -308,12 +308,21 @@ REASONING_FAMILY_PATTERNS = [
 
 # Releases that match a pattern above but do not reason, per their developers (2026-10-01): Qwen's
 # separate Instruct / Coder / Omni non-thinking models, the first Qwen3-Max (its Thinking release
-# came later), xAI's fast non-reasoning variant, OpenAI's Instant models. Checked before the
-# patterns and the models table, so a match here is always a non-reasoning model.
+# came later), xAI's fast non-reasoning variant, OpenAI's Instant and Chat models. A run with
+# reasoning off (`_none`) is a non-reasoning run whatever its family (user, 2026-10-01). Checked
+# before the patterns and the models table, so a match here is always a non-reasoning model.
 NON_REASONING_PATTERNS = [
     r"-instruct-2507", r"qwen3-coder", r"qwen3-next-.*-instruct", r"qwen3-omni-.*-instruct",
-    r"^qwen3-max-2025-09-23", r"non-reasoning", r"-instant($|[_-])",
+    r"^qwen3-max-2025-09-23", r"non-reasoning", r"-instant($|[_-])", r"_chat$", r"_none$",
 ]
+
+# Test-takers whose regime is undetermined (user decision 2026-10-01): left out of both regime
+# fits (they stay in the model and on the figures). Every effort-less Claude run of a family that
+# also has effort or budget runs is one too (analysis.regimes.regime_ignored): since the pipeline's
+# 2026-10-01 build those runs gather the scores of unknown thinking mode only (system cards, agent
+# harnesses), the runs without thinking being `_none` and the thinking ones `_thinking`. Here:
+# Muse Spark of April (Instant by default, the mode of its scores is unknown).
+REGIME_IGNORED = frozenset({"muse-spark"})
 
 # Optional backcast clamp per axis (envelope basis): a tier already passed at
 # the window start is backcast at the envelope's early rate, and an entry here

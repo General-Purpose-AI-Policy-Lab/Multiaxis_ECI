@@ -38,7 +38,7 @@ from scipy.stats import multivariate_normal
 
 from multiaxis_eci.analysis.forecast import ForecastResult, _to_date, _to_year
 from multiaxis_eci.analysis.stats import post_stats
-from multiaxis_eci.config import NON_REASONING_PATTERNS, REASONING_FAMILY_PATTERNS
+from multiaxis_eci.config import NON_REASONING_PATTERNS, REASONING_FAMILY_PATTERNS, REGIME_IGNORED
 from multiaxis_eci.data import MODELS_FILE, ECIData, model_family, model_organization
 
 _OFF_LEVELS = {"", "none", "minimal"}
@@ -64,6 +64,24 @@ def is_reasoning(name: str) -> bool:
     if _NOT.search(name):
         return False
     return model_family(name) in _reasoning_families() or bool(_PATTERN.search(name))
+
+
+@lru_cache(maxsize=1)
+def _bare_hybrid_claude() -> frozenset:
+    """Effort-less Claude runs whose family also has effort or budget runs."""
+    m = pd.read_csv(MODELS_FILE, dtype=str).fillna("").drop_duplicates("model_version")
+    claude = m[m["base_model"].str.startswith("claude")]
+    bare = (claude["reasoning_level"] == "") & (claude["reasoning_tokens"] == "") \
+        & (claude["variant"] == "")
+    fam = claude["model_version"].map(model_family)
+    hybrid = set(fam[~bare])
+    return frozenset(claude.loc[bare & fam.isin(hybrid), "model_version"])
+
+
+def regime_ignored(name: str) -> bool:
+    """Whether a test-taker is left out of both regime fits (`config.REGIME_IGNORED`, plus the
+    effort-less runs of hybrid Claude families)."""
+    return name in REGIME_IGNORED or name in _bare_hybrid_claude()
 
 
 def reasoning_mask(data: ECIData) -> np.ndarray:
@@ -173,11 +191,14 @@ def two_regime_forecast(theta_draws: np.ndarray, k: int, data: ECIData, tl: pd.D
     when fewer than three reasoning families qualify."""
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     idx = {m: i for i, m in enumerate(names)}
-    best = one_per_org_day(family_best(tl.assign(release_date=pd.to_datetime(tl["release_date"]))))
+    tl = tl[~tl["name"].map(regime_ignored)]   # undetermined regime: in neither fit
+    tl = tl.assign(release_date=pd.to_datetime(tl["release_date"]))
+    best = one_per_org_day(family_best(tl))
     if best.empty:
         raise ValueError("no frontier candidate")
-    is_r = best["name"].map(is_reasoning)
-    reason = best[is_r]
+    # A family's best reasoning run, picked among its reasoning runs: its best run on the axis may
+    # be one with reasoning off (`_none`), which joins the others' pool instead.
+    reason = one_per_org_day(family_best(tl[tl["name"].map(is_reasoning)]))
     reason = reason[reason["name"].isin(frontier_topk(reason, top_k))].sort_values("release_date")
     front = best[best["name"].isin(frontier_topk(best, top_k))].sort_values("release_date")
     other = front[~front["name"].map(is_reasoning)]
