@@ -57,6 +57,9 @@ Llama-2-70b-hf,open,override
 Llama-2-7b,open,epoch:Open weights (restricted use)
 Llama-3.1-405B,open,epoch:Open weights (restricted use)
 Llama-3.1-405B-Instruct,open,epoch:Open weights (restricted use)
+Llama-3.1-405B-Instruct_bio-llama,open,family:Llama-3.1-405B-Instruct
+Llama-3.1-405B-Instruct_hermes-3,open,family:Llama-3.1-405B-Instruct
+Llama-3.1-405B-Instruct_unsafety-llama,open,family:Llama-3.1-405B-Instruct
 Llama-3.1-70B-Instruct,open,epoch:Open weights (restricted use)
 Llama-3.1-8B-Instruct,open,epoch:Open weights (restricted use)
 Llama-3.1-Tulu-3-70B-DPO,open,epoch:Open weights (restricted use)
@@ -178,21 +181,25 @@ claude-3-7-sonnet-20250219_2K,closed,epoch:API access
 claude-3-7-sonnet-20250219_32K,closed,epoch:API access
 claude-3-7-sonnet-20250219_64K,closed,epoch:API access
 claude-3-7-sonnet-20250219_8K,closed,epoch:API access
-claude-3-7-sonnet-20250219_thinking,closed,family:claude-3-7-sonnet-20250219
+claude-3-7-sonnet-20250219_none,closed,epoch:API access
+claude-3-7-sonnet-20250219_thinking,closed,epoch:API access
 claude-3-haiku-20240307,closed,epoch:API access
 claude-3-opus-20240229,closed,epoch:API access
 claude-3-sonnet-20240229,closed,epoch:API access
 claude-fable-5,closed,epoch:API access
-claude-fable-5-1,closed,epoch:API access
+claude-fable-5-1,closed,family:claude-fable-5-1_high
 claude-fable-5-1_high,closed,epoch:API access
 claude-fable-5-1_low,closed,epoch:API access
 claude-fable-5-1_max,closed,epoch:API access
 claude-fable-5-1_medium,closed,epoch:API access
+claude-fable-5-1_thinking,closed,epoch:API access
 claude-fable-5-1_xhigh,closed,epoch:API access
 claude-fable-5_high,closed,epoch:API access
 claude-fable-5_low,closed,epoch:API access
 claude-fable-5_max,closed,epoch:API access
 claude-fable-5_medium,closed,epoch:API access
+claude-fable-5_none,closed,epoch:API access
+claude-fable-5_thinking,closed,epoch:API access
 claude-fable-5_xhigh,closed,epoch:API access
 claude-haiku-4-5-20251001,closed,epoch:API access
 claude-haiku-4-5-20251001_16K,closed,epoch:API access
@@ -200,7 +207,8 @@ claude-haiku-4-5-20251001_1K,closed,epoch:API access
 claude-haiku-4-5-20251001_32K,closed,epoch:API access
 claude-haiku-4-5-20251001_8K,closed,epoch:API access
 claude-haiku-4-5-20251001_low,closed,epoch:API access
-claude-haiku-4-5-20251001_thinking,closed,family:claude-haiku-4-5-20251001
+claude-haiku-4-5-20251001_none,closed,epoch:API access
+claude-haiku-4-5-20251001_thinking,closed,epoch:API access
 claude-haiku-4-5-20251001_xhigh,closed,family:claude-haiku-4-5-20251001
 claude-instant-1.1,closed,epoch:API access
 claude-instant-1.2,closed,epoch:API access
@@ -212,7 +220,8 @@ claude-opus-4-1-20250805_16K,closed,epoch:API access
 claude-opus-4-1-20250805_24K,closed,epoch:API access
 claude-opus-4-1-20250805_27K,closed,epoch:API access
 claude-opus-4-1-20250805_32K,closed,epoch:API access
-claude-opus-4-1-20250805_thinking,closed,family:claude-opus-4-1-20250805
+claude-opus-4-1-20250805_none,closed,epoch:API access
+claude-opus-4-1-20250805_thinking,closed,epoch:API access
 claude-opus-4-20250514,closed,epoch:API access
 claude-opus-4-20250514_12K,closed,epoch:API access
 claude-opus-4-20250514_16K,closed,epoch:API access
@@ -221,7 +230,8 @@ claude-opus-4-20250514_27K,closed,epoch:API access
 claude-opus-4-20250514_2K,closed,epoch:API access
 claude-opus-4-20250514_32K,closed,epoch:API access
 claude-opus-4-20250514_8K,closed,epoch:API access
-claude-opus-4-20250514_thinking,closed,family:claude-opus-4-20250514
+claude-opus-4-20250514_none,closed,epoch:API access
+claude-opus-4-20250514_thinking,closed,epoch:API access
 claude-opus-4-5-20251101,closed,epoch:API access
 claude-opus-4-5-20251101_128K,closed,epoch:API access
 claude-opus-4-5-20251101_16K,closed,epoch:API access
@@ -232,7 +242,7 @@ claude-opus-4-5-20251101_8K,closed,epoch:API access
 claude-opus-4-5-20251101_high,closed,epoch:API access
 claude-opus-4-5-20251101_low,closed,epoch:API access
 claude-opus-4-5-20251101_none,closed,epoch:API access
-claude-opus-4-5-20251101_thinking,closed,family:claude-opus-4-5-20251101
+claude-opus-4-5-20251101_thinking,closed,epoch:API access
 claude-opus-4-6,closed,epoch:API access
 claude-opus-4-6_120K,closed,epoch:API access
 claude-opus-4-6_32K,closed,epoch:API access
@@ -241,20 +251,23 @@ claude-opus-4-6_high,closed,epoch:API access
 claude-opus-4-6_low,closed,epoch:API access
 claude-opus-4-6_max,closed,epoch:API access
 claude-opus-4-6_medium,closed,epoch:API access
-claude-opus-4-6_none,closed,family:claude-opus-4-6
-claude-opus-4-6_thinking,closed,family:claude-opus-4-6
+claude-opus-4-6_none,closed,epoch:API access
+claude-opus-4-6_thinking,closed,epoch:API access
 claude-opus-4-7,closed,epoch:API access
 claude-opus-4-7_high,closed,epoch:API access
 claude-opus-4-7_low,closed,epoch:API access
 claude-opus-4-7_max,closed,epoch:API access
 claude-opus-4-7_medium,closed,epoch:API access
+claude-opus-4-7_none,closed,epoch:API access
+claude-opus-4-7_thinking,closed,epoch:API access
 claude-opus-4-7_xhigh,closed,epoch:API access
-claude-opus-4-8,closed,epoch:API access
+claude-opus-4-8,closed,family:claude-opus-4-8_high
 claude-opus-4-8_high,closed,epoch:API access
 claude-opus-4-8_low,closed,epoch:API access
 claude-opus-4-8_max,closed,epoch:API access
 claude-opus-4-8_medium,closed,epoch:API access
 claude-opus-4-8_none,closed,epoch:API access
+claude-opus-4-8_thinking,closed,epoch:API access
 claude-opus-4-8_xhigh,closed,epoch:API access
 claude-opus-5,closed,epoch:API access
 claude-opus-5-5,closed,family:claude-opus-5-5_max
@@ -264,6 +277,8 @@ claude-opus-5_high,closed,epoch:API access
 claude-opus-5_low,closed,epoch:API access
 claude-opus-5_max,closed,epoch:API access
 claude-opus-5_medium,closed,epoch:API access
+claude-opus-5_none,closed,epoch:API access
+claude-opus-5_thinking,closed,epoch:API access
 claude-opus-5_xhigh,closed,epoch:API access
 claude-sonnet-4-20250514,closed,epoch:API access
 claude-sonnet-4-20250514_12K,closed,epoch:API access
@@ -273,7 +288,8 @@ claude-sonnet-4-20250514_2K,closed,epoch:API access
 claude-sonnet-4-20250514_32K,closed,epoch:API access
 claude-sonnet-4-20250514_59K,closed,epoch:API access
 claude-sonnet-4-20250514_8K,closed,epoch:API access
-claude-sonnet-4-20250514_thinking,closed,family:claude-sonnet-4-20250514
+claude-sonnet-4-20250514_none,closed,epoch:API access
+claude-sonnet-4-20250514_thinking,closed,epoch:API access
 claude-sonnet-4-5-20250929,closed,epoch:API access
 claude-sonnet-4-5-20250929_12K,closed,epoch:API access
 claude-sonnet-4-5-20250929_16K,closed,epoch:API access
@@ -284,19 +300,23 @@ claude-sonnet-4-5-20250929_48K,closed,epoch:API access
 claude-sonnet-4-5-20250929_59K,closed,epoch:API access
 claude-sonnet-4-5-20250929_8K,closed,epoch:API access
 claude-sonnet-4-5-20250929_low,closed,epoch:API access
-claude-sonnet-4-5-20250929_thinking,closed,family:claude-sonnet-4-5-20250929
+claude-sonnet-4-5-20250929_none,closed,epoch:API access
+claude-sonnet-4-5-20250929_thinking,closed,epoch:API access
 claude-sonnet-4-6,closed,epoch:API access
 claude-sonnet-4-6_32K,closed,epoch:API access
 claude-sonnet-4-6_high,closed,epoch:API access
 claude-sonnet-4-6_low,closed,epoch:API access
 claude-sonnet-4-6_max,closed,epoch:API access
 claude-sonnet-4-6_medium,closed,epoch:API access
-claude-sonnet-5,closed,epoch:API access
+claude-sonnet-4-6_none,closed,epoch:API access
+claude-sonnet-4-6_thinking,closed,epoch:API access
 claude-sonnet-5-5_max,closed,epoch:API access
 claude-sonnet-5_high,closed,epoch:API access
 claude-sonnet-5_low,closed,epoch:API access
 claude-sonnet-5_max,closed,epoch:API access
 claude-sonnet-5_medium,closed,epoch:API access
+claude-sonnet-5_none,closed,family:claude-sonnet-5_high
+claude-sonnet-5_thinking,closed,epoch:API access
 claude-sonnet-5_xhigh,closed,epoch:API access
 code-davinci-002,closed,epoch:API access
 codestral-2501,closed,override
@@ -491,6 +511,7 @@ gpt-4o-audio-preview-2025-06-03,closed,override
 gpt-4o-mini-2024-07-18,closed,epoch:API access
 gpt-4o-mini-audio-preview-2024-12-17,closed,override
 gpt-5-2025-08-07,closed,epoch:API access
+gpt-5-2025-08-07_chat,closed,epoch:API access
 gpt-5-2025-08-07_high,closed,epoch:API access
 gpt-5-2025-08-07_low,closed,epoch:API access
 gpt-5-2025-08-07_medium,closed,epoch:API access
@@ -534,6 +555,7 @@ gpt-5.2-pro-2025-12-11_xhigh,closed,epoch:API access
 gpt-5.3-codex,closed,epoch:API access
 gpt-5.3-codex_xhigh,closed,epoch:API access
 gpt-5.4-2026-03-05,closed,epoch:API access
+gpt-5.4-2026-03-05_cyber,closed,family:gpt-5.4-2026-03-05_high
 gpt-5.4-2026-03-05_high,closed,epoch:API access
 gpt-5.4-2026-03-05_low,closed,epoch:API access
 gpt-5.4-2026-03-05_medium,closed,epoch:API access
@@ -560,6 +582,7 @@ gpt-5.5-pro,closed,epoch:API access
 gpt-5.5-pro-pre-release_xhigh,closed,epoch:API access
 gpt-5.5-pro_high,closed,epoch:API access
 gpt-5.5-pro_xhigh,closed,epoch:API access
+gpt-5.5_cyber,closed,family:gpt-5.5_high
 gpt-5.5_high,closed,epoch:API access
 gpt-5.5_low,closed,epoch:API access
 gpt-5.5_medium,closed,epoch:API access

@@ -1,0 +1,3 @@
+organization,country,source
+Deep Cogito,US,San Francisco company (deepcogito.com); the models table gives no country for its releases
+Manus,,"agent scaffold over other developers' models (Claude, Qwen among them): no country of its own; left blank on purpose, so it joins no country group"

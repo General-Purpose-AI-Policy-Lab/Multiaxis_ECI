@@ -1,0 +1,891 @@
+model_version,regime,mode,evidence
+Baichuan-13B-Base,non-reasoning,default,no reasoning evidence
+Baichuan-2-13B-Base,non-reasoning,default,no reasoning evidence
+Baichuan-2-7B-Base,non-reasoning,default,no reasoning evidence
+Baichuan-7B,non-reasoning,default,no reasoning evidence
+Baichuan2-13B-Chat,non-reasoning,default,no reasoning evidence
+Cerebras-GPT-13B,non-reasoning,default,no reasoning evidence
+ChatGPT agent,reasoning,default,pattern 'ChatGPT agent'
+Chinchilla (70B),non-reasoning,default,no reasoning evidence
+CodeQwen1.5-7B,non-reasoning,default,no reasoning evidence
+Composer 2.5,reasoning,default,pattern 'Composer 2'
+DeepSeek-Coder-V2-Base,non-reasoning,default,no reasoning evidence
+DeepSeek-Coder-V2-Instruct,non-reasoning,default,no reasoning evidence
+DeepSeek-Coder-V2-Lite-Base,non-reasoning,default,no reasoning evidence
+DeepSeek-Coder-V2-Lite-Instruct,non-reasoning,default,no reasoning evidence
+DeepSeek-R1,reasoning,default,pattern 'DeepSeek-R1'
+DeepSeek-R1-0528,reasoning,default,pattern 'DeepSeek-R1'
+DeepSeek-R1-Distill-Llama-70B,reasoning,default,pattern 'DeepSeek-R1'
+DeepSeek-R1-Distill-Qwen-1.5B,reasoning,default,pattern 'DeepSeek-R1'
+DeepSeek-R1-Distill-Qwen-14B,reasoning,default,pattern 'DeepSeek-R1'
+DeepSeek-R1-Distill-Qwen-32B,reasoning,default,pattern 'DeepSeek-R1'
+DeepSeek-V2,non-reasoning,default,no reasoning evidence
+DeepSeek-V2.5,non-reasoning,default,no reasoning evidence
+DeepSeek-V3,non-reasoning,default,no reasoning evidence
+DeepSeek-V3-0324,non-reasoning,default,no reasoning evidence
+DeepSeek-V3-Base,non-reasoning,default,no reasoning evidence
+DeepSeek-V3.1,undetermined,default,bare run of a hybrid release
+DeepSeek-V3.1-Terminus,reasoning,default,pattern 'DeepSeek-V3.1'
+DeepSeek-V3.1_thinking,reasoning,on,run mode on
+DeepSeek-V3.2-Exp,undetermined,default,bare run of a hybrid release
+DeepSeek-V3.2-Exp_thinking,reasoning,on,run mode on
+DeepSeek-V3.2-Speciale,reasoning,default,pattern 'DeepSeek-V3.2'
+Eurus-2-7B-PRIME,non-reasoning,default,no reasoning evidence
+GLM-4.5-Air,reasoning,default,pattern 'GLM-4.5'
+GLaM (MoE),non-reasoning,default,no reasoning evidence
+Gopher (280B),non-reasoning,default,no reasoning evidence
+Hermes-2-Theta-Llama-3-70B,non-reasoning,default,no reasoning evidence
+INTELLECT-1-Instruct,non-reasoning,default,no reasoning evidence
+Inflection-1,non-reasoning,default,no reasoning evidence
+Inkling,undetermined,default,bare run of a hybrid release
+Inkling_high,reasoning,on,run mode on
+Inkling_thinking,reasoning,on,run mode on
+Inkling_xhigh,reasoning,on,run mode on
+Kimi-Audio-7B-Instruct,non-reasoning,default,no reasoning evidence
+Kimi-K2-Instruct,non-reasoning,default,no reasoning evidence
+Kimi-K2-Instruct-0905,non-reasoning,default,no reasoning evidence
+LFM2-Audio-1.5B,non-reasoning,default,no reasoning evidence
+LLaMA-13B,non-reasoning,default,no reasoning evidence
+LLaMA-33B,non-reasoning,default,no reasoning evidence
+LLaMA-65B,non-reasoning,default,no reasoning evidence
+LLaMA-7B,non-reasoning,default,no reasoning evidence
+Llama-2-13b,non-reasoning,default,no reasoning evidence
+Llama-2-13b-chat,non-reasoning,default,no reasoning evidence
+Llama-2-34b,non-reasoning,default,no reasoning evidence
+Llama-2-70b-chat,non-reasoning,default,no reasoning evidence
+Llama-2-70b-hf,non-reasoning,default,no reasoning evidence
+Llama-2-7b,non-reasoning,default,no reasoning evidence
+Llama-3.1-405B,non-reasoning,default,no reasoning evidence
+Llama-3.1-405B-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.1-405B-Instruct_bio-llama,non-reasoning,default,no reasoning evidence
+Llama-3.1-405B-Instruct_hermes-3,non-reasoning,default,no reasoning evidence
+Llama-3.1-405B-Instruct_unsafety-llama,non-reasoning,default,no reasoning evidence
+Llama-3.1-70B-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.1-8B-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.1-Tulu-3-70B-DPO,non-reasoning,default,no reasoning evidence
+Llama-3.2-11B-Vision-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.2-1B-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.2-3B-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.2-90B-Vision-Instruct,non-reasoning,default,no reasoning evidence
+Llama-3.3-70B-Instruct,non-reasoning,default,no reasoning evidence
+Llama-4-Maverick-17B-128E-Instruct,non-reasoning,default,no reasoning evidence
+Llama-4-Scout-17B-16E-Instruct,non-reasoning,default,no reasoning evidence
+Manus 1.0,non-reasoning,default,no reasoning evidence
+Manus 1.5,non-reasoning,default,no reasoning evidence
+Manus 1.6_max,reasoning,on,run mode on
+Megatron-Turing NLG 530B,non-reasoning,default,no reasoning evidence
+Meta-Llama-3-70B,non-reasoning,default,no reasoning evidence
+Meta-Llama-3-70B-Instruct,non-reasoning,default,no reasoning evidence
+Meta-Llama-3-8B,non-reasoning,default,no reasoning evidence
+Meta-Llama-3-8B-Instruct,non-reasoning,default,no reasoning evidence
+MiMo-Audio-7B-Instruct,undetermined,default,bare run of a hybrid release
+MiMo-Audio-7B-Instruct_thinking,reasoning,on,run mode on
+MiniMax-M1-80k,reasoning,default,pattern 'MiniMax-M1'
+MiniMax-M2,reasoning,default,pattern 'MiniMax-M2'
+MiniMax-M2.1,reasoning,default,pattern 'MiniMax-M2'
+MiniMax-M2.5,reasoning,default,pattern 'MiniMax-M2'
+MiniMax-M2.7,reasoning,default,pattern 'MiniMax-M2'
+MiniMax-M3,undetermined,default,bare run of a hybrid release
+MiniMax-M3_none,non-reasoning,off,non-reasoning pattern
+MiniMax-M3_xhigh,reasoning,on,run mode on
+Mistral-7B-Instruct-v0.1,non-reasoning,default,no reasoning evidence
+Mistral-7B-Instruct-v0.2,non-reasoning,default,no reasoning evidence
+Mistral-7B-Instruct-v0.3,non-reasoning,default,no reasoning evidence
+Mistral-7B-v0.1,non-reasoning,default,no reasoning evidence
+Mistral-Nemo-Base-2407,non-reasoning,default,no reasoning evidence
+Mistral-Nemo-Instruct-2407,non-reasoning,default,no reasoning evidence
+Mixtral-8x22B-Instruct-v0.1,non-reasoning,default,no reasoning evidence
+Mixtral-8x22B-v0.1,non-reasoning,default,no reasoning evidence
+Mixtral-8x7B-Instruct-v0.1,non-reasoning,default,no reasoning evidence
+Mixtral-8x7B-v0.1,non-reasoning,default,no reasoning evidence
+Nemotron-4 15B,non-reasoning,default,no reasoning evidence
+PaLM 2-L,non-reasoning,default,no reasoning evidence
+PaLM 2-M,non-reasoning,default,no reasoning evidence
+PaLM 2-S,non-reasoning,default,no reasoning evidence
+PaLM 540B,non-reasoning,default,no reasoning evidence
+PaLM 62B,non-reasoning,default,no reasoning evidence
+Phi-3-medium-128k-instruct,non-reasoning,default,no reasoning evidence
+Phi-3-mini-4k-instruct,non-reasoning,default,no reasoning evidence
+Phi-3-small-8k-instruct,non-reasoning,default,no reasoning evidence
+Phi-3.5-MoE-instruct,non-reasoning,default,no reasoning evidence
+Phi-3.5-mini-instruct,non-reasoning,default,no reasoning evidence
+Phi-3.5-vision-instruct,non-reasoning,default,no reasoning evidence
+Phi-4-mini-instruct,non-reasoning,default,no reasoning evidence
+Phi-4-multimodal-instruct,non-reasoning,default,no reasoning evidence
+Pixtral-12B-2409,non-reasoning,default,no reasoning evidence
+QwQ-32B,reasoning,default,a run of the release thinks
+QwQ-32B_16K,reasoning,on,run mode on
+Qwen-14B,non-reasoning,default,no reasoning evidence
+Qwen-14B-Chat,non-reasoning,default,no reasoning evidence
+Qwen-1_8B,non-reasoning,default,no reasoning evidence
+Qwen-7B,non-reasoning,default,no reasoning evidence
+Qwen1.5-7B,non-reasoning,default,no reasoning evidence
+Qwen2-VL-72B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen2-VL-7B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen2.5-72B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-0.5B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-1.5B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-14B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-14B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-32B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-32B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-3B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-3B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-7B,non-reasoning,default,no reasoning evidence
+Qwen2.5-Coder-7B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen2.5-Omni-7B,non-reasoning,default,no reasoning evidence
+Qwen2.5-VL-72B-Instruct,non-reasoning,default,no reasoning evidence
+Qwen3-235B-A22B-Instruct-2507,non-reasoning,off,non-reasoning pattern
+Qwen3-235B-A22B-Thinking-2507,reasoning,default,pattern 'Qwen3'
+Qwen3-30B-A3B,undetermined,default,bare run of a hybrid release
+Qwen3-30B-A3B_none,non-reasoning,off,non-reasoning pattern
+Qwen3-32B,undetermined,default,bare run of a hybrid release
+Qwen3-32B_none,non-reasoning,off,non-reasoning pattern
+Qwen3-Coder-480B-A35B-Instruct,non-reasoning,off,non-reasoning pattern
+Qwen3-Next-80B-A3B-Instruct,non-reasoning,off,non-reasoning pattern
+Qwen3-Omni-30B-A3B-Instruct,non-reasoning,off,non-reasoning pattern
+RedPajama-INCITE-7B-Base,non-reasoning,default,no reasoning evidence
+Ring-2.6-1T,reasoning,default,pattern 'Ring-2'
+StableBeluga2,non-reasoning,default,no reasoning evidence
+Voxtral-Small-24B-2507,non-reasoning,default,no reasoning evidence
+WizardLM-2-8x22B,non-reasoning,default,no reasoning evidence
+Yi-1.5-34B-Chat,non-reasoning,default,no reasoning evidence
+Yi-34B,non-reasoning,default,no reasoning evidence
+Yi-34B-Chat,non-reasoning,default,no reasoning evidence
+Yi-6B,non-reasoning,default,no reasoning evidence
+Yi-6B-Chat,non-reasoning,default,no reasoning evidence
+Yi-9B,non-reasoning,default,no reasoning evidence
+Yi-large,non-reasoning,default,no reasoning evidence
+ada,non-reasoning,default,no reasoning evidence
+amazon.nova-lite-v1:0,non-reasoning,default,no reasoning evidence
+amazon.nova-micro-v1:0,non-reasoning,default,no reasoning evidence
+amazon.nova-pro-v1:0,non-reasoning,default,no reasoning evidence
+babbage,non-reasoning,default,no reasoning evidence
+bloom,non-reasoning,default,no reasoning evidence
+c4ai-command-a-03-2025,non-reasoning,default,no reasoning evidence
+c4ai-command-r-08-2024,non-reasoning,default,no reasoning evidence
+c4ai-command-r-plus-08-2024,non-reasoning,default,no reasoning evidence
+chatglm2-6b,non-reasoning,default,no reasoning evidence
+claude-1.3,non-reasoning,default,no reasoning evidence
+claude-2.0,non-reasoning,default,no reasoning evidence
+claude-2.1,non-reasoning,default,no reasoning evidence
+claude-3-5-haiku-20241022,non-reasoning,default,no reasoning evidence
+claude-3-5-sonnet-20240620,non-reasoning,default,no reasoning evidence
+claude-3-5-sonnet-20241022,non-reasoning,default,no reasoning evidence
+claude-3-7-sonnet-20250219,undetermined,default,bare run of a hybrid release
+claude-3-7-sonnet-20250219_12K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_15K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_16K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_1K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_2K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_32K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_64K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_8K,reasoning,on,run mode on
+claude-3-7-sonnet-20250219_none,non-reasoning,off,non-reasoning pattern
+claude-3-7-sonnet-20250219_thinking,reasoning,on,run mode on
+claude-3-haiku-20240307,non-reasoning,default,no reasoning evidence
+claude-3-opus-20240229,non-reasoning,default,no reasoning evidence
+claude-3-sonnet-20240229,non-reasoning,default,no reasoning evidence
+claude-fable-5,undetermined,default,bare run of a hybrid release
+claude-fable-5-1,undetermined,default,bare run of a hybrid release
+claude-fable-5-1_high,reasoning,on,run mode on
+claude-fable-5-1_low,reasoning,on,run mode on
+claude-fable-5-1_max,reasoning,on,run mode on
+claude-fable-5-1_medium,reasoning,on,run mode on
+claude-fable-5-1_thinking,reasoning,on,run mode on
+claude-fable-5-1_xhigh,reasoning,on,run mode on
+claude-fable-5_high,reasoning,on,run mode on
+claude-fable-5_low,reasoning,on,run mode on
+claude-fable-5_max,reasoning,on,run mode on
+claude-fable-5_medium,reasoning,on,run mode on
+claude-fable-5_none,non-reasoning,off,non-reasoning pattern
+claude-fable-5_thinking,reasoning,on,run mode on
+claude-fable-5_xhigh,reasoning,on,run mode on
+claude-haiku-4-5-20251001,undetermined,default,bare run of a hybrid release
+claude-haiku-4-5-20251001_16K,reasoning,on,run mode on
+claude-haiku-4-5-20251001_1K,reasoning,on,run mode on
+claude-haiku-4-5-20251001_32K,reasoning,on,run mode on
+claude-haiku-4-5-20251001_8K,reasoning,on,run mode on
+claude-haiku-4-5-20251001_low,reasoning,on,run mode on
+claude-haiku-4-5-20251001_none,non-reasoning,off,non-reasoning pattern
+claude-haiku-4-5-20251001_thinking,reasoning,on,run mode on
+claude-haiku-4-5-20251001_xhigh,reasoning,on,run mode on
+claude-instant-1.1,non-reasoning,off,non-reasoning pattern
+claude-instant-1.2,non-reasoning,off,non-reasoning pattern
+claude-mythos-5,reasoning,default,pattern 'claude-mythos'
+claude-mythos-preview,reasoning,default,pattern 'claude-mythos'
+claude-mythos-preview-early,reasoning,default,pattern 'claude-mythos'
+claude-opus-4-1-20250805,undetermined,default,bare run of a hybrid release
+claude-opus-4-1-20250805_16K,reasoning,on,run mode on
+claude-opus-4-1-20250805_24K,reasoning,on,run mode on
+claude-opus-4-1-20250805_27K,reasoning,on,run mode on
+claude-opus-4-1-20250805_32K,reasoning,on,run mode on
+claude-opus-4-1-20250805_none,non-reasoning,off,non-reasoning pattern
+claude-opus-4-1-20250805_thinking,reasoning,on,run mode on
+claude-opus-4-20250514,undetermined,default,bare run of a hybrid release
+claude-opus-4-20250514_12K,reasoning,on,run mode on
+claude-opus-4-20250514_16K,reasoning,on,run mode on
+claude-opus-4-20250514_1K,reasoning,on,run mode on
+claude-opus-4-20250514_27K,reasoning,on,run mode on
+claude-opus-4-20250514_2K,reasoning,on,run mode on
+claude-opus-4-20250514_32K,reasoning,on,run mode on
+claude-opus-4-20250514_8K,reasoning,on,run mode on
+claude-opus-4-20250514_none,non-reasoning,off,non-reasoning pattern
+claude-opus-4-20250514_thinking,reasoning,on,run mode on
+claude-opus-4-5-20251101,undetermined,default,bare run of a hybrid release
+claude-opus-4-5-20251101_128K,reasoning,on,run mode on
+claude-opus-4-5-20251101_16K,reasoning,on,run mode on
+claude-opus-4-5-20251101_32K,reasoning,on,run mode on
+claude-opus-4-5-20251101_48K,reasoning,on,run mode on
+claude-opus-4-5-20251101_64K,reasoning,on,run mode on
+claude-opus-4-5-20251101_8K,reasoning,on,run mode on
+claude-opus-4-5-20251101_high,reasoning,on,run mode on
+claude-opus-4-5-20251101_low,reasoning,on,run mode on
+claude-opus-4-5-20251101_none,non-reasoning,off,non-reasoning pattern
+claude-opus-4-5-20251101_thinking,reasoning,on,run mode on
+claude-opus-4-6,undetermined,default,bare run of a hybrid release
+claude-opus-4-6_120K,reasoning,on,run mode on
+claude-opus-4-6_32K,reasoning,on,run mode on
+claude-opus-4-6_64K,reasoning,on,run mode on
+claude-opus-4-6_high,reasoning,on,run mode on
+claude-opus-4-6_low,reasoning,on,run mode on
+claude-opus-4-6_max,reasoning,on,run mode on
+claude-opus-4-6_medium,reasoning,on,run mode on
+claude-opus-4-6_none,non-reasoning,off,non-reasoning pattern
+claude-opus-4-6_thinking,reasoning,on,run mode on
+claude-opus-4-7,undetermined,default,bare run of a hybrid release
+claude-opus-4-7_high,reasoning,on,run mode on
+claude-opus-4-7_low,reasoning,on,run mode on
+claude-opus-4-7_max,reasoning,on,run mode on
+claude-opus-4-7_medium,reasoning,on,run mode on
+claude-opus-4-7_none,non-reasoning,off,non-reasoning pattern
+claude-opus-4-7_thinking,reasoning,on,run mode on
+claude-opus-4-7_xhigh,reasoning,on,run mode on
+claude-opus-4-8,undetermined,default,bare run of a hybrid release
+claude-opus-4-8_high,reasoning,on,run mode on
+claude-opus-4-8_low,reasoning,on,run mode on
+claude-opus-4-8_max,reasoning,on,run mode on
+claude-opus-4-8_medium,reasoning,on,run mode on
+claude-opus-4-8_none,non-reasoning,off,non-reasoning pattern
+claude-opus-4-8_thinking,reasoning,on,run mode on
+claude-opus-4-8_xhigh,reasoning,on,run mode on
+claude-opus-5,undetermined,default,bare run of a hybrid release
+claude-opus-5-5,undetermined,default,bare run of a hybrid release
+claude-opus-5-5_max,reasoning,on,run mode on
+claude-opus-5-5_xhigh,reasoning,on,run mode on
+claude-opus-5_high,reasoning,on,run mode on
+claude-opus-5_low,reasoning,on,run mode on
+claude-opus-5_max,reasoning,on,run mode on
+claude-opus-5_medium,reasoning,on,run mode on
+claude-opus-5_none,non-reasoning,off,non-reasoning pattern
+claude-opus-5_thinking,reasoning,on,run mode on
+claude-opus-5_xhigh,reasoning,on,run mode on
+claude-sonnet-4-20250514,undetermined,default,bare run of a hybrid release
+claude-sonnet-4-20250514_12K,reasoning,on,run mode on
+claude-sonnet-4-20250514_16K,reasoning,on,run mode on
+claude-sonnet-4-20250514_1K,reasoning,on,run mode on
+claude-sonnet-4-20250514_2K,reasoning,on,run mode on
+claude-sonnet-4-20250514_32K,reasoning,on,run mode on
+claude-sonnet-4-20250514_59K,reasoning,on,run mode on
+claude-sonnet-4-20250514_8K,reasoning,on,run mode on
+claude-sonnet-4-20250514_none,non-reasoning,off,non-reasoning pattern
+claude-sonnet-4-20250514_thinking,reasoning,on,run mode on
+claude-sonnet-4-5-20250929,undetermined,default,bare run of a hybrid release
+claude-sonnet-4-5-20250929_12K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_16K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_1K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_2K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_32K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_48K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_59K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_8K,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_low,reasoning,on,run mode on
+claude-sonnet-4-5-20250929_none,non-reasoning,off,non-reasoning pattern
+claude-sonnet-4-5-20250929_thinking,reasoning,on,run mode on
+claude-sonnet-4-6,undetermined,default,bare run of a hybrid release
+claude-sonnet-4-6_32K,reasoning,on,run mode on
+claude-sonnet-4-6_high,reasoning,on,run mode on
+claude-sonnet-4-6_low,reasoning,on,run mode on
+claude-sonnet-4-6_max,reasoning,on,run mode on
+claude-sonnet-4-6_medium,reasoning,on,run mode on
+claude-sonnet-4-6_none,non-reasoning,off,non-reasoning pattern
+claude-sonnet-4-6_thinking,reasoning,on,run mode on
+claude-sonnet-5-5_max,reasoning,on,run mode on
+claude-sonnet-5_high,reasoning,on,run mode on
+claude-sonnet-5_low,reasoning,on,run mode on
+claude-sonnet-5_max,reasoning,on,run mode on
+claude-sonnet-5_medium,reasoning,on,run mode on
+claude-sonnet-5_none,non-reasoning,off,non-reasoning pattern
+claude-sonnet-5_thinking,reasoning,on,run mode on
+claude-sonnet-5_xhigh,reasoning,on,run mode on
+code-davinci-002,non-reasoning,default,no reasoning evidence
+codestral-2501,non-reasoning,default,no reasoning evidence
+codex-mini-2025-05-16,reasoning,default,pattern 'codex-mini'
+cogito-671b-v2.1,reasoning,default,pattern 'cogito-671b-v2'
+command-a-plus-05-2026,reasoning,default,pattern 'command-a-plus'
+computer-use-preview-2025-03-11,non-reasoning,default,no reasoning evidence
+curie,non-reasoning,default,no reasoning evidence
+davinci,non-reasoning,default,no reasoning evidence
+dbrx-instruct,non-reasoning,default,no reasoning evidence
+deepseek-chat,non-reasoning,default,no reasoning evidence
+deepseek-coder-1.3b-base,non-reasoning,default,no reasoning evidence
+deepseek-coder-33b-base,non-reasoning,default,no reasoning evidence
+deepseek-coder-6.7b-base,non-reasoning,default,no reasoning evidence
+deepseek-llm-67b-chat,non-reasoning,default,no reasoning evidence
+deepseek-r1-0528-qwen3-8b,reasoning,default,pattern 'deepseek-r1'
+deepseek-v3.2,undetermined,default,bare run of a hybrid release
+deepseek-v3.2_thinking,reasoning,on,run mode on
+deepseek-v4-flash,undetermined,default,bare run of a hybrid release
+deepseek-v4-flash-0731,undetermined,default,bare run of a hybrid release
+deepseek-v4-flash-0731_high,reasoning,on,run mode on
+deepseek-v4-flash-0731_low,reasoning,on,run mode on
+deepseek-v4-flash-0731_max,reasoning,on,run mode on
+deepseek-v4-flash-0731_none,non-reasoning,off,non-reasoning pattern
+deepseek-v4-flash_high,reasoning,on,run mode on
+deepseek-v4-flash_max,reasoning,on,run mode on
+deepseek-v4-flash_none,non-reasoning,off,non-reasoning pattern
+deepseek-v4-pro,undetermined,default,bare run of a hybrid release
+deepseek-v4-pro-0813,undetermined,default,bare run of a hybrid release
+deepseek-v4-pro-0813_high,reasoning,on,run mode on
+deepseek-v4-pro-0813_low,reasoning,on,run mode on
+deepseek-v4-pro-0813_max,reasoning,on,run mode on
+deepseek-v4-pro-0813_none,non-reasoning,off,non-reasoning pattern
+deepseek-v4-pro_high,reasoning,on,run mode on
+deepseek-v4-pro_max,reasoning,on,run mode on
+deepseek-v4-pro_none,non-reasoning,off,non-reasoning pattern
+deepseek-v4-pro_xhigh,reasoning,on,run mode on
+deepseek-v4.1-flash,reasoning,default,a run of the release thinks
+deepseek-v4.1-flash_high,reasoning,on,run mode on
+deepseek-v4.1-flash_max,reasoning,on,run mode on
+devstral-small-2512,non-reasoning,default,no reasoning evidence
+dolly-v2-12b,non-reasoning,default,no reasoning evidence
+falcon-11b,non-reasoning,default,no reasoning evidence
+falcon-180B,non-reasoning,default,no reasoning evidence
+falcon-40b,non-reasoning,default,no reasoning evidence
+falcon-40b-instruct,non-reasoning,default,no reasoning evidence
+falcon-7b,non-reasoning,default,no reasoning evidence
+gdm-ai-co-mathematician,non-reasoning,default,no reasoning evidence
+gemini-1.0-pro-001,non-reasoning,default,no reasoning evidence
+gemini-1.5-flash-001,non-reasoning,default,no reasoning evidence
+gemini-1.5-flash-002,non-reasoning,default,no reasoning evidence
+gemini-1.5-flash-0514,non-reasoning,default,no reasoning evidence
+gemini-1.5-flash-8b-001,non-reasoning,default,no reasoning evidence
+gemini-1.5-pro-001,non-reasoning,default,no reasoning evidence
+gemini-1.5-pro-001-feb24,non-reasoning,default,no reasoning evidence
+gemini-1.5-pro-002,non-reasoning,default,no reasoning evidence
+gemini-2.0-flash-001,non-reasoning,default,no reasoning evidence
+gemini-2.0-flash-exp,non-reasoning,default,no reasoning evidence
+gemini-2.0-flash-lite,non-reasoning,default,no reasoning evidence
+gemini-2.0-flash-thinking-exp-01-21,reasoning,default,pattern '-thinking-'
+gemini-2.0-flash-thinking-exp-1219,reasoning,default,pattern '-thinking-'
+gemini-2.0-pro-exp-02-05,non-reasoning,default,no reasoning evidence
+gemini-2.5-flash,reasoning,default,pattern 'gemini-2.5-'
+gemini-2.5-flash-2025-04,reasoning,default,pattern 'gemini-2.5-'
+gemini-2.5-flash-2025-05,reasoning,default,pattern 'gemini-2.5-'
+gemini-2.5-flash-lite-preview-06-17_16K,reasoning,on,run mode on
+gemini-2.5-flash-lite-preview-06-17_thinking,reasoning,on,run mode on
+gemini-2.5-flash-lite-preview-09-2025,non-reasoning,default,no reasoning evidence
+gemini-2.5-flash-native-audio-preview-12-2025_none,non-reasoning,off,non-reasoning pattern
+gemini-2.5-flash-native-audio-preview-12-2025_thinking,reasoning,on,run mode on
+gemini-2.5-flash-preview-04-17,reasoning,default,a run of the release thinks
+gemini-2.5-flash-preview-04-17_16K,reasoning,on,run mode on
+gemini-2.5-flash-preview-04-17_24K,reasoning,on,run mode on
+gemini-2.5-flash-preview-05-20,reasoning,default,a run of the release thinks
+gemini-2.5-flash-preview-05-20_16K,reasoning,on,run mode on
+gemini-2.5-flash-preview-05-20_1K,reasoning,on,run mode on
+gemini-2.5-flash-preview-05-20_24K,reasoning,on,run mode on
+gemini-2.5-flash-preview-05-20_8K,reasoning,on,run mode on
+gemini-2.5-flash-preview-09-2025,reasoning,default,a run of the release thinks
+gemini-2.5-flash-preview-09-2025_16k,reasoning,on,run mode on
+gemini-2.5-pro,reasoning,default,a run of the release thinks
+gemini-2.5-pro-exp-03-25,reasoning,default,pattern 'gemini-2.5-'
+gemini-2.5-pro-preview-05-06,reasoning,default,pattern 'gemini-2.5-'
+gemini-2.5-pro-preview-06-05,reasoning,default,a run of the release thinks
+gemini-2.5-pro-preview-06-05_1K,reasoning,on,run mode on
+gemini-2.5-pro-preview-06-05_32K,reasoning,on,run mode on
+gemini-2.5-pro_16K,reasoning,on,run mode on
+gemini-2.5-pro_32K,reasoning,on,run mode on
+gemini-2.5-pro_8K,reasoning,on,run mode on
+gemini-3-deep-think-preview,reasoning,default,pattern 'gemini-3'
+gemini-3-flash-preview,undetermined,default,bare run of a hybrid release
+gemini-3-flash-preview_high,reasoning,on,run mode on
+gemini-3-flash-preview_low,reasoning,on,run mode on
+gemini-3-flash-preview_medium,reasoning,on,run mode on
+gemini-3-flash-preview_minimal,non-reasoning,off,run mode off
+gemini-3-pro-preview,reasoning,default,a run of the release thinks
+gemini-3-pro-preview_high,reasoning,on,run mode on
+gemini-3-pro-preview_low,reasoning,on,run mode on
+gemini-3.1-flash-lite,undetermined,default,bare run of a hybrid release
+gemini-3.1-flash-lite_high,reasoning,on,run mode on
+gemini-3.1-flash-lite_low,reasoning,on,run mode on
+gemini-3.1-flash-lite_minimal,non-reasoning,off,run mode off
+gemini-3.1-flash-live-preview,reasoning,default,pattern 'gemini-3'
+gemini-3.1-pro-preview,reasoning,default,a run of the release thinks
+gemini-3.1-pro-preview_high,reasoning,on,run mode on
+gemini-3.1-pro-preview_low,reasoning,on,run mode on
+gemini-3.1-pro-preview_medium,reasoning,on,run mode on
+gemini-3.5-flash,undetermined,default,bare run of a hybrid release
+gemini-3.5-flash-lite,undetermined,default,bare run of a hybrid release
+gemini-3.5-flash-lite_high,reasoning,on,run mode on
+gemini-3.5-flash-lite_low,reasoning,on,run mode on
+gemini-3.5-flash-lite_medium,reasoning,on,run mode on
+gemini-3.5-flash-lite_minimal,non-reasoning,off,run mode off
+gemini-3.5-flash_high,reasoning,on,run mode on
+gemini-3.5-flash_low,reasoning,on,run mode on
+gemini-3.5-flash_medium,reasoning,on,run mode on
+gemini-3.5-flash_minimal,non-reasoning,off,run mode off
+gemini-3.6-flash,undetermined,default,bare run of a hybrid release
+gemini-3.6-flash_high,reasoning,on,run mode on
+gemini-3.6-flash_low,reasoning,on,run mode on
+gemini-3.6-flash_medium,reasoning,on,run mode on
+gemini-3.6-flash_minimal,non-reasoning,off,run mode off
+gemini-3.7-flash,reasoning,default,a run of the release thinks
+gemini-3.7-flash_high,reasoning,on,run mode on
+gemini-3.7-flash_low,reasoning,on,run mode on
+gemini-3.7-flash_medium,reasoning,on,run mode on
+gemini-3.8-flash,reasoning,default,a run of the release thinks
+gemini-3.8-flash_high,reasoning,on,run mode on
+gemini-3.8-flash_low,reasoning,on,run mode on
+gemini-3.8-flash_medium,reasoning,on,run mode on
+gemini-exp-1206,non-reasoning,default,no reasoning evidence
+gemini-robotics-er-1.5-preview,reasoning,default,pattern 'gemini-robotics-er'
+gemini-robotics-er-1.6-preview,reasoning,default,pattern 'gemini-robotics-er'
+gemma-2-27b,non-reasoning,default,no reasoning evidence
+gemma-2-27b-it,non-reasoning,default,no reasoning evidence
+gemma-2-9b,non-reasoning,default,no reasoning evidence
+gemma-2-9b-it,non-reasoning,default,no reasoning evidence
+gemma-2b,non-reasoning,default,no reasoning evidence
+gemma-3-12b-it,non-reasoning,default,no reasoning evidence
+gemma-3-1b-it,non-reasoning,default,no reasoning evidence
+gemma-3-27b-it,non-reasoning,default,no reasoning evidence
+gemma-3-4b-it,non-reasoning,default,no reasoning evidence
+gemma-3n-E4B-it,non-reasoning,default,no reasoning evidence
+gemma-4-26b-a4b,undetermined,default,bare run of a hybrid release
+gemma-4-26b-a4b_minimal,non-reasoning,off,run mode off
+gemma-4-31b-it,undetermined,default,bare run of a hybrid release
+gemma-4-31b-it_minimal,non-reasoning,off,run mode off
+gemma-4-31b-it_none,non-reasoning,off,non-reasoning pattern
+gemma-7b,non-reasoning,default,no reasoning evidence
+glm-4.5,undetermined,default,bare run of a hybrid release
+glm-4.5_thinking,reasoning,on,run mode on
+glm-4.6,reasoning,default,pattern 'glm-4.6'
+glm-4.7,reasoning,default,a run of the release thinks
+glm-4.7-flash,undetermined,default,bare run of a hybrid release
+glm-4.7-flash_none,non-reasoning,off,non-reasoning pattern
+glm-4.7_high,reasoning,on,run mode on
+glm-5,reasoning,default,pattern 'glm-5'
+glm-5.1,undetermined,default,bare run of a hybrid release
+glm-5.1_none,non-reasoning,off,non-reasoning pattern
+glm-5.2,undetermined,default,bare run of a hybrid release
+glm-5.2_high,reasoning,on,run mode on
+glm-5.2_low,reasoning,on,run mode on
+glm-5.2_max,reasoning,on,run mode on
+glm-5.2_medium,reasoning,on,run mode on
+glm-5.2_minimal,non-reasoning,off,run mode off
+glm-5.2_none,non-reasoning,off,non-reasoning pattern
+glm-5.2_xhigh,reasoning,on,run mode on
+glm-5.3,reasoning,default,a run of the release thinks
+glm-5.3-flash,reasoning,default,a run of the release thinks
+glm-5.3-flash_max,reasoning,on,run mode on
+glm-5.3_max,reasoning,on,run mode on
+gpt-3.5-turbo-0125,non-reasoning,default,no reasoning evidence
+gpt-3.5-turbo-0613,non-reasoning,default,no reasoning evidence
+gpt-3.5-turbo-1106,non-reasoning,default,no reasoning evidence
+gpt-3.5-turbo-instruct,non-reasoning,default,no reasoning evidence
+gpt-4-0125-preview,non-reasoning,default,no reasoning evidence
+gpt-4-0314,non-reasoning,default,no reasoning evidence
+gpt-4-0613,non-reasoning,default,no reasoning evidence
+gpt-4-1106-preview,non-reasoning,default,no reasoning evidence
+gpt-4-32k-0314,non-reasoning,default,no reasoning evidence
+gpt-4-turbo-2024-04-09,non-reasoning,default,no reasoning evidence
+gpt-4.1-2025-04-14,non-reasoning,default,no reasoning evidence
+gpt-4.1-mini-2025-04-14,non-reasoning,default,no reasoning evidence
+gpt-4.1-nano-2025-04-14,non-reasoning,default,no reasoning evidence
+gpt-4.5-preview-2025-02-27,non-reasoning,default,no reasoning evidence
+gpt-4o-2024-05-13,non-reasoning,default,no reasoning evidence
+gpt-4o-2024-08-06,non-reasoning,default,no reasoning evidence
+gpt-4o-2024-11-20,non-reasoning,default,no reasoning evidence
+gpt-4o-2025-01-29,non-reasoning,default,no reasoning evidence
+gpt-4o-2025-03-27,non-reasoning,default,no reasoning evidence
+gpt-4o-audio-preview-2025-06-03,non-reasoning,default,no reasoning evidence
+gpt-4o-mini-2024-07-18,non-reasoning,default,no reasoning evidence
+gpt-4o-mini-audio-preview-2024-12-17,non-reasoning,default,no reasoning evidence
+gpt-5-2025-08-07,undetermined,default,bare run of a hybrid release
+gpt-5-2025-08-07_chat,non-reasoning,off,non-reasoning pattern
+gpt-5-2025-08-07_high,reasoning,on,run mode on
+gpt-5-2025-08-07_low,reasoning,on,run mode on
+gpt-5-2025-08-07_medium,reasoning,on,run mode on
+gpt-5-2025-08-07_minimal,non-reasoning,off,run mode off
+gpt-5-2025-08-07_thinking,reasoning,on,run mode on
+gpt-5-codex,reasoning,default,a run of the release thinks
+gpt-5-codex_high,reasoning,on,run mode on
+gpt-5-mini-2025-08-07,undetermined,default,bare run of a hybrid release
+gpt-5-mini-2025-08-07_high,reasoning,on,run mode on
+gpt-5-mini-2025-08-07_low,reasoning,on,run mode on
+gpt-5-mini-2025-08-07_medium,reasoning,on,run mode on
+gpt-5-mini-2025-08-07_minimal,non-reasoning,off,run mode off
+gpt-5-mini-2025-08-07_thinking,reasoning,on,run mode on
+gpt-5-nano-2025-08-07,undetermined,default,bare run of a hybrid release
+gpt-5-nano-2025-08-07_high,reasoning,on,run mode on
+gpt-5-nano-2025-08-07_low,reasoning,on,run mode on
+gpt-5-nano-2025-08-07_medium,reasoning,on,run mode on
+gpt-5-nano-2025-08-07_minimal,non-reasoning,off,run mode off
+gpt-5-pro-2025-10-06,reasoning,default,a run of the release thinks
+gpt-5-pro-2025-10-06_high,reasoning,on,run mode on
+gpt-5.1-2025-11-13,undetermined,default,bare run of a hybrid release
+gpt-5.1-2025-11-13_high,reasoning,on,run mode on
+gpt-5.1-2025-11-13_low,reasoning,on,run mode on
+gpt-5.1-2025-11-13_medium,reasoning,on,run mode on
+gpt-5.1-2025-11-13_none,non-reasoning,off,non-reasoning pattern
+gpt-5.1-2025-11-13_thinking,reasoning,on,run mode on
+gpt-5.1-codex,reasoning,default,pattern 'gpt-5'
+gpt-5.1-codex-max,reasoning,default,pattern 'gpt-5'
+gpt-5.1-codex-mini,reasoning,default,pattern 'gpt-5'
+gpt-5.2-2025-12-11,undetermined,default,bare run of a hybrid release
+gpt-5.2-2025-12-11_high,reasoning,on,run mode on
+gpt-5.2-2025-12-11_low,reasoning,on,run mode on
+gpt-5.2-2025-12-11_medium,reasoning,on,run mode on
+gpt-5.2-2025-12-11_none,non-reasoning,off,non-reasoning pattern
+gpt-5.2-2025-12-11_xhigh,reasoning,on,run mode on
+gpt-5.2-codex,reasoning,default,pattern 'gpt-5'
+gpt-5.2-pro-2025-12-11,reasoning,default,a run of the release thinks
+gpt-5.2-pro-2025-12-11_high,reasoning,on,run mode on
+gpt-5.2-pro-2025-12-11_medium,reasoning,on,run mode on
+gpt-5.2-pro-2025-12-11_xhigh,reasoning,on,run mode on
+gpt-5.3-codex,reasoning,default,a run of the release thinks
+gpt-5.3-codex_xhigh,reasoning,on,run mode on
+gpt-5.4-2026-03-05,undetermined,default,bare run of a hybrid release
+gpt-5.4-2026-03-05_cyber,reasoning,default,a run of the release thinks
+gpt-5.4-2026-03-05_high,reasoning,on,run mode on
+gpt-5.4-2026-03-05_low,reasoning,on,run mode on
+gpt-5.4-2026-03-05_medium,reasoning,on,run mode on
+gpt-5.4-2026-03-05_none,non-reasoning,off,non-reasoning pattern
+gpt-5.4-2026-03-05_xhigh,reasoning,on,run mode on
+gpt-5.4-mini-2026-03-17,undetermined,default,bare run of a hybrid release
+gpt-5.4-mini-2026-03-17_high,reasoning,on,run mode on
+gpt-5.4-mini-2026-03-17_low,reasoning,on,run mode on
+gpt-5.4-mini-2026-03-17_medium,reasoning,on,run mode on
+gpt-5.4-mini-2026-03-17_none,non-reasoning,off,non-reasoning pattern
+gpt-5.4-mini-2026-03-17_xhigh,reasoning,on,run mode on
+gpt-5.4-nano-2026-03-17_high,reasoning,on,run mode on
+gpt-5.4-nano-2026-03-17_low,reasoning,on,run mode on
+gpt-5.4-nano-2026-03-17_medium,reasoning,on,run mode on
+gpt-5.4-nano-2026-03-17_none,non-reasoning,off,non-reasoning pattern
+gpt-5.4-nano-2026-03-17_xhigh,reasoning,on,run mode on
+gpt-5.4-pro-2026-03-05,undetermined,default,bare run of a hybrid release
+gpt-5.4-pro-2026-03-05_none,non-reasoning,off,non-reasoning pattern
+gpt-5.4-pro-2026-03-05_xhigh,reasoning,on,run mode on
+gpt-5.5,undetermined,default,bare run of a hybrid release
+gpt-5.5-instant,non-reasoning,off,non-reasoning pattern
+gpt-5.5-pre-release_xhigh,reasoning,on,run mode on
+gpt-5.5-pro,reasoning,default,a run of the release thinks
+gpt-5.5-pro-pre-release_xhigh,reasoning,on,run mode on
+gpt-5.5-pro_high,reasoning,on,run mode on
+gpt-5.5-pro_xhigh,reasoning,on,run mode on
+gpt-5.5_cyber,reasoning,default,a run of the release thinks
+gpt-5.5_high,reasoning,on,run mode on
+gpt-5.5_low,reasoning,on,run mode on
+gpt-5.5_medium,reasoning,on,run mode on
+gpt-5.5_none,non-reasoning,off,non-reasoning pattern
+gpt-5.5_xhigh,reasoning,on,run mode on
+gpt-5.6-luna,undetermined,default,bare run of a hybrid release
+gpt-5.6-luna_high,reasoning,on,run mode on
+gpt-5.6-luna_low,reasoning,on,run mode on
+gpt-5.6-luna_max,reasoning,on,run mode on
+gpt-5.6-luna_medium,reasoning,on,run mode on
+gpt-5.6-luna_none,non-reasoning,off,non-reasoning pattern
+gpt-5.6-luna_xhigh,reasoning,on,run mode on
+gpt-5.6-sol,undetermined,default,bare run of a hybrid release
+gpt-5.6-sol_high,reasoning,on,run mode on
+gpt-5.6-sol_low,reasoning,on,run mode on
+gpt-5.6-sol_max,reasoning,on,run mode on
+gpt-5.6-sol_medium,reasoning,on,run mode on
+gpt-5.6-sol_none,non-reasoning,off,non-reasoning pattern
+gpt-5.6-sol_promax,reasoning,on,run mode on
+gpt-5.6-sol_prounknown,reasoning,default,a run of the release thinks
+gpt-5.6-sol_proxhigh,reasoning,on,run mode on
+gpt-5.6-sol_xhigh,reasoning,on,run mode on
+gpt-5.6-terra,undetermined,default,bare run of a hybrid release
+gpt-5.6-terra_high,reasoning,on,run mode on
+gpt-5.6-terra_low,reasoning,on,run mode on
+gpt-5.6-terra_max,reasoning,on,run mode on
+gpt-5.6-terra_medium,reasoning,on,run mode on
+gpt-5.6-terra_none,non-reasoning,off,non-reasoning pattern
+gpt-5.6-terra_xhigh,reasoning,on,run mode on
+gpt-6-astra,undetermined,default,bare run of a hybrid release
+gpt-6-astra_high,reasoning,on,run mode on
+gpt-6-astra_low,reasoning,on,run mode on
+gpt-6-astra_max,reasoning,on,run mode on
+gpt-6-astra_medium,reasoning,on,run mode on
+gpt-6-astra_none,non-reasoning,off,non-reasoning pattern
+gpt-6-astra_promax,reasoning,on,run mode on
+gpt-6-astra_xhigh,reasoning,on,run mode on
+gpt-6-luna_max,reasoning,on,run mode on
+gpt-6-sol,reasoning,default,a run of the release thinks
+gpt-6-sol_max,reasoning,on,run mode on
+gpt-j-6b,non-reasoning,default,no reasoning evidence
+gpt-neo-2.7B,non-reasoning,default,no reasoning evidence
+gpt-neox-20b,non-reasoning,default,no reasoning evidence
+gpt-oss-120b,reasoning,default,a run of the release thinks
+gpt-oss-120b_high,reasoning,on,run mode on
+gpt-oss-120b_low,reasoning,on,run mode on
+gpt-oss-120b_medium,reasoning,on,run mode on
+gpt-oss-20b,reasoning,default,a run of the release thinks
+gpt-oss-20b_high,reasoning,on,run mode on
+gpt-oss-20b_low,reasoning,on,run mode on
+gpt-oss-20b_medium,reasoning,on,run mode on
+gpt-realtime-1.5,non-reasoning,default,no reasoning evidence
+gpt-realtime-2,reasoning,default,a run of the release thinks
+gpt-realtime-2025-08-28,non-reasoning,default,no reasoning evidence
+gpt-realtime-2_xhigh,reasoning,on,run mode on
+gpt-realtime-mini-2025-12-15,non-reasoning,default,no reasoning evidence
+gpt2-xl,non-reasoning,default,no reasoning evidence
+granite-4.0-1b,non-reasoning,default,no reasoning evidence
+granite-4.0-350m,non-reasoning,default,no reasoning evidence
+granite-4.0-h-small,non-reasoning,default,no reasoning evidence
+granite-4.0-micro,non-reasoning,default,no reasoning evidence
+granite-4.1-30b,non-reasoning,default,no reasoning evidence
+grok-2,non-reasoning,default,no reasoning evidence
+grok-2-1212,non-reasoning,default,no reasoning evidence
+grok-3,non-reasoning,default,no reasoning evidence
+grok-3-mini,reasoning,default,a run of the release thinks
+grok-3-mini-beta_high,reasoning,on,run mode on
+grok-3-mini-beta_low,reasoning,on,run mode on
+grok-3-mini-beta_medium,reasoning,on,run mode on
+grok-3-mini_high,reasoning,on,run mode on
+grok-3-mini_low,reasoning,on,run mode on
+grok-4-0709,reasoning,default,a run of the release thinks
+grok-4-0709_high,reasoning,on,run mode on
+grok-4-1,reasoning,default,pattern 'grok-4'
+grok-4-1-fast-non-reasoning,non-reasoning,off,non-reasoning pattern
+grok-4-1-fast-reasoning,reasoning,default,pattern 'grok-4'
+grok-4-20,reasoning,default,a run of the release thinks
+grok-4-20_high,reasoning,on,run mode on
+grok-4-fast,undetermined,default,bare run of a hybrid release
+grok-4-fast_thinking,reasoning,on,run mode on
+grok-4.20-0309-reasoning,reasoning,default,pattern 'grok-4'
+grok-4.3,undetermined,default,bare run of a hybrid release
+grok-4.3_high,reasoning,on,run mode on
+grok-4.3_none,non-reasoning,off,non-reasoning pattern
+grok-4.5,reasoning,default,a run of the release thinks
+grok-4.5_high,reasoning,on,run mode on
+grok-4.5_low,reasoning,on,run mode on
+grok-4.5_medium,reasoning,on,run mode on
+grok-4.6,reasoning,default,a run of the release thinks
+grok-4.6_high,reasoning,on,run mode on
+grok-4.6_low,reasoning,on,run mode on
+grok-4.6_medium,reasoning,on,run mode on
+grok-4.6_xhigh,reasoning,on,run mode on
+grok-4.7,reasoning,default,a run of the release thinks
+grok-4.7_xhigh,reasoning,on,run mode on
+grok-build-0.1,reasoning,default,pattern 'grok-build'
+grok-code-fast-1,reasoning,default,pattern 'grok-code-fast'
+hy4-preview,reasoning,default,pattern 'hy4'
+inkling-small,undetermined,default,bare run of a hybrid release
+inkling-small_high,reasoning,on,run mode on
+inkling-small_low,reasoning,on,run mode on
+inkling-small_medium,reasoning,on,run mode on
+inkling-small_minimal,non-reasoning,off,run mode off
+inkling-small_none,non-reasoning,off,non-reasoning pattern
+inkling-small_xhigh,reasoning,on,run mode on
+internlm-20b,non-reasoning,default,no reasoning evidence
+internlm-7b,non-reasoning,default,no reasoning evidence
+internlm-chat-20b,non-reasoning,default,no reasoning evidence
+kimi-k2-thinking,reasoning,default,pattern '-thinking'
+kimi-k2.5,reasoning,default,a run of the release thinks
+kimi-k2.5_high,reasoning,on,run mode on
+kimi-k2.6,undetermined,default,bare run of a hybrid release
+kimi-k2.6_none,non-reasoning,off,non-reasoning pattern
+kimi-k2.7-code,reasoning,default,a run of the release thinks
+kimi-k2.7-code_xhigh,reasoning,on,run mode on
+kimi-k3,reasoning,default,a run of the release thinks
+kimi-k3_high,reasoning,on,run mode on
+kimi-k3_low,reasoning,on,run mode on
+kimi-k3_max,reasoning,on,run mode on
+laguna-m.1,reasoning,default,pattern 'laguna'
+laguna-xs.2,reasoning,default,pattern 'laguna'
+llama-2-7b-chat,non-reasoning,default,no reasoning evidence
+magistral-medium-2506,reasoning,default,pattern 'magistral'
+magistral-medium-2509,reasoning,default,pattern 'magistral'
+magistral-small-2506,reasoning,default,pattern 'magistral'
+magistral-small-2509,reasoning,default,pattern 'magistral'
+mercury-2,reasoning,default,pattern 'mercury-2'
+mercury-2.5,reasoning,default,pattern 'mercury-2'
+mimo-v2-flash,reasoning,default,pattern 'mimo-v2'
+mimo-v2-pro,reasoning,default,a run of the release thinks
+mimo-v2-pro_high,reasoning,on,run mode on
+mimo-v2.5,reasoning,default,pattern 'mimo-v2'
+mimo-v2.5-pro,reasoning,default,pattern 'mimo-v2'
+ministral-3b-2410,non-reasoning,default,no reasoning evidence
+ministral-8b-2410,non-reasoning,default,no reasoning evidence
+mistral-large-2402,non-reasoning,default,no reasoning evidence
+mistral-large-2407,non-reasoning,default,no reasoning evidence
+mistral-large-2411,non-reasoning,default,no reasoning evidence
+mistral-large-2512,non-reasoning,default,no reasoning evidence
+mistral-medium-2312,non-reasoning,default,no reasoning evidence
+mistral-medium-2505,non-reasoning,default,no reasoning evidence
+mistral-medium-2508,non-reasoning,default,no reasoning evidence
+mistral-medium-2604,reasoning,default,a run of the release thinks
+mistral-medium-2604_high,reasoning,on,run mode on
+mistral-small-2402,non-reasoning,default,no reasoning evidence
+mistral-small-2409,non-reasoning,default,no reasoning evidence
+mistral-small-2603,non-reasoning,default,no reasoning evidence
+mistral-small-3-2501,non-reasoning,default,no reasoning evidence
+mistral-small-3.1-2503,non-reasoning,default,no reasoning evidence
+mistral-small-3.2-2506,non-reasoning,default,no reasoning evidence
+ml-elephant,non-reasoning,default,no reasoning evidence
+mpt-30b,non-reasoning,default,no reasoning evidence
+mpt-30b-instruct,non-reasoning,default,no reasoning evidence
+mpt-7b,non-reasoning,default,no reasoning evidence
+muse-spark,undetermined,default,config.REGIME_IGNORED
+muse-spark-1.1,undetermined,default,bare run of a hybrid release
+muse-spark-1.1_high,reasoning,on,run mode on
+muse-spark-1.1_medium,reasoning,on,run mode on
+muse-spark-1.1_xhigh,reasoning,on,run mode on
+muse-spark-1.2,undetermined,default,bare run of a hybrid release
+muse-spark-1.2_xhigh,reasoning,on,run mode on
+muse-spark-1.3,undetermined,default,bare run of a hybrid release
+muse-spark-1.3_high,reasoning,on,run mode on
+muse-spark-1.3_max,reasoning,on,run mode on
+muse-spark-1.3_xhigh,reasoning,on,run mode on
+nemotron-3-super,reasoning,default,pattern 'nemotron-3'
+nemotron-3-ultra,undetermined,default,bare run of a hybrid release
+nemotron-3-ultra_thinking,reasoning,on,run mode on
+nova-2.0-pro-preview,undetermined,default,bare run of a hybrid release
+nova-2.0-pro-preview_low,reasoning,on,run mode on
+nova-2.0-pro-preview_medium,reasoning,on,run mode on
+nova-2.0-pro-preview_none,non-reasoning,off,non-reasoning pattern
+nova-premier,non-reasoning,default,no reasoning evidence
+o1-2024-12-17,reasoning,default,a run of the release thinks
+o1-2024-12-17_high,reasoning,on,run mode on
+o1-2024-12-17_low,reasoning,on,run mode on
+o1-2024-12-17_medium,reasoning,on,run mode on
+o1-mini-2024-09-12,reasoning,default,a run of the release thinks
+o1-mini-2024-09-12_high,reasoning,on,run mode on
+o1-mini-2024-09-12_medium,reasoning,on,run mode on
+o1-preview-2024-09-12,reasoning,default,pattern 'o1-'
+o1-pro-2025-03-19,reasoning,default,a run of the release thinks
+o1-pro-2025-03-19_low,reasoning,on,run mode on
+o3-2025-04-16,reasoning,default,a run of the release thinks
+o3-2025-04-16_high,reasoning,on,run mode on
+o3-2025-04-16_low,reasoning,on,run mode on
+o3-2025-04-16_medium,reasoning,on,run mode on
+o3-mini-2025-01-31,reasoning,default,a run of the release thinks
+o3-mini-2025-01-31_high,reasoning,on,run mode on
+o3-mini-2025-01-31_low,reasoning,on,run mode on
+o3-mini-2025-01-31_medium,reasoning,on,run mode on
+o3-pro-2025-06-10,reasoning,default,a run of the release thinks
+o3-pro-2025-06-10_high,reasoning,on,run mode on
+o3-pro-2025-06-10_low,reasoning,on,run mode on
+o3-pro-2025-06-10_medium,reasoning,on,run mode on
+o4-mini-2025-04-16,reasoning,default,a run of the release thinks
+o4-mini-2025-04-16_high,reasoning,on,run mode on
+o4-mini-2025-04-16_low,reasoning,on,run mode on
+o4-mini-2025-04-16_medium,reasoning,on,run mode on
+open-mistral-7b,non-reasoning,default,no reasoning evidence
+open_llama_7b,non-reasoning,default,no reasoning evidence
+openhands-lm-32b-v0.1,non-reasoning,default,no reasoning evidence
+opt-1.3b,non-reasoning,default,no reasoning evidence
+opt-13b,non-reasoning,default,no reasoning evidence
+opt-175b,non-reasoning,default,no reasoning evidence
+opt-66b,non-reasoning,default,no reasoning evidence
+phi-1_5,non-reasoning,default,no reasoning evidence
+phi-2,non-reasoning,default,no reasoning evidence
+phi-4,non-reasoning,default,no reasoning evidence
+pixtral-large-2411,non-reasoning,default,no reasoning evidence
+qwen-max-2025-01-25,non-reasoning,default,no reasoning evidence
+qwen-plus-2025-01-25,non-reasoning,default,no reasoning evidence
+qwen-plus-2025-04-28,reasoning,default,pattern 'qwen-plus-2025-04-28'
+qwen-turbo-2024-11-01,non-reasoning,default,no reasoning evidence
+qwen1.5-14B,non-reasoning,default,no reasoning evidence
+qwen1.5-32B,non-reasoning,default,no reasoning evidence
+qwen1.5-32b-chat,non-reasoning,default,no reasoning evidence
+qwen1.5-72b-chat,non-reasoning,default,no reasoning evidence
+qwen2-72b-instruct,non-reasoning,default,no reasoning evidence
+qwen2.5-14b-instruct,non-reasoning,default,no reasoning evidence
+qwen2.5-32b-instruct,non-reasoning,default,no reasoning evidence
+qwen2.5-72b-instruct,non-reasoning,default,no reasoning evidence
+qwen2.5-7b-instruct,non-reasoning,default,no reasoning evidence
+qwen3-1.7b,undetermined,default,bare run of a hybrid release
+qwen3-1.7b_none,non-reasoning,off,non-reasoning pattern
+qwen3-14b,undetermined,default,bare run of a hybrid release
+qwen3-14b_none,non-reasoning,off,non-reasoning pattern
+qwen3-235b-a22b,reasoning,default,pattern 'qwen3'
+qwen3-30b-a3b-instruct-2507,non-reasoning,off,non-reasoning pattern
+qwen3-30b-a3b-thinking-2507,reasoning,default,pattern 'qwen3'
+qwen3-4b,undetermined,default,bare run of a hybrid release
+qwen3-4b-instruct-2507,non-reasoning,off,non-reasoning pattern
+qwen3-4b_none,non-reasoning,off,non-reasoning pattern
+qwen3-8b,undetermined,default,bare run of a hybrid release
+qwen3-8b_none,non-reasoning,off,non-reasoning pattern
+qwen3-coder-next,non-reasoning,off,non-reasoning pattern
+qwen3-max-2025-09-23,non-reasoning,off,non-reasoning pattern
+qwen3.5-122b-a10b_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-27B,reasoning,default,pattern 'qwen3'
+qwen3.5-2b_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-35b-a3b,undetermined,default,bare run of a hybrid release
+qwen3.5-35b-a3b_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-397b-a17b,undetermined,default,bare run of a hybrid release
+qwen3.5-397b-a17b_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-4b_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-9B,undetermined,default,bare run of a hybrid release
+qwen3.5-9B_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-flash,undetermined,default,bare run of a hybrid release
+qwen3.5-flash_none,non-reasoning,off,non-reasoning pattern
+qwen3.5-plus,undetermined,default,bare run of a hybrid release
+qwen3.5-plus_high,reasoning,on,run mode on
+qwen3.5-plus_none,non-reasoning,off,non-reasoning pattern
+qwen3.6-27b,undetermined,default,bare run of a hybrid release
+qwen3.6-27b_none,non-reasoning,off,non-reasoning pattern
+qwen3.6-35b-a3b,undetermined,default,bare run of a hybrid release
+qwen3.6-35b-a3b_none,non-reasoning,off,non-reasoning pattern
+qwen3.6-flash,undetermined,default,bare run of a hybrid release
+qwen3.6-flash_none,non-reasoning,off,non-reasoning pattern
+qwen3.6-max-preview,undetermined,default,bare run of a hybrid release
+qwen3.6-max-preview_none,non-reasoning,off,non-reasoning pattern
+qwen3.6-plus,undetermined,default,bare run of a hybrid release
+qwen3.6-plus_none,non-reasoning,off,non-reasoning pattern
+qwen3.7-flash,undetermined,default,bare run of a hybrid release
+qwen3.7-flash_none,non-reasoning,off,non-reasoning pattern
+qwen3.7-max,undetermined,default,bare run of a hybrid release
+qwen3.7-max_none,non-reasoning,off,non-reasoning pattern
+qwen3.7-max_xhigh,reasoning,on,run mode on
+qwen3.7-plus,undetermined,default,bare run of a hybrid release
+qwen3.7-plus_none,non-reasoning,off,non-reasoning pattern
+qwen3.8-2.4t-a95b_xhigh,reasoning,on,run mode on
+qwen3.8-27b,undetermined,default,bare run of a hybrid release
+qwen3.8-27b_low,reasoning,on,run mode on
+qwen3.8-27b_medium,reasoning,on,run mode on
+qwen3.8-27b_none,non-reasoning,off,non-reasoning pattern
+qwen3.8-27b_xhigh,reasoning,on,run mode on
+qwen3.8-flash_xhigh,reasoning,on,run mode on
+qwen3.8-max,reasoning,default,a run of the release thinks
+qwen3.8-max-0902,reasoning,default,a run of the release thinks
+qwen3.8-max-0902_xhigh,reasoning,on,run mode on
+qwen3.8-max_xhigh,reasoning,on,run mode on
+qwq-plus,reasoning,default,pattern 'qwq'
+reka-flash-3,reasoning,default,pattern 'reka-flash-3'
+seed-oss-36b-instruct,reasoning,default,pattern 'seed-oss'
+solar-pro-3,reasoning,default,pattern 'solar-pro-3'
+stablelm-tuned-alpha-7b,non-reasoning,default,no reasoning evidence
+starcoder2-15b,non-reasoning,default,no reasoning evidence
+starcoder2-3b,non-reasoning,default,no reasoning evidence
+starcoder2-7b,non-reasoning,default,no reasoning evidence
+step-3.7-flash,reasoning,default,pattern 'step-3.7'
+step-5-preview,reasoning,default,pattern 'step-5'
+swe-1.6,reasoning,default,pattern 'swe-1.6'
+swe-1.7,reasoning,default,pattern 'swe-1.7'
+swe-2_max,reasoning,on,run mode on
+text-ada-001,non-reasoning,default,no reasoning evidence
+text-babbage-001,non-reasoning,default,no reasoning evidence
+text-curie-001,non-reasoning,default,no reasoning evidence
+text-davinci-001,non-reasoning,default,no reasoning evidence
+text-davinci-002,non-reasoning,default,no reasoning evidence
+text-davinci-003,non-reasoning,default,no reasoning evidence
+tiny-recursion-model,non-reasoning,default,no reasoning evidence
+tml-interaction-small,non-reasoning,default,no reasoning evidence
+trinity-large-thinking,reasoning,default,pattern '-thinking'
+vicuna-13b-v1.1,non-reasoning,default,no reasoning evidence
+vicuna-13b-v1.3,non-reasoning,default,no reasoning evidence
+xgen-7b-8k-base,non-reasoning,default,no reasoning evidence
+yi-lightning,non-reasoning,default,no reasoning evidence

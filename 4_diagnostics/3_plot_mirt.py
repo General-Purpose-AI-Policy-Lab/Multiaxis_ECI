@@ -58,7 +58,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     rescale_theta,
     trace_loading_prior,
 )
-from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
+from multiaxis_eci.data import PROCESSED_FILE, model_organization  # noqa: E402
 from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt  # noqa: E402
 from multiaxis_eci.viz import (  # noqa: E402
     alignment_methods_fig,
@@ -216,9 +216,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                     & ~data.is_human & ~data.is_low_obs)
             idx = np.where(keep)[0]
             if len(idx) > 5:
-                org_by_model = (raw.dropna(subset=["organization"])
-                                .groupby("model_version")["organization"].first())
-                orgs = np.array([org_by_model.get(mod[i], "other") for i in idx])
+                orgs = np.array([model_organization(mod[i]) or "other" for i in idx])
                 top = pd.Series(orgs).value_counts().head(7).index.tolist()
                 tmean = rescale_theta(view.theta, affine).mean(axis=0)
                 dfm = pd.DataFrame({names[k]: tmean[idx, k] for k in range(n_axes)})

@@ -295,8 +295,9 @@ FORECAST_KW = dict(fit_basis="regimes", top_k=2, fit_start="2024-10-01", hdi_pro
 # matches one of these patterns (case-insensitive; families whose default mode
 # reasons without an effort suffix in the data). Edit here when a new family lands.
 REASONING_FAMILY_PATTERNS = [
-    r"(^|[^a-z0-9])(o1|o3|o4)[-_]", r"DeepSeek-R1", r"deepseek-reasoner", r"QwQ",
-    r"gemini-2\.5", r"gemini-3", r"grok-4", r"grok-3-mini", r"kimi-k2\.[5-9]", r"kimi-k3",
+    r"(^|[^a-z0-9])(o1|o3|o4)[-_]", r"DeepSeek-R1", r"QwQ",
+    # Gemini 2.5 Flash-Lite ships with thinking off; its thinking runs carry a budget.
+    r"gemini-2\.5-(?!flash-lite)", r"gemini-3", r"grok-4", r"grok-3-mini", r"kimi-k2\.[5-9]", r"kimi-k3",
     r"glm-5", r"qwen3", r"MiniMax-M2", r"deepseek-v3\.[12]", r"deepseek-v4",
     r"claude-opus-4", r"claude-sonnet-4", r"claude-mythos", r"claude-fable", r"gpt-5", r"gpt-6",
     r"magistral", r"gpt-oss",
@@ -308,6 +309,8 @@ REASONING_FAMILY_PATTERNS = [
     r"ChatGPT agent", r"gemini-robotics-er", r"qwen-plus-2025-04-28",
 ]
 
+# Every pattern above and below must match a current model (tests/test_model_metadata.py), so a
+# rule nothing uses any more is dropped rather than left to catch a future name by accident.
 # Releases that match a pattern above but do not reason, per their developers (2026-10-01): Qwen's
 # separate Instruct / Coder / Omni non-thinking models, the first Qwen3-Max (its Thinking release
 # came later), xAI's fast non-reasoning variant, OpenAI's Instant and Chat models. A run with
@@ -318,12 +321,18 @@ NON_REASONING_PATTERNS = [
     r"^qwen3-max-2025-09-23", r"non-reasoning", r"-instant($|[_-])", r"_chat$", r"_none$",
 ]
 
+# Lines hybrid by design (thinking optional), named by their release ids: a release of these that
+# thinks on some runs is hybrid even where the data shows no run without thinking, so its bare
+# run's regime is undetermined (analysis.regimes.hybrid_families). Releases with a `_none` /
+# `_minimal` / chat run or a `_thinking` variant are found hybrid from the data, whatever the line.
+HYBRID_LINE_PATTERNS = [r"^claude-", r"^muse-spark"]
+
 # Test-takers whose regime is undetermined (user decision 2026-10-01): left out of both regime
-# fits (they stay in the model and on the figures). Every effort-less Claude run of a family that
-# also has effort or budget runs is one too (analysis.regimes.regime_ignored): since the pipeline's
-# 2026-10-01 build those runs gather the scores of unknown thinking mode only (system cards, agent
-# harnesses), the runs without thinking being `_none` and the thinking ones `_thinking`. Here:
-# Muse Spark of April (Instant by default, the mode of its scores is unknown).
+# fits (they stay in the model and on the figures). The bare run of every hybrid release is one
+# too (analysis.regimes.regime_ignored): since the pipeline's 2026-10-01 build those runs gather
+# the scores of unknown thinking mode only (system cards, agent harnesses), the runs without
+# thinking being `_none` and the thinking ones `_thinking` or an effort. Here: Muse Spark of
+# April (Instant by default, the mode of its scores is unknown; no other run of the release).
 REGIME_IGNORED = frozenset({"muse-spark"})
 
 # Optional backcast clamp per axis (envelope basis): a tier already passed at

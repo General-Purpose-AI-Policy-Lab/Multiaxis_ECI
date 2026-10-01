@@ -49,6 +49,8 @@ MODELS_FILE     = INPUT_DIR / "models.csv"
 BENCHMARKS_FILE = INPUT_DIR / "benchmarks.csv"
 # Epoch's reference ECI table, only used by --eci-data-only.
 REFERENCE_ECI_FILE = CURATED_DIR / "eci_data.csv"
+# Country of an organization the models table never gives one for (hand-researched).
+ORGANIZATION_COUNTRIES_FILE = CURATED_DIR / "organization_countries.csv"
 
 # The eight columns the modeling code was written against, in the view's order.
 SCORE_COLUMNS = ["model_version", "score", "release_date", "organization", "benchmark",
@@ -62,6 +64,10 @@ def read_scores() -> pd.DataFrame:
             f"{PROCESSED_FILE} not found. Run `python -m multiaxis_eci sync` with a "
             "benchmark-data-pipeline checkout next to this repository.")
     df = pd.read_csv(PROCESSED_FILE)
+    # A row the pipeline leaves without an organization takes its release's (`models_table`).
+    missing = df["organization"].isna() | (df["organization"].astype(str).str.strip() == "")
+    if missing.any():
+        df.loc[missing, "organization"] = df.loc[missing, "model_version"].map(model_organization)
     return df[SCORE_COLUMNS + ["lower_bound"]]
 
 
@@ -330,16 +336,50 @@ def _effort_base(model_version: str) -> str:
 
 
 _IDENTITY: pd.DataFrame | None = None
+_MODELS: pd.DataFrame | None = None
+
+
+def models_table() -> pd.DataFrame:
+    """The pipeline's models table (0_input/models.csv), one row per model_version, strings,
+    with `organization` and `country` completed where the pipeline leaves them empty.
+
+    Every reader of the table goes through here, so a gap upstream is filled once and the same
+    way everywhere (found 2026-10-01: claude-opus-5-5, gpt-6-sol and claude-fable-5-1_thinking
+    came without either, which dropped them from the US group of the country frontier, from the
+    linking members and from same-day pooling, while their siblings carried Anthropic / OpenAI,
+    US). In order: the value every other row of the release (`base_model`) agrees on; for the
+    country, the one every other model of the organization carries; then
+    1_curated/organization_countries.csv, which may also leave a country blank on purpose (an
+    agent scaffold such as Manus runs other developers' models and has no country of its own,
+    so it joins no country group). Any other empty value stays empty, and
+    tests/test_model_metadata.py fails on it.
+    """
+    global _MODELS
+    if _MODELS is None:
+        m = pd.read_csv(MODELS_FILE, dtype=str).fillna("")
+        m = m.drop_duplicates("model_version").reset_index(drop=True)
+        for col in ("organization", "country"):
+            m[col] = m[col].str.strip()
+            known = m[m[col] != ""].groupby("base_model")[col].agg(set)
+            agreed = known[known.map(len) == 1].map(lambda v: next(iter(v)))
+            empty = m[col] == ""
+            m.loc[empty, col] = m.loc[empty, "base_model"].map(agreed).fillna("")
+        by_org = m[m["country"] != ""].groupby("organization")["country"].agg(set)
+        org_country = by_org[by_org.map(len) == 1].map(lambda v: next(iter(v))).to_dict()
+        if ORGANIZATION_COUNTRIES_FILE.exists():
+            cur = pd.read_csv(ORGANIZATION_COUNTRIES_FILE, dtype=str).fillna("")
+            org_country.update(dict(zip(cur["organization"], cur["country"])))
+        empty = (m["country"] == "") & (m["organization"] != "")
+        m.loc[empty, "country"] = m.loc[empty, "organization"].map(org_country).fillna("")
+        _MODELS = m
+    return _MODELS
 
 
 def _identity() -> pd.DataFrame:
-    """The pipeline's models table (0_input/models.csv) indexed by model_version, read once."""
+    """`models_table` indexed by model_version."""
     global _IDENTITY
     if _IDENTITY is None:
-        cols = ["model_version", "base_model", "snapshot", "reasoning_level", "reasoning_tokens",
-                "variant", "organization"]
-        table = pd.read_csv(MODELS_FILE, dtype=str).fillna("")[cols]
-        _IDENTITY = table.drop_duplicates("model_version").set_index("model_version")
+        _IDENTITY = models_table().set_index("model_version")
     return _IDENTITY
 
 
@@ -358,10 +398,41 @@ def model_family(model_version: str) -> str:
     return _effort_base(model_version)
 
 
+# Run variants that are a way of running the release itself. Any other variant names a product
+# of its own built on the release: a pro mode (GPT-5.6 Sol and GPT-6 Astra "pro", where GPT-5.5
+# Pro is its own base model upstream), an access tier (the cyber-tuned GPT-5.4 / GPT-5.5, out
+# 40 days later), a fine-tune (Hermes 3, Bio Llama on Llama 3.1 405B).
+MODE_VARIANTS = frozenset({"", "thinking", "chat"})
+
+
+def model_product(model_version: str) -> str:
+    """The product a test-taker stands for when ONE run represents a release (the best effort
+    of a frontier family, a SOTA row, a forest row): `model_family`, plus the run variant when
+    the variant is a product of its own (not in MODE_VARIANTS). `gpt-5.6-sol_promax` is the
+    product `gpt-5.6-sol-pro`, so the Sol frontier point is never a pro-mode run, the way
+    GPT-5.5 Pro was never a GPT-5.5 point. Weights-level questions (openness, the lineage
+    collapse, isolated families) keep `model_family`."""
+    ident = _identity()
+    fam = model_family(model_version)
+    if model_version in ident.index:
+        v = ident.loc[model_version, "variant"]
+        if v not in MODE_VARIANTS:
+            base, _, snap = fam.partition("@")
+            slug = re.sub(r"[^a-z0-9]+", "-", v.lower()).strip("-")
+            return f"{base}-{slug}" + (f"@{snap}" if snap else "")
+    return fam
+
+
 def model_organization(model_version: str) -> str:
-    """The organization of a test-taker per the models table; "" when the name is not in it."""
+    """The organization of a test-taker per `models_table`; "" when the name is not in it."""
     ident = _identity()
     return str(ident.loc[model_version, "organization"]) if model_version in ident.index else ""
+
+
+def model_country(model_version: str) -> str:
+    """The country of a test-taker per `models_table`; "" when the name is not in it."""
+    ident = _identity()
+    return str(ident.loc[model_version, "country"]) if model_version in ident.index else ""
 
 
 def is_bare(model_version: str) -> bool:
@@ -380,8 +451,9 @@ def sota_families() -> set[str]:
 
 
 def is_sota_model(model_version: str) -> bool:
-    """True when the test-taker belongs to a SOTA family, whatever its reasoning effort."""
-    return model_family(model_version) in sota_families()
+    """True when the test-taker belongs to a SOTA family, whatever its reasoning effort (a
+    product of its own on the release, a pro mode, is not the family: `model_product`)."""
+    return model_product(model_version) in sota_families()
 
 
 def _known_release_date_by_model() -> pd.Series:

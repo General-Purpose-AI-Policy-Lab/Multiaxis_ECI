@@ -6,9 +6,13 @@ base model and snapshot across its reasoning efforts and run variants), then to 
 per organization and day (`one_per_org_day`: o1-mini and o1-preview, both OpenAI on
 2024-09-12, count as one frontier point, the better one, rather than filling a top-2 between
 them). They split into two
-regimes, reasoning models and the others (`reasoning_mask`: a family carries a reasoning
-level, a thinking budget or a thinking variant in the models table, or matches
-`config.REASONING_FAMILY_PATTERNS`). The reasoning fit set is the running top-k of
+regimes, reasoning models and the others (`reasoning_mask`, decided per run by `run_mode`: a
+run without thinking (`_none`, `_minimal`, a chat or Instant endpoint) is never a reasoning
+model; a run with a reasoning level, a thinking budget or a thinking variant always is; a run
+with no mode of its own (the bare release) reads its family: reasoning when another run of the
+release thinks or its name matches `config.REASONING_FAMILY_PATTERNS`). The bare run of a
+HYBRID release, one that runs both with and without thinking, has no determined regime and
+sits out of both fits (`regime_ignored`). The reasoning fit set is the running top-k of
 posterior-median abilities by release date AMONG reasoning families (`frontier_topk`, k = 2 by
 default: a release enters when it is at least the second best of its regime seen so far), so
 the reasoning line starts at the first reasoning releases even where non-reasoning models
@@ -38,50 +42,122 @@ from scipy.stats import multivariate_normal
 
 from multiaxis_eci.analysis.forecast import ForecastResult, _to_date, _to_year
 from multiaxis_eci.analysis.stats import post_stats
-from multiaxis_eci.config import NON_REASONING_PATTERNS, REASONING_FAMILY_PATTERNS, REGIME_IGNORED
-from multiaxis_eci.data import MODELS_FILE, ECIData, model_family, model_organization
+from multiaxis_eci.config import (
+    HYBRID_LINE_PATTERNS,
+    NON_REASONING_PATTERNS,
+    REASONING_FAMILY_PATTERNS,
+    REGIME_IGNORED,
+)
+from multiaxis_eci.data import (
+    ECIData,
+    is_bare,
+    model_family,
+    model_organization,
+    model_product,
+    models_table,
+)
 
-_OFF_LEVELS = {"", "none", "minimal"}
-
-
-@lru_cache(maxsize=1)
-def _reasoning_families() -> frozenset:
-    """Families with a reasoning level, a thinking budget or a thinking variant in the table."""
-    m = pd.read_csv(MODELS_FILE, dtype=str).fillna("")
-    on = m[(~m["reasoning_level"].isin(_OFF_LEVELS)) | (m["reasoning_tokens"] != "")
-           | (m["variant"] == "thinking")]
-    return frozenset(model_family(x) for x in on["model_version"])
-
+# Reasoning levels that turn thinking off, and run variants that never think.
+OFF_LEVELS = frozenset({"none", "minimal"})
+OFF_VARIANTS = frozenset({"chat"})
 
 _PATTERN = re.compile("|".join(REASONING_FAMILY_PATTERNS), re.I)
 _NOT = re.compile("|".join(NON_REASONING_PATTERNS), re.I)
+_HYBRID = re.compile("|".join(HYBRID_LINE_PATTERNS), re.I)
 
 
-def is_reasoning(name: str) -> bool:
-    """Whether a test-taker is a reasoning model: its family shows reasoning evidence in the
-    models table, or its name matches one of the reasoning family patterns, unless it matches one
-    of the non-reasoning patterns."""
+@lru_cache(maxsize=None)
+def run_mode(name: str) -> str:
+    """The thinking mode a run states by itself: "off" (`config.NON_REASONING_PATTERNS`, a
+    reasoning level of OFF_LEVELS, a variant of OFF_VARIANTS), "on" (any other reasoning level,
+    a thinking budget, the thinking variant) or "default" (none stated: the bare release, a
+    pro mode without effort, a name the models table does not know)."""
     if _NOT.search(name):
-        return False
-    return model_family(name) in _reasoning_families() or bool(_PATTERN.search(name))
+        return "off"
+    m = models_table()
+    row = m[m["model_version"] == name]
+    if row.empty:
+        return "default"
+    level, tokens, variant = row.iloc[0][["reasoning_level", "reasoning_tokens", "variant"]]
+    if level in OFF_LEVELS or variant in OFF_VARIANTS:
+        return "off"
+    if level or tokens or variant == "thinking":
+        return "on"
+    return "default"
 
 
 @lru_cache(maxsize=1)
-def _bare_hybrid_claude() -> frozenset:
-    """Effort-less Claude runs whose family also has effort or budget runs."""
-    m = pd.read_csv(MODELS_FILE, dtype=str).fillna("").drop_duplicates("model_version")
-    claude = m[m["base_model"].str.startswith("claude")]
-    bare = (claude["reasoning_level"] == "") & (claude["reasoning_tokens"] == "") \
-        & (claude["variant"] == "")
-    fam = claude["model_version"].map(model_family)
-    hybrid = set(fam[~bare])
-    return frozenset(claude.loc[bare & fam.isin(hybrid), "model_version"])
+def _family_modes() -> dict:
+    """Release (`data.model_family`) -> the set of run modes its runs state, plus "thinking"
+    when one of them is the thinking variant."""
+    out: dict[str, set] = {}
+    for name, variant in zip(models_table()["model_version"], models_table()["variant"]):
+        modes = out.setdefault(model_family(name), set())
+        modes.add(run_mode(name))
+        if variant == "thinking":
+            modes.add("thinking")
+    return out
+
+
+def _reasoning_families() -> frozenset:
+    """Releases with a run that thinks (a reasoning level, a budget, the thinking variant)."""
+    return frozenset(f for f, modes in _family_modes().items() if "on" in modes)
+
+
+@lru_cache(maxsize=1)
+def hybrid_families() -> frozenset:
+    """Releases that run both with and without thinking, so their bare run's mode is unknown:
+    a run of theirs turns thinking off, or a separate thinking variant exists (the bare run is
+    then the other mode, or a mix), or the release thinks on some runs and belongs to a line
+    hybrid by design (`config.HYBRID_LINE_PATTERNS`: Claude's extended thinking, Muse Spark's
+    Instant / Thinking modes), whose data need not show an off run."""
+    return frozenset(f for f, modes in _family_modes().items()
+                     if "off" in modes or "thinking" in modes
+                     or ("on" in modes and _HYBRID.search(f)))
+
+
+def is_reasoning(name: str) -> bool:
+    """Whether a test-taker is a reasoning model, decided per run (`run_mode`): off runs never
+    are, on runs always are, a run with no stated mode is when its release has a run that
+    thinks or its name matches `config.REASONING_FAMILY_PATTERNS`."""
+    mode = run_mode(name)
+    if mode != "default":
+        return mode == "on"
+    return model_family(name) in _reasoning_families() or bool(_PATTERN.search(name))
 
 
 def regime_ignored(name: str) -> bool:
-    """Whether a test-taker is left out of both regime fits (`config.REGIME_IGNORED`, plus the
-    effort-less runs of hybrid Claude families)."""
-    return name in REGIME_IGNORED or name in _bare_hybrid_claude()
+    """Whether a test-taker is left out of both regime fits: `config.REGIME_IGNORED`, plus the
+    bare run of every hybrid release (`hybrid_families`), whose scores mix or hide the thinking
+    mode (the pipeline files the runs without thinking as `_none` and the thinking ones with
+    their effort or `_thinking`, the bare run keeping the scores of unknown mode)."""
+    if name in REGIME_IGNORED:
+        return True
+    return run_mode(name) == "default" and is_bare(name) and model_family(name) in hybrid_families()
+
+
+def regime_table() -> pd.DataFrame:
+    """One row per model of the models table: its regime ("reasoning", "non-reasoning" or
+    "undetermined", the last in neither regime fit), its run mode and the evidence that decided.
+    Written to 1_curated/model_regimes.csv by 1_curated/4_build_model_regimes.py, the reviewed
+    snapshot tests/test_model_metadata.py holds the code to."""
+    rows = []
+    for name in models_table()["model_version"]:
+        mode = run_mode(name)
+        if regime_ignored(name):
+            regime = "undetermined"
+            why = "config.REGIME_IGNORED" if name in REGIME_IGNORED else "bare run of a hybrid release"
+        elif mode != "default":
+            regime = "reasoning" if mode == "on" else "non-reasoning"
+            why = "non-reasoning pattern" if _NOT.search(name) else f"run mode {mode}"
+        elif model_family(name) in _reasoning_families():
+            regime, why = "reasoning", "a run of the release thinks"
+        elif _PATTERN.search(name):
+            regime, why = "reasoning", f"pattern {_PATTERN.search(name).group(0)!r}"
+        else:
+            regime, why = "non-reasoning", "no reasoning evidence"
+        rows.append({"model_version": name, "regime": regime, "mode": mode, "evidence": why})
+    return pd.DataFrame(rows).sort_values("model_version").reset_index(drop=True)
 
 
 def reasoning_mask(data: ECIData) -> np.ndarray:
@@ -90,9 +166,10 @@ def reasoning_mask(data: ECIData) -> np.ndarray:
 
 
 def family_best(tl: pd.DataFrame) -> pd.DataFrame:
-    """One row per family (`data.model_family`): the effort with the highest posterior median
-    (`mean`) on the axis, keeping its own name and release date. Ties keep the first."""
-    d = tl.assign(_fam=tl["name"].map(model_family))
+    """One row per family (`data.model_product`: a release across its efforts, a pro mode or
+    access tier apart): the effort with the highest posterior median (`mean`) on the axis,
+    keeping its own name and release date. Ties keep the first."""
+    d = tl.assign(_fam=tl["name"].map(model_product))
     d = d.sort_values(["_fam", "mean"], ascending=[True, False], kind="stable")
     return d.drop_duplicates("_fam", keep="first").drop(columns="_fam").reset_index(drop=True)
 

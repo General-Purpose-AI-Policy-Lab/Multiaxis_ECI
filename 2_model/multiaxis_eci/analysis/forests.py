@@ -9,7 +9,7 @@ import pandas as pd
 from multiaxis_eci.analysis.stats import _release_dates
 from multiaxis_eci.analysis.timelines import candidate_mask
 from multiaxis_eci.config import FOREST_PINNED_RELEASES
-from multiaxis_eci.data import ECIData, model_family
+from multiaxis_eci.data import ECIData, model_product
 
 
 def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top: int = 11,
@@ -19,8 +19,8 @@ def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top
     candidates (`candidate_mask`, the forecast's gate, so the forest and the forecast can
     never show different frontiers), the `pinned` frontier releases, and every human tier.
 
-    `by_family` collapses the candidates to one row per release (`data.model_family`: base
-    model plus snapshot), keeping the effort with the highest median on the axis, so the forest
+    `by_family` collapses the candidates to one row per release (`data.model_product`: base
+    model plus snapshot, a pro mode or access tier apart), keeping the effort with the highest median on the axis, so the forest
     ranks releases rather than reasoning efforts; the row keeps the winning effort's name.
 
     Undated models cannot be candidates; without `raw_df` every model counts as dated. Rows are
@@ -47,17 +47,17 @@ def forest_frames(view, data: ECIData, raw_df: pd.DataFrame | None = None, n_top
         if by_family:
             seen: set[str] = set()
             ranked = [i for i in ranked
-                      if not (model_family(names[i]) in seen or seen.add(model_family(names[i])))]
+                      if not (model_product(names[i]) in seen or seen.add(model_product(names[i])))]
         top = ranked[:n_top]
         if by_family:
             # A pinned release is a family here too: it joins as its best effort, and only
             # when no effort of that family is already among the top rows.
-            shown = {model_family(names[i]) for i in top}
-            pinned_fams = {model_family(p) for p in pinned} - shown
+            shown = {model_product(names[i]) for i in top}
+            pinned_fams = {model_product(p) for p in pinned} - shown
             frontier = []
             for fam_name in sorted(pinned_fams):
                 members = [i for i in range(len(names))
-                           if not is_h[i] and model_family(names[i]) == fam_name]
+                           if not is_h[i] and model_product(names[i]) == fam_name]
                 if members:
                     frontier.append(max(members, key=lambda i: med[i]))
         else:

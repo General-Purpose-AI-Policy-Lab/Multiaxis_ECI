@@ -50,8 +50,8 @@ Chess Puzzles,gpt-5.4-nano-2026-03-17_none,False,0.03,0.0496,0.0496,2026-03-17,f
 Chess Puzzles,magistral-small-2509,False,0.03,0.0496,0.0496,2025-09-18,frontier
 Chess Puzzles,MiniMax-M3_none,False,0.04,0.0496,0.0496,2026-06-01,frontier
 Chess Puzzles,Qwen3-30B-A3B,False,0.04,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,claude-opus-4-5-20251101,False,0.04,0.0496,0.0496,2025-11-24,frontier
-Chess Puzzles,claude-sonnet-4-5-20250929,False,0.04,0.0496,0.0496,2025-09-29,frontier
+Chess Puzzles,claude-opus-4-5-20251101_none,False,0.04,0.0496,0.0496,2025-11-24,frontier
+Chess Puzzles,claude-sonnet-4-5-20250929_none,False,0.04,0.0496,0.0496,2025-09-29,frontier
 Chess Puzzles,gpt-4-0613,False,0.04,0.0496,0.0496,2023-06-13,old/weak
 Chess Puzzles,gpt-5.2-2025-12-11_none,False,0.04,0.0496,0.0496,2025-12-11,frontier
 Chess Puzzles,gpt-oss-20b_medium,False,0.04,0.0496,0.0496,2025-08-05,frontier
@@ -125,10 +125,10 @@ OpenBookQA,gpt2-xl,False,0.224,0.25,0.25,2019-11-05,frontier
 OpenBookQA,gpt-neo-2.7B,False,0.232,0.25,0.25,2021-03-30,old/weak
 OpenBookQA,opt-1.3b,False,0.24,0.25,0.25,2022-05-11,old/weak
 SimpleBench,gpt-4o-mini-2024-07-18,False,0.107,0.167,0.167,2024-07-18,old/weak
-VPCT,claude-sonnet-4-20250514,False,0.3,0.333,0.333,2025-05-22,old/weak
+VPCT,claude-sonnet-4-20250514_none,False,0.3,0.333,0.333,2025-05-22,old/weak
 VPCT,gemini-2.5-flash-lite-preview-09-2025,False,0.3,0.333,0.333,2025-09-25,frontier
 VPCT,claude-3-5-sonnet-20240620,False,0.33,0.333,0.333,2024-06-20,frontier
 VPCT,claude-3-5-sonnet-20241022,False,0.33,0.333,0.333,2024-10-22,old/weak
 VPCT,claude-opus-4-1-20250805_16K,False,0.33,0.333,0.333,2025-08-05,frontier
-VPCT,claude-opus-4-20250514,False,0.33,0.333,0.333,2025-05-22,old/weak
+VPCT,claude-opus-4-20250514_none,False,0.33,0.333,0.333,2025-05-22,old/weak
 WMDP Chemistry,Mistral-7B-Instruct-v0.1,False,0.243,0.25,0.25,2023-09-27,old/weak

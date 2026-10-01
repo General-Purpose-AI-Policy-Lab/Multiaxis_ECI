@@ -11,7 +11,7 @@ import pandas as pd
 from multiaxis_eci import (
     config,  # attribute access so runtime overrides (e.g., --eci-data-only) propagate
 )
-from multiaxis_eci.data import ECIData, find_model_idx
+from multiaxis_eci.data import BENCHMARKS_FILE, ECIData, find_model_idx
 
 
 @dataclass
@@ -97,7 +97,7 @@ def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
     the release), in the list's order (newest first). A family with no surviving test-taker
     (e.g. all its benchmarks fell into a dropped category) is skipped with a warning.
     """
-    from multiaxis_eci.data import model_family
+    from multiaxis_eci.data import model_product
     C_flat = flat_C(trace)
     transform = eci_transform(C_flat, data)
     names = list(data.mlookup.sort_values("model_idx")["model"].values)
@@ -108,7 +108,7 @@ def sota_stats_df(trace, data: ECIData, raw_df: pd.DataFrame) -> pd.DataFrame:
     for i, name in enumerate(names):
         if data.is_human[i]:
             continue
-        fam = model_family(name)
+        fam = model_product(name)
         if fam in config.SOTA_FAMILIES and (fam not in best or medians[i] > medians[best[fam]]):
             best[fam] = i
     missing = [f for f in config.SOTA_FAMILIES if f not in best]
@@ -278,8 +278,21 @@ def forest_stats_df(trace, var_name: str, names: list[str]) -> pd.DataFrame:
 
 
 def _release_dates(raw_df: pd.DataFrame):
-    """Earliest release_date per model/benchmark (the pipeline dates every model it can)."""
+    """Earliest release_date per model (the pipeline dates every model it can); per benchmark,
+    its public release (`release_date` of the pipeline's benchmarks.csv), else the earliest
+    release among the models scored on it, which postdates the benchmark when it was run
+    retrospectively on older models only and predates it otherwise."""
     valid = raw_df.dropna(subset=["release_date"])
     model_dates = valid.groupby("model_version")["release_date"].min()
     bench_dates = valid.groupby("benchmark")["release_date"].min()
+    if BENCHMARKS_FILE.exists():
+        table = pd.read_csv(BENCHMARKS_FILE)
+        if "release_date" in table.columns:
+            released = table.dropna(subset=["release_date"]).set_index("name")["release_date"]
+            undated = sorted(set(bench_dates.index) - set(released.index))
+            if undated:
+                print(f"  [_release_dates] {len(undated)} benchmark(s) without a release date "
+                      f"in {BENCHMARKS_FILE.name}, dated by their first model: {undated}")
+            hit = bench_dates.index.isin(released.index)
+            bench_dates[hit] = released.reindex(bench_dates.index[hit]).values
     return model_dates, bench_dates

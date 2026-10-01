@@ -65,14 +65,15 @@ def build_lineage_structure(mlookup: pd.DataFrame,
         # The caller aggregated evaluation settings, so a model's rows now carry
         # its BASE name and every `raw_string` with an effort/token/provider
         # suffix would silently miss the join, taking whole chains with it. Map
-        # the keys the same way. Safe because no base model spans two
-        # (chain, node) pairs — variants of one release always share a node —
-        # and `variant` stops meaning anything once the settings are merged.
-        from multiaxis_eci.data import model_family
-        m["raw_string"] = m["raw_string"].map(model_family)
+        # the keys the same way. Keyed on the product (`data.model_product`), not
+        # the release: a pro mode sits on the pro chain, away from its release's
+        # node, so only the product never spans two (chain, node) pairs; and
+        # `variant` stops meaning anything once the settings are merged.
+        from multiaxis_eci.data import model_product
+        m["raw_string"] = m["raw_string"].map(model_product)
         m["variant"] = "bare"
         m = m.drop_duplicates("raw_string")
-        row_of = {model_family(name): i for i, name in enumerate(mlookup["model"].tolist())}
+        row_of = {model_product(name): i for i, name in enumerate(mlookup["model"].tolist())}
     else:
         row_of = {name: i for i, name in enumerate(mlookup["model"].tolist())}
     m = m[m["raw_string"].isin(row_of)]

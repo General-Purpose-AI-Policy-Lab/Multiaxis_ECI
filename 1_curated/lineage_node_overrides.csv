@@ -1,6 +1,5 @@
 raw_string,chain,node,parent,node_date
 gemini-1.5-flash-002,gemini-flash,flash 1.5 2024-09-24,,2024-09-24
-gemini-1.5-flash-8b-001,gemini-flash,flash 1.5 2024-09-24,,2024-09-24
 gemini-2.0-flash-thinking-exp-01-21,gemini-flash,flash 2.0 2025-01-21,,2025-01-21
 gemini-2.0-flash-001,gemini-flash,flash 2.0 2025-02-05,,2025-02-05
 gemini-2.5-flash-preview-05-20,gemini-flash,flash 2.5 2025-05-20,,2025-05-20
@@ -25,7 +24,6 @@ gemini-2.5-pro_16K,gemini-pro,pro 2.5 2025-06-05,,2025-06-05
 gemini-2.5-pro_32K,gemini-pro,pro 2.5 2025-06-05,,2025-06-05
 gemini-2.5-pro_8K,gemini-pro,pro 2.5 2025-06-05,,2025-06-05
 gemini-2.5-pro_high,gemini-pro,pro 2.5 2025-06-05,,2025-06-05
-gemini-3-deep-think-preview,gemini-pro,pro 3 2026-02-12,,2026-02-12
 gpt-4-0613,gpt,4 2023-06-13,,2023-06-13
 gpt-4-1106-preview,gpt,4-turbo 2023-11-06,,2023-11-06
 gpt-4-1106-vision-preview,gpt,4-turbo 2023-11-06,,2023-11-06
@@ -34,8 +32,8 @@ gpt-4-0125-preview,gpt,4-turbo 2024-01-25,,2024-01-25
 gpt-4-turbo-2024-04-09,gpt,4-turbo 2024-04-09,,2024-04-09
 gpt-4o-2024-08-06,gpt,4o 2024-08-06,,2024-08-06
 gpt-4o-2024-11-20,gpt,4o 2024-11-20,,2024-11-20
-chatgpt-4o-01-29-2025,gpt,chatgpt-4o 2025-01-29,4o 2024-11-20,2025-01-29
-chatgpt-4o-03-27-2025,gpt,chatgpt-4o 2025-03-27,chatgpt-4o 2025-01-29,2025-03-27
+gpt-4o-2025-01-29,gpt,chatgpt-4o 2025-01-29,4o 2024-11-20,2025-01-29
+gpt-4o-2025-03-27,gpt,chatgpt-4o 2025-03-27,chatgpt-4o 2025-01-29,2025-03-27
 gpt-3.5-turbo-0613,gpt-3.5,3.5-turbo-0613,,2023-06-13
 gpt-3.5-turbo-instruct,gpt-3.5,3.5-turbo-instruct,,2023-09-18
 gpt-3.5-turbo-1106,gpt-3.5,3.5-turbo-1106,,2023-11-06
@@ -57,3 +55,7 @@ claude-opus-5-5_xhigh,opus,Opus 5.5,Opus 5,2026-09-22
 claude-sonnet-5-5_max,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28
 gpt-6-sol_max,gpt,sol 6,5.6,2026-09-22
 gpt-6-luna_max,gpt,luna 6,5.6,2026-09-22
+claude-opus-5-5,opus,Opus 5.5,Opus 5,2026-09-22
+gpt-6-sol,gpt,sol 6,5.6,2026-09-22
+grok-2-1212,grok,2-1212,,2024-12-12
+gemini-2.5-flash-2025-05,gemini-flash,flash 2.5 2025-05-20,,2025-05-20

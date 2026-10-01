@@ -10,9 +10,6 @@ import pandas as pd
 # Anchor I/O to the repo root (parent of 1_curated/) so the script works from
 # any working directory, not just the repo root.
 ROOT = Path(__file__).resolve().parent.parent
-df = pd.read_csv(ROOT / '0_input/all_scores_flat.csv')
-base = df[['model_version', 'organization']].drop_duplicates('model_version').copy()
-base['n_obs'] = base.model_version.map(df.groupby('model_version').size())
 
 HOST = re.compile(r'^(chutes|fireworks|deepinfra|parasail|zai-org|qwen|moonshotai|openai|deepseek)[/-]', re.I)
 
@@ -31,6 +28,14 @@ def variant(t):
     # materially different mode, so tag it as a distinct variant of the node.
     if 'non-reasoning' in tl or 'non reasoning' in tl: return 'non-reasoning'
     if 'reasoning' in tl: return 'reasoning'
+    # Run variants the pipeline keeps in the release's family but which are not the
+    # release's own configuration: the non-reasoning chat / instant endpoints, the
+    # cyber-tuned access tier, DeepSeek's Speciale. Tagged so they never share the
+    # bare release's (node, variant) group, i.e. its theta.
+    if re.search(r'_chat\b', tl): return 'chat'
+    if re.search(r'-instant\b', tl): return 'instant'
+    if re.search(r'_cyber\b', tl): return 'cyber'
+    if 'speciale' in tl: return 'speciale'
     # Effort is delimited by '_' (e.g. _high) or '(' (e.g. (xHigh)), NOT a bare
     # space — a space+word is a tier NAME ('Mistral Medium 3'), not an effort level.
     # The optional 'pro' prefix keeps GPT-5.6 Sol's pro mode ('_promax',
@@ -64,13 +69,12 @@ def variant(t):
 CODENAME_CHAIN = {'sol': 'gpt', 'terra': 'gpt', 'luna': 'gpt'}
 CODENAME_PARENT = {'terra': '5.5', 'luna': '5.5'}
 
-# `_pro<effort>` is the effort parser swallowing a Pro-MODE tag: upstream names it
-# "GPT 5.6 Sol (Max + Pro)", i.e. Sol run under an advanced harness, not a separate
-# release. Scored as the model's own ability it would inflate the node. Anchored to
-# `_pro` + an effort word at the end so real `-pro-` models (gpt-5.4-pro,
-# deepseek-v4-pro) are untouched.
-OUT_HARNESS = re.compile(r'cowork|web-?app|heavy|chatgpt agent| agent$'
-                         r'|_pro(max|unknown|high|low|medium|xhigh|none|minimal)$', re.I)
+# A Pro mode ('gpt-5.6-sol_promax', upstream "GPT 5.6 Sol (Max + Pro)") is the release run
+# with parallel test-time compute: the product GPT-5.5 Pro and earlier shipped as models of their
+# own. Filed the same way, on the `pro` chain ('pro 5.6', 'pro 6'), never on the release's own
+# node, which it would inflate (`data.model_product` keeps it apart the same way).
+PRO_MODE = re.compile(r'_pro(max|unknown|high|low|medium|xhigh|none|minimal)$', re.I)
+OUT_HARNESS = re.compile(r'cowork|web-?app|heavy|chatgpt agent| agent$', re.I)
 OUT_MODALITY = re.compile(r'audio|-live|live-preview|robotics|video|llava|omni|realtime|voxtral', re.I)
 
 def classify(mv, org):
@@ -82,14 +86,46 @@ def classify(mv, org):
     # ================= ANTHROPIC =================
     if 'anthropic' in ol or 'claude' in tl or 'fable' in tl or 'mythos' in tl:
         v = variant(t)
-        if 'mythos' in tl: return dict(vendor='Anthropic', chain='opus', node='Fable 5', variant='preview', in_chain='yes')
-        if 'fable' in tl:  return dict(vendor='Anthropic', chain='opus', node='Fable 5', variant=v, in_chain='yes')
+        # The Mythos previews are the 'Fable 5' node (the earliest Fable 5 checkpoint
+        # shown, 2026-04); Fable 5 itself sits on its own reviewed node through
+        # lineage_node_overrides.csv. A later Mythos release ('claude-mythos-5') is not
+        # a preview and continues the line from that node.
+        if 'mythos' in tl:
+            if 'preview' in tl:
+                return dict(vendor='Anthropic', chain='opus', node='Fable 5', variant='preview', in_chain='yes')
+            mo = re.search(r'mythos-(\d+)(?:[-.](\d))?(?![\d.])', tl)
+            ver = (mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')) if mo else '?'
+            return dict(vendor='Anthropic', chain='opus', node=f'Mythos {ver}', parent='Fable 5',
+                        variant=v, in_chain='yes')
+        if 'fable' in tl:
+            mo = re.search(r'fable-(\d+)(?:[-.](\d))?(?![\d.])', tl)
+            ver = (mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')) if mo else '?'
+            # Fable 5 (major only) is the reviewed off-spine node of the overrides file;
+            # every rung of it lands there, the ones the file does not list too.
+            if ver == '5':
+                return dict(vendor='Anthropic', chain='opus', node='Fable 5 2026-06-09',
+                            parent='Opus 4.8', variant=v, in_chain='yes')
+            # A minor version continues the Fable line, off the Opus spine: 5.1 hangs off
+            # Fable 5, 5.2 off 5.1, and so on.
+            if mo and mo.group(1) == '5' and mo.group(2):
+                minor = int(mo.group(2))
+                parent = 'Fable 5 2026-06-09' if minor == 1 else f'Fable 5.{minor - 1}'
+                return dict(vendor='Anthropic', chain='opus', node=f'Fable {ver}', parent=parent,
+                            variant=v, in_chain='yes')
+            return dict(vendor='Anthropic', chain='opus', node=f'Fable {ver}', variant=v, in_chain='yes')
         for tier in ['opus', 'sonnet', 'haiku']:
             if tier in tl:
                 # version
                 ver = None
                 if tier == 'sonnet' and '0620' in tl: ver = '3.5-Jun'
                 elif tier == 'sonnet' and '1022' in tl: ver = '3.5-Oct'
+                elif re.search(tier + r'-([5-9])(?:[-.](\d))?(?![\d.])', tl):
+                    # Generation 5 onwards is named '<tier>-<major>[-<minor>]' with no
+                    # date: read the version off the name, so a new minor release
+                    # ('opus-5-5', 'sonnet-5-1', 'opus-6') gets its own node instead of
+                    # falling into the bare '-5' entry below.
+                    mo = re.search(tier + r'-([5-9])(?:[-.](\d))?(?![\d.])', tl)
+                    ver = mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')
                 else:
                     # Order matters: every 4-x / 3-x pattern is checked before the
                     # bare '-5', which would otherwise swallow the '-5' inside
@@ -155,10 +191,14 @@ def classify(mv, org):
             if base == '4' and 'turbo' in s: return '4-turbo'
             if base == '3.5': return '3.5-turbo'
             return base
+        mo = PRO_MODE.search(tl)
+        if mo:
+            return dict(vendor='OpenAI', chain='pro', node='pro '+gptver(tl),
+                        variant='effort:'+mo.group(1).lower(), in_chain='yes')
         # Codename releases carry no tier word, so the substring tests below see
         # nothing and would collapse every tier onto the flagship node. Runs
-        # BEFORE the 'pro' test so Sol's pro-mode rows stay Sol variants rather
-        # than being pulled onto the pro chain by the bare 'pro' substring.
+        # BEFORE the 'pro' substring test, which would pull 'gpt-5.6-sol' rows
+        # whose name happens to hold 'pro' onto the pro chain.
         mo = re.search(r'gpt-\d(?:\.\d+)?[- (]+(' + '|'.join(CODENAME_CHAIN) + r')', tl)
         if mo:
             cn = mo.group(1); ch = CODENAME_CHAIN[cn]
@@ -187,6 +227,13 @@ def classify(mv, org):
         if any(x in tl for x in ['palm','bard','gopher','chinchilla','t5-','glam','mathematician']):
             return dict(vendor='Google', chain='', node='legacy', variant='', in_chain='no')
         if 'exp-1206' in tl: return dict(vendor='Google', chain='', node='gemini-exp-1206', variant='', in_chain='no')
+        # Deep Think is Gemini Pro run with parallel thinking (Google: a mode of Gemini 3 Pro,
+        # OpenAI's Pro is the same idea), published apart and later: neither a step of the Pro
+        # spine nor one of Pro 3's own rungs. No Deep Think line yet, so out of the chains
+        # (user decision 2026-10-01; formerly a spine node through an override).
+        if re.search(r'deep-?think', tl): return dict(vendor='Google', chain='', node='gemini-deep-think', variant='', in_chain='no')
+        # Flash-8B is a smaller model of its own, not a Flash snapshot.
+        if re.search(r'flash-8b', tl): return dict(vendor='Google', chain='', node='gemini-flash-8b', variant='', in_chain='no')
         if 'gemini' in tl:
             v = variant(t)
             tier = 'flash-lite' if ('flash-lite' in tl or 'flash lite' in tl) else ('flash' if 'flash' in tl else 'pro')
@@ -208,15 +255,14 @@ def classify(mv, org):
         if 'fast' in tl:
             ver = '4.1' if '4-1' in tl else '4'
             return dict(vendor='xAI', chain='grok-fast', node=f'{ver}-fast', variant=v, in_chain='yes')
-        # Both spellings of every minor version must be listed BEFORE the bare
-        # 'grok-<gen>' fallbacks, which are prefix matches: an unlisted 'grok-4.5'
-        # falls through to 'grok-4' and silently shares the grok-4 node instead of
-        # getting its own, which costs the chain a step.
-        # ponytail: hand list, so each new minor version needs its entry here; a
-        # version-boundary regex would generalize, but the date-suffixed ids
-        # ('grok-4-0709') make that a rewrite, not a one-liner.
-        for vv,lab in [('4-3','4.3'),('4.3','4.3'),('4-20','4.20'),('4.20','4.20'),('4-5','4.5'),('4.5','4.5'),('4-1','4.1'),('grok-4','4'),('grok-3','3'),('grok-2','2')]:
-            if vv in tl: return dict(vendor='xAI', chain='grok', node=lab, variant=v, in_chain='yes')
+        # Version off the name: 'grok-<major>' then an optional '-' or '.' minor of one
+        # or two digits that is not the start of a 4-digit snapshot ('grok-4-0709' is
+        # 4, 'grok-4-20' is 4.20, 'grok-4.7' is 4.7). The former hand list let every
+        # unlisted minor (4.6, 4.7) fall into the grok-4 node of July 2025.
+        mo = re.search(r'grok-(\d+)(?:[-.](\d{1,2})(?!\d))?', tl)
+        if mo:
+            lab = mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')
+            return dict(vendor='xAI', chain='grok', node=lab, variant=v, in_chain='yes')
         # A grok model with an unrecognized version (e.g. a future grok-5): flag
         # it UNROUTED so the coverage report surfaces it for review, rather than
         # silently dropping it into the generic independent bucket below.
@@ -225,12 +271,23 @@ def classify(mv, org):
     # ================= DEEPSEEK =================
     if 'deepseek' in ol or 'deepseek' in tl:
         v = variant(t)
-        if 'distill' in tl: return dict(vendor='DeepSeek', chain='', node='R1-distill', variant='', in_chain='no')
+        # A distill names its student ('deepseek-r1-0528-qwen3-8b'): another model.
+        if 'distill' in tl or re.search(r'qwen|llama', tl):
+            return dict(vendor='DeepSeek', chain='', node='R1-distill', variant='', in_chain='no')
         if 'coder' in tl:   return dict(vendor='DeepSeek', chain='', node='coder', variant='', in_chain='no')
-        if 'v4-flash' in tl:
-            node = 'V4-flash-0731' if '0731' in tl else 'V4-flash'
-            return dict(vendor='DeepSeek', chain='deepseek-flash', node=node, variant=v, in_chain='yes')
-        if 'v4' in tl:      return dict(vendor='DeepSeek', chain='deepseek-v', node='V4-pro', variant=v, in_chain='yes')
+        if tl.endswith('-base'): return dict(vendor='DeepSeek', chain='', node='base', variant='', in_chain='no')
+        # V4 onwards: 'v<ver>-<flash|pro>[-<MMDD snapshot>]'. Each version and each
+        # dated snapshot is its own node ('V4.1-flash', 'V4-pro-0813'); flash and pro
+        # are separate lines.
+        mo = re.search(r'v(\d+(?:\.\d+)?)-(flash|pro)(?:-(\d{4}))?(?![\d])', tl)
+        if mo and float(mo.group(1)) >= 4:
+            ver, line, snap = mo.groups()
+            node = f'V{ver}-{line}' + (f'-{snap}' if snap else '')
+            chain = 'deepseek-flash' if line == 'flash' else 'deepseek-v'
+            return dict(vendor='DeepSeek', chain=chain, node=node, variant=v, in_chain='yes')
+        if re.search(r'v[4-9]', tl):
+            return dict(vendor='DeepSeek', chain='', node='UNROUTED', variant=v, in_chain='no')
+        if 'terminus' in tl: return dict(vendor='DeepSeek', chain='deepseek-v', node='V3.1-Terminus', variant=v, in_chain='yes')
         if 'reasoner' in tl: return dict(vendor='DeepSeek', chain='deepseek-v', node='V3.2', variant='thinking', in_chain='yes')
         if 'march 2025' in tl: return dict(vendor='DeepSeek', chain='deepseek-v', node='V3-0324', variant='bare', in_chain='yes')  # manual: "V3 (March 2025)" = 0324
         # r1[-_]: HOST strips the 'deepseek-' vendor prefix, so an effort row
@@ -268,7 +325,12 @@ def classify(mv, org):
             m = re.search(r'qwen(\d\.?\d?)', s)
             return m.group(1) if m else '1'
         if 'turbo' in tl: return dict(vendor='Alibaba', chain='', node='qwen-turbo', variant=v, in_chain='no')
-        if 'max' in tl:   return dict(vendor='Alibaba', chain='qwen-max', node='max '+('2.5' if 'max-2025-01' in tl else qver(tl)), variant=v, in_chain='yes')
+        if 'max' in tl:
+            node = 'max '+('2.5' if 'max-2025-01' in tl else qver(tl))
+            # A later dated snapshot of one generation ('qwen3.8-max-0902') is its own node.
+            mo = re.search(r'max-(\d{4})(?=$|_)', tl)
+            if mo: node += f'-{mo.group(1)}'
+            return dict(vendor='Alibaba', chain='qwen-max', node=node, variant=v, in_chain='yes')
         # NB: dated qwen-plus snapshots within a generation (e.g. plus-2025-01-25 and
         # plus-2025-04-28) intentionally share one 'plus 2.5' node — kept pooled by
         # decision (ordering vs neighbouring nodes is unaffected either way).
@@ -278,6 +340,10 @@ def classify(mv, org):
         mo = re.search(r'(\d+)b', tl)
         sz = mo.group(1) if mo else '?'
         if sz in ['110','72','32','14','7'] and '235' not in tl:
+            # Before Qwen3 the bare id is the pretrained base checkpoint, the chat model
+            # carries -chat / -instruct: two models of one node, never one test-taker.
+            if qver(tl) in ('1', '1.5', '2', '2.5') and not re.search(r'chat|instruct', tl):
+                v = 'base'
             return dict(vendor='Alibaba', chain=f'qwen-open-{sz}b', node=f'{qver(tl)}-{sz}B', variant=v, in_chain='yes')
         return dict(vendor='Alibaba', chain='', node=f'qwen-open-{sz}b', variant=v, in_chain='no')
 
@@ -307,16 +373,22 @@ def classify(mv, org):
         # splitting one release across two. The alias map normally renames these
         # away upstream, but it is hand-maintained and lags a new release.
         tlv = re.sub(r'(\d)p(\d)', r'\1.\2', tl)
-        for vv in ['5.2','5.1','4.7','4.6','4.5','5']:
-            if vv in tlv: return dict(vendor='Zhipu', chain='glm', node=vv, variant=v, in_chain='yes')
+        # Version off the name (the former list stopped at 5.2, so 5.3 joined the glm-5
+        # node of February); the flash models are a smaller line of their own.
+        mo = re.search(r'glm-?(\d+(?:\.\d+)?)', tlv)
+        if mo:
+            if 'flash' in tlv:
+                return dict(vendor='Zhipu', chain='glm-flash', node=f'flash {mo.group(1)}', variant=v, in_chain='yes')
+            return dict(vendor='Zhipu', chain='glm', node=mo.group(1), variant=v, in_chain='yes')
         return dict(vendor='Zhipu', chain='', node='UNROUTED', variant=v, in_chain='no')  # unknown GLM version → flag for review
 
     # ================= META LLAMA =================
     if 'meta' in ol or 'llama' in tl or 'muse-spark' in tl:
-        # muse-spark 1 (2026-04-08) -> 1.1 (2026-07-09): a real two-node chain,
-        # and 1.1's high/xhigh rungs tie to its node
+        # muse-spark 1 (2026-04-08) -> 1.1 (2026-07-09) -> 1.2 -> 1.3 ...: one node per
+        # version read off the name, each version's effort rungs tied to it
         if 'muse-spark' in tl:
-            node = 'spark 1.1' if '1.1' in tl else 'spark 1'
+            mo = re.search(r'muse-spark-(\d+(?:\.\d+)?)', tl)
+            node = f'spark {mo.group(1)}' if mo else 'spark 1'
             return dict(vendor='Meta AI', chain='muse-spark', node=node,
                         variant=variant(t), in_chain='yes')
         # 3rd-party derivatives / multimodal / MoE / base → independent
@@ -335,9 +407,11 @@ def classify(mv, org):
 
     # ================= MINIMAX =================
     if 'minimax' in ol or 'minimax' in tl:
-        # Minor versions first: the bare-generation entries are prefix matches.
-        for vv in ['2.7','2.5','2.1','3','2','1']:
-            if vv in tl: return dict(vendor='MiniMax', chain='minimax', node='M'+vv, variant='bare', in_chain='yes')
+        # Version off the name ('minimax-m2.5' -> M2.5); the former hand list put an
+        # unlisted 'M3.1' on M3. Effort rungs are variants of their node, never one
+        # 'bare' group: MiniMax-M3, M3_none and M3_xhigh are three test-takers.
+        mo = re.search(r'(?:^|[-_ ])m(\d+(?:\.\d+)?)(?![\d.])', tl)
+        if mo: return dict(vendor='MiniMax', chain='minimax', node='M'+mo.group(1), variant=variant(t), in_chain='yes')
         return dict(vendor='MiniMax', chain='', node='UNROUTED', variant='bare', in_chain='no')  # unknown MiniMax version → flag
 
     # ================= MISTRAL =================
@@ -346,6 +420,7 @@ def classify(mv, org):
         v = variant(t)
         if 'pixtral' in tl: return dict(vendor='Mistral', chain='', node='pixtral', variant='', in_chain='no')
         if 'magistral' in tl: return dict(vendor='Mistral', chain='', node='magistral', variant='', in_chain='no')
+        if 'devstral' in tl: return dict(vendor='Mistral', chain='', node='devstral', variant='', in_chain='no')
         if 'ministral' in tl: return dict(vendor='Mistral', chain='', node='ministral', variant='', in_chain='no')
         if 'mixtral' in tl: return dict(vendor='Mistral', chain='', node='mixtral', variant='', in_chain='no')
         if 'nemo' in tl: return dict(vendor='Mistral', chain='', node='mistral-nemo', variant='', in_chain='no')
@@ -353,11 +428,14 @@ def classify(mv, org):
             return dict(vendor='Mistral', chain='codestral', node=('2501' if '2501' in tl else '2405'), variant=v, in_chain='yes')
         for line in ['large','small','medium']:
             if line in tl:
-                mo = re.search(r'(2402|2407|2411|2501|2503|2505|2508)', tl)
+                # Any YYMM snapshot (the former list ended at 2508, so 2506, 2603 and
+                # 2604 fell onto the undated 'small-?' / 'medium-?' nodes of 2023-24).
+                mo = re.search(r'(?<!\d)(2[3-9][01]\d)(?!\d)', tl)
                 node = f'{line}-{mo.group(1)}' if mo else (f'{line}-2505' if 'medium 3' in tl else f'{line}-?')
                 return dict(vendor='Mistral', chain=f'mistral-{line}', node=node, variant=v, in_chain='yes')
         if 'mistral-7b' in tl or re.search(r'mistral.*7b|7b.*mistral', tl):
             ver = 'v0.3' if 'v0.3' in tl else 'v0.2' if 'v0.2' in tl else 'v0.1'
+            if not re.search(r'instruct|open-mistral', tl): v = 'base'   # the pretrained checkpoint
             return dict(vendor='Mistral', chain='mistral-open-7b', node=ver, variant=v, in_chain='yes')
 
     # ================= XIAOMI MIMO =================
@@ -401,96 +479,110 @@ def classify(mv, org):
     v0 = org.split(',')[0] if isinstance(org, str) else 'other'
     return dict(vendor=v0, chain='', node='(independent)', variant='', in_chain='no')
 
-rows = [dict(raw_string=r.model_version, n_obs=r.n_obs, **classify(r.model_version, r.organization)) for r in base.itertuples()]
-out = pd.DataFrame(rows)
+def main(out_path=None, report=True):
+    """Build the map from 0_input and write it to `out_path` (default: the tracked
+    1_curated/lineage_map.csv). `report=False` skips the coverage printout. Returns the map."""
+    df = pd.read_csv(ROOT / '0_input/all_scores_flat.csv')
+    base = df[['model_version', 'organization']].drop_duplicates('model_version').copy()
+    base['n_obs'] = base.model_version.map(df.groupby('model_version').size())
 
-# ---- node_date: min release date over a node's aliases; manual backfill for undated nodes ----
-mdate = df.assign(d=pd.to_datetime(df.release_date, errors='coerce')).groupby('model_version').d.min()
-out['model_date'] = out.raw_string.map(mdate)
-nd = out[out.in_chain == 'yes'].groupby(['vendor', 'chain', 'node']).model_date.min()
-BACKFILL = {('Anthropic','opus','Opus 3'): '2024-02-29', ('Anthropic','haiku','Haiku 3'): '2024-03-07',
-            # pro 3 / flash-lite 3.1 are dated in the current data (2025-11-18 /
-            # 2026-03-03); kept only as a safety net if a future refresh drops the
-            # date, updated to match data so they can't re-introduce a mis-order.
-            ('Google','gemini-pro','pro 3'): '2025-11-18', ('Google','gemini-flash-lite','flash-lite 3.1'): '2026-03-03',
-            # Nodes whose rows carry NO release_date in the data at all, so the
-            # min-over-aliases is NaT and only this map can date them. Without an
-            # entry the node is undated and lineage.py drops its whole chain.
-            # Dates are the vendors' own announcements, checked against external
-            # sources on 2026-07-27 (Mistral's Codestral post; Xiaomi's MiMo
-            # release log, which stamps v2.5-pro 04-23 Beijing = 04-22 UTC).
-            ('Mistral','codestral','2405'): '2024-05-29',
-            ('Xiaomi','mimo-pro','v2-pro'): '2026-03-18',
-            ('Xiaomi','mimo-pro','v2.5-pro'): '2026-04-22',
-            ('Xiaomi','mimo-flash','v2-flash'): '2026-03-18',
-            # gpt-5.5-codex carries no release_date in the data (SEAL Remote Labor
-            # Index only); use the gpt-5.5 flagship date as a proxy so it orders
-            # after gpt-5.3-codex (2026-02-05). Only within-chain order matters here.
-            ('OpenAI','codex','5.5-codex'): '2026-04-23'}
-def node_date(r):
-    if r.in_chain != 'yes': return r.model_date
-    key = (r.vendor, r.chain, r.node)
-    val = nd.get(key)
-    if pd.isna(val): val = pd.to_datetime(BACKFILL.get(key))
-    return val
-out['node_date'] = out.apply(node_date, axis=1).dt.strftime('%Y-%m-%d')
-out['parent'] = out['parent'].fillna('') if 'parent' in out.columns else ''
+    rows = [dict(raw_string=r.model_version, n_obs=r.n_obs, **classify(r.model_version, r.organization)) for r in base.itertuples()]
+    out = pd.DataFrame(rows)
 
-# ---- reviewed per-model overrides ----
-# The rules above assign one node per (tier, version), which pools every dated
-# snapshot of a release: the whole 4o line lands on one node, so its releases
-# cannot move apart and share one theta. Splitting a pooled node, re-filing a
-# model onto a different tier, and naming a `parent` are all judgements about
-# what a release IS, which no regex over the name can recover. They live in this
-# tracked overlay so a rebuild keeps them, applied AFTER node_date so the rows
-# left behind on a pooled node keep the min-over-aliases date, which is the
-# earliest release still on it.
-OVERRIDES = ROOT / '1_curated/lineage_node_overrides.csv'
-ov = pd.read_csv(OVERRIDES, keep_default_na=False, dtype=str).set_index('raw_string')
-hit = out.raw_string.isin(ov.index)
-for col in ['chain', 'node', 'parent', 'node_date']:
-    out.loc[hit, col] = out.loc[hit, 'raw_string'].map(ov[col])
-stale = sorted(set(ov.index) - set(out.raw_string))
-print(f'\noverrides applied: {hit.sum()}/{len(ov)} from {OVERRIDES.name}')
-if stale:
-    print(f'  STALE (no such model in the data, drop the row): {stale}')
+    # ---- node_date: min release date over a node's aliases; manual backfill for undated nodes ----
+    mdate = df.assign(d=pd.to_datetime(df.release_date, errors='coerce')).groupby('model_version').d.min()
+    out['model_date'] = out.raw_string.map(mdate)
+    nd = out[out.in_chain == 'yes'].groupby(['vendor', 'chain', 'node']).model_date.min()
+    BACKFILL = {('Anthropic','opus','Opus 3'): '2024-02-29', ('Anthropic','haiku','Haiku 3'): '2024-03-07',
+                # pro 3 / flash-lite 3.1 are dated in the current data (2025-11-18 /
+                # 2026-03-03); kept only as a safety net if a future refresh drops the
+                # date, updated to match data so they can't re-introduce a mis-order.
+                ('Google','gemini-pro','pro 3'): '2025-11-18', ('Google','gemini-flash-lite','flash-lite 3.1'): '2026-03-03',
+                # Nodes whose rows carry NO release_date in the data at all, so the
+                # min-over-aliases is NaT and only this map can date them. Without an
+                # entry the node is undated and lineage.py drops its whole chain.
+                # Dates are the vendors' own announcements, checked against external
+                # sources on 2026-07-27 (Mistral's Codestral post; Xiaomi's MiMo
+                # release log, which stamps v2.5-pro 04-23 Beijing = 04-22 UTC).
+                ('Mistral','codestral','2405'): '2024-05-29',
+                ('Xiaomi','mimo-pro','v2-pro'): '2026-03-18',
+                ('Xiaomi','mimo-pro','v2.5-pro'): '2026-04-22',
+                ('Xiaomi','mimo-flash','v2-flash'): '2026-03-18',
+                # gpt-5.5-codex carries no release_date in the data (SEAL Remote Labor
+                # Index only); use the gpt-5.5 flagship date as a proxy so it orders
+                # after gpt-5.3-codex (2026-02-05). Only within-chain order matters here.
+                ('OpenAI','codex','5.5-codex'): '2026-04-23'}
+    def node_date(r):
+        if r.in_chain != 'yes': return r.model_date
+        key = (r.vendor, r.chain, r.node)
+        val = nd.get(key)
+        if pd.isna(val): val = pd.to_datetime(BACKFILL.get(key))
+        return val
+    out['node_date'] = out.apply(node_date, axis=1).dt.strftime('%Y-%m-%d')
+    out['parent'] = out['parent'].fillna('') if 'parent' in out.columns else ''
 
-# ---- demote chains the fit would drop anyway ----
-# Per-row rules can't see siblings, so generic rules (every gemma id founds a
-# chain) file lone releases as chains that build_lineage_structure then drops
-# (single node, single variant group: nothing to tie). Demote them here, where
-# the whole family is visible, so `in_chain=yes` means exactly "carries the
-# lineage prior" and the map's chain count equals the live count. Runs AFTER
-# the overrides, which can re-file rows either way. Mirror of lineage.py's
-# keep rule: survive on >=2 nodes OR >=2 (node, variant) groups.
-_yes = out.in_chain == 'yes'
-_alive = {c for c, g in out[_yes].groupby('chain')
-          if g['node'].nunique() >= 2
-          or g[['node', 'variant']].drop_duplicates().shape[0] >= 2}
-_demote = _yes & ~out.chain.isin(_alive)
-if int(_demote.sum()):
-    print(f"demoted {int(_demote.sum())} row(s) in "
-          f"{out.loc[_demote, 'chain'].nunique()} lone single-variant chain(s) "
-          f"to in_chain=no: {sorted(out.loc[_demote, 'chain'].unique())}")
-    out.loc[_demote, 'in_chain'] = 'no'
-    out.loc[_demote, 'chain'] = ''
+    # ---- reviewed per-model overrides ----
+    # The rules above assign one node per (tier, version), which pools every dated
+    # snapshot of a release: the whole 4o line lands on one node, so its releases
+    # cannot move apart and share one theta. Splitting a pooled node, re-filing a
+    # model onto a different tier, and naming a `parent` are all judgements about
+    # what a release IS, which no regex over the name can recover. They live in this
+    # tracked overlay so a rebuild keeps them, applied AFTER node_date so the rows
+    # left behind on a pooled node keep the min-over-aliases date, which is the
+    # earliest release still on it.
+    OVERRIDES = ROOT / '1_curated/lineage_node_overrides.csv'
+    ov = pd.read_csv(OVERRIDES, keep_default_na=False, dtype=str).set_index('raw_string')
+    hit = out.raw_string.isin(ov.index)
+    for col in ['chain', 'node', 'parent', 'node_date']:
+        out.loc[hit, col] = out.loc[hit, 'raw_string'].map(ov[col])
+    stale = sorted(set(ov.index) - set(out.raw_string))
+    print(f'\noverrides applied: {hit.sum()}/{len(ov)} from {OVERRIDES.name}')
+    if stale:
+        print(f'  STALE (no such model in the data, drop the row): {stale}')
 
-out = out[['raw_string','vendor','chain','node','parent','node_date','variant','in_chain','n_obs']].sort_values(['in_chain','vendor','chain','node_date','node'])
-out_path = ROOT / '1_curated/lineage_map.csv'
-out.to_csv(out_path, index=False)
-print('WROTE', out_path)
+    # ---- demote chains the fit would drop anyway ----
+    # Per-row rules can't see siblings, so generic rules (every gemma id founds a
+    # chain) file lone releases as chains that build_lineage_structure then drops
+    # (single node, single variant group: nothing to tie). Demote them here, where
+    # the whole family is visible, so `in_chain=yes` means exactly "carries the
+    # lineage prior" and the map's chain count equals the live count. Runs AFTER
+    # the overrides, which can re-file rows either way. Mirror of lineage.py's
+    # keep rule: survive on >=2 nodes OR >=2 (node, variant) groups.
+    _yes = out.in_chain == 'yes'
+    _alive = {c for c, g in out[_yes].groupby('chain')
+              if g['node'].nunique() >= 2
+              or g[['node', 'variant']].drop_duplicates().shape[0] >= 2}
+    _demote = _yes & ~out.chain.isin(_alive)
+    if int(_demote.sum()):
+        print(f"demoted {int(_demote.sum())} row(s) in "
+              f"{out.loc[_demote, 'chain'].nunique()} lone single-variant chain(s) "
+              f"to in_chain=no: {sorted(out.loc[_demote, 'chain'].unique())}")
+        out.loc[_demote, 'in_chain'] = 'no'
+        out.loc[_demote, 'chain'] = ''
 
-# ---- coverage report ----
-print('TOTAL models:', len(out), '| obs:', out.n_obs.sum())
-print('in_chain:', out.in_chain.value_counts().to_dict())
-un = out[out.node == 'UNROUTED']
-print(f'\nUNROUTED ({len(un)} models, {un.n_obs.sum()} obs):')
-for r in un.itertuples(): print('   ', repr(r.raw_string), '|', r.vendor)
-print('\nchained obs by vendor:', out[out.in_chain=='yes'].groupby('vendor').n_obs.sum().to_dict())
-# cross-check key chains vs LINEAGE_PLAN validated node obs
-print('\n=== node-obs cross-check (vs plan) ===')
-for ch in ['opus','sonnet','haiku','llama-70b','llama-8b','gpt','grok','minimax']:
-    sub = out[out.chain==ch]
-    if not len(sub): continue
-    nodes = sub.groupby('node').n_obs.sum().to_dict()
-    print(f'  {ch}: {nodes}')
+    out = out[['raw_string','vendor','chain','node','parent','node_date','variant','in_chain','n_obs']].sort_values(['in_chain','vendor','chain','node_date','node'])
+    out_path = Path(out_path) if out_path else ROOT / '1_curated/lineage_map.csv'
+    out.to_csv(out_path, index=False)
+    print('WROTE', out_path)
+    if not report:
+        return out
+
+    # ---- coverage report ----
+    print('TOTAL models:', len(out), '| obs:', out.n_obs.sum())
+    print('in_chain:', out.in_chain.value_counts().to_dict())
+    un = out[out.node == 'UNROUTED']
+    print(f'\nUNROUTED ({len(un)} models, {un.n_obs.sum()} obs):')
+    for r in un.itertuples(): print('   ', repr(r.raw_string), '|', r.vendor)
+    print('\nchained obs by vendor:', out[out.in_chain=='yes'].groupby('vendor').n_obs.sum().to_dict())
+    # cross-check key chains vs LINEAGE_PLAN validated node obs
+    print('\n=== node-obs cross-check (vs plan) ===')
+    for ch in ['opus','sonnet','haiku','llama-70b','llama-8b','gpt','grok','minimax']:
+        sub = out[out.chain==ch]
+        if not len(sub): continue
+        nodes = sub.groupby('node').n_obs.sum().to_dict()
+        print(f'  {ch}: {nodes}')
+
+    return out
+
+if __name__ == '__main__':
+    main()

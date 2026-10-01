@@ -1,0 +1,205 @@
+"""Guards on the lineage alias map (1_curated/lineage_map.csv).
+
+The lineage prior gives every (chain, node, variant) group ONE ability:
+theta = psi[node] + offset[(node, variant)]. A new release filed under an older node
+silently shares that node's ability (muse-spark-1.3 on the April muse-spark node, glm-5.3
+on glm-5, grok-4.6 on grok-4: found 2026-10-01), and nothing in the fit flags it. These
+tests fail on the data instead:
+
+- the tracked map is what the builder produces from 0_input (no stale map after a sync,
+  no hand edit a rebuild would erase), and covers every scored model;
+- a (chain, node, variant) group holds one model unless the pooling is reviewed in
+  1_curated/lineage_reviewed_exceptions.csv;
+- a chained model's release date sits within a month of its node's date;
+- a node carries one date and one parent;
+- the builder reads versions off the names, so the next release gets its own node.
+
+When a sync adds models: rerun `python 1_curated/2_build_lineage_map.py`, then read any
+failure here as a routing question, fixed in the builder rules, in
+lineage_node_overrides.csv, or (for true aliases of one release) in the exceptions file.
+"""
+from __future__ import annotations
+
+import importlib.util
+from pathlib import Path
+
+import pandas as pd
+import pytest
+
+ROOT = Path(__file__).resolve().parent.parent
+MAP = ROOT / "1_curated" / "lineage_map.csv"
+EXCEPTIONS = ROOT / "1_curated" / "lineage_reviewed_exceptions.csv"
+SCORES = ROOT / "0_input" / "all_scores_flat.csv"
+# Release dates may trail the node's (the min over its aliases) by a few weeks: a GA after
+# its preview, an API name after the open weights. Beyond this, the row is another release.
+MAX_DATE_GAP_DAYS = 31
+
+
+def _builder():
+    spec = importlib.util.spec_from_file_location(
+        "build_lineage_map", ROOT / "1_curated" / "2_build_lineage_map.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@pytest.fixture(scope="module")
+def builder():
+    return _builder()
+
+
+@pytest.fixture(scope="module")
+def lineage_map():
+    return pd.read_csv(MAP, keep_default_na=False, dtype=str)
+
+
+@pytest.fixture(scope="module")
+def chained(lineage_map):
+    return lineage_map[lineage_map["in_chain"] == "yes"]
+
+
+@pytest.fixture(scope="module")
+def exceptions():
+    return pd.read_csv(EXCEPTIONS, keep_default_na=False, dtype=str)
+
+
+def test_map_is_the_builders_output(builder, lineage_map, tmp_path_factory):
+    out = tmp_path_factory.mktemp("lineage") / "lineage_map.csv"
+    builder.main(out_path=out, report=False)
+    fresh = pd.read_csv(out, keep_default_na=False, dtype=str)
+    key = ["raw_string"]
+    a = lineage_map.sort_values(key).reset_index(drop=True)
+    b = fresh.sort_values(key).reset_index(drop=True)
+    assert list(a.columns) == list(b.columns)
+    diff = a.merge(b, how="outer", indicator=True)
+    diff = diff[diff["_merge"] != "both"]
+    assert diff.empty, ("lineage_map.csv is not the builder's output on 0_input; rerun "
+                        "1_curated/2_build_lineage_map.py (left_only = tracked, right_only = "
+                        f"rebuilt):\n{diff.sort_values(key).to_string(index=False)}")
+
+
+def test_every_scored_model_is_mapped(lineage_map):
+    scored = set(pd.read_csv(SCORES, usecols=["model_version"])["model_version"])
+    missing = sorted(scored - set(lineage_map["raw_string"]))
+    assert not missing, f"models scored in 0_input but absent from the lineage map: {missing}"
+
+
+def test_no_unreviewed_pooling(chained, exceptions):
+    """Two models in one (chain, node, variant) group are ONE test-taker in the fit."""
+    groups = (chained.groupby(["chain", "node", "variant"])["raw_string"]
+              .agg(lambda s: "|".join(sorted(s))))
+    pooled = groups[groups.str.contains("|", regex=False)]
+    ok = exceptions[exceptions["check"] == "pool"].set_index(["chain", "node", "variant"])["raw_strings"]
+    unreviewed = {k: v for k, v in pooled.items() if ok.get(k) != v}
+    assert not unreviewed, (
+        "models sharing one (chain, node, variant) group, i.e. one theta, with no review in "
+        f"{EXCEPTIONS.name}:\n" + "\n".join(f"  {k}: {v}" for k, v in sorted(unreviewed.items())))
+    stale = sorted(set(ok.index) - set(pooled.index))
+    assert not stale, f"{EXCEPTIONS.name}: pool entries that no longer exist, drop them: {stale}"
+
+
+def test_release_dates_match_their_node(chained, exceptions):
+    raw = pd.read_csv(SCORES, usecols=["model_version", "release_date"])
+    released = pd.to_datetime(raw.groupby("model_version")["release_date"].first(), errors="coerce")
+    rows = chained.assign(rel=chained["raw_string"].map(released),
+                          nd=pd.to_datetime(chained["node_date"]))
+    rows = rows[rows["rel"].notna()]
+    gap = (rows["rel"] - rows["nd"]).dt.days
+    ok = set(exceptions.loc[exceptions["check"] == "date", "raw_strings"])
+    off = rows[(gap.abs() > MAX_DATE_GAP_DAYS) & ~rows["raw_string"].isin(ok)]
+    assert off.empty, (
+        f"chained models released more than {MAX_DATE_GAP_DAYS} days from their node's date "
+        "(another release filed under an existing node?):\n"
+        + off.assign(gap_days=gap)[["raw_string", "chain", "node", "node_date", "rel", "gap_days"]]
+        .to_string(index=False))
+
+
+def test_node_carries_one_date_and_one_parent(chained):
+    by_node = chained.groupby(["chain", "node"])
+    bad = by_node.filter(lambda g: g["node_date"].nunique() > 1 or g["parent"].nunique() > 1)
+    assert bad.empty, ("rows of one node disagree on its date or parent (lineage.py keeps the "
+                       f"first row's):\n{bad[['raw_string', 'chain', 'node', 'parent', 'node_date']]}")
+    nodes = set(zip(chained["chain"], chained["node"]))
+    orphans = chained[(chained["parent"] != "")
+                      & ~pd.Series(list(zip(chained["chain"], chained["parent"])),
+                                   index=chained.index).isin(nodes)]
+    assert orphans.empty, f"parents that are no node of their chain:\n{orphans}"
+
+
+def test_a_product_sits_on_one_node(chained):
+    """Every run of one product (`data.model_product`: a release's efforts, its pro mode apart)
+    shares one (chain, node): an effort filed on another node splits the release's ability."""
+    from multiaxis_eci.data import model_product
+    nodes = chained.assign(product=chained["raw_string"].map(model_product)) \
+        .groupby("product")[["chain", "node"]].apply(lambda g: g.drop_duplicates().shape[0])
+    assert (nodes == 1).all(), nodes[nodes > 1]
+
+
+# A future release must get a node of its own, read off its name. Each case is a name the
+# former hand lists routed onto an older node (or a neighbour of one), plus names the new
+# rules must keep where they were.
+@pytest.mark.parametrize("name, org, chain, node", [
+    ("muse-spark-1.4_max", "Meta AI", "muse-spark", "spark 1.4"),
+    ("muse-spark", "Meta AI", "muse-spark", "spark 1"),
+    ("glm-5.4", "Z.ai (Zhipu AI)", "glm", "5.4"),
+    ("glm-6_max", "Z.ai (Zhipu AI)", "glm", "6"),
+    ("glm-5.4-flash", "Z.ai (Zhipu AI)", "glm-flash", "flash 5.4"),
+    ("glm-5p2", "Z.ai (Zhipu AI)", "glm", "5.2"),
+    ("grok-4.8_high", "xAI", "grok", "4.8"),
+    ("grok-5", "xAI", "grok", "5"),
+    ("grok-4-0709", "xAI", "grok", "4"),
+    ("grok-4-20", "xAI", "grok", "4.20"),
+    ("grok-4.20-0309-reasoning", "xAI", "grok", "4.20"),
+    ("claude-opus-5-6_max", "Anthropic", "opus", "Opus 5.6"),
+    ("claude-opus-6", "Anthropic", "opus", "Opus 6"),
+    ("claude-sonnet-5-1_high", "Anthropic", "sonnet", "Sonnet 5.1"),
+    ("claude-opus-5", "Anthropic", "opus", "Opus 5"),
+    ("claude-opus-4-5-20251101_32K", "Anthropic", "opus", "Opus 4.5"),
+    ("claude-3-7-sonnet-20250219", "Anthropic", "sonnet", "Sonnet 3.7"),
+    ("claude-fable-5-2", "Anthropic", "opus", "Fable 5.2"),
+    ("deepseek-v4.2-flash_max", "DeepSeek", "deepseek-flash", "V4.2-flash"),
+    ("deepseek-v4.1-pro-1020", "DeepSeek", "deepseek-v", "V4.1-pro-1020"),
+    ("deepseek-v4-flash-0731_high", "DeepSeek", "deepseek-flash", "V4-flash-0731"),
+    ("qwen3.9-max-1015_xhigh", "Alibaba", "qwen-max", "max 3.9-1015"),
+    ("qwen3-max-2025-09-23", "Alibaba", "qwen-max", "max 3"),
+    ("mistral-medium-2611", "Mistral AI", "mistral-medium", "medium-2611"),
+    ("mistral-small-3.1-2503", "Mistral AI", "mistral-small", "small-2503"),
+    ("MiniMax-M3.1_xhigh", "MiniMax", "minimax", "M3.1"),
+    ("MiniMax-M1-80k", "MiniMax", "minimax", "M1"),
+    ("gpt-5.6-sol_promax", "OpenAI", "pro", "pro 5.6"),       # pro mode: the pro chain
+    ("gpt-7-astra_proxhigh", "OpenAI", "pro", "pro 7"),
+    ("gpt-5.4-pro-2026-03-05_xhigh", "OpenAI", "pro", "pro 5.4"),
+])
+def test_builder_reads_versions_off_names(builder, name, org, chain, node):
+    got = builder.classify(name, org)
+    assert (got["chain"], got["node"]) == (chain, node), got
+
+
+@pytest.mark.parametrize("name, org", [
+    ("deepseek-v5", "DeepSeek"),          # a new generation is flagged, not filed under V4
+])
+def test_unknown_generation_is_unrouted(builder, name, org):
+    assert builder.classify(name, org)["node"] == "UNROUTED"
+
+
+@pytest.mark.parametrize("name, org, variant", [
+    ("gpt-6-instant", "OpenAI", "instant"),
+    ("gpt-6_cyber", "OpenAI", "cyber"),
+    ("gpt-6_chat", "OpenAI", "chat"),
+    ("DeepSeek-V3.2-Speciale", "DeepSeek", "speciale"),
+    ("Qwen2.5-72B", "Alibaba", "base"),
+    ("qwen2.5-72b-instruct", "Alibaba", "bare"),
+    ("MiniMax-M3_xhigh", "MiniMax", "effort:xhigh"),
+])
+def test_run_variants_get_their_own_group(builder, name, org, variant):
+    assert builder.classify(name, org)["variant"] == variant
+
+
+@pytest.mark.parametrize("name, org", [
+    ("deepseek-r1-0528-qwen3-8b", "DeepSeek"),   # a distill: its student is another model
+    ("gemini-1.5-flash-8b-001", "Google DeepMind"),
+    ("gemini-3-deep-think-preview", "Google DeepMind"),   # parallel-thinking mode, not a release
+    ("devstral-small-2512", "Mistral AI"),
+])
+def test_other_models_stay_out_of_the_chain(builder, name, org):
+    assert builder.classify(name, org)["in_chain"] == "no"

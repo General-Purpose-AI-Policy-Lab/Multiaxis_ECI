@@ -5,7 +5,7 @@ of the best model of each organisation on the recent frontier, the records of th
 WINDOW_MONTHS).  A record of any era is the information the record envelope and the forecasts
 rest on, so it is kept whatever its age (user decision 2026-09-10); the organisations whose
 catalogue counts as top-line are read off the recent records only. The file lists families (a
-release: base model plus snapshot, `data.model_family`), so every reasoning effort of a SOTA
+release: base model plus snapshot, a pro mode or access tier apart, `data.model_product`), so every reasoning effort of a SOTA
 release is shown; the canonical fit's SOTA table keeps the best effort of each.
 Read off the canonical K=1 fit of the current data generation (`all_models_eci.csv`,
 `timeline.csv`): no separate sampling. The list drives the timelines, the frontier gap's
@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
-from multiaxis_eci.data import MODELS_FILE, model_family  # noqa: E402
+from multiaxis_eci.data import model_organization, model_product  # noqa: E402
 
 WINDOW_MONTHS = 24        # "recent frontier": the organisations whose records fall in the last 24 months
 MIN_OBS = config.LOW_OBS_THRESHOLD   # Epoch's >= 4-benchmark rule for record-setters
@@ -52,24 +52,22 @@ def compute(results_dir: Path) -> pd.DataFrame:
     eci = pd.read_csv(results_dir / "all_models_eci.csv")
     tl = pd.read_csv(results_dir / "timeline.csv")
     humans = set(pd.read_csv(results_dir / "human_groups.csv")["name"])
-    models = pd.read_csv(MODELS_FILE, dtype=str).fillna("")
-    org = dict(zip(models["model_version"], models["organization"], strict=True))
 
     d = eci.merge(tl.loc[tl["kind"] == "model", ["name", "release_date"]], on="name")
     d = d[~d["name"].isin(humans) & (d["n_obs"] >= MIN_OBS)].copy()
     d["release_date"] = pd.to_datetime(d["release_date"])
-    d["family"] = d["name"].map(model_family)
-    d["org"] = d["name"].map(org).fillna("")
+    d["family"] = d["name"].map(model_product)
+    d["org"] = d["name"].map(model_organization)
 
     cutoff = d["release_date"].max() - pd.DateOffset(months=WINDOW_MONTHS)
     records = set(frontier_records(d, d["release_date"].min()))          # every era
-    frontier_orgs = {org.get(m, "") for m in frontier_records(d, cutoff)} - {""}
+    frontier_orgs = {model_organization(m) for m in frontier_records(d, cutoff)} - {""}
 
     # Best effort per family, then the two rules.
     fam = (d.sort_values("mean", ascending=False).drop_duplicates("family")
              .rename(columns={"name": "best_model"}))
     fam["release_date"] = fam["family"].map(d.groupby("family")["release_date"].min())
-    fam["is_record"] = fam["family"].isin({model_family(m) for m in records})
+    fam["is_record"] = fam["family"].isin({model_product(m) for m in records})
     org_best = fam.groupby("org")["mean"].transform("max")
     fam["is_top_line"] = fam["org"].isin(frontier_orgs) & (fam["mean"] >= org_best - NEAR_ECI)
     out = fam[fam["is_record"] | fam["is_top_line"]].sort_values("release_date", ascending=False)
