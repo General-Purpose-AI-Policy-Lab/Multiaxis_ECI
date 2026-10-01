@@ -125,9 +125,10 @@ class _Heartbeat:
 
 
 # Interval width and y-range of the ECI-H timeline figure (the post's figure 1): the range
-# keeps one benchmark with a very uncertain difficulty from squashing the cloud.
+# keeps one benchmark with a very uncertain difficulty from squashing the cloud; it starts at 50
+# for legibility (only the lower bar of WMDP Biology runs below it, 2026-10-01).
 TIMELINE_HDI_PROB = 0.80
-TIMELINE_ECI_RANGE = (30, 230)
+TIMELINE_ECI_RANGE = (50, 230)
 
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
