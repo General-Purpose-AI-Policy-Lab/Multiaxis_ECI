@@ -231,6 +231,31 @@ def load_boundary_eps(data: ECIData) -> np.ndarray:
     return eps_b[data.bench_idx]
 
 
+def load_binomial_n(data: ECIData) -> np.ndarray:
+    """Per-observation item count for the Beta-binomial likelihood (`build_mirt_model(binomial_n=)`).
+
+    N_b from `1_curated/benchmark_n_items.csv` where its `scoring` column says `items` (the score
+    is a share of N_b items, possibly averaged over several runs of them); NaN where it says
+    `continuous` (correlations, areas, rubric fractions, step counts of one dependent scenario),
+    which keeps the Beta density. A benchmark missing from the table keeps the Beta too and is
+    listed in a warning. Returns one value per observation.
+    """
+    benchmarks = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+    table = pd.read_csv(N_ITEMS_FILE)
+    bad = sorted(set(table["scoring"]) - {"items", "continuous"})
+    if bad:
+        raise ValueError(f"{N_ITEMS_FILE.name}: scoring must be items or continuous, got {bad}")
+    items = table[table["scoring"] == "items"]
+    n_by = dict(zip(items["benchmark"], pd.to_numeric(items["n_items"], errors="raise")))
+    missing = [b for b in benchmarks if b not in set(table["benchmark"])]
+    if missing:
+        warnings.warn(
+            f"{len(missing)} benchmark(s) are not in {N_ITEMS_FILE.name} and keep the Beta "
+            f"likelihood: {missing}", UserWarning)
+    n_b = np.array([float(n_by[b]) if b in n_by else np.nan for b in benchmarks])
+    return n_b[data.bench_idx]
+
+
 def clip_scores_to_floors(data: ECIData, floors: np.ndarray) -> ECIData:
     """Return a new ECIData with the reviewed row-level clips applied.
 

@@ -13,6 +13,7 @@ import pymc as pm
 import pytensor.tensor as pt
 
 from multiaxis_eci.config import (
+    CONTINUOUS_EPS,
     ECI_EPS,
     PRIOR_ALPHA,
     PRIOR_DELTA_HUMAN,
@@ -384,6 +385,24 @@ def _censored_beta_logp(value, a, b, lo, hi):
     return pt.maximum(term, CENSOR_LOG_FLOOR)
 
 
+def _beta_binomial_logp(value, a, b, n_items, k):
+    """Beta-binomial log-probability of k successes out of n_items where n_items > 0, the plain
+    Beta density of `value` elsewhere (continuous benchmarks, n_items = 0).
+
+    k = score * n_items may be fractional (a mean over several runs of the same items): the pmf
+    is written with log-gamma functions, which extend it smoothly. Each branch gets safe inputs
+    on the other branch's rows (n = 1, k = 0.5), so both stay finite and so do the gradients.
+    Used by build_mirt_model(binomial_n=...).
+    """
+    is_b = pt.gt(n_items, 0.0)
+    n = pt.switch(is_b, n_items, 1.0)
+    kk = pt.switch(is_b, k, 0.5)
+    lgam = pt.gammaln
+    log_choose = lgam(n + 1.0) - lgam(kk + 1.0) - lgam(n - kk + 1.0)
+    log_beta_ratio = (lgam(kk + a) + lgam(n - kk + b) - lgam(n + a + b)) - (lgam(a) + lgam(b) - lgam(a + b))
+    return pt.switch(is_b, log_choose + log_beta_ratio, pm.logp(pm.Beta.dist(alpha=a, beta=b), value))
+
+
 def build_mirt_model(data: ECIData, K: int,
                       anchors: dict | None = None,
                       loading_prior: str = "normal",
@@ -397,6 +416,7 @@ def build_mirt_model(data: ECIData, K: int,
                       ceiling_noise: bool = False,
                       known_se: bool = False,
                       censor_eps: np.ndarray | None = None,
+                      binomial_n: np.ndarray | None = None,
                       pooled_noise: bool = False,
                       shared_base_zsn: bool = True,
                       time_t: np.ndarray | None = None,
@@ -610,6 +630,10 @@ def build_mirt_model(data: ECIData, K: int,
     read from a curated file was the retired --ceilings flag, and a freely
     estimated one (the retired soft_ceiling flag) was weakly identified /
     multimodal on this data, which is why the gap is confined to noise size.
+
+    binomial_n: per-observation item count N of the benchmark (NaN for a benchmark whose
+    score is not a share of items): the score enters as k = score * N successes of a
+    Beta-binomial instead of a Beta density (see the likelihood block).
 
     censor_eps: per-observation bound (data.load_boundary_eps) turning the Beta
     likelihood into a censored one: a score at or beyond eps_b contributes
@@ -1055,7 +1079,28 @@ def build_mirt_model(data: ECIData, K: int,
         a = mu_n * phi_n
         b = (1.0 - mu_n) * phi_n
 
-        if censor_eps is None:
+        if binomial_n is not None:
+            # Beta-binomial on the benchmarks whose score is a share of N items: the score is
+            # k = score * N successes, k ~ Binomial(N, p), p ~ Beta(mu, phi). The likelihood is a
+            # probability (<= 1, so an exact fit earns nothing more), and even with no excess noise
+            # (phi -> inf) a score keeps the binomial spread of item-level success, so no benchmark's
+            # noise can collapse: on 2026-10-01 one K=4 axis captured Chess Puzzles, its sigma_b fell
+            # to 4e-4 and six of eight chains froze in that spike. Scores of 0 and 1 enter as k = 0
+            # and k = N, no clip needed. Benchmarks whose score is not a share of items
+            # (binomial_n = NaN: correlations, areas, rubric means) keep the Beta density,
+            # their exact zeros clipped to config.CONTINUOUS_EPS.
+            if censor_eps is not None:
+                raise ValueError("binomial_n and censor_eps are not combined")
+            n_items = np.asarray(binomial_n, dtype=np.float64)
+            if n_items.shape != (data.n_obs,):
+                raise ValueError("binomial_n must have one value per observation (NaN = Beta)")
+            is_b = np.isfinite(n_items) & (n_items > 0)
+            n_items = np.where(is_b, n_items, 0.0)
+            k = np.where(is_b, np.clip(data.scores, 0.0, 1.0) * n_items, 0.0)
+            # Read by the Beta rows only (the item rows read k and n_items).
+            clipped = np.clip(data.scores, CONTINUOUS_EPS, 1.0 - CONTINUOUS_EPS)
+            pm.CustomDist("obs", a, b, n_items, k, logp=_beta_binomial_logp, observed=clipped)
+        elif censor_eps is None:
             clipped = np.clip(data.scores, ECI_EPS, 1.0 - ECI_EPS)
             pm.Beta("obs", alpha=a, beta=b, observed=clipped)
         else:

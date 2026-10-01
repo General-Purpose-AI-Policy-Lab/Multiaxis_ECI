@@ -64,6 +64,7 @@ from multiaxis_eci.data import (
     REFERENCE_ECI_FILE,
     access_scope_drop_list,
     drop_zero_scores,
+    load_binomial_n,
     load_boundary_eps,
     load_eci_data,
     release_time_covariate,
@@ -141,7 +142,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
                 loading_prior="signed", floor_c=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
-                pooled_noise=False, shared_base_zsn=True, time_t=None,
+                binomial_n=None, pooled_noise=False, shared_base_zsn=True, time_t=None,
                 theta_t_cells=False, theta_pos=False, link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None,
                 save_thin: int = config.SAVE_THIN):
@@ -161,6 +162,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         tag += ", known-SE noise"
     if censor_eps is not None:
         tag += ", censored bounds"
+    if binomial_n is not None:
+        tag += f", Beta-binomial on {int(np.isfinite(binomial_n).sum())} item-scored obs"
     if pooled_noise:
         tag += ", pooled noise"
     if not shared_base_zsn:
@@ -181,7 +184,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                              variant_offsets=variant_offsets,
                              floor_c=floor_c,
                              ceiling_noise=ceiling_noise, known_se=known_se,
-                             censor_eps=censor_eps,
+                             censor_eps=censor_eps, binomial_n=binomial_n,
                              pooled_noise=pooled_noise,
                              shared_base_zsn=shared_base_zsn,
                              time_t=time_t, theta_t_cells=theta_t_cells,
@@ -321,6 +324,8 @@ def run_canonical(args) -> None:
         scope_tag += "_keepiso"
     if args.censor_bounds:
         scope_tag += "_censor"
+    elif not args.beta_binomial:
+        scope_tag += "_betalik"
     if args.human_merge:
         scope_tag += "_humanmerge"
     elif args.human_prior:
@@ -416,13 +421,16 @@ def run_canonical(args) -> None:
         # sum-to-zero log-alpha gauge), fewer divergences than `normal` on this
         # scope at unchanged abilities (rank corr 0.9988).
         censor_eps = load_boundary_eps(data) if args.censor_bounds else None
+        beta_binomial = args.beta_binomial and not args.censor_bounds
         stream = args.stream_draws and args.sampler == "nutpie"
         trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
                                human_order=human_order, censor_eps=censor_eps,
+                               binomial_n=load_binomial_n(data) if beta_binomial else None,
                                save_thin=args.save_thin,
                                stream_path=(trace_path.parent / "live_draws.zarr"
                                             if stream else None))
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
+        trace.posterior.attrs["mirt_beta_binomial"] = json.dumps(beta_binomial)
         if args.censor_bounds:
             trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
         if args.keep_isolated:
@@ -659,7 +667,9 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_censor_bounds"] = json.dumps(True)
     if args.keep_isolated:
         attrs["mirt_keep_isolated"] = json.dumps(True)
+    attrs["mirt_beta_binomial"] = json.dumps(spec.beta_binomial)
     censor_eps = load_boundary_eps(data) if args.censor_bounds else None
+    binomial_n = spec.binomial_n(data)
 
     # Streaming is nutpie's zarr storage; the other backends keep their own traces.
     stream = args.stream_draws and args.sampler == "nutpie"
@@ -671,7 +681,7 @@ def run_exploration(args, parser) -> None:
                                   loading_prior=spec.loading_prior, floor_c=floor_c,
                                   ceiling_noise=spec.ceiling_noise,
                                   known_se=spec.known_se,
-                                  censor_eps=censor_eps,
+                                  censor_eps=censor_eps, binomial_n=binomial_n,
                                   pooled_noise=spec.pooled_noise,
                                   shared_base_zsn=not spec.private_bases,
                                   theta_t_cells=spec.theta_t,
@@ -781,7 +791,9 @@ def run_exploration(args, parser) -> None:
             # aborted 0-draw trace, and the dims of an empty trace still match.
             cached = (post.sizes.get("draw", 0) > 0
                       and post.sizes.get("model") == data.n_models
-                      and post.sizes.get("bench") == data.n_benchmarks)
+                      and post.sizes.get("bench") == data.n_benchmarks
+                      and json.loads(post.attrs.get("mirt_beta_binomial", "false"))
+                      == spec.beta_binomial)
             if cached:
                 print(f"\nReusing cached K=1 baseline → {baseline_path}", flush=True)
                 gof_path = results_dir / "mirt_gof_k1.json"
@@ -790,7 +802,7 @@ def run_exploration(args, parser) -> None:
                     print(f"  1D (K=1, cached): R²={m['bayesian_r2']:.3f}  "
                           f"RMSE={m['rmse']:.3f}  MAE={m['mae']:.3f}", flush=True)
             else:
-                print(f"\nCached K=1 dims (model={post.sizes.get('model')}, "
+                print(f"\nCached K=1 dims or likelihood (model={post.sizes.get('model')}, "
                       f"bench={post.sizes.get('bench')}) don't match current data "
                       f"({data.n_models}, {data.n_benchmarks}) — refitting.", flush=True)
         if not cached:
@@ -801,12 +813,13 @@ def run_exploration(args, parser) -> None:
                 floor_c=floor_c,
                 ceiling_noise=args.ceiling_noise,
                 known_se=args.known_se,
-                censor_eps=censor_eps,
+                censor_eps=censor_eps, binomial_n=binomial_n,
                 stream_path=(results_dir / "live_draws_k1.zarr"
                              if stream else None),
                 spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
                             "mirt_loading_prior": "normal",
-                            "mirt_link": "linear"})
+                            "mirt_link": "linear",
+                            "mirt_beta_binomial": json.dumps(spec.beta_binomial)})
             save_trace(thin_trace(idata_1d, args.save_thin), baseline_path)
             gof_report(idata_1d, "1D (K=1)", "k1")
 
@@ -1035,6 +1048,11 @@ def main():
                              "eps_b = 1 / (2 N_b) from 1_curated/benchmark_n_items.csv, "
                              "instead of a density at a clipped 0.001. Both modes; "
                              "emits the `_censor` tag token"),
+    parser.add_argument("--beta-likelihood", dest="beta_binomial", action="store_false",
+                        help="the Beta density on every benchmark, instead of the default "
+                             "Beta-binomial on the benchmarks whose score is a share of N "
+                             "items (1_curated/benchmark_n_items.csv, scoring = items). Both "
+                             "modes; emits the `_betalik` tag token")
     parser.add_argument("--no-pooled-noise", dest="pooled_noise",
                         action="store_false",
                         help="[exploration] fix the per-benchmark noise prior "

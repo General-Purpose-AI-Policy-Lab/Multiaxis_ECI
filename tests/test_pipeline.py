@@ -2494,9 +2494,28 @@ class TestFitSpec:
         assert (spec.cyber, spec.floors, spec.known_se) == (True, True, True)
         assert not (spec.human_prior or spec.lineage_prior or spec.pooled_noise)
         # floors ON emits no token; the baseline is fit pooled_noise=False
-        # (3_fit/fit.py's baseline rule), which the tag now names. Harmless for
+        # (3_fit/fit.py's baseline rule), which the tag now names, and an attr-less
+        # trace predates the Beta-binomial, so `_betalik` too. Harmless for
         # folders: a baseline lives untagged in its K-fit's folder.
-        assert spec.tag == "_cyber_knownse_unpooled"
+        assert not spec.beta_binomial
+        assert spec.tag == "_cyber_knownse_unpooled_betalik"
+
+    def test_spec_written_before_beta_binomial_reads_as_beta(self):
+        # Every trace up to 2026-10-01 carries a mirt_spec without the field and was fit with
+        # the Beta: it must not inherit the new default, or its predictive draws and its K=1
+        # baseline cache would score a likelihood it never had.
+        old = {k: v for k, v in dataclasses.asdict(analysis.FitSpec(K=3)).items()
+               if k != "beta_binomial"}
+        idata = self._idata(K=3, attrs={"mirt_spec": json.dumps(old),
+                                         "mirt_loading_prior": "normal"})
+        spec = analysis.FitSpec.from_trace(idata, PROJECT_ROOT / "results" / "mirt"
+                                           / "trace_mirt_k3.nc")
+        assert not spec.beta_binomial
+        assert analysis.FitSpec(K=3).beta_binomial and analysis.FitSpec(K=3).tag == ""
+
+    def test_censored_fit_is_a_beta_fit(self):
+        spec = analysis.FitSpec(K=2, censor_bounds=True)
+        assert not spec.beta_binomial and spec.tag.endswith("_censor")
 
     # `tag` writes the tokens and `_parse_tag` reads them from a second list, so
     # every flag has to survive the round trip or a folder tag silently loads the
@@ -2841,6 +2860,66 @@ class TestPipelineIdentity:
         # Every exact zero sits at its bound; so do the scores below half an item
         # (a 1/350 partial credit on a 71-item benchmark), censored the same way.
         assert (observed == eps).sum() >= int(data.zero_score_mask.sum())
+
+    def test_binomial_n_reads_the_scoring_column(self, data):
+        from multiaxis_eci.data import N_ITEMS_FILE, load_binomial_n
+        t = pd.read_csv(N_ITEMS_FILE).set_index("benchmark")
+        assert set(t["scoring"]) == {"items", "continuous"}
+        n = load_binomial_n(data)
+        bench = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+        for i, b in enumerate(bench):
+            rows = np.flatnonzero(data.bench_idx == i)
+            if not len(rows):
+                continue
+            if b in t.index and t.loc[b, "scoring"] == "items":
+                assert np.allclose(n[rows], float(t.loc[b, "n_items"])), b
+            else:
+                assert np.isnan(n[rows]).all(), b
+
+    def test_beta_binomial_logp_matches_scipy_and_keeps_beta_rows(self):
+        import pytensor.tensor as pt
+        from scipy.stats import beta as beta_dist
+        from scipy.stats import betabinom
+
+        from multiaxis_eci.models.mirt import _beta_binomial_logp
+        a, b = np.array([2.0, 0.7, 3.0, 1.5]), np.array([5.0, 0.9, 1.2, 4.0])
+        n = np.array([40.0, 12.0, 0.0, 100.0])          # 0 = a continuous row
+        k = np.array([7.0, 12.0, 0.0, 0.0])
+        y = np.array([7 / 40, 1.0 - 1e-3, 0.31, 1e-3])
+        got = _beta_binomial_logp(pt.as_tensor(y), pt.as_tensor(a), pt.as_tensor(b),
+                                  pt.as_tensor(n), pt.as_tensor(k)).eval()
+        want = [betabinom.logpmf(7, 40, 2.0, 5.0), betabinom.logpmf(12, 12, 0.7, 0.9),
+                beta_dist.logpdf(0.31, 3.0, 1.2), betabinom.logpmf(0, 100, 1.5, 4.0)]
+        assert np.allclose(got, want)
+        # A fractional k (a mean over runs) sits between its integer neighbours.
+        frac = _beta_binomial_logp(pt.as_tensor(0.18), 2.0, 5.0, 40.0, 7.2).eval()
+        lo, hi = sorted([betabinom.logpmf(7, 40, 2.0, 5.0), betabinom.logpmf(8, 40, 2.0, 5.0)])
+        assert lo <= frac <= hi
+
+    def test_beta_binomial_likelihood_is_a_probability(self, data):
+        # The point of the switch: a benchmark whose noise collapses can no longer buy an
+        # unbounded density. Every item-scored term is a log-probability, so <= 0.
+        from multiaxis_eci.data import load_binomial_n
+        from multiaxis_eci.models.mirt import build_mirt_model
+        n = load_binomial_n(data)
+        model = build_mirt_model(data, K=1, loading_prior="pt1", binomial_n=n)
+        obs = model["obs"]
+        assert "CustomDist" in type(obs.owner.op).__name__
+        terms = model.compile_fn(model.logp(vars=[obs], sum=False)[0])(model.initial_point())
+        on = np.isfinite(n)
+        assert np.isfinite(terms).all() and (terms[on] <= 1e-9).all()
+
+    def test_beta_binomial_predictive_sits_on_the_item_grid(self, data):
+        from multiaxis_eci.data import load_binomial_n
+        from multiaxis_eci.ppc import _beta_draw
+        n = load_binomial_n(data)
+        mu = np.full((3, data.n_obs), 0.4)
+        phi = np.full((3, data.n_benchmarks), 20.0)
+        y = _beta_draw(mu, phi, data, seed=0, binomial_n=n)
+        on = np.isfinite(n)
+        k = y[:, on] * np.rint(n[on])
+        assert np.allclose(k, np.rint(k))
+        assert not np.allclose(y[:, ~on] * 1000, np.rint(y[:, ~on] * 1000))
 
 
 class TestIsolatedFamilies:

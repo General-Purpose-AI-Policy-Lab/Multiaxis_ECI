@@ -387,13 +387,24 @@ class TestGoldenLogp:
 
     def test_mirt_k1_pt1_censored(self, data):
         """--censor-bounds: boundary scores enter as Beta CDF terms (data.load_boundary_eps
-        gives eps_b = 1 / (2 N_b)); interior scores are unchanged. Pinned 2026-09-08 on the
-        pipeline data (4,571 obs, 102 zeros and 13 ones censored)."""
+        gives eps_b = 1 / (2 N_b)); interior scores are unchanged. Re-pinned 2026-10-01
+        when 1_curated/benchmark_n_items.csv gained 31 benchmarks and three corrected N
+        (the AISI CTFs, 18 to 27 items, now censor at 1 / (2 N) instead of ECI_EPS)."""
         from multiaxis_eci.data import load_boundary_eps
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         censor_eps=load_boundary_eps(data))),
-            -89866.444837, rtol=self.RTOL)
+            -87270.704309, rtol=self.RTOL)
+
+    def test_mirt_k1_pt1_beta_binomial(self, data):
+        """The default likelihood since 2026-10-01: Beta-binomial on the item-scored
+        benchmarks (data.load_binomial_n), Beta on the continuous ones, their zeros at
+        config.CONTINUOUS_EPS. Pinned 2026-10-01 (4,445 obs, 3,631 of them item-scored)."""
+        from multiaxis_eci.data import load_binomial_n
+        np.testing.assert_allclose(
+            total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
+                                        binomial_n=load_binomial_n(data))),
+            -65231.486267, rtol=self.RTOL)
 
     def test_mirt_k1_pt1(self, data):
         np.testing.assert_allclose(

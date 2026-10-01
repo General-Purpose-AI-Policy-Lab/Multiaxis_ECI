@@ -81,6 +81,12 @@ class FitSpec:
     # the panel cannot pin. The default (ON) carries no token; the opt-out
     # emits `_unpooled` for the same folder-separation reason as `floors`.
     pooled_noise: bool = True
+    # Beta-binomial likelihood on the benchmarks whose score is a share of items
+    # (data.load_binomial_n), the Beta density on the others: the basic likelihood since
+    # 2026-10-01, when a Beta-only K=4 fit froze six of eight chains in a noise spike on
+    # Chess Puzzles. The default (ON) carries no token; the opt-out emits `_betalik`. A
+    # censored fit (`censor_bounds`) is a Beta variant and turns it off.
+    beta_binomial: bool = True
 
     def __post_init__(self):
         # The cross-flag constraint the model cannot express on its own. Checked
@@ -89,6 +95,8 @@ class FitSpec:
             raise ValueError(
                 "--lineage-bm re-indexes the lineage increments by time; it "
                 "needs --lineage-prior.")
+        if self.censor_bounds and self.beta_binomial:
+            object.__setattr__(self, "beta_binomial", False)
 
     # ── identity ────────────────────────────────────────────────────────────
     @property
@@ -121,6 +129,7 @@ class FitSpec:
         if self.known_se: tag += "_knownse"
         if not self.pooled_noise: tag += "_unpooled"
         if self.censor_bounds: tag += "_censor"
+        elif not self.beta_binomial: tag += "_betalik"
         return tag
 
     @property
@@ -182,7 +191,8 @@ class FitSpec:
                 floors=args.floors,
                 ceiling_noise=args.ceiling_noise, known_se=args.known_se,
                 pooled_noise=args.pooled_noise,
-                censor_bounds=args.censor_bounds)
+                censor_bounds=args.censor_bounds,
+                beta_binomial=args.beta_binomial)
         except ValueError as e:
             if parser is None:
                 raise
@@ -215,6 +225,8 @@ class FitSpec:
         if post.attrs.get("mirt_spec"):
             d = json.loads(post.attrs["mirt_spec"])
             d["drop_benchmarks"] = tuple(d.get("drop_benchmarks") or ())
+            # A spec written before the Beta-binomial existed was fit with the Beta.
+            d.setdefault("beta_binomial", False)
             spec = FitSpec(**d)
         else:
             attr = _attr_flags(post)
@@ -227,8 +239,9 @@ class FitSpec:
                     "a crash checkpoint or an old baseline of a floors-ON fit. "
                     "Verify the recovered spec before trusting derived numbers.")
             tag = _folder_tag(trace_path)
+            # Without mirt_spec the trace predates the Beta-binomial: the Beta, unless an attr says so.
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
-                                   **attr})
+                                   "beta_binomial": False, **attr})
             if is_baseline:
                 spec = _baseline_spec(spec)
         if not is_baseline:
@@ -283,6 +296,11 @@ class FitSpec:
                   f"tasks; the rest keep the estimated per-benchmark noise",
                   flush=True)
         return data, floor_c, (data.n_eff if self.known_se else None)
+
+    def binomial_n(self, data):
+        """Per-observation item count for `build_mirt_model(binomial_n=)`, or None for a Beta fit."""
+        from multiaxis_eci.data import load_binomial_n
+        return load_binomial_n(data) if self.beta_binomial else None
 
     # ── lazy posterior access ───────────────────────────────────────────────
     def open_posterior(self, keep=None, thin: int = 1, chains=None, path=None):
@@ -402,6 +420,8 @@ def _attr_flags(post) -> dict:
         out["known_se"] = True
     if a.get("mirt_pooled_noise"):
         out["pooled_noise"] = True
+    if "mirt_beta_binomial" in a:
+        out["beta_binomial"] = bool(json.loads(a["mirt_beta_binomial"]))
     return out
 
 
@@ -490,6 +510,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["pooled_noise"] = False
     if take("_censor"):
         out["censor_bounds"] = True
+    if take("_betalik"):
+        out["beta_binomial"] = False
     if rest:
         raise ValueError(f"unrecognized tag token {rest!r} in folder tag {tag!r} "
                          "— refusing to guess the fit's data scope")
@@ -537,7 +559,10 @@ def _check_round_trip(spec: FitSpec, trace_path: Path) -> None:
     # token, whose attrs say False while its folder carries nothing. New fits
     # still round-trip exactly (both sides emit the same opt-out token). Every
     # other flag is compared strictly.
-    if replace(got, floors=want.floors, pooled_noise=want.pooled_noise) != want:
+    # `beta_binomial` too: ON is untagged, and every trace from before 2026-10-01 sits in an
+    # untagged folder with a Beta likelihood.
+    if replace(got, floors=want.floors, pooled_noise=want.pooled_noise,
+               beta_binomial=want.beta_binomial) != want:
         raise ValueError(f"spec round-trip failed: folder tag {folder_tag!r} names "
                          f"a different flag set than the recovered spec, whose own "
                          f"tag is {spec.tag!r}")

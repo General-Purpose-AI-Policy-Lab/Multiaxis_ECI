@@ -88,6 +88,22 @@ $$
 
 Interior scores are untouched. $\varepsilon$ is `ECI_EPS` in the code.
 
+### 2.3 Beta-binomial on item-scored benchmarks (the default)
+
+Since 2026-10-01 the default likelihood treats a score that is a share of a benchmark's $N_b$ items as $k_n = y_n N_b$ successes:
+
+$$
+p_n \sim \mathrm{Beta}\big(\mu_n\phi_{b_n},\,(1-\mu_n)\phi_{b_n}\big), \qquad k_n \mid p_n \sim \mathrm{Binomial}(N_{b_n}, p_n),
+$$
+
+$$
+\log P(k_n) = \log\binom{N}{k_n} + \log B(k_n + \alpha_n,\, N - k_n + \beta_n) - \log B(\alpha_n, \beta_n).
+$$
+
+The variance is $\mu(1-\mu)\,\big[1 + (N-1)/(\phi+1)\big]/N$, so even with no excess noise ($\phi\to\infty$) a score keeps the binomial spread $\mu(1-\mu)/N$ of item sampling. Each term is a probability, at most 1: a benchmark fitted exactly earns nothing more, where the Beta density grows without bound as $\sigma_b \to 0$. That unbounded gain is what froze six of eight chains of the 2026-10-01 K=4 fit, with one axis on Chess Puzzles (57 of 100 scores at the floor) and its $\sigma_b$ at $4\times10^{-4}$.
+
+$k_n$ may be fractional (a mean over several runs of the same items): the log-gamma form extends the pmf smoothly to real $k$, and its normalization is then approximate, which only touches absolute log-likelihoods (LOO), not the posterior. Scores of 0 and 1 enter as $k=0$ and $k=N$, with no clipping. $N_b$ and the `items` / `continuous` split come from `1_curated/benchmark_n_items.csv` (`data.load_binomial_n`). The 23 continuous benchmarks keep the Beta of Section 2, their exact zeros clipped to `CONTINUOUS_EPS` $=5\times10^{-3}$. `--beta-likelihood` restores the Beta on every score.
+
 ---
 
 ## 3. The shared linear predictor $\eta$

@@ -49,7 +49,8 @@ def _pull_flat(post, names: list[str], max_draws: int) -> list[np.ndarray]:
 
 
 def _beta_draw(mu: np.ndarray, phi_flat: np.ndarray, data: ECIData,
-               seed: int, n_eff: np.ndarray | None = None) -> np.ndarray:
+               seed: int, n_eff: np.ndarray | None = None,
+               binomial_n: np.ndarray | None = None) -> np.ndarray:
     """Draw Beta(mu*phi, (1-mu)*phi) per observation — the shared tail of every
     MIRT posterior predictive. mu: (S, n_obs); phi_flat: (S, n_benchmarks).
 
@@ -58,13 +59,23 @@ def _beta_draw(mu: np.ndarray, phi_flat: np.ndarray, data: ECIData,
     instrument part and the estimated excess add as relative variances:
     1/(1+phi_n) = 1/n_eff + 4*sigma_b^2, and 4*sigma_b^2 == 1/(1+phi_b). A cell
     with n_eff = inf keeps phi_b.
+
+    binomial_n: per-observation item count of a Beta-binomial fit (data.load_binomial_n, NaN =
+    Beta): those cells draw k ~ Binomial(N, p) on the Beta draw p and return k / N, the
+    likelihood the model scored.
     """
     phi_obs = phi_flat[:, data.bench_idx]
     if n_eff is not None:
         phi_obs = 1.0 / (1.0 / np.asarray(n_eff, dtype=np.float64)
                          + 1.0 / (1.0 + phi_obs)) - 1.0
     rng = np.random.default_rng(seed)
-    return rng.beta(mu * phi_obs, (1.0 - mu) * phi_obs)
+    y = rng.beta(mu * phi_obs, (1.0 - mu) * phi_obs)
+    if binomial_n is not None:
+        n = np.asarray(binomial_n, dtype=np.float64)
+        on = np.isfinite(n) & (n > 0)
+        n_int = np.rint(n[on]).astype(np.int64)
+        y[:, on] = rng.binomial(n_int, y[:, on]) / n_int
+    return y
 
 
 def posterior_predictive_mirt(trace, data: ECIData,
@@ -73,7 +84,8 @@ def posterior_predictive_mirt(trace, data: ECIData,
                               floor_c: np.ndarray | None = None,
                               n_eff: np.ndarray | None = None,
                               return_mean: bool = False,
-                              censor_eps: np.ndarray | None = None) -> np.ndarray:
+                              censor_eps: np.ndarray | None = None,
+                              binomial_n: np.ndarray | None = None) -> np.ndarray:
     """MIRT posterior predictive: mu = sigmoid(sum_k A theta - D), draw Beta.
 
     Posterior predictive for the k-factor compensatory model (models/mirt.py). Thins to `max_draws` posterior samples — the (n_samples,
@@ -100,11 +112,17 @@ def posterior_predictive_mirt(trace, data: ECIData,
     `censor_eps` (data.load_boundary_eps); the predictive draws are clipped to
     [eps, 1 - eps] like the censored observations. Detected from the trace's
     `mirt_censor_bounds` attr when omitted.
+
+    binomial_n: per-observation item count of a Beta-binomial fit (data.load_binomial_n);
+    detected from the trace's `mirt_beta_binomial` attr when omitted.
     """
     post = trace.posterior
     if censor_eps is None and json.loads(post.attrs.get("mirt_censor_bounds", "false")):
         from multiaxis_eci.data import load_boundary_eps
         censor_eps = load_boundary_eps(data)
+    if binomial_n is None and json.loads(post.attrs.get("mirt_beta_binomial", "false")):
+        from multiaxis_eci.data import load_binomial_n
+        binomial_n = load_binomial_n(data)
     soft_d = "ceiling_d" in post
     ceil_names = ["ceiling_d"] if soft_d else []
     if "alpha" in post:
@@ -143,7 +161,7 @@ def posterior_predictive_mirt(trace, data: ECIData,
         mu = c_obs + (1.0 - c_obs) * mu
     if return_mean:
         return mu
-    y = _beta_draw(mu, phi, data, seed, n_eff=n_eff)
+    y = _beta_draw(mu, phi, data, seed, n_eff=n_eff, binomial_n=binomial_n)
     if censor_eps is not None:
         lo = np.asarray(censor_eps, dtype=np.float64)
         y = np.clip(y, lo, 1.0 - lo)

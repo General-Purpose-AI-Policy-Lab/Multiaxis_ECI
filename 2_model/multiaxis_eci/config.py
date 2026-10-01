@@ -64,6 +64,12 @@ ZERO_DIAG_THRESHOLD = 5e-3
 # scores onto [ECI_EPS, 1 - ECI_EPS]; the same epsilon lets 3_fit/fit.py's
 # --drop-zero-scores identify rows on or outside (ECI_EPS, 1 - ECI_EPS).
 ECI_EPS = 1e-3
+# The bound of the continuous benchmarks under the default Beta-binomial likelihood
+# (models/mirt.py, binomial_n): item-scored benchmarks need none (a 0 is k = 0), so only the
+# few exact zeros of a continuous score are clipped, to 5e-3 rather than 1e-3 so they sit in
+# the noise of a near-zero score (logit -5.3 instead of -6.9) instead of pulling a benchmark's
+# noise down. Chosen 2026-10-01; the Beta-only likelihood keeps ECI_EPS.
+CONTINUOUS_EPS = 5e-3
 
 # ── Low-observation flag ─────────────────────────────────────────────────
 # Models with fewer than this many benchmark observations are flagged as
