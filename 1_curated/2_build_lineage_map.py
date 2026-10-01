@@ -316,7 +316,9 @@ def classify(mv, org):
         if 'plus' in tl:  return dict(vendor='Alibaba', chain='qwen-plus', node='plus '+('2.5' if 'plus-2025' in tl else qver(tl)), variant=v, in_chain='yes')
         if 'flash' in tl: return dict(vendor='Alibaba', chain='qwen-flash', node='flash '+qver(tl), variant=v, in_chain='yes')
         # open-weight: chain only fixed sizes 72/32/14/7B
-        mo = re.search(r'(\d+)b', tl)
+        # The whole size, decimals included: '(\d+)b' read 'qwen3-1.7b' as 7B and filed it on
+        # the 7B chain (found 2026-10-01 by the ECI-H regression scan).
+        mo = re.search(r'(?<![\d.])(\d+(?:\.\d+)?)b', tl)
         sz = mo.group(1) if mo else '?'
         if sz in ['110','72','32','14','7'] and '235' not in tl:
             # Before Qwen3 the bare id is the pretrained base checkpoint, the chat model

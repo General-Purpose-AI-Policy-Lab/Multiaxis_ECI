@@ -42,6 +42,8 @@ Qwen2.5-Coder-3B,Alibaba,,qwen-coder,,2024-11-12,,no,4
 Qwen2.5-Coder-32B-Instruct,Alibaba,,qwen-coder,,2024-11-12,,no,2
 Qwen2.5-Coder-14B-Instruct,Alibaba,,qwen-coder,,2024-11-12,,no,1
 Qwen2.5-Coder-3B-Instruct,Alibaba,,qwen-coder,,2024-11-12,,no,1
+qwen3-1.7b_none,Alibaba,,qwen-open-1.7b,,2025-04-29,effort:none,no,3
+qwen3-1.7b,Alibaba,,qwen-open-1.7b,,2025-04-29,bare,no,1
 qwen3-235b-a22b,Alibaba,,qwen-open-235b,,2025-04-29,bare,no,10
 Qwen3-30B-A3B,Alibaba,,qwen-open-30b,,2025-04-29,bare,no,7
 Qwen3-30B-A3B_none,Alibaba,,qwen-open-30b,,2025-04-29,effort:none,no,3
@@ -311,8 +313,6 @@ Qwen-7B,Alibaba,qwen-open-7b,1-7B,,2023-09-28,base,yes,4
 Qwen1.5-7B,Alibaba,qwen-open-7b,1.5-7B,,2024-02-04,base,yes,1
 CodeQwen1.5-7B,Alibaba,qwen-open-7b,1.5-7B 2024-04-15,,2024-04-15,base,yes,4
 qwen2.5-7b-instruct,Alibaba,qwen-open-7b,2.5-7B,,2024-09-19,bare,yes,7
-qwen3-1.7b_none,Alibaba,qwen-open-7b,3-7B,,2025-04-29,effort:none,yes,3
-qwen3-1.7b,Alibaba,qwen-open-7b,3-7B,,2025-04-29,bare,yes,1
 qwen-plus-2025-01-25,Alibaba,qwen-plus,plus 2.5,,2025-01-25,bare,yes,3
 qwen-plus-2025-04-28,Alibaba,qwen-plus,plus 2.5 2025-04-28,,2025-04-28,bare,yes,2
 qwen3.5-plus,Alibaba,qwen-plus,plus 3.5,,2026-02-16,bare,yes,8
