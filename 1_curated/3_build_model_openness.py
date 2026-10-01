@@ -12,7 +12,7 @@ serves can be downloaded. Both rules are applied by hand, in the overrides, sinc
 
   1. Epoch's model metadata (`accessibility`), read from the pipeline checkout's
      0_input/feed/epoch/model_metadata.csv, matched on the pipeline's model_version and on the
-     raw Epoch names of 2_database/model_names.csv;
+     raw Epoch names of model_names.csv in its latest run, 2_database/<YYYYMMDD>/;
   2. the family: a release and its reasoning efforts share one state (`data.model_family`), so
      `gpt-5-2025-08-07_thinking` reads off `gpt-5-2025-08-07`;
   3. `model_openness_overrides.csv`, hand-researched, for what Epoch does not cover (it also
@@ -36,6 +36,7 @@ sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci.config import PIPELINE_DIR  # noqa: E402
 from multiaxis_eci.data import MODELS_FILE, model_family  # noqa: E402
+from multiaxis_eci.sync import latest_run  # noqa: E402
 
 OUT = ROOT / "1_curated" / "model_openness.csv"
 OVERRIDES = ROOT / "1_curated" / "model_openness_overrides.csv"
@@ -48,7 +49,7 @@ def epoch_labels(pipeline: Path, models: pd.DataFrame) -> dict[str, tuple[str, s
     """model_version -> (label, source) from Epoch's accessibility column."""
     meta = pd.read_csv(pipeline / "0_input" / "feed" / "epoch" / "model_metadata.csv",
                        low_memory=False).dropna(subset=["accessibility"])
-    names = pd.read_csv(pipeline / "2_database" / "model_names.csv")
+    names = pd.read_csv(pipeline / "2_database" / latest_run(pipeline) / "model_names.csv")
 
     def label(acc: str) -> str | None:
         if acc in OPEN_CLASSES:
