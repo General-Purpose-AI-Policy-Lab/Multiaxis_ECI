@@ -162,6 +162,7 @@ def test_a_product_sits_on_one_node(chained):
     ("claude-3-7-sonnet-20250219", "Anthropic", "sonnet", "Sonnet 3.7"),
     ("claude-fable-5-2", "Anthropic", "mythos-fable", "Fable 5.2"),
     ("claude-mythos-6", "Anthropic", "mythos-fable", "Mythos 6"),
+    ("claude-mythos-preview-early", "Anthropic", "mythos-fable", "Mythos Preview Early"),
     ("deepseek-v4.2-flash_max", "DeepSeek", "deepseek-flash", "V4.2-flash"),
     ("deepseek-v4.1-pro-1020", "DeepSeek", "deepseek-v", "V4.1-pro-1020"),
     ("deepseek-v4-flash-0731_high", "DeepSeek", "deepseek-flash", "V4-flash-0731"),

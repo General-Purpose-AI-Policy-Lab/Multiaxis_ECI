@@ -39,7 +39,6 @@ gpt-3.5-turbo-instruct,gpt-3.5,3.5-turbo-instruct,,2023-09-18
 gpt-3.5-turbo-1106,gpt-3.5,3.5-turbo-1106,,2023-11-06
 gpt-3.5-turbo-0125,gpt-3.5,3.5-turbo-0125,,2024-01-25
 mimo-v2-flash,mimo-flash,v2-flash,,2025-12-16
-claude-mythos-preview-early,mythos-fable,Fable 5,,2026-06-09
 qwen1.5-32b-chat,qwen-open-32b,1.5-32B 2024-04-03,,2024-04-03
 qwen-plus-2025-04-28,qwen-plus,plus 2.5 2025-04-28,,2025-04-28
 claude-opus-5-5_max,opus,Opus 5.5,Opus 5,2026-09-22

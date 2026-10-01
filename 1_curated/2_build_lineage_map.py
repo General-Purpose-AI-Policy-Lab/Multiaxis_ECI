@@ -78,13 +78,13 @@ def classify(mv, org):
     if 'anthropic' in ol or 'claude' in tl or 'fable' in tl or 'mythos' in tl:
         v = variant(t)
         # Mythos and Fable are a line of their own, apart from Opus (user, 2026-10-01): the
-        # Mythos preview (2026-04) founds it, Fable 5 continues it, each Fable 5.x the one
-        # before. A later Mythos release ('claude-mythos-5', the day of Fable 5) branches off
-        # the preview. The early Mythos checkpoint is filed with Fable 5 through
-        # lineage_node_overrides.csv.
+        # early Mythos checkpoint (2026-04-06) founds it, the April preview continues it, then
+        # Fable 5 and each Fable 5.x the one before. A later Mythos release ('claude-mythos-5',
+        # the day of Fable 5) branches off the preview.
         if 'mythos' in tl:
             if 'preview' in tl:
-                return dict(vendor='Anthropic', chain='mythos-fable', node='Mythos Preview',
+                node = 'Mythos Preview Early' if 'early' in tl else 'Mythos Preview'
+                return dict(vendor='Anthropic', chain='mythos-fable', node=node,
                             variant='preview', in_chain='yes')
             mo = re.search(r'mythos-(\d+)(?:[-.](\d))?(?![\d.])', tl)
             ver = (mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')) if mo else '?'

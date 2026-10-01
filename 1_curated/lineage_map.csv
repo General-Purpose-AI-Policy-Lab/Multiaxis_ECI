@@ -314,8 +314,8 @@ claude-haiku-4-5-20251001_thinking,Anthropic,haiku,Haiku 4.5,,2025-10-15,thinkin
 claude-haiku-4-5-20251001_low,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:low,yes,1
 claude-haiku-4-5-20251001,Anthropic,haiku,Haiku 4.5,,2025-10-15,bare,yes,1
 claude-haiku-4-5-20251001_xhigh,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:xhigh,yes,1
-claude-mythos-preview,Anthropic,mythos-fable,Mythos Preview,,2026-04-06,preview,yes,5
-claude-mythos-preview-early,Anthropic,mythos-fable,Fable 5,,2026-06-09,preview,yes,8
+claude-mythos-preview-early,Anthropic,mythos-fable,Mythos Preview Early,,2026-04-06,preview,yes,8
+claude-mythos-preview,Anthropic,mythos-fable,Mythos Preview,,2026-04-07,preview,yes,5
 claude-fable-5_none,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:none,yes,2
 claude-fable-5_high,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:high,yes,13
 claude-fable-5_low,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:low,yes,8
