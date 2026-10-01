@@ -747,7 +747,7 @@ gpt-oss-20b_high,OpenAI,gpt-oss-20b,oss-20b,,2025-08-05,effort:high,yes,7
 gpt-oss-20b_low,OpenAI,gpt-oss-20b,oss-20b,,2025-08-05,effort:low,yes,3
 gpt-oss-20b_medium,OpenAI,gpt-oss-20b,oss-20b,,2025-08-05,effort:medium,yes,4
 gpt-oss-20b,OpenAI,gpt-oss-20b,oss-20b,,2025-08-05,bare,yes,5
-gpt-5.6-sol,OpenAI,gpt-sol,sol 5.6,,2026-07-09,bare,yes,14
+gpt-5.6-sol,OpenAI,gpt-sol,sol 5.6,,2026-07-09,bare,yes,13
 gpt-5.6-sol_high,OpenAI,gpt-sol,sol 5.6,,2026-07-09,effort:high,yes,9
 gpt-5.6-sol_low,OpenAI,gpt-sol,sol 5.6,,2026-07-09,effort:low,yes,10
 gpt-5.6-sol_max,OpenAI,gpt-sol,sol 5.6,,2026-07-09,effort:max,yes,24
