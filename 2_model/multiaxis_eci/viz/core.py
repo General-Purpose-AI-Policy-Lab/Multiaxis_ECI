@@ -489,8 +489,8 @@ def sota_forest_fig(sota_df: pd.DataFrame,
 
 # ── Capability / difficulty timeline ──────────────────────────────────────────
 HUMAN_LEVEL_LABELS_FR = {
-    "Committee of Average Humans":  "Comité d'humains moyens",
-    "Average Human":                "Humain moyen",
+    "Committee of Average Humans":  "Comité d'humains médians",
+    "Average Human":                "Humain médian",
     "Committee of Skilled Generalists": "Comité de généralistes qualifiés",
     "Skilled Generalist":           "Généraliste qualifié",
     "Domain Expert":                "Expert du domaine",

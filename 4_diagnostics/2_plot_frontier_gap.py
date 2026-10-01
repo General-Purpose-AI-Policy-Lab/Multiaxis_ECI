@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis.frontier_gap import (  # noqa: E402
+    GROUP_NOUNS,
     GROUP_PAIRS,
     GROUP_TITLES,
     SCOPES,
@@ -42,15 +43,17 @@ from multiaxis_eci.viz.frontier_gap_print import lag_fig_print, save_print  # no
 from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 from multiaxis_eci.viz.style import POST  # noqa: E402
 
-# (quantity, group role, label, unit, signed)
+# (quantity, group role, label, unit, signed). {leader} / {follower} are the group captions
+# (GROUP_TITLES), {leader_n} / {follower_n} the same groups inside a sentence (GROUP_NOUNS): the
+# French of every label is written from those in viz.i18n, for every group.
 TABLE_ROWS = [
     ("slope", "leader", "{leader} frontier slope", "ECI-H / yr", True),
     ("slope", "follower", "{follower} frontier slope", "ECI-H / yr", True),
     ("slope_diff", None, "Slope difference ({leader} - {follower})", "ECI-H / yr", True),
     ("gap_today", None, "Gap today ({leader} - {follower} trend lines)", "ECI-H", True),
-    ("lag_today", None, "Lag today (gap / {leader} slope)", "months", False),
-    ("envelope_lag_latest_record", None, "Lag of the latest {follower} record", "months", False),
-    ("envelope_lag_last_12m_mean", None, "Mean lag of the last 12 months' {follower} records",
+    ("lag_today", None, "Lag today (gap / {leader_n} slope)", "months", False),
+    ("envelope_lag_latest_record", None, "Lag of the latest {follower_n} record", "months", False),
+    ("envelope_lag_last_12m_mean", None, "Mean lag of the last 12 months' {follower_n} records",
      "months", False),
 ]
 # Per-draw arrays behind each table row, for the differences against the all-benchmarks scope.
@@ -115,9 +118,9 @@ def markdown_table(df: pd.DataFrame) -> str:
 
 # The displayed table: the lags in months only, headline first, one column per scope and no
 # differences between scopes. The long CSV keeps every quantity and every difference.
-SHOWN_ROWS = [("envelope_lag_last_12m_mean", "Mean lag of the last 12 months' {follower} records"),
-              ("envelope_lag_latest_record", "Lag of the latest {follower} record"),
-              ("lag_today", "Lag today on the trend lines (gap / {leader} slope)")]
+SHOWN_ROWS = [("envelope_lag_last_12m_mean", "Mean lag of the last 12 months' {follower_n} records"),
+              ("envelope_lag_latest_record", "Lag of the latest {follower_n} record"),
+              ("lag_today", "Lag today on the trend lines (gap / {leader_n} slope)")]
 
 
 def build_table(results: dict, scopes: list[str], kind: str) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -125,7 +128,9 @@ def build_table(results: dict, scopes: list[str], kind: str) -> tuple[pd.DataFra
     the long numeric frame of every quantity, the differences between scopes included."""
     leader, follower = GROUP_PAIRS[kind]
     titles = GROUP_TITLES[kind]
-    names = {"leader": titles[leader], "follower": titles[follower]}
+    nouns = GROUP_NOUNS[kind]
+    names = {"leader": titles[leader], "follower": titles[follower],
+             "leader_n": nouns[leader][0], "follower_n": nouns[follower][0]}
     cells, long = [], []
     for q, role, label, unit, signed in TABLE_ROWS:
         key = f"{q}_{role}" if role else q
@@ -187,7 +192,7 @@ def main():
                     help="fix the panels' ECI-H range (default: read off the candidates)")
     args = ap.parse_args()
     kind = args.group
-    titles = GROUP_TITLES[kind]
+    titles, nouns = GROUP_TITLES[kind], GROUP_NOUNS[kind]
     leader, follower = GROUP_PAIRS[kind]
 
     cmp_dir = config.COMPARISONS_DIR
@@ -220,7 +225,8 @@ def main():
     big = replace(POST, font_axis=40, font_tick=34, font_legend=38, font_tier=33, font_note=24)
     fig = lag_fig(results, scopes, today=args.today, label_scope="all", scope_titles=captions,
                   style=big, title=None,
-                  follower_title=titles[follower].lower(), leader_title=titles[leader].lower())
+                  follower_title=nouns[follower][0], leader_title=nouns[leader][0],
+                  leader_one=nouns[leader][1])
     save_en_fr(fig, f"{stem}_lag", figures_dir, scale=1)
     # The French render people print is drawn again in the lab's house style (matplotlib, the
     # lab's marks in the corners), over the translated Plotly PNG and SVG; the interactive twin
@@ -246,7 +252,7 @@ def main():
     cells, long = build_table(results, scopes, kind)
     long.to_csv(cmp_dir / f"{stem}_table.csv", index=False)
     (cmp_dir / f"{stem}_table.md").write_text(markdown_table(cells))
-    fig = summary_table_fig(cells, "Months behind the closed frontier, median [80% interval]",
+    fig = summary_table_fig(cells, f"Months behind the {nouns[leader][0]} frontier, median [80% interval]",
                             width=1500)
     # A table is not a plot: it has no HTML twin worth keeping, so it skips save_en_fr.
     fig.write_image(str(figures_dir / f"{stem}_table.png"), scale=2)

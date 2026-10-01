@@ -69,7 +69,8 @@ from multiaxis_eci.analysis.regimes import (
     weighted_line_fit,
 )
 from multiaxis_eci.analysis.stats import post_stats
-from multiaxis_eci.data import MODEL_OPENNESS_FILE, MODELS_FILE, load_model_openness, model_family
+from multiaxis_eci.data import (MODEL_OPENNESS_FILE, load_model_openness, model_country,
+                                model_organization, model_product)
 
 # Smallest posterior SD (ECI-H points) a frontier point carries in the line fits.
 SD_FLOOR = 0.5
@@ -98,6 +99,12 @@ LINK_MIN_OBS = 4
 GROUP_PAIRS = {"openness": ("closed", "open"), "country": ("US", "CN")}
 GROUP_TITLES = {"openness": {"closed": "Closed models", "open": "Open-weights models"},
                 "country": {"US": "US models", "CN": "Chinese models"}}
+# The same groups inside a sentence, plural and singular: "Release date of the open-weights models
+# record", "first closed model above". Their French forms are viz.i18n.FR_GROUPS, from which the
+# French of every frontier-gap caption is written, so a new group needs its line there too.
+GROUP_NOUNS = {"openness": {"closed": ("closed models", "closed model"),
+                            "open": ("open-weights models", "open-weights model")},
+               "country": {"US": ("US models", "US model"), "CN": ("Chinese models", "Chinese model")}}
 # Benchmark access scopes: the fit folder and the caption of each.
 SCOPES = {"all": ("canonical", "all benchmarks"),
           "public": ("canonical_public", "public benchmarks"),
@@ -113,9 +120,7 @@ def group_labels(kind: str, names: list[str]) -> dict[str, str]:
         lab = load_model_openness()
         return {m: lab[m] for m in names if lab.get(m) in ("open", "closed")}
     if kind == "country":
-        df = pd.read_csv(MODELS_FILE, dtype=str).fillna("")
-        cmap = dict(zip(df["model_version"], df["country"]))
-        return {m: cmap[m] for m in names if cmap.get(m) in ("US", "CN")}
+        return {m: model_country(m) for m in names if model_country(m) in ("US", "CN")}
     raise ValueError(f"unknown group kind {kind!r}")
 
 
@@ -124,12 +129,10 @@ def linking_members(names: list[str], candidates: np.ndarray, n_obs: np.ndarray,
     """(n,) bool: the models a class fit is linked through, the leader group's candidates from
     LINK_ORGANIZATIONS with at least LINK_MIN_OBS scores in the scope (closed OpenAI, Anthropic
     and Google models; gpt-oss and Gemma, open, are not among them)."""
-    org = pd.read_csv(MODELS_FILE, dtype=str).drop_duplicates("model_version") \
-        .set_index("model_version")["organization"]
     labels = group_labels(kind, names)
     leader = GROUP_PAIRS[kind][0]
     return np.array([bool(candidates[i]) and n_obs[i] >= LINK_MIN_OBS
-                     and labels.get(m) == leader and org.get(m) in LINK_ORGANIZATIONS
+                     and labels.get(m) == leader and model_organization(m) in LINK_ORGANIZATIONS
                      for i, m in enumerate(names)])
 
 
@@ -138,15 +141,15 @@ def off_frontier_records(group: GroupFrontier, reference: GroupFrontier,
     """The records of `group` (a class scope) whose release stands more than `tol` ECI-H below
     the same group's record of its date in `reference` (the all-benchmarks scope), both read on
     the reference's posterior medians: the best of the models the class scored, not a frontier
-    model. A release is its best effort on the reference (`data.model_family`), so kimi-k3_max is
+    model. A release is its best effort on the reference (`data.model_product`), so kimi-k3_max is
     judged as Kimi K3, whichever effort holds the reference's record. A release the reference
     does not hold is kept."""
-    ref = reference.tl.assign(family=reference.tl["name"].map(model_family))
+    ref = reference.tl.assign(family=reference.tl["name"].map(model_product))
     level = ref.groupby("family")["mean"].max()
     ref_recs = ref[ref["is_record"]]
     out = set()
     for _, r in group.tl[group.tl["is_record"]].iterrows():
-        fam = model_family(r["name"])
+        fam = model_product(r["name"])
         if fam not in level.index:
             continue
         front = ref_recs.loc[ref_recs["release_date"] <= r["release_date"], "mean"]

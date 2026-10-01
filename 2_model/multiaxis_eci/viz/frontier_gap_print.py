@@ -18,7 +18,9 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
 
+from multiaxis_eci.analysis.frontier_gap import GROUP_PAIRS  # noqa: E402
 from multiaxis_eci.viz.frontier_gap import _lag_curve, _today  # noqa: E402
+from multiaxis_eci.viz.i18n import FR_GROUPS  # noqa: E402
 
 # ── Style ─────────────────────────────────────────────────────────────────────────────────────
 ENCRE = "#14243d"            # navy ink in place of black: texts, axis, ticks
@@ -49,14 +51,16 @@ STYLE = {"font.family": "sans-serif", "font.sans-serif": ["Helvetica Neue", "Ari
          "axes.unicode_minus": True}
 
 # ── Texts (French) ────────────────────────────────────────────────────────────────────────────
-# The vertical caption names the leader group whose frontier the lag is read off.
-Y_LABEL = {"openness": "Mois de retard sur la frontière\ndes modèles fermés",
-           "country": "Mois de retard sur la frontière\ndes modèles américains"}
+# The vertical caption names the leader group whose frontier the lag is read off, in the French
+# of viz.i18n.FR_GROUPS: "... des modèles fermés", "... des modèles américains".
+Y_LABEL = {kind: f"Mois de retard sur la frontière\ndes {FR_GROUPS[leader][1]}"
+           for kind, (leader, _) in GROUP_PAIRS.items()}
 SCOPES_FR = {"all": "Tous les benchmarks", "public": "Benchmarks publics",
              "semi_private": "Benchmarks semi-privés", "private": "Benchmarks privés"}
 AUJOURDHUI = "aujourd’hui"
 # A few records everyone knows, named beside their dot on all benchmarks, per group: name -> (text,
-# offset in points from the dot, horizontal and vertical alignment). Positions chosen by eye.
+# offset in points from the dot, horizontal and vertical alignment). Positions chosen by eye; a
+# group without an entry names none.
 MODELES = {"openness": {"LLaMA-65B": ("LLaMA 65B", (0, 7), "center", "bottom"),
                         "Llama-3.1-405B": ("Llama 3.1 405B", (-6, 0), "right", "center"),
                         "DeepSeek-R1": ("DeepSeek R1", (0, -7), "center", "top"),
@@ -155,7 +159,7 @@ def lag_fig_print(results: dict, scopes: list[str], *, today=None, counts: dict 
 
         # A few well-known records named beside their dot
         df = results[label_scope].lag_df.set_index("name")
-        for key, (text, (dx, dy), ha, va) in MODELES[group].items():
+        for key, (text, (dx, dy), ha, va) in MODELES.get(group, {}).items():
             if key in df.index and np.isfinite(df.at[key, "lag_months_median"]):
                 ax.annotate(text, (df.at[key, "release_date"], df.at[key, "lag_months_median"]),
                             xytext=(dx, dy), textcoords="offset points", ha=ha, va=va,

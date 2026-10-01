@@ -252,12 +252,14 @@ def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
 def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             window: tuple[str, str] | None = None, today=None, smooth_months: float = 6.0,
             label_scope: str = "all", title: str | None = None,
-            follower_title: str = "open-weights", leader_title: str = "closed",
-            scope_titles: dict | None = None) -> go.Figure:
+            follower_title: str = "open-weights models", leader_title: str = "closed models",
+            leader_one: str = "closed model", scope_titles: dict | None = None) -> go.Figure:
     """Months behind the leader's frontier, per follower record and access scope: a dot with its
     50% interval per record, and a Gaussian-smoothed curve (bandwidth `smooth_months`) with its
     80% band across posterior draws per scope, named at its right end. The records of
     `label_scope` are named beside their dot, the names spread so they do not cover one another.
+    The group names are as a sentence carries them (analysis.frontier_gap.GROUP_NOUNS), the
+    leader's in the plural and, for the hover, in the singular (`leader_one`).
 
     The y-range and the plotting area are fixed here rather than left to Plotly (the margins are
     declared `autoexpand=False`), because the name band is measured in pixels and its height has
@@ -383,7 +385,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                 customdata=np.column_stack([(sub[f"frac_{key}"] * 100).round() if key else np.zeros(len(sub)),
                                             sub["first_leader_above"] if "first_leader_above" in sub else [""] * len(sub)]),
                 hovertemplate="%{text}<br>%{x|%Y-%m-%d}: " + hover
-                              + "<br>first closed model above: %{customdata[1]}<extra>" + name + "</extra>"))
+                              + f"<br>first {leader_one} above: %{{customdata[1]}}<extra>" + name + "</extra>"))
 
         points(df[~cens & ~back], "circle", "%{y:.1f} months behind", "")
         # Backcast records: the closed frontier already exceeded them on its first measured day;

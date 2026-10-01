@@ -9,11 +9,69 @@ from __future__ import annotations
 import numpy as np
 import plotly.graph_objects as go
 
+# French forms of the frontier-gap groups (analysis.frontier_gap.GROUP_TITLES and GROUP_NOUNS): the
+# caption, then the plural and the singular inside a sentence. A new group needs only its line here.
+FR_GROUPS: dict[str, tuple[str, str, str]] = {
+    "closed": ("Modèles fermés", "modèles fermés", "modèle fermé"),
+    "open": ("Modèles à poids ouverts", "modèles à poids ouverts", "modèle à poids ouverts"),
+    "US": ("Modèles américains", "modèles américains", "modèle américain"),
+    "CN": ("Modèles chinois", "modèles chinois", "modèle chinois"),
+}
+
+
+def _frontier_gap_entries() -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
+    """The French of every frontier-gap caption that names a group, for every group pair of
+    analysis.frontier_gap: the phrases (titles, axis captions, table rows, hover), then the legend
+    entries and the bare group names, which must come after every phrase containing them."""
+    from multiaxis_eci.analysis.frontier_gap import GROUP_NOUNS, GROUP_PAIRS, GROUP_TITLES
+    missing = sorted({g for pair in GROUP_PAIRS.values() for g in pair} - set(FR_GROUPS))
+    if missing:
+        raise KeyError(f"viz.i18n.FR_GROUPS has no French for the frontier-gap groups {missing}")
+    phrases, legend, bare = [], [], []
+    for kind, (lead, fol) in GROUP_PAIRS.items():
+        titles, nouns = GROUP_TITLES[kind], GROUP_NOUNS[kind]
+        lt, ft = titles[lead], titles[fol]
+        (ln, ln1), (fn, _) = nouns[lead], nouns[fol]
+        _, lp, ls = FR_GROUPS[lead]
+        _, fp, _ = FR_GROUPS[fol]
+        phrases += [
+            (f"{lt} vs {ft} (ECI-H), by benchmark access",
+             f"{FR_GROUPS[lead][0]} contre {fp} (ECI-H), par accès aux benchmarks"),
+            (f"Months behind the {ln}<br>frontier (ECI-H)",
+             f"Mois de retard sur la frontière<br>des {lp} (ECI-H)"),
+            (f"Months behind the {ln} frontier, median [80% interval]",
+             f"Mois de retard sur la frontière des {lp}, médiane [intervalle à 80 %]"),
+            (f"Release date of the {fn} record", f"Date de sortie du record des {fp}"),
+            # The summary table's rows
+            (f"Mean lag of the last 12 months' {fn} records",
+             f"Retard moyen des records des {fp} des 12 derniers mois"),
+            (f"Lag of the latest {fn} record", f"Retard du dernier record des {fp}"),
+            (f"Gap today ({lt} - {ft} trend lines)",
+             f"Écart aujourd'hui (droites de tendance : {lp} − {fp})"),
+            (f"Slope difference ({lt} - {ft})", f"Différence de pente ({lp} − {fp})"),
+            (f"Lag today on the trend lines (gap / {ln} slope)",
+             f"Retard aujourd'hui sur les droites de tendance (écart / pente des {lp})"),
+            (f"Lag today (gap / {ln} slope)", f"Retard aujourd'hui (écart / pente des {lp})"),
+            (f"{ft} frontier slope", f"Pente de la frontière des {fp}"),
+            (f"{lt} frontier slope", f"Pente de la frontière des {lp}"),
+            (f"first {ln1} above:", f"premier {ls} au-dessus :"),
+        ]
+        for g in (fol, lead):
+            cap, plural, _ = FR_GROUPS[g]
+            legend += [(f"{titles[g]}: frontier record", f"{cap} : record de la frontière"),
+                       (f"{titles[g]}: trend (80% band)", f"{cap} : tendance (bande à 80 %)"),
+                       (f"{titles[g]} trend", f"tendance des {plural}")]
+            bare.append((titles[g], cap))
+    return phrases, legend + bare
+
+
+_FG_PHRASES, _FG_NAMES = _frontier_gap_entries()
+
 FR_TABLE: list[tuple[str, str]] = [
     # Dashboard and per-fit figure titles
     ("Forecast:", "Prévision :"),
     ("non-reasoning models", "modèles sans raisonnement"),
-    ("ability (Average Human = 0, Top Performer = 1)", "capacité (Humain moyen = 0, Meilleur performeur = 1)"),
+    ("ability (Average Human = 0, Top Performer = 1)", "capacité (Humain médian = 0, Meilleur performeur = 1)"),
     ("(80% intervals)", "(intervalles à 80 %)"),
     ("(50% intervals)", "(intervalles à 50 %)"),
     ("(crossing dates)", "(dates de croisement)"),
@@ -51,17 +109,17 @@ FR_TABLE: list[tuple[str, str]] = [
      "Axe 2 : Connaissances et raisonnement scientifiques"),
     ("Axis 3: Agentic Capabilities", "Axe 3 : Capacités agentiques"),
     ("Axis 4: Legacy QA", "Axe 4 : Questions-Réponses (obsolète)"),
-    # Human tiers, in the post's capitalized style (the dashboard's
-    # HUMAN_LEVEL_LABELS_FR keeps its own lowercase labels)
-    ("Committee of Average Humans", "Comité d'Humains Moyens"),
-    ("Committee of Skilled Generalists", "Comité de Généralistes Qualifiés"),
-    ("Committee of Domain Experts", "Comité d'Experts du Domaine"),
-    ("High School Top Performer", "Lycéen Meilleur Performeur"),
-    ("High School Qualifier", "Lycéen Qualifié"),
-    ("Average Human", "Humain Moyen"),
-    ("Skilled Generalist", "Généraliste Qualifié"),
-    ("Domain Expert", "Expert du Domaine"),
-    ("Top Performer", "Meilleur Performeur"),
+    # Human tiers, capitalized as French titles are: first word only
+    # (the same labels as the dashboard's HUMAN_LEVEL_LABELS_FR)
+    ("Committee of Average Humans", "Comité d'humains médians"),
+    ("Committee of Skilled Generalists", "Comité de généralistes qualifiés"),
+    ("Committee of Domain Experts", "Comité d'experts du domaine"),
+    ("High School Top Performer", "Lycéen, meilleur performeur"),
+    ("High School Qualifier", "Lycéen qualifié"),
+    ("Average Human", "Humain médian"),
+    ("Skilled Generalist", "Généraliste qualifié"),
+    ("Domain Expert", "Expert du domaine"),
+    ("Top Performer", "Meilleur performeur"),
     # Trend legend and subtitle (the per-fit panels), before "models" and "AI models"
     ("Frontier forecast against human tiers",
      "Prévision de la frontière face aux niveaux humains"),
@@ -83,36 +141,11 @@ FR_TABLE: list[tuple[str, str]] = [
     # PIT
     ("calibrated (uniform)", "calibré (uniforme)"),
     ("density", "densité"),
-    # Frontier gap (open weights vs closed, by benchmark access). Before the small words
-    # below: "Closed models" has to land before "models", "Gap today" before "today".
-    ("How far behind the closed models frontier are open-weights models?",
-     "De combien de mois les modèles à poids ouverts sont-ils derrière la frontière des modèles fermés ?"),
-    ("Closed models vs Open-weights models (ECI-H), by benchmark access",
-     "Modèles fermés contre modèles à poids ouverts (ECI-H), par accès aux benchmarks"),
-    ("Closed models vs Open-weights models: median [80% interval]",
-     "Modèles fermés contre modèles à poids ouverts : médiane [intervalle à 80 %]"),
-    ("Months behind the closed models<br>frontier (ECI-H)",
-     "Mois de retard sur la frontière<br>des modèles fermés (ECI-H)"),
-    ("Release date of the open-weights models record",
-     "Date de sortie du record des modèles à poids ouverts"),
+    # Frontier gap, by benchmark access: every caption naming a group is written from
+    # FR_GROUPS for every group pair (_frontier_gap_entries). Before the small words below:
+    # "Closed models" has to land before "models", "Gap today" before "today".
+    *_FG_PHRASES,
     ("How far behind: ", "De combien de mois de retard : "),
-    # The summary table's rows and headers
-    ("Mean lag of the last 12 months' Open-weights models records",
-     "Retard moyen des records des modèles à poids ouverts des 12 derniers mois"),
-    ("Gap today (Closed models - Open-weights models trend lines)",
-     "Écart aujourd'hui (droites de tendance : modèles fermés − modèles à poids ouverts)"),
-    ("Slope difference (Closed models - Open-weights models)",
-     "Différence de pente (modèles fermés − modèles à poids ouverts)"),
-    ("Lag of the latest Open-weights models record",
-     "Retard du dernier record des modèles à poids ouverts"),
-    ("Months behind the closed frontier, median [80% interval]",
-     "Mois de retard sur la frontière des modèles fermés, médiane [intervalle à 80 %]"),
-    ("Lag today on the trend lines (gap / Closed models slope)",
-     "Retard aujourd'hui sur les droites de tendance (écart / pente des modèles fermés)"),
-    ("Lag today (gap / Closed models slope)",
-     "Retard aujourd'hui (écart / pente des modèles fermés)"),
-    ("Open-weights models frontier slope", "Pente de la frontière des modèles à poids ouverts"),
-    ("Closed models frontier slope", "Pente de la frontière des modèles fermés"),
     ("Δ semi-private - all", "Δ semi-privés − tous"),
     ("Δ public - all", "Δ publics − tous"),
     ("Δ private - public", "Δ privés − publics"),
@@ -120,15 +153,8 @@ FR_TABLE: list[tuple[str, str]] = [
     ("ECI-H / yr", "ECI-H / an"),
     ("quantity", "quantité"),
     ("unit", "unité"),
-    # Legend entries and hover labels of both frontier figures
-    ("Open-weights models: frontier record", "Modèles à poids ouverts : record de la frontière"),
-    ("Closed models: frontier record", "Modèles fermés : record de la frontière"),
-    ("Open-weights models: trend (80% band)", "Modèles à poids ouverts : tendance (bande à 80 %)"),
-    ("Closed models: trend (80% band)", "Modèles fermés : tendance (bande à 80 %)"),
-    ("Open-weights models trend", "tendance des modèles à poids ouverts"),
-    ("Closed models trend", "tendance des modèles fermés"),
-    ("Open-weights models", "Modèles à poids ouverts"),
-    ("Closed models", "Modèles fermés"),
+    # Legend entries and hover labels of both frontier figures, then the bare group names
+    *_FG_NAMES,
     ("Semi-private benchmarks", "Benchmarks semi-privés"),
     ("Private benchmarks", "Benchmarks privés"),
     ("Public benchmarks", "Benchmarks publics"),
@@ -142,7 +168,6 @@ FR_TABLE: list[tuple[str, str]] = [
     ("crossing measured", "croisement mesuré"),
     ("lower bound", "borne inférieure"),
     # Hover fragments: the longest form of each first
-    ("first closed model above:", "premier modèle fermé au-dessus :"),
     ("at least %{y:.1f} months behind", "au moins %{y:.1f} mois de retard"),
     (" months behind (backcast in ", " mois de retard (rétrodaté dans "),
     (" months behind", " mois de retard"),

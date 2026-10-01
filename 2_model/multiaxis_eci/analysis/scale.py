@@ -25,7 +25,7 @@ from multiaxis_eci.data import ECIData
 
 ABILITY_LABEL = {
     "en": f"ability ({HUMAN_UNIT_ANCHORS[0]} = 0, {HUMAN_UNIT_ANCHORS[1]} = 1)",
-    "fr": "capacité (Humain moyen = 0, Meilleur performeur = 1)",
+    "fr": "capacité (Humain médian = 0, Meilleur performeur = 1)",
 }
 _FRAME_COLS = ("mean", "hdi_low", "hdi_high")
 

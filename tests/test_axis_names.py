@@ -94,7 +94,7 @@ def test_translate_fig_keeps_categories_together():
                       xaxis_title="Release date")
     fr = translate_fig(fig)
     assert fr.layout.title.text == "Prévision : Axe 1 : Intelligence fluide (intervalles à 80 %)"
-    assert list(fr.data[0].y) == ["Humain Moyen", "Meilleur Performeur"]
-    assert list(fr.layout.yaxis.categoryarray) == ["Humain Moyen", "Meilleur Performeur"]
+    assert list(fr.data[0].y) == ["Humain médian", "Meilleur performeur"]
+    assert list(fr.layout.yaxis.categoryarray) == ["Humain médian", "Meilleur performeur"]
     assert fr.layout.xaxis.title.text == "Date de sortie"
     assert fig.layout.title.text.startswith("Forecast")        # the original is untouched
