@@ -586,3 +586,9 @@ def main(out_path=None, report=True):
 
 if __name__ == '__main__':
     main()
+    # The overview figure of the map just written, to review it at a glance (5_plot_lineage_map.py).
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('plot_lineage_map', ROOT / '1_curated/5_plot_lineage_map.py')
+    plot = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(plot)
+    plot.main()
