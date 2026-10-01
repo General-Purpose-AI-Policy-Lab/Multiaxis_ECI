@@ -121,7 +121,14 @@ def classify(mv, org):
                 ver = vmap.get(ver, ver)
                 node = f'{tier.capitalize()} {ver}' if ver else f'{tier.capitalize()} ?'
                 return dict(vendor='Anthropic', chain=tier, node=node, variant=v, in_chain='yes')
-        # legacy Claude (1.x / 2.x / instant) — no tier → independent
+        # Claude 1 / 2 and Instant carry no tier: two lines of their own (user, 2026-10-01),
+        # 1.3 -> 2.0 -> 2.1 and instant 1.1 -> 1.2.
+        mo = re.search(r'claude-(instant-)?(\d\.\d)', tl)
+        if mo and mo.group(1):
+            return dict(vendor='Anthropic', chain='claude-instant', node=f'instant {mo.group(2)}',
+                        variant=v, in_chain='yes')
+        if mo:
+            return dict(vendor='Anthropic', chain='claude', node=mo.group(2), variant=v, in_chain='yes')
         return dict(vendor='Anthropic', chain='', node='claude-legacy', variant='', in_chain='no')
 
     # ================= OPENAI =================
@@ -197,6 +204,14 @@ def classify(mv, org):
     # ================= GOOGLE =================
     if 'google' in ol or 'deepmind' in ol or 'gemini' in tl or 'gemma' in tl:
         if 'gemma' in tl:
+            # Gemma 2's base and instruction-tuned checkpoints are one release (base / instruct
+            # variants of its node), and the 27B size continues from Gemma 2 to Gemma 3 (user,
+            # 2026-10-01).
+            mo = re.fullmatch(r'gemma-([23])-(27b|9b)(-it)?', tl)
+            if mo:
+                return dict(vendor='Google', chain=f'gemma-{mo.group(2)}',
+                            node=f'{mo.group(1)}-{mo.group(2).upper()}',
+                            variant='instruct' if mo.group(3) else 'base', in_chain='yes')
             # sizes are separate products, so each model id founds its own
             # single-node chain: gemma-4-31b-it ties its bare/minimal/none
             # rungs, lone releases drop at fit time as before
@@ -253,6 +268,12 @@ def classify(mv, org):
         # A distill names its student ('deepseek-r1-0528-qwen3-8b'): another model.
         if 'distill' in tl or re.search(r'qwen|llama', tl):
             return dict(vendor='DeepSeek', chain='', node='R1-distill', variant='', in_chain='no')
+        # Coder-V2 and Coder-V2-Lite: base and instruct of one release each (user, 2026-10-01).
+        mo = re.search(r'deepseek-coder-v2(-lite)?-(base|instruct)', tl)
+        if mo:
+            lite = '-lite' if mo.group(1) else ''
+            return dict(vendor='DeepSeek', chain=f'deepseek-coder-v2{lite}',
+                        node='Coder-V2' + ('-Lite' if lite else ''), variant=mo.group(2), in_chain='yes')
         if 'coder' in tl:   return dict(vendor='DeepSeek', chain='', node='coder', variant='', in_chain='no')
         if tl.endswith('-base'): return dict(vendor='DeepSeek', chain='', node='base', variant='', in_chain='no')
         # V4 onwards: 'v<ver>-<flash|pro>[-<MMDD snapshot>]'. Each version and each
@@ -300,7 +321,6 @@ def classify(mv, org):
         if 'qwq' in tl:
             node = 'QwQ-Preview' if 'preview' in tl else 'QwQ-32B'
             return dict(vendor='Alibaba', chain='qwq', node=node, variant=v, in_chain='yes')
-        if 'thinking-2507' in tl: return dict(vendor='Alibaba', chain='', node='qwq', variant='', in_chain='no')
         def qver(s):
             # gen is the number right after 'qwen'; dash-then-size (qwen-7b) = gen 1
             m = re.search(r'qwen(\d\.?\d?)', s)
@@ -317,17 +337,24 @@ def classify(mv, org):
         # decision (ordering vs neighbouring nodes is unaffected either way).
         if 'plus' in tl:  return dict(vendor='Alibaba', chain='qwen-plus', node='plus '+('2.5' if 'plus-2025' in tl else qver(tl)), variant=v, in_chain='yes')
         if 'flash' in tl: return dict(vendor='Alibaba', chain='qwen-flash', node='flash '+qver(tl), variant=v, in_chain='yes')
-        # open-weight: chain only fixed sizes 72/32/14/7B
+        # Open weights: every size is a line of its own (user, 2026-10-01; formerly only
+        # 110/72/32/14/7B), its releases in date order: qwen3.5-27b -> qwen3.6-27b -> qwen3.8-27b.
+        # Qwen3's 2507 refresh is a node of its own, its Instruct and Thinking checkpoints the
+        # bare and thinking variants. A size in trillions ('2.4t-a95b') is no open line.
+        if re.search(r'\d(?:\.\d+)?t-a\d', tl):
+            return dict(vendor='Alibaba', chain='', node='qwen-open-t', variant=v, in_chain='no')
+        tl = re.sub(r'(\d)_(\d+b)', r'\1.\2', tl)   # 'qwen-1_8b' is 1.8B
         # The whole size, decimals included: '(\d+)b' read 'qwen3-1.7b' as 7B and filed it on
         # the 7B chain (found 2026-10-01 by the ECI-H regression scan).
         mo = re.search(r'(?<![\d.])(\d+(?:\.\d+)?)b', tl)
         sz = mo.group(1) if mo else '?'
-        if sz in ['110','72','32','14','7'] and '235' not in tl:
+        if sz != '?':
             # Before Qwen3 the bare id is the pretrained base checkpoint, the chat model
             # carries -chat / -instruct: two models of one node, never one test-taker.
             if qver(tl) in ('1', '1.5', '2', '2.5') and not re.search(r'chat|instruct', tl):
                 v = 'base'
-            return dict(vendor='Alibaba', chain=f'qwen-open-{sz}b', node=f'{qver(tl)}-{sz}B', variant=v, in_chain='yes')
+            node = f'{qver(tl)}-{sz}B' + (' 2507' if '2507' in tl else '')
+            return dict(vendor='Alibaba', chain=f'qwen-open-{sz}b', node=node, variant=v, in_chain='yes')
         return dict(vendor='Alibaba', chain='', node=f'qwen-open-{sz}b', variant=v, in_chain='no')
 
     # ================= MOONSHOT KIMI =================
@@ -374,18 +401,24 @@ def classify(mv, org):
             node = f'spark {mo.group(1)}' if mo else 'spark 1'
             return dict(vendor='Meta AI', chain='muse-spark', node=node,
                         variant=variant(t), in_chain='yes')
-        # 3rd-party derivatives / multimodal / MoE / base → independent
-        if any(x in tl for x in ['tulu','hermes','dracarys','distill','open_llama','llava','vision','slime','vilamp','chutes/','-4-maverick','-4-scout','4-maverick','4-scout','17b']):
+        # 3rd-party derivatives / multimodal / MoE → independent; so are the named fine-tunes
+        # of Llama 3.1 405B (Bio-Llama, Unsafety-Llama), which would otherwise pool with it.
+        if any(x in tl for x in ['tulu','hermes','dracarys','distill','open_llama','llava','vision','slime','vilamp','chutes/','-4-maverick','-4-scout','4-maverick','4-scout','17b','bio-llama','unsafety']):
             return dict(vendor='Meta', chain='', node='llama-other', variant='', in_chain='no')
-        if 'llama' in tl and ('instruct' in tl or 'chat' in tl):
-            mo = re.search(r'(\d+)b', tl); sz = mo.group(1) if mo else '?'
-            if 'llama-2' in tl or 'llama 2' in tl: gen = '2'
+        # A release's base and instruction-tuned checkpoints are two variants of its node
+        # (user, 2026-10-01). Lines by size: 7B and 13B (LLaMA 1 -> Llama 2), 8B and 70B
+        # (Llama 2 / 3 onwards), 405B (Llama 3.1).
+        if 'llama' in tl:
+            mo = re.search(r'(?<![\d.])(\d+)b', tl); sz = mo.group(1) if mo else '?'
+            if re.search(r'llama[- ]2', tl): gen = '2'
             elif '3.3' in tl: gen = '3.3'
             elif '3.1' in tl: gen = '3.1'
-            elif 'llama-3' in tl or 'llama 3' in tl: gen = '3'
+            elif re.search(r'llama[- ]3(?![.\d])', tl): gen = '3'
+            elif re.match(r'llama-\d+b', tl): gen = '1'
             else: gen = '?'
-            if sz == '70': return dict(vendor='Meta', chain='llama-70b', node=f'{gen}-70B', variant='instruct', in_chain='yes')
-            if sz == '8':  return dict(vendor='Meta', chain='llama-8b',  node=f'{gen}-8B',  variant='instruct', in_chain='yes')
+            if gen != '?' and sz in ('7', '8', '13', '70', '405'):
+                variant_ = 'instruct' if re.search(r'instruct|chat', tl) else 'base'
+                return dict(vendor='Meta', chain=f'llama-{sz}b', node=f'{gen}-{sz}B', variant=variant_, in_chain='yes')
         return dict(vendor='Meta', chain='', node='llama-other', variant='', in_chain='no')
 
     # ================= MINIMAX =================
@@ -402,11 +435,23 @@ def classify(mv, org):
         if 'nemotron' in tl: return dict(vendor='NVIDIA', chain='', node='nemotron', variant='', in_chain='no')
         v = variant(t)
         if 'pixtral' in tl: return dict(vendor='Mistral', chain='', node='pixtral', variant='', in_chain='no')
+        # Magistral small and medium, Mixtral 8x7B and 8x22B, Nemo: lines of their own, base
+        # and instruct one node (user, 2026-10-01).
+        mo = re.search(r'magistral-(small|medium)-(\d{4})', tl)
+        if mo:
+            return dict(vendor='Mistral', chain=f'magistral-{mo.group(1)}',
+                        node=f'{mo.group(1)} {mo.group(2)}', variant=v, in_chain='yes')
         if 'magistral' in tl: return dict(vendor='Mistral', chain='', node='magistral', variant='', in_chain='no')
         if 'devstral' in tl: return dict(vendor='Mistral', chain='', node='devstral', variant='', in_chain='no')
         if 'ministral' in tl: return dict(vendor='Mistral', chain='', node='ministral', variant='', in_chain='no')
+        bi = 'instruct' if 'instruct' in tl else 'base'
+        mo = re.search(r'mixtral-(8x\d+b)', tl)
+        if mo:
+            return dict(vendor='Mistral', chain=f'mixtral-{mo.group(1)}', node=mo.group(1).upper(),
+                        variant=bi, in_chain='yes')
         if 'mixtral' in tl: return dict(vendor='Mistral', chain='', node='mixtral', variant='', in_chain='no')
-        if 'nemo' in tl: return dict(vendor='Mistral', chain='', node='mistral-nemo', variant='', in_chain='no')
+        if 'nemo' in tl:
+            return dict(vendor='Mistral', chain='mistral-nemo', node='nemo 2407', variant=bi, in_chain='yes')
         if 'codestral' in tl:
             return dict(vendor='Mistral', chain='codestral', node=('2501' if '2501' in tl else '2405'), variant=v, in_chain='yes')
         for line in ['large','small','medium']:

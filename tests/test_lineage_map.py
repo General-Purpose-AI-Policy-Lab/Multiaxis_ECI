@@ -173,6 +173,15 @@ def test_a_product_sits_on_one_node(chained):
     ("MiniMax-M1-80k", "MiniMax", "minimax", "M1"),
     ("gpt-5.6-sol_promax", "OpenAI", "pro", "pro 5.6"),       # pro mode: the pro chain
     ("gpt-5.6-sol_high", "OpenAI", "gpt-sol", "sol 5.6"),      # codenames: a line each
+    ("qwen3-1.7b", "Alibaba", "qwen-open-1.7b", "3-1.7B"),   # every Qwen open size a line
+    ("qwen3.8-27b_low", "Alibaba", "qwen-open-27b", "3.8-27B"),
+    ("Qwen3-235B-A22B-Thinking-2507", "Alibaba", "qwen-open-235b", "3-235B 2507"),
+    ("LLaMA-7B", "Meta", "llama-7b", "1-7B"),
+    ("Llama-3.1-405B", "Meta", "llama-405b", "3.1-405B"),
+    ("claude-2.1", "Anthropic", "claude", "2.1"),
+    ("claude-instant-1.2", "Anthropic", "claude-instant", "instant 1.2"),
+    ("magistral-small-2509", "Mistral AI", "magistral-small", "small 2509"),
+    ("gemma-3-27b-it", "Google", "gemma-27b", "3-27B"),
     ("gpt-6.1-sol_max", "OpenAI", "gpt-sol", "sol 6.1"),
     ("gpt-6-luna_none", "OpenAI", "gpt-luna", "luna 6"),
     ("gpt-5.6-terra", "OpenAI", "gpt-terra", "terra 5.6"),
@@ -211,7 +220,8 @@ def test_run_variants_get_their_own_group(builder, name, org, variant):
     ("gemini-3-deep-think-preview", "Google DeepMind"),   # parallel-thinking mode, not a release
     ("devstral-small-2512", "Mistral AI"),
     ("CodeQwen1.5-7B", "Alibaba"),   # a code model, off the general 7B spine
-    ("qwen3-1.7b", "Alibaba"),       # 1.7B, not 7B: no chain at that size
+    ("Llama-3.1-405B-Instruct_bio-llama", "Meta"),   # a fine-tune, not the release
+    ("qwen3.8-2.4t-a95b_xhigh", "Alibaba"),          # a size in trillions
 ])
 def test_other_models_stay_out_of_the_chain(builder, name, org):
     assert builder.classify(name, org)["in_chain"] == "no"
