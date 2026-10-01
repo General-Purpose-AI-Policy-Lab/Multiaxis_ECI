@@ -293,7 +293,9 @@ def classify(mv, org):
         if 'qwen3-coder' in tl or 'coder-next' in tl:
             node = 'Coder-next' if 'next' in tl else 'Coder-480B'
             return dict(vendor='Alibaba', chain='qwen-coder', node=node, variant=v, in_chain='yes')
-        if 'coder' in tl: return dict(vendor='Alibaba', chain='', node='qwen-coder', variant='', in_chain='no')
+        # 'codeqwen1.5' carries no 'coder': a code model, out of the general chains like the
+        # Qwen2.5-Coder sizes (user, 2026-10-01; it sat on the 7B spine through an override).
+        if 'coder' in tl or 'codeqwen' in tl: return dict(vendor='Alibaba', chain='', node='qwen-coder', variant='', in_chain='no')
         if re.search(r'\bvl\b|omni|video|llava|vilamp', tl): return dict(vendor='Alibaba', chain='', node='qwen-mm', variant='', in_chain='no')
         if 'qwq' in tl:
             node = 'QwQ-Preview' if 'preview' in tl else 'QwQ-32B'

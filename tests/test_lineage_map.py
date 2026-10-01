@@ -13,6 +13,10 @@ tests fail on the data instead:
 - a chained model's release date sits within a month of its node's date;
 - a node carries one date and one parent;
 - the builder reads versions off the names, so the next release gets its own node.
+- no release scores far below the one it continues (ECI-H of the current canonical fit,
+  `analysis.lineage_check`) unless that regression was investigated and listed in the
+  exceptions file (`check` = regression): a big drop is how a misfiled model shows (Qwen3
+  1.7B on the 7B chain, 2026-10-01).
 
 When a sync adds models: rerun `python 1_curated/2_build_lineage_map.py`, then read any
 failure here as a routing question, fixed in the builder rules, in
@@ -206,6 +210,31 @@ def test_run_variants_get_their_own_group(builder, name, org, variant):
     ("gemini-1.5-flash-8b-001", "Google DeepMind"),
     ("gemini-3-deep-think-preview", "Google DeepMind"),   # parallel-thinking mode, not a release
     ("devstral-small-2512", "Mistral AI"),
+    ("CodeQwen1.5-7B", "Alibaba"),   # a code model, off the general 7B spine
+    ("qwen3-1.7b", "Alibaba"),       # 1.7B, not 7B: no chain at that size
 ])
 def test_other_models_stay_out_of_the_chain(builder, name, org):
     assert builder.classify(name, org)["in_chain"] == "no"
+
+
+def test_no_unreviewed_regression(exceptions):
+    """A child release far below its parent on the current canonical fit's ECI-H is either a
+    filing mistake (fix the map) or a genuine regression, investigated and listed in the
+    exceptions file with its reason (key: chain, child node, variant compared, parent|child run).
+    Skipped until the data generation has its canonical fit."""
+    from multiaxis_eci import config
+    from multiaxis_eci.analysis.lineage_check import MIN_DROP, regressions
+    fit = config.RESULTS_DIR / "canonical_humanmerge" / "all_models_eci.csv"
+    if not fit.exists():
+        pytest.skip(f"no canonical fit yet in {config.RESULTS_DIR.name}/")
+    flagged = regressions(pd.read_csv(fit), pd.read_csv(MAP))
+    ok = set(map(tuple, exceptions.loc[exceptions["check"] == "regression",
+                                       ["chain", "node", "variant", "raw_strings"]].values))
+    unreviewed = [r for r in flagged.itertuples()
+                  if (r.chain, r.child, r.variant, f"{r.parent_run}|{r.child_run}") not in ok]
+    assert not unreviewed, (
+        f"releases at least {MIN_DROP:g} ECI-H below their parent ({fit.parent.parent.name}), "
+        f"neither fixed in the map nor reviewed in {EXCEPTIONS.name} "
+        "(python 4_diagnostics/lineage_regressions.py lists every edge):\n" + "\n".join(
+            f"  {r.chain}: {r.parent} -> {r.child} [{r.variant}] {r.parent_run} {r.parent_eci:.1f} "
+            f"-> {r.child_run} {r.child_eci:.1f} (n={r.n_parent}/{r.n_child})" for r in unreviewed))

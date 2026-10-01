@@ -28,6 +28,7 @@ Yi-1.5-34B-Chat,01.AI,,(independent),,2024-05-13,,no,2
 Yi-large,01.AI,,(independent),,2024-05-13,,no,1
 yi-lightning,01.AI,,(independent),,2024-12-02,,no,1
 Qwen-1_8B,Alibaba,,qwen-open-8b,,2023-11-30,bare,no,4
+CodeQwen1.5-7B,Alibaba,,qwen-coder,,2024-04-15,,no,4
 Qwen2-VL-72B-Instruct,Alibaba,,qwen-mm,,2024-08-29,,no,2
 Qwen2-VL-7B-Instruct,Alibaba,,qwen-mm,,2024-08-29,,no,1
 Qwen2.5-Coder-1.5B,Alibaba,,qwen-coder,,2024-09-18,,no,5
@@ -311,7 +312,6 @@ Qwen2.5-72B,Alibaba,qwen-open-72b,2.5-72B,,2024-09-19,base,yes,6
 qwen2.5-72b-instruct,Alibaba,qwen-open-72b,2.5-72B,,2024-09-19,bare,yes,10
 Qwen-7B,Alibaba,qwen-open-7b,1-7B,,2023-09-28,base,yes,4
 Qwen1.5-7B,Alibaba,qwen-open-7b,1.5-7B,,2024-02-04,base,yes,1
-CodeQwen1.5-7B,Alibaba,qwen-open-7b,1.5-7B 2024-04-15,,2024-04-15,base,yes,4
 qwen2.5-7b-instruct,Alibaba,qwen-open-7b,2.5-7B,,2024-09-19,bare,yes,7
 qwen-plus-2025-01-25,Alibaba,qwen-plus,plus 2.5,,2025-01-25,bare,yes,3
 qwen-plus-2025-04-28,Alibaba,qwen-plus,plus 2.5 2025-04-28,,2025-04-28,bare,yes,2
