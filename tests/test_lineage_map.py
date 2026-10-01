@@ -156,7 +156,8 @@ def test_a_product_sits_on_one_node(chained):
     ("claude-opus-5", "Anthropic", "opus", "Opus 5"),
     ("claude-opus-4-5-20251101_32K", "Anthropic", "opus", "Opus 4.5"),
     ("claude-3-7-sonnet-20250219", "Anthropic", "sonnet", "Sonnet 3.7"),
-    ("claude-fable-5-2", "Anthropic", "opus", "Fable 5.2"),
+    ("claude-fable-5-2", "Anthropic", "mythos-fable", "Fable 5.2"),
+    ("claude-mythos-6", "Anthropic", "mythos-fable", "Mythos 6"),
     ("deepseek-v4.2-flash_max", "DeepSeek", "deepseek-flash", "V4.2-flash"),
     ("deepseek-v4.1-pro-1020", "DeepSeek", "deepseek-v", "V4.1-pro-1020"),
     ("deepseek-v4-flash-0731_high", "DeepSeek", "deepseek-flash", "V4-flash-0731"),
@@ -167,6 +168,11 @@ def test_a_product_sits_on_one_node(chained):
     ("MiniMax-M3.1_xhigh", "MiniMax", "minimax", "M3.1"),
     ("MiniMax-M1-80k", "MiniMax", "minimax", "M1"),
     ("gpt-5.6-sol_promax", "OpenAI", "pro", "pro 5.6"),       # pro mode: the pro chain
+    ("gpt-5.6-sol_high", "OpenAI", "gpt-sol", "sol 5.6"),      # codenames: a line each
+    ("gpt-6.1-sol_max", "OpenAI", "gpt-sol", "sol 6.1"),
+    ("gpt-6-luna_none", "OpenAI", "gpt-luna", "luna 6"),
+    ("gpt-5.6-terra", "OpenAI", "gpt-terra", "terra 5.6"),
+    ("gpt-6-astra_xhigh", "OpenAI", "gpt-astra", "astra 6"),
     ("gpt-7-astra_proxhigh", "OpenAI", "pro", "pro 7"),
     ("gpt-5.4-pro-2026-03-05_xhigh", "OpenAI", "pro", "pro 5.4"),
 ])

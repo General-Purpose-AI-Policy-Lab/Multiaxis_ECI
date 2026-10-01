@@ -49,25 +49,16 @@ def variant(t):
     if 'beta' in tl: return 'beta'
     return 'bare'
 
-# OpenAI codename releases (5.6: sol / terra / luna). Reviewed by hand: these are
-# PEER MODEL TYPES shipped in one generation, not a flagship/pro/mini capability
-# ladder, so none is folded into a tier chain. The scores rule out the ladder
-# reading: terra sits 0.095 BELOW sol at matched effort (0/40 benchmarks) whereas
-# a real pro tier sits ABOVE its flagship (5.4-pro +0.051 on 9/10, 5.2-pro +0.090
-# on 7/7), and luna outscores the mini line it was previously filed on (+0.129
-# over 5.4-mini, 11/11). sol continues the flagship spine (+0.027 over 5.5, above
-# on 20/28 effort-matched cells). terra and luna BRANCH off the 5.5 node as
-# parented off-spine siblings: all three types share the 5.5 base, so each
-# codename takes one Brownian delta from 5.5 and its effort variants (including
-# the effort:unknown leaderboard rows) tie to the node through the variant
-# offsets. Founding them as their own chains instead loses both: a single-node
-# chain is dropped by `build_lineage_structure`, leaving every variant a free
-# test-taker. The cost of the branch is prior-vs-data tension: the delta mean is
-# positive but both sit BELOW 5.5 (above on 3/27 and 0/27), so the data pays the
-# soft prior to place them under their parent. A 5.7-terra would parent onto
-# `terra 5.6`, continuing the branch.
-CODENAME_CHAIN = {'sol': 'gpt', 'terra': 'gpt', 'luna': 'gpt'}
-CODENAME_PARENT = {'terra': '5.5', 'luna': '5.5'}
+# OpenAI codename releases (5.6: sol / terra / luna; 6: astra, sol, luna; 6.1: sol). They are
+# PEER MODEL TYPES shipped in one generation, not a flagship/pro/mini capability ladder: terra
+# sits 0.095 BELOW sol at matched effort (0/40 benchmarks) whereas a real pro tier sits ABOVE its
+# flagship (5.4-pro +0.051 on 9/10, 5.2-pro +0.090 on 7/7), and luna outscores the mini line it
+# was once filed on (+0.129 over 5.4-mini, 11/11). Each codename is a line of its own (user,
+# 2026-10-01), apart from the numbered gpt spine and from each other: gpt-sol (sol 5.6 -> sol 6
+# -> sol 6.1), gpt-luna (luna 5.6 -> luna 6), gpt-terra, gpt-astra. A one-node line (terra 5.6,
+# astra 6 today) is still kept by `build_lineage_structure`, its effort rungs tied to the node
+# by the variant offsets, and gains steps when the next version ships.
+CODENAME_CHAIN = {'sol': 'gpt-sol', 'terra': 'gpt-terra', 'luna': 'gpt-luna', 'astra': 'gpt-astra'}
 
 # A Pro mode ('gpt-5.6-sol_promax', upstream "GPT 5.6 Sol (Max + Pro)") is the release run
 # with parallel test-time compute: the product GPT-5.5 Pro and earlier shipped as models of their
@@ -86,33 +77,24 @@ def classify(mv, org):
     # ================= ANTHROPIC =================
     if 'anthropic' in ol or 'claude' in tl or 'fable' in tl or 'mythos' in tl:
         v = variant(t)
-        # The Mythos previews are the 'Fable 5' node (the earliest Fable 5 checkpoint
-        # shown, 2026-04); Fable 5 itself sits on its own reviewed node through
-        # lineage_node_overrides.csv. A later Mythos release ('claude-mythos-5') is not
-        # a preview and continues the line from that node.
+        # Mythos and Fable are a line of their own, apart from Opus (user, 2026-10-01): the
+        # Mythos preview (2026-04) founds it, Fable 5 continues it, each Fable 5.x the one
+        # before. A later Mythos release ('claude-mythos-5', the day of Fable 5) branches off
+        # the preview. The early Mythos checkpoint is filed with Fable 5 through
+        # lineage_node_overrides.csv.
         if 'mythos' in tl:
             if 'preview' in tl:
-                return dict(vendor='Anthropic', chain='opus', node='Fable 5', variant='preview', in_chain='yes')
+                return dict(vendor='Anthropic', chain='mythos-fable', node='Mythos Preview',
+                            variant='preview', in_chain='yes')
             mo = re.search(r'mythos-(\d+)(?:[-.](\d))?(?![\d.])', tl)
             ver = (mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')) if mo else '?'
-            return dict(vendor='Anthropic', chain='opus', node=f'Mythos {ver}', parent='Fable 5',
-                        variant=v, in_chain='yes')
+            return dict(vendor='Anthropic', chain='mythos-fable', node=f'Mythos {ver}',
+                        parent='Mythos Preview', variant=v, in_chain='yes')
         if 'fable' in tl:
             mo = re.search(r'fable-(\d+)(?:[-.](\d))?(?![\d.])', tl)
             ver = (mo.group(1) + (f'.{mo.group(2)}' if mo.group(2) else '')) if mo else '?'
-            # Fable 5 (major only) is the reviewed off-spine node of the overrides file;
-            # every rung of it lands there, the ones the file does not list too.
-            if ver == '5':
-                return dict(vendor='Anthropic', chain='opus', node='Fable 5 2026-06-09',
-                            parent='Opus 4.8', variant=v, in_chain='yes')
-            # A minor version continues the Fable line, off the Opus spine: 5.1 hangs off
-            # Fable 5, 5.2 off 5.1, and so on.
-            if mo and mo.group(1) == '5' and mo.group(2):
-                minor = int(mo.group(2))
-                parent = 'Fable 5 2026-06-09' if minor == 1 else f'Fable 5.{minor - 1}'
-                return dict(vendor='Anthropic', chain='opus', node=f'Fable {ver}', parent=parent,
-                            variant=v, in_chain='yes')
-            return dict(vendor='Anthropic', chain='opus', node=f'Fable {ver}', variant=v, in_chain='yes')
+            return dict(vendor='Anthropic', chain='mythos-fable', node=f'Fable {ver}', variant=v,
+                        in_chain='yes')
         for tier in ['opus', 'sonnet', 'haiku']:
             if tier in tl:
                 # version
@@ -201,12 +183,9 @@ def classify(mv, org):
         # whose name happens to hold 'pro' onto the pro chain.
         mo = re.search(r'gpt-\d(?:\.\d+)?[- (]+(' + '|'.join(CODENAME_CHAIN) + r')', tl)
         if mo:
-            cn = mo.group(1); ch = CODENAME_CHAIN[cn]
-            node = gptver(tl) if cn == 'sol' else f'{cn} {gptver(tl)}'
-            d = dict(vendor='OpenAI', chain=ch, node=node, variant=v, in_chain='yes')
-            if cn in CODENAME_PARENT:
-                d['parent'] = CODENAME_PARENT[cn]
-            return d
+            cn = mo.group(1)
+            return dict(vendor='OpenAI', chain=CODENAME_CHAIN[cn], node=f'{cn} {gptver(tl)}',
+                        variant=v, in_chain='yes')
         if 'nano' in tl:  return dict(vendor='OpenAI', chain='nano',  node='nano '+gptver(tl), variant=v, in_chain='yes')
         if re.search(r'gpt-5-mini|4o-mini|4\.1-mini|5\.4-mini', tl): return dict(vendor='OpenAI', chain='mini', node='mini '+gptver(tl), variant=v, in_chain='yes')
         if 'pro' in tl and 'gpt-5' in tl: return dict(vendor='OpenAI', chain='pro', node='pro '+gptver(tl), variant=v, in_chain='yes')

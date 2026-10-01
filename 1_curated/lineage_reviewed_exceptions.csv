@@ -11,5 +11,5 @@ pool,pro,pro 5.5,effort:xhigh,gpt-5.5-pro-pre-release_xhigh|gpt-5.5-pro_xhigh,pr
 pool,mistral-open-7b,v0.1,bare,Mistral-7B-Instruct-v0.1|open-mistral-7b,open-mistral-7b is the API name of Mistral-7B-Instruct-v0.1
 pool,qwq,QwQ-32B,bare,QwQ-32B|qwq-plus,qwq-plus is the API version of QwQ-32B
 date,qwq,QwQ-32B,,qwq-plus,API version of QwQ-32B published 34 days after the open weights
-date,opus,Fable 5 2026-06-09,,claude-mythos-preview-early,reviewed override: the early Mythos checkpoint is filed with Fable 5 (lineage_node_overrides.csv)
+date,mythos-fable,Fable 5,,claude-mythos-preview-early,reviewed override: the early Mythos checkpoint is filed with Fable 5 (lineage_node_overrides.csv)
 date,gpt,5.4,,gpt-5.4-2026-03-05_cyber,cyber access tier of GPT-5.4 opened 40 days after the release; its own variant offset

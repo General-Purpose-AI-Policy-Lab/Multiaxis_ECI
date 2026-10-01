@@ -286,6 +286,12 @@ refreshed that day (1616f68: GPT-6.1 Sol and the effort runs of GPT-6 Sol / Luna
 (lineage_node_overrides.csv). Each scope moved by one delta across its configurations: data
 only; no model math moved.
 
+The seven lineage-dependent goldens were re-pinned later on 2026-10-01 when Mythos / Fable
+left the Opus chain for a line of their own (mythos-fable: Mythos Preview -> Fable 5 -> Fable
+5.1, Mythos 5 off the preview) and each GPT codename got its own line (gpt-sol, gpt-luna,
+gpt-terra, gpt-astra), the numbered gpt spine ending at 5.5 (user). Data unchanged; no model
+math moved.
+
 Three guards:
 - Golden initial-point log-probabilities per model configuration — any
   unintended change to the model math fails these.
@@ -425,7 +431,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal",
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True)
         np.testing.assert_allclose(
-            total_logp(model), -191446.720808, rtol=self.RTOL)
+            total_logp(model), -179489.112917, rtol=self.RTOL)
 
     def test_mirt_k3_signed_bm_full_options(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial
@@ -439,7 +445,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True,
             plt_founders=[bench[5], bench[10], bench[20]])
         np.testing.assert_allclose(
-            perturbed_logp(model), -76947.057764, rtol=self.RTOL)
+            perturbed_logp(model), -80075.627977, rtol=self.RTOL)
 
     def test_mirt_k3_normal_time_prior(self, data):
         # Config lock only: at the initial point time_beta = 0, so the trend
@@ -453,7 +459,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=lin, time_t=release_time_covariate(data.mlookup, lin))
         np.testing.assert_allclose(
-            total_logp(model), -187307.207075, rtol=self.RTOL)
+            total_logp(model), -173743.364441, rtol=self.RTOL)
 
     def test_mirt_k3_signed_theta_t(self, data):
         # Config lock: at the initial point every t cell is 0 and re-centering
@@ -474,7 +480,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), theta_t_cells=True)
         np.testing.assert_allclose(
-            total_logp(model), -187350.134392, rtol=self.RTOL)
+            total_logp(model), -173787.220118, rtol=self.RTOL)
 
     def test_mirt_k3_normal_theta_pos(self, data):
         # Formula lock: at the initial point theta = 0 but softplus(0) = log 2,
@@ -517,7 +523,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), known_se=True)
         np.testing.assert_allclose(
-            total_logp(model), -165438.8787300, rtol=self.RTOL)
+            total_logp(model), -153113.5979230, rtol=self.RTOL)
 
     def test_mirt_k3_normal_pooled_knownse(self, data):
         # The production combo: pooled noise on top of the known-SE split. At the
@@ -530,7 +536,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup), known_se=True,
             pooled_noise=True)
         np.testing.assert_allclose(
-            total_logp(model), -210166.521422, rtol=self.RTOL)
+            total_logp(model), -194895.420651, rtol=self.RTOL)
 
     def test_mirt_k3_signed_floors(self, data_all):
         from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
@@ -557,7 +563,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(clipped.mlookup), lineage_bm=True,
             floor_c=floors, ceiling_noise=True)
         np.testing.assert_allclose(
-            total_logp(model), -224138.941080, rtol=self.RTOL)
+            total_logp(model), -214728.313431, rtol=self.RTOL)
 
     def test_mirt_k3_anchored(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial
