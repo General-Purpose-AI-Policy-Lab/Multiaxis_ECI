@@ -423,6 +423,7 @@ claude-fable-5-1_xhigh,Anthropic,opus,Fable 5.1,Fable 5 2026-06-09,2026-09-01,ef
 claude-fable-5-1,Anthropic,opus,Fable 5.1,Fable 5 2026-06-09,2026-09-01,bare,yes,3
 claude-opus-5-5_max,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:max,yes,18
 claude-opus-5-5_xhigh,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:xhigh,yes,4
+claude-opus-5-5_medium,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:medium,yes,1
 claude-opus-5-5,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,bare,yes,1
 claude-3-sonnet-20240229,Anthropic,sonnet,Sonnet 3,,2024-02-29,bare,yes,23
 claude-3-5-sonnet-20240620,Anthropic,sonnet,Sonnet 3.5-Jun,,2024-06-20,bare,yes,29
@@ -475,7 +476,11 @@ claude-sonnet-5_high,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:high,yes,5
 claude-sonnet-5_low,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:low,yes,3
 claude-sonnet-5_medium,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:medium,yes,4
 claude-sonnet-5_none,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:none,yes,2
-claude-sonnet-5-5_max,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:max,yes,7
+claude-sonnet-5-5_max,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:max,yes,11
+claude-sonnet-5-5_medium,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:medium,yes,2
+claude-sonnet-5-5_high,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:high,yes,1
+claude-sonnet-5-5_low,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:low,yes,1
+claude-sonnet-5-5_xhigh,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:xhigh,yes,2
 deepseek-v4-flash_none,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:none,yes,3
 deepseek-v4-flash_high,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:high,yes,2
 deepseek-v4-flash_max,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:max,yes,4
@@ -553,7 +558,7 @@ gemini-3.7-flash,Google,gemini-flash,flash 3.7,,2026-08-13,bare,yes,7
 gemini-3.7-flash_high,Google,gemini-flash,flash 3.7,,2026-08-13,effort:high,yes,16
 gemini-3.7-flash_low,Google,gemini-flash,flash 3.7,,2026-08-13,effort:low,yes,6
 gemini-3.7-flash_medium,Google,gemini-flash,flash 3.7,,2026-08-13,effort:medium,yes,7
-gemini-3.8-flash,Google,gemini-flash,flash 3.8,,2026-09-02,bare,yes,10
+gemini-3.8-flash,Google,gemini-flash,flash 3.8,,2026-09-02,bare,yes,11
 gemini-3.8-flash_high,Google,gemini-flash,flash 3.8,,2026-09-02,effort:high,yes,16
 gemini-3.8-flash_low,Google,gemini-flash,flash 3.8,,2026-09-02,effort:low,yes,3
 gemini-3.8-flash_medium,Google,gemini-flash,flash 3.8,,2026-09-02,effort:medium,yes,6
@@ -737,9 +742,26 @@ gpt-6-astra_max,OpenAI,gpt,6,,2026-09-03,effort:max,yes,19
 gpt-6-astra_medium,OpenAI,gpt,6,,2026-09-03,effort:medium,yes,7
 gpt-6-astra_none,OpenAI,gpt,6,,2026-09-03,effort:none,yes,4
 gpt-6-astra_xhigh,OpenAI,gpt,6,,2026-09-03,effort:xhigh,yes,9
-gpt-6-luna_max,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:max,yes,1
-gpt-6-sol_max,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:max,yes,2
-gpt-6-sol,OpenAI,gpt,sol 6,5.6,2026-09-22,bare,yes,1
+gpt-6-luna_max,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:max,yes,14
+gpt-6-luna_high,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:high,yes,3
+gpt-6-luna_low,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:low,yes,3
+gpt-6-luna_medium,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:medium,yes,3
+gpt-6-luna_none,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:none,yes,3
+gpt-6-luna_xhigh,OpenAI,gpt,luna 6,5.6,2026-09-22,effort:xhigh,yes,4
+gpt-6-luna,OpenAI,gpt,luna 6,5.6,2026-09-22,bare,yes,2
+gpt-6-sol_max,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:max,yes,16
+gpt-6-sol_high,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:high,yes,3
+gpt-6-sol_low,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:low,yes,3
+gpt-6-sol_medium,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:medium,yes,3
+gpt-6-sol_none,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:none,yes,3
+gpt-6-sol_xhigh,OpenAI,gpt,sol 6,5.6,2026-09-22,effort:xhigh,yes,4
+gpt-6-sol,OpenAI,gpt,sol 6,5.6,2026-09-22,bare,yes,3
+gpt-6.1-sol_max,OpenAI,gpt,sol 6.1,sol 6,2026-09-29,effort:max,yes,11
+gpt-6.1-sol_high,OpenAI,gpt,sol 6.1,sol 6,2026-09-29,effort:high,yes,1
+gpt-6.1-sol_low,OpenAI,gpt,sol 6.1,sol 6,2026-09-29,effort:low,yes,1
+gpt-6.1-sol_medium,OpenAI,gpt,sol 6.1,sol 6,2026-09-29,effort:medium,yes,2
+gpt-6.1-sol_xhigh,OpenAI,gpt,sol 6.1,sol 6,2026-09-29,effort:xhigh,yes,1
+gpt-6.1-sol,OpenAI,gpt,sol 6.1,sol 6,2026-09-29,bare,yes,1
 gpt-3.5-turbo-0613,OpenAI,gpt-3.5,3.5-turbo-0613,,2023-06-13,bare,yes,5
 gpt-3.5-turbo-instruct,OpenAI,gpt-3.5,3.5-turbo-instruct,,2023-09-18,bare,yes,1
 gpt-3.5-turbo-1106,OpenAI,gpt-3.5,3.5-turbo-1106,,2023-11-06,bare,yes,9

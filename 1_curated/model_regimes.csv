@@ -272,6 +272,7 @@ claude-opus-4-8_xhigh,reasoning,on,run mode on
 claude-opus-5,undetermined,default,bare run of a hybrid release
 claude-opus-5-5,undetermined,default,bare run of a hybrid release
 claude-opus-5-5_max,reasoning,on,run mode on
+claude-opus-5-5_medium,reasoning,on,run mode on
 claude-opus-5-5_xhigh,reasoning,on,run mode on
 claude-opus-5_high,reasoning,on,run mode on
 claude-opus-5_low,reasoning,on,run mode on
@@ -310,7 +311,11 @@ claude-sonnet-4-6_max,reasoning,on,run mode on
 claude-sonnet-4-6_medium,reasoning,on,run mode on
 claude-sonnet-4-6_none,non-reasoning,off,non-reasoning pattern
 claude-sonnet-4-6_thinking,reasoning,on,run mode on
+claude-sonnet-5-5_high,reasoning,on,run mode on
+claude-sonnet-5-5_low,reasoning,on,run mode on
 claude-sonnet-5-5_max,reasoning,on,run mode on
+claude-sonnet-5-5_medium,reasoning,on,run mode on
+claude-sonnet-5-5_xhigh,reasoning,on,run mode on
 claude-sonnet-5_high,reasoning,on,run mode on
 claude-sonnet-5_low,reasoning,on,run mode on
 claude-sonnet-5_max,reasoning,on,run mode on
@@ -620,9 +625,26 @@ gpt-6-astra_medium,reasoning,on,run mode on
 gpt-6-astra_none,non-reasoning,off,non-reasoning pattern
 gpt-6-astra_promax,reasoning,on,run mode on
 gpt-6-astra_xhigh,reasoning,on,run mode on
+gpt-6-luna,undetermined,default,bare run of a hybrid release
+gpt-6-luna_high,reasoning,on,run mode on
+gpt-6-luna_low,reasoning,on,run mode on
 gpt-6-luna_max,reasoning,on,run mode on
-gpt-6-sol,reasoning,default,a run of the release thinks
+gpt-6-luna_medium,reasoning,on,run mode on
+gpt-6-luna_none,non-reasoning,off,non-reasoning pattern
+gpt-6-luna_xhigh,reasoning,on,run mode on
+gpt-6-sol,undetermined,default,bare run of a hybrid release
+gpt-6-sol_high,reasoning,on,run mode on
+gpt-6-sol_low,reasoning,on,run mode on
 gpt-6-sol_max,reasoning,on,run mode on
+gpt-6-sol_medium,reasoning,on,run mode on
+gpt-6-sol_none,non-reasoning,off,non-reasoning pattern
+gpt-6-sol_xhigh,reasoning,on,run mode on
+gpt-6.1-sol,reasoning,default,a run of the release thinks
+gpt-6.1-sol_high,reasoning,on,run mode on
+gpt-6.1-sol_low,reasoning,on,run mode on
+gpt-6.1-sol_max,reasoning,on,run mode on
+gpt-6.1-sol_medium,reasoning,on,run mode on
+gpt-6.1-sol_xhigh,reasoning,on,run mode on
 gpt-j-6b,non-reasoning,default,no reasoning evidence
 gpt-neo-2.7B,non-reasoning,default,no reasoning evidence
 gpt-neox-20b,non-reasoning,default,no reasoning evidence

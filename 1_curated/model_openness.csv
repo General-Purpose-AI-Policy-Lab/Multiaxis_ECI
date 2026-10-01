@@ -272,6 +272,7 @@ claude-opus-4-8_xhigh,closed,epoch:API access
 claude-opus-5,closed,epoch:API access
 claude-opus-5-5,closed,family:claude-opus-5-5_max
 claude-opus-5-5_max,closed,epoch:API access
+claude-opus-5-5_medium,closed,epoch:API access
 claude-opus-5-5_xhigh,closed,epoch:API access
 claude-opus-5_high,closed,epoch:API access
 claude-opus-5_low,closed,epoch:API access
@@ -310,7 +311,11 @@ claude-sonnet-4-6_max,closed,epoch:API access
 claude-sonnet-4-6_medium,closed,epoch:API access
 claude-sonnet-4-6_none,closed,epoch:API access
 claude-sonnet-4-6_thinking,closed,epoch:API access
+claude-sonnet-5-5_high,closed,epoch:API access
+claude-sonnet-5-5_low,closed,epoch:API access
 claude-sonnet-5-5_max,closed,epoch:API access
+claude-sonnet-5-5_medium,closed,epoch:API access
+claude-sonnet-5-5_xhigh,closed,epoch:API access
 claude-sonnet-5_high,closed,epoch:API access
 claude-sonnet-5_low,closed,epoch:API access
 claude-sonnet-5_max,closed,epoch:API access
@@ -620,9 +625,26 @@ gpt-6-astra_medium,closed,epoch:API access
 gpt-6-astra_none,closed,epoch:API access
 gpt-6-astra_promax,closed,epoch:API access
 gpt-6-astra_xhigh,closed,epoch:API access
+gpt-6-luna,closed,epoch:API access
+gpt-6-luna_high,closed,epoch:API access
+gpt-6-luna_low,closed,epoch:API access
 gpt-6-luna_max,closed,epoch:API access
-gpt-6-sol,closed,family:gpt-6-sol_max
+gpt-6-luna_medium,closed,epoch:API access
+gpt-6-luna_none,closed,epoch:API access
+gpt-6-luna_xhigh,closed,epoch:API access
+gpt-6-sol,closed,epoch:API access
+gpt-6-sol_high,closed,epoch:API access
+gpt-6-sol_low,closed,epoch:API access
 gpt-6-sol_max,closed,epoch:API access
+gpt-6-sol_medium,closed,epoch:API access
+gpt-6-sol_none,closed,epoch:API access
+gpt-6-sol_xhigh,closed,epoch:API access
+gpt-6.1-sol,closed,epoch:API access
+gpt-6.1-sol_high,closed,epoch:API access
+gpt-6.1-sol_low,closed,epoch:API access
+gpt-6.1-sol_max,closed,epoch:API access
+gpt-6.1-sol_medium,closed,epoch:API access
+gpt-6.1-sol_xhigh,closed,epoch:API access
 gpt-j-6b,open,epoch:Open weights (unrestricted)
 gpt-neo-2.7B,open,epoch:Open weights (unrestricted)
 gpt-neox-20b,open,epoch:Open weights (unrestricted)
