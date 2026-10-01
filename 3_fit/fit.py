@@ -129,6 +129,13 @@ class _Heartbeat:
 # for legibility (only the lower bar of WMDP Biology runs below it, 2026-10-01).
 TIMELINE_HDI_PROB = 0.80
 TIMELINE_ECI_RANGE = (50, 230)
+# The names written on that figure, and where their labels sit (release date, ECI-H): in the
+# empty parts of the plot, joined to their point by a leader line, so none covers the cloud.
+TIMELINE_BENCH_LABELS = {"MMLU": ("2020-11-15", 72), "GSM8K": ("2021-10-15", 128),
+                         "GPQA Diamond": ("2023-04-01", 160), "OSWorld": ("2024-04-11", 168),
+                         "GSO-Bench": ("2024-12-01", 203), "HLE Diamond": ("2026-11-10", 222)}
+TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-06-15", 61, "Claude 3.5 Sonnet (Oct 2024)"),
+                         config.ANCHOR_HIGH[0]: ("2025-09-20", 72, "GPT-5 (medium)")}
 
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, variant_offsets=True,
@@ -538,9 +545,9 @@ def run_canonical(args) -> None:
                     tl_eci, human_stats=humans_eci, lang=lang,
                     hdi_prob=TIMELINE_HDI_PROB, y_label="ECI-H",
                     y_range=TIMELINE_ECI_RANGE, human_bands=DEFAULT_HUMAN_BANDS,
-                    annotate_benchmarks=["GSM8K", "MMLU", "GPQA Diamond", "HLE Diamond",
-                                         "GSO-Bench", "OSWorld"],
-                    annotate_models=[config.ANCHOR_LOW[0], config.ANCHOR_HIGH[0]]),
+                    annotate_benchmarks=list(TIMELINE_BENCH_LABELS),
+                    annotate_models=list(TIMELINE_MODEL_LABELS),
+                    label_positions={**TIMELINE_BENCH_LABELS, **TIMELINE_MODEL_LABELS}),
                  "capability_timeline", sub)
 
     save_fig(pit_hist_fig(gof.pit), "calibration_pit_histogram", figures_dir)

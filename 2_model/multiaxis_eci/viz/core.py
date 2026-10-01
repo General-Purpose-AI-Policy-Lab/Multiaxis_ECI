@@ -560,7 +560,8 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                              style: FigureStyle = DASHBOARD,
                              x_min: str | None = None,
                              y_range: tuple[float, float] | None = None,
-                             benchmarks_before_models: bool = False) -> go.Figure:
+                             benchmarks_before_models: bool = False,
+                             label_positions: dict[str, tuple] | None = None) -> go.Figure:
     """Capability (models) + difficulty (benchmarks) vs release date.
 
     The one builder behind the canonical ECI-H figure, the blog post's figure 1
@@ -579,7 +580,11 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
     right end of its line instead of the legend (the post's arrangement).
     `x_min` drops models and benchmarks released before that date. Benchmarks released before the
     first model shown are dropped too unless `benchmarks_before_models` (since benchmarks are dated
-    by their own release, TriviaQA's 2017 stretched the axis two years left of GPT-2); `y_label`
+    by their own release, TriviaQA's 2017 stretched the axis two years left of GPT-2).
+    `label_positions` places an annotated name at (date, y) in an empty part of the plot, joined to
+    its point by a thin leader line, with an optional third element as the text written (else the
+    benchmark's name or `pretty_model_name`); names it does not list sit just under their point.
+    `y_label`
     overrides the y-axis title (e.g. "ECI-H" when the frame is on that scale);
     `y_range` pins the y-axis (the post uses 30 to 220 on ECI-H, so one benchmark
     with a very uncertain difficulty does not squash the cloud)."""
@@ -683,17 +688,29 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
         hovertemplate="<b>%{text}</b><br>C = %{y:.2f}<br>%{x|%Y-%m-%d}<extra></extra>",
     ))
 
-    # Inline name labels for selected points
+    # Inline name labels for selected points: at their `label_positions` place with a leader line,
+    # else just under the point.
+    label_positions = label_positions or {}
+    def _label(r, text, color):
+        if r["name"] in label_positions:
+            lx, ly, *own = label_positions[r["name"]]
+            text = own[0] if own else text
+            fig.add_annotation(x=r["release_date"], y=r["mean"], ax=lx, ay=ly,
+                               axref="x", ayref="y", text=text, showarrow=True, arrowhead=0,
+                               arrowwidth=0.8, arrowcolor="rgba(90,90,90,0.6)", standoff=3,
+                               bgcolor="rgba(255,255,255,0.85)", borderpad=2,
+                               font=dict(size=style.font_note - 1, color=color))
+        else:
+            fig.add_annotation(x=r["release_date"], y=r["mean"],
+                               text=text, showarrow=False, yshift=-12,
+                               font=dict(size=style.font_note - 2, color=color))
     for _, r in benches.iterrows():
         if r["name"] in annotate_benchmarks:
-            fig.add_annotation(x=r["release_date"], y=r["mean"],
-                               text=r["name"], showarrow=False, yshift=-12,
-                               font=dict(size=style.font_note - 2, color="#888"))
+            _label(r, r["name"], "#a3195b" if r["name"] in label_positions else "#888")
     for _, r in models.iterrows():
         if r["name"] in annotate_models:
-            fig.add_annotation(x=r["release_date"], y=r["mean"],
-                               text=pretty_model_name(r["name"]), showarrow=False, yshift=-12,
-                               font=dict(size=style.font_note - 2, color="#666"))
+            _label(r, pretty_model_name(r["name"]),
+                   "#15706c" if r["name"] in label_positions else "#666")
 
     fig.update_layout(
         title=dict(text=text["title"], x=0.5),
