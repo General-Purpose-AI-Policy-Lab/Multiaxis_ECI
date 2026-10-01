@@ -537,7 +537,7 @@ def run_canonical(args) -> None:
                     tl_eci, human_stats=humans_eci, lang=lang,
                     hdi_prob=TIMELINE_HDI_PROB, y_label="ECI-H",
                     y_range=TIMELINE_ECI_RANGE, human_bands=DEFAULT_HUMAN_BANDS,
-                    annotate_benchmarks=["GSM8K", "MMLU", "GPQA Diamond", "HLE",
+                    annotate_benchmarks=["GSM8K", "MMLU", "GPQA Diamond", "HLE Diamond",
                                          "GSO-Bench", "OSWorld"],
                     annotate_models=[config.ANCHOR_LOW[0], config.ANCHOR_HIGH[0]]),
                  "capability_timeline", sub)
