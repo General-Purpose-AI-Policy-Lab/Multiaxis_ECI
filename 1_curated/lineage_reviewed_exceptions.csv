@@ -13,3 +13,7 @@ pool,qwq,QwQ-32B,bare,QwQ-32B|qwq-plus,qwq-plus is the API version of QwQ-32B
 date,qwq,QwQ-32B,,qwq-plus,API version of QwQ-32B published 34 days after the open weights
 date,mythos-fable,Fable 5,,claude-mythos-preview-early,reviewed override: the early Mythos checkpoint is filed with Fable 5 (lineage_node_overrides.csv)
 date,gpt,5.4,,gpt-5.4-2026-03-05_cyber,cyber access tier of GPT-5.4 opened 40 days after the release; its own variant offset
+regression,grok,4.3,bare,grok-4-20|grok-4.3,"reviewed 2026-10-01: Grok 4.3 is a hosted beta with thinking on and off; its bare run (unknown mode, 2 scores) has 0 on CritPt and BlueprintBench 2 and trails 4.20 on WeirdML v2 (0.499 vs 0.523): measured, not a filing error"
+regression,grok,4.7,bare,grok-4.6|grok-4.7,"reviewed 2026-10-01: the bare 4.7 run (unknown mode, 2 scores: HLE Diamond 0.234, ProofBench 0.34 vs 4.6's 0.51) is all the data; names and dates consistent: measured, not a filing error"
+regression,opus,Opus 4.8,effort:none,claude-opus-4-7_none|claude-opus-4-8_none,"reviewed 2026-10-01: the two none runs are scored on different benchmarks (agentic and cyber for 4.7, knowledge and maths for 4.8), WeirdML v2 the only common one (0.764 -> 0.704): composition, not a filing error"
+regression,gemini-pro,pro 2.5 2025-05-06,best,gemini-2.5-pro-exp-03-25|gemini-2.5-pro-preview-05-06,"reviewed 2026-10-01: a genuine regression of the 05-06 preview, measured by Epoch (GPQA Diamond 0.667 vs 0.838) and Fiction.LiveBench (0.719 vs 0.906); the 06-05 preview recovers"
