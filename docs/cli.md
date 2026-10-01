@@ -77,7 +77,7 @@ unmarked to both.
 
 ## Where a fit's output goes
 
-Everything a fit or a diagnostic writes lives under `5_outputs/`, whose first level is the data generation: `data<YYYYMMDD>`, the build date of the pipeline tables in `0_input/provenance.json` (`config.DATA_TAG`). Fits on two data generations therefore never overwrite each other. `5_outputs/pre_pipeline/` holds the fits published with the post, on the pre-pipeline dataset, kept as they were.
+Everything a fit or a diagnostic writes lives under `5_outputs/`, whose first level is the data generation: `data<YYYYMMDD>`, the day the synced pipeline run happened (its `2_database/<YYYYMMDD>/` folder, `pipeline_run_date` in `0_input/provenance.json`, `config.DATA_TAG`), not the day of the analysis. Fits on two data generations therefore never overwrite each other. `5_outputs/pre_pipeline/` holds the fits published with the post, on the pre-pipeline dataset, kept as they were.
 
 Inside a generation, one folder per fit holds its tables, its trace and its figures (`figures/` for the PNGs, `figures/html/` for the interactive twins, `figures/fr/` for the French versions, `figures/fr/svg/` for their untitled vector twins); `comparisons/` holds the cross-fit tables (frontier gap, chain verdicts) with their own `figures/`; `diagnostics/` the one-off diagnostic outputs.
 
@@ -86,7 +86,7 @@ A fit's flags become one tag, and the tag names the results folder and the trace
 ```
 flags    --K 4 --human-merge --lineage-prior --lineage-bm
 tag      _humanmerge_lineageprior_lineagebm
-results  5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/
+results  5_outputs/data20260930/mirt_humanmerge_lineageprior_lineagebm/
 trace      ├── trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 figures    └── figures/k4/            (PNG; html/ beneath it)
 ```
@@ -138,7 +138,7 @@ and copies the deliverables, French included, into that folder (`GROUP=country` 
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --trace \
-  5_outputs/data20260908/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+  5_outputs/data20260930/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
 Figures land in the fit's own `figures/k{K}/`, one PNG each with the HTML twin
@@ -149,8 +149,8 @@ destination. Full catalogue: [plots.md](plots.md).
 ### Plot everything
 
 ```bash
-python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260908/ --dry-run   # decisions only
-python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260908/             # render
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260930/ --dry-run   # decisions only
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260930/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder

@@ -2,7 +2,7 @@
 
 The question of [Ihle (2026), *How far behind are open models?*](https://www.lesswrong.com/posts/rJcCrXyEsJKmmDpWG/how-far-behind-are-open-models), asked on our ECI-H scale instead of per-benchmark score thresholds: how many months does the open-weights frontier trail the closed one, and does the answer change with the access class of the benchmarks?
 
-Data generation 2026-09-29 (pipeline commit `ab88fee`), today pinned at 2026-09-29. Figures and tables are copies of `5_outputs/data20260929/comparisons/frontier_gap_openness_*`; French versions in `fr/`, vector twins in `fr/svg/`; the French months-behind figure is drawn in the lab's print style, with its marks (`viz.frontier_gap_print`).
+Data generation 2026-09-29 (pipeline commit `ab88fee`), today pinned at 2026-09-29. Figures and tables are copies of `5_outputs/data20260929/comparisons/frontier_gap_openness_*` (that folder was deleted on 2026-10-01; these copies are what remains of it, the rest is in the git history); French versions in `fr/`, vector twins in `fr/svg/`; the French months-behind figure is drawn in the lab's print style, with its marks (`viz.frontier_gap_print`).
 
 ![Months behind](frontier_gap_openness_lag.png)
 

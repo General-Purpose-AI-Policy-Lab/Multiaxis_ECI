@@ -9,29 +9,31 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]   # 2_model/multiaxis_eci/con
 INPUT_DIR    = PROJECT_ROOT / "0_input"     # tables of benchmark-data-pipeline, copied by `python -m multiaxis_eci sync`
 CURATED_DIR  = PROJECT_ROOT / "1_curated"   # inputs specific to this model (exclusions, lineages, SOTA list, clips)
 PIPELINE_DIR = PROJECT_ROOT.parent / "benchmark-data-pipeline"
-# name here -> path in the pipeline checkout
+# name here -> folder of the pipeline checkout; `sync` reads the file from that folder's latest
+# run, `<folder>/<YYYYMMDD>/` (the date the pipeline ran)
 INPUT_FILES = {
-    "all_scores_flat.csv": "3_views/all_scores_flat.csv",   # every score with release date, organization, category, floor, ceiling
-    "human_baselines.csv": "3_views/human_baselines.csv",   # one row per published human measurement
-    "models.csv":          "2_database/models.csv",         # identity, organization, country
-    "benchmarks.csv":      "2_database/benchmarks.csv",     # category, floor, ceiling, access class
-    "build_manifest.json": "2_database/build_manifest.json",
+    "all_scores_flat.csv": "3_views",      # every score with release date, organization, category, floor, ceiling
+    "human_baselines.csv": "3_views",      # one row per published human measurement
+    "models.csv":          "2_database",   # identity, organization, country
+    "benchmarks.csv":      "2_database",   # category, floor, ceiling, access class
+    "build_manifest.json": "2_database",
 }
 PROVENANCE_FILE = "provenance.json"
 
 
 def data_tag() -> str:
-    """Date of the synced pipeline build as YYYYMMDD, or '' before the first sync.
+    """Date the synced pipeline run happened, YYYYMMDD (its `2_database/<date>/` folder), or ''
+    before the first sync.
 
     Names the per-generation output folder (`5_outputs/data<tag>/`), so fits on two
-    data generations never overwrite each other.
+    data generations never overwrite each other, and a later analysis of the same data
+    lands in the same folder.
     """
     import json
     p = INPUT_DIR / PROVENANCE_FILE
     if not p.exists():
         return ""
-    built = json.loads(p.read_text()).get("pipeline_built_at", "")
-    return built[:10].replace("-", "")
+    return json.loads(p.read_text()).get("pipeline_run_date", "")
 
 
 DATA_TAG = data_tag()

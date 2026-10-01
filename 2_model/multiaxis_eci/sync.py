@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 from datetime import UTC, datetime
@@ -23,12 +24,25 @@ def pipeline_repo(pipeline_dir: Path) -> str:
         return pipeline_dir.name
 
 
+def latest_run(pipeline_dir: Path) -> str:
+    """The pipeline's most recent run, YYYYMMDD: the newest dated folder of its 2_database/."""
+    db = pipeline_dir / "2_database"
+    runs = sorted(p.name for p in db.iterdir()
+                  if p.is_dir() and re.fullmatch(r"\d{8}", p.name)) if db.is_dir() else []
+    if not runs:
+        raise FileNotFoundError(
+            f"{db}: no dated run, run `python -m benchmark_data build` in the pipeline first")
+    return runs[-1]
+
+
 def sync(pipeline_dir: Path = PIPELINE_DIR, input_dir: Path = INPUT_DIR) -> dict:
-    """Copy the views and tables listed in INPUT_FILES, write provenance.json, return it."""
+    """Copy the views and tables listed in INPUT_FILES from the pipeline's latest run, write
+    provenance.json (with that run's date, which names the outputs), return it."""
     pipeline_dir = Path(pipeline_dir)
     input_dir.mkdir(exist_ok=True)
-    for name, rel in INPUT_FILES.items():
-        src = pipeline_dir / rel
+    run = latest_run(pipeline_dir)
+    for name, folder in INPUT_FILES.items():
+        src = pipeline_dir / folder / run / name
         if not src.exists():
             raise FileNotFoundError(
                 f"{src}: run `python -m benchmark_data build` in the pipeline first")
@@ -38,6 +52,7 @@ def sync(pipeline_dir: Path = PIPELINE_DIR, input_dir: Path = INPUT_DIR) -> dict
     provenance = {
         "pipeline_repo": pipeline_repo(pipeline_dir),
         "pipeline_commit": manifest.get("git_commit", ""),
+        "pipeline_run_date": run,
         "pipeline_built_at": manifest.get("built_at", ""),
         "schema_version": manifest.get("schema_version", ""),
         "synced_at": datetime.now(UTC).isoformat(timespec="seconds"),

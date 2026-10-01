@@ -18,7 +18,7 @@ def main() -> None:
     if args.command == "sync":
         provenance = sync(args.pipeline)
         print(f"0_input/ now mirrors pipeline commit {provenance['pipeline_commit'][:8]} "
-              f"built {provenance['pipeline_built_at']}")
+              f"run {provenance['pipeline_run_date']} (built {provenance['pipeline_built_at']})")
 
 
 if __name__ == "__main__":
