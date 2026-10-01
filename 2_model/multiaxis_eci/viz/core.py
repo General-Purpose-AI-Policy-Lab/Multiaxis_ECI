@@ -559,7 +559,8 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
                              tier_names_at_right: bool = False,
                              style: FigureStyle = DASHBOARD,
                              x_min: str | None = None,
-                             y_range: tuple[float, float] | None = None) -> go.Figure:
+                             y_range: tuple[float, float] | None = None,
+                             benchmarks_before_models: bool = False) -> go.Figure:
     """Capability (models) + difficulty (benchmarks) vs release date.
 
     The one builder behind the canonical ECI-H figure, the blog post's figure 1
@@ -576,7 +577,9 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
     `lang` picks the labels ("en" default, "fr"); `human_labels` overrides the
     tier display names. `tier_names_at_right` writes each tier's name at the
     right end of its line instead of the legend (the post's arrangement).
-    `x_min` drops models and benchmarks released before that date; `y_label`
+    `x_min` drops models and benchmarks released before that date. Benchmarks released before the
+    first model shown are dropped too unless `benchmarks_before_models` (since benchmarks are dated
+    by their own release, TriviaQA's 2017 stretched the axis two years left of GPT-2); `y_label`
     overrides the y-axis title (e.g. "ECI-H" when the frame is on that scale);
     `y_range` pins the y-axis (the post uses 30 to 220 on ECI-H, so one benchmark
     with a very uncertain difficulty does not squash the cloud)."""
@@ -597,6 +600,8 @@ def capability_timeline_fig(timeline_df: pd.DataFrame,
 
     models = tl[tl["kind"] == "model"]
     benches = tl[tl["kind"] == "benchmark"]
+    if not benchmarks_before_models and len(models):
+        benches = benches[benches["release_date"] >= models["release_date"].min()]
 
     fig = go.Figure()
 

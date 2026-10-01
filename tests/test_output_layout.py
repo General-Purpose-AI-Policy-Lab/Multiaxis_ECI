@@ -54,3 +54,20 @@ def test_save_fig_writes_png_beside_html_subfolder(tmp_path, monkeypatch):
     save_fig(go.Figure(), "benchmark_difficulty", tmp_path / "figures")
     assert (tmp_path / "figures" / "benchmark_difficulty.png").exists()
     assert (tmp_path / "figures" / "html" / "benchmark_difficulty.html").exists()
+
+
+def test_timeline_starts_with_the_first_model():
+    """Benchmarks dated before the first model (TriviaQA, 2017) are left off the timeline unless
+    asked for, so they do not stretch the axis years left of the models."""
+    import pandas as pd
+
+    from multiaxis_eci.viz.core import capability_timeline_fig
+    tl = pd.DataFrame({
+        "name": ["TriviaQA", "MMLU", "gpt2-xl", "gpt-4"], "kind": ["benchmark", "benchmark", "model", "model"],
+        "release_date": ["2017-05-09", "2020-09-07", "2019-11-05", "2023-03-14"],
+        "mean": [80.0, 110.0, 76.0, 120.0], "hdi_low": [70.0, 100.0, 70.0, 115.0],
+        "hdi_high": [90.0, 120.0, 82.0, 125.0]})
+    def bench_names(fig):
+        return [n for t in fig.data if t.legendgroup == "benchmarks" for n in t.text]
+    assert bench_names(capability_timeline_fig(tl)) == ["MMLU"]
+    assert bench_names(capability_timeline_fig(tl, benchmarks_before_models=True)) == ["TriviaQA", "MMLU"]
