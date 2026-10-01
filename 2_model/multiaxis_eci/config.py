@@ -218,14 +218,18 @@ NC_C_OFFSET = 1.0
 PRIOR_TAU_C = dict(mu=math.log(1.0), sigma=0.5)
 
 # ── Sampling ──────────────────────────────────────────────────────────────
-# Every `step`-th draw is written to disk (`persistence.thin_trace`): 10,000 draws x 8
-# chains keep 16,000, enough for every median and interval here, at a fifth of the file.
+# Every `step`-th draw is written to disk (`persistence.thin_trace`): 2,500 draws x 8
+# chains keep 4,000, enough for every median and interval here, at a fifth of the file.
 # Convergence and the deliverable tables use the full run before the save.
 SAVE_THIN = 5
+# The canonical run: 2,500 draws per chain since 2026-10-01 (10,000 before). The 8 x 10,000
+# Beta fit of that day had a bulk ESS of 7,200 at least on every ability (median 15,900), 5,100
+# in the tails and 2,150 on its worst loading; a quarter of the draws keeps about 1,800, 1,300
+# and 540, and the run takes about 2.7 times less.
 SAMPLE_KW = dict(
-    draws=10000,
+    draws=2500,
     tune=2000,
-    chains=8,             # 15 physical cores — 8 chains run in parallel
+    chains=8,             # 10 cores here (4 performance, 6 efficiency): 8 chains in parallel
     cores=8,
     target_accept=0.95,
     random_seed=42,

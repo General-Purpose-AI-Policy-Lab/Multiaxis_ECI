@@ -15,7 +15,7 @@ unmarked to both.
 
 | flag | effect |
 |---|---|
-| `--draws N` | posterior draws per chain. Default 10,000 canonical, 2,000 exploration |
+| `--draws N` | posterior draws per chain. Default 2,500 canonical (10,000 before 2026-10-01), 2,000 exploration |
 | `--tune N` | tuning steps per chain. Default 2,000 |
 | `--chains N` | chains and cores. Default 8 |
 | `--sampler {pymc,nutpie,numpyro}` | NUTS backend. Default `nutpie` |

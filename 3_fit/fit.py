@@ -853,7 +853,7 @@ def main():
     # Shared sampling controls.
     parser.add_argument("--draws", type=int, default=None,
                         help="posterior draws per chain (default: config.SAMPLE_KW, "
-                             "10000 draws, with --preset canonical; 2000 for an "
+                             "2500 draws, with --preset canonical; 2000 for an "
                              "exploration fit, so pass --draws 10000 --tune 2000 for a "
                              "full-length K-axis fit)")
     parser.add_argument("--tune", type=int, default=None,
