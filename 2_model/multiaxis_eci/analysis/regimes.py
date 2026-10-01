@@ -38,7 +38,7 @@ from scipy.stats import multivariate_normal
 
 from multiaxis_eci.analysis.forecast import ForecastResult, _to_date, _to_year
 from multiaxis_eci.analysis.stats import post_stats
-from multiaxis_eci.config import REASONING_FAMILY_PATTERNS
+from multiaxis_eci.config import NON_REASONING_PATTERNS, REASONING_FAMILY_PATTERNS
 from multiaxis_eci.data import MODELS_FILE, ECIData, model_family, model_organization
 
 _OFF_LEVELS = {"", "none", "minimal"}
@@ -54,11 +54,15 @@ def _reasoning_families() -> frozenset:
 
 
 _PATTERN = re.compile("|".join(REASONING_FAMILY_PATTERNS), re.I)
+_NOT = re.compile("|".join(NON_REASONING_PATTERNS), re.I)
 
 
 def is_reasoning(name: str) -> bool:
     """Whether a test-taker is a reasoning model: its family shows reasoning evidence in the
-    models table, or its name matches one of the reasoning family patterns."""
+    models table, or its name matches one of the reasoning family patterns, unless it matches one
+    of the non-reasoning patterns."""
+    if _NOT.search(name):
+        return False
     return model_family(name) in _reasoning_families() or bool(_PATTERN.search(name))
 
 

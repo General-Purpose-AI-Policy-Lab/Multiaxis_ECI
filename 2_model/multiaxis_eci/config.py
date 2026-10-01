@@ -298,6 +298,21 @@ REASONING_FAMILY_PATTERNS = [
     r"glm-5", r"qwen3", r"MiniMax-M2", r"deepseek-v3\.[12]", r"deepseek-v4",
     r"claude-opus-4", r"claude-sonnet-4", r"claude-mythos", r"claude-fable", r"gpt-5", r"gpt-6",
     r"magistral", r"gpt-oss",
+    # Reasoning by default without an effort suffix in the data, per their developers (2026-10-01):
+    r"muse-spark", r"grok-build", r"grok-code-fast", r"mimo-v2", r"gemma-4", r"seed-oss",
+    r"mercury-2", r"nemotron-3", r"glm-4\.[5-9]", r"laguna", r"-thinking($|[_-])",
+    r"step-3\.7", r"step-5", r"hy4", r"Ring-2", r"Composer 2", r"^swe-1\.[6-9]", r"solar-pro-3",
+    r"command-a-plus", r"reka-flash-3", r"MiniMax-M1", r"codex-mini", r"cogito-.*-v2",
+    r"ChatGPT agent", r"gemini-robotics-er", r"qwen-plus-2025-04-28",
+]
+
+# Releases that match a pattern above but do not reason, per their developers (2026-10-01): Qwen's
+# separate Instruct / Coder / Omni non-thinking models, the first Qwen3-Max (its Thinking release
+# came later), xAI's fast non-reasoning variant, OpenAI's Instant models. Checked before the
+# patterns and the models table, so a match here is always a non-reasoning model.
+NON_REASONING_PATTERNS = [
+    r"-instruct-2507", r"qwen3-coder", r"qwen3-next-.*-instruct", r"qwen3-omni-.*-instruct",
+    r"^qwen3-max-2025-09-23", r"non-reasoning", r"-instant($|[_-])",
 ]
 
 # Optional backcast clamp per axis (envelope basis): a tier already passed at
