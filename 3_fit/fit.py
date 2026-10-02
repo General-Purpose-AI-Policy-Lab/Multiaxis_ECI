@@ -139,7 +139,7 @@ TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-06-15", 61, "Claude 3.5 So
                          config.ANCHOR_HIGH[0]: ("2025-09-20", 72, "GPT-5 (medium)")}
 
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
-                lineage_bm=False, variant_offsets=True,
+                lineage_bm=False, lineage_links=True, variant_offsets=True,
                 loading_prior="signed", floor_c=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
                 binomial_n=None, pooled_noise=False, shared_base_zsn=True, time_t=None,
@@ -151,7 +151,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
     if human_order:
         tag += ", ordered-human prior"
     if lineage:
-        tag += ", Brownian lineage prior" if lineage_bm else ", lineage prior"
+        tag += (", release nodes (no links)" if not lineage_links
+                else ", Brownian lineage prior" if lineage_bm else ", lineage prior")
     if time_t is not None:
         tag += ", time prior"
     if floor_c is not None:
@@ -180,7 +181,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
           flush=True)
     model = build_mirt_model(data, K, loading_prior=loading_prior,
                              human_order=human_order, lineage=lineage,
-                             lineage_bm=lineage_bm,
+                             lineage_bm=lineage_bm, lineage_links=lineage_links,
                              variant_offsets=variant_offsets,
                              floor_c=floor_c,
                              ceiling_noise=ceiling_noise, known_se=known_se,
@@ -326,6 +327,8 @@ def run_canonical(args) -> None:
         scope_tag += "_censor"
     elif not args.beta_binomial:
         scope_tag += "_betalik"
+    if not args.release_nodes:
+        scope_tag += "_noreleases"
     if args.human_merge:
         scope_tag += "_humanmerge"
     elif args.human_prior:
@@ -423,14 +426,22 @@ def run_canonical(args) -> None:
         censor_eps = load_boundary_eps(data) if args.censor_bounds else None
         beta_binomial = args.beta_binomial and not args.censor_bounds
         stream = args.stream_draws and args.sampler == "nutpie"
+        # A release's effort variants share its level, as in the K-axis fit's lineage prior,
+        # without the links between releases (models/mirt._release_block).
+        releases = build_lineage_structure(data.mlookup) if args.release_nodes else None
+        if releases is not None:
+            print(f"   release nodes: {releases.n_nodes} releases / {len(releases.row_idx)} runs / "
+                  f"{releases.n_groups} (release, variant) offsets", flush=True)
         trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
                                human_order=human_order, censor_eps=censor_eps,
+                               lineage=releases, lineage_links=False,
                                binomial_n=load_binomial_n(data) if beta_binomial else None,
                                save_thin=args.save_thin,
                                stream_path=(trace_path.parent / "live_draws.zarr"
                                             if stream else None))
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
         trace.posterior.attrs["mirt_beta_binomial"] = json.dumps(beta_binomial)
+        trace.posterior.attrs["mirt_release_nodes"] = json.dumps(releases is not None)
         if args.censor_bounds:
             trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
         if args.keep_isolated:
@@ -1051,6 +1062,11 @@ def main():
                              "eps_b = 1 / (2 N_b) from 1_curated/benchmark_n_items.csv, "
                              "instead of a density at a clipped 0.001. Both modes; "
                              "emits the `_censor` tag token"),
+    parser.add_argument("--no-release-nodes", dest="release_nodes", action="store_false",
+                        help="canonical only: every run a free test-taker, instead of the default "
+                             "grouping of a release's effort variants around one level (the "
+                             "lineage map's nodes and variant offsets, without the links between "
+                             "releases). Emits the `_noreleases` scope token")
     parser.add_argument("--beta-likelihood", dest="beta_binomial", action="store_false",
                         help="the Beta density on every benchmark, instead of the default "
                              "Beta-binomial on the benchmarks whose score is a share of N "

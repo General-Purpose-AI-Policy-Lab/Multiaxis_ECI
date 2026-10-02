@@ -73,9 +73,14 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                     variant_offsets: bool = True,
                     shared_base_zsn: bool = True,
                     time_t=None,
-                    theta_t_cells: bool = False):
+                    theta_t_cells: bool = False,
+                    lineage_links: bool = True):
     """Stitch the structured theta blocks and the unstructured rows into ONE
     ZeroSumNormal.
+
+    lineage_links=False keeps the lineage map's release nodes and their variant offsets but
+    drops the links between releases: every node gets its own base in the ZeroSumNormal
+    instead of its chain founder's level plus increments (see _release_block).
 
     Human tiers and lineage chains are each a base level plus increments along
     a path. Those bases (human roots, chain founders) sit INSIDE the same
@@ -155,7 +160,8 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
 
     rest = np.setdiff1d(np.arange(n_models), claimed)
     n_roots = human_struct[3] if human_struct is not None else 0
-    n_chains = lin.n_chains if lin is not None else 0
+    # One base per chain founder, or one per release node when the links are dropped.
+    n_chains = (0 if lin is None else lin.n_chains if lineage_links else lin.n_nodes)
     if not shared_base_zsn and rest.size == 0:
         raise ValueError("shared_base_zsn=False needs unstructured rows to carry "
                          "the ZeroSumNormal location pin; every model is structured.")
@@ -176,8 +182,9 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
         base_l = (pm.Deterministic("lin_base", zsn[cut:cut + n_chains])
                   if shared_base_zsn else
                   pm.Normal("lin_base", 0.0, 1.0, shape=(n_chains, K)))
-        rows_l, theta_l = _lineage_block(lin, K, base_l, bm=lineage_bm,
-                                         variant_offsets=variant_offsets)
+        rows_l, theta_l = (_lineage_block(lin, K, base_l, bm=lineage_bm,
+                                          variant_offsets=variant_offsets)
+                           if lineage_links else _release_block(lin, K, base_l))
         theta_full = pt.set_subtensor(theta_full[rows_l, :], theta_l)
     return finish(theta_full)
 
@@ -347,6 +354,23 @@ def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
     return lin.row_idx, theta_lin
 
 
+def _release_block(lin: LineageStructure, K, base):
+    """Release nodes without the chains: theta = base[node] + the variant offset.
+
+    The canonical K=1 index's grouping of a release's effort variants, built like the
+    lineage prior of the K-axis fit (`_lineage_block`) minus the links between releases: the
+    same nodes of 1_curated/lineage_map.csv, the same (node, variant) offset groups and the
+    same single offset scale tau_o ~ HalfNormal(PRIOR_LINEAGE_OFFSET), but each node's level
+    is its own draw from the shared ZeroSumNormal (`base`, one row per node) instead of its
+    chain founder's plus increments, so no release is ordered after another. A variant seen on
+    one benchmark only (a CritPt score per effort) then sits near its release's level, which
+    every run of the release informs, instead of being a free test-taker. Returns
+    (row_idx, theta)."""
+    tau_o = pm.HalfNormal("lin_offset_sd", sigma=PRIOR_LINEAGE_OFFSET)
+    offset = tau_o * pm.Normal("lin_offset_z", 0.0, 1.0, shape=(lin.n_groups, K))
+    return lin.row_idx, base[lin.node_idx] + offset[lin.offset_group]
+
+
 def _apply_plt(A, plt_idx, K):
     """Impose the positive-lower-triangular pattern on the founder rows.
 
@@ -409,6 +433,7 @@ def build_mirt_model(data: ECIData, K: int,
                       human_order: dict[str, str | None] | list[str] | None = None,
                       lineage: LineageStructure | None = None,
                       lineage_bm: bool = False,
+                      lineage_links: bool = True,
                       variant_offsets: bool = True,
                       pin_benchmark: str | None = None,
                       plt_founders: list[str] | None = None,
@@ -511,6 +536,10 @@ def build_mirt_model(data: ECIData, K: int,
     rate was fitted 2026-07-27 and removed: roughly one release per year per
     vendor cannot pin a rate; see _lineage_block). The mean-zero effort-variant
     offsets are unaffected.
+    lineage_links=False keeps the release nodes and their variant offsets and drops the
+    chains: each node is its own draw from the shared ZeroSumNormal (_release_block). The
+    canonical K=1 index uses it so a release's effort variants share its level, as in the
+    K-axis fit, without ordering any release after another.
 
     Both are priors on theta only, and both compose with any loading_prior. The
     human roots and chain founders join the unstructured models inside one
@@ -752,6 +781,9 @@ def build_mirt_model(data: ECIData, K: int,
 
     if lineage_bm and lineage is None:
         raise ValueError("lineage_bm=True requires a lineage structure")
+    if lineage_bm and not lineage_links:
+        raise ValueError("lineage_bm scales the links between releases; lineage_links=False "
+                         "has none")
 
     if loading_prior == "signed" and (human_order or lineage):
         import warnings
@@ -887,7 +919,7 @@ def build_mirt_model(data: ECIData, K: int,
             lin=lineage, lineage_bm=lineage_bm,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,
-            theta_t_cells=theta_t_cells)
+            theta_t_cells=theta_t_cells, lineage_links=lineage_links)
         # Likelihood-side ability. Raw theta stays the reported ability (it
         # carries the location pin and the order structure); the positive copy
         # is what eta reads, so with A >= 0 an axis can only add to a score,

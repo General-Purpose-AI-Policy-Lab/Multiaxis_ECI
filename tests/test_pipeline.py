@@ -2863,6 +2863,22 @@ class TestPipelineIdentity:
         # (a 1/350 partial credit on a 71-item benchmark), censored the same way.
         assert (observed == eps).sum() >= int(data.zero_score_mask.sum())
 
+    def test_release_nodes_share_a_level_without_chain_links(self, data):
+        """The canonical index's release grouping: the lineage map's nodes and variant offsets,
+        one base per node from the shared ZeroSumNormal, no chain increments."""
+        from multiaxis_eci.lineage import build_lineage_structure
+        from multiaxis_eci.models.mirt import build_mirt_model
+        lin = build_lineage_structure(data.mlookup)
+        model = build_mirt_model(data, K=1, loading_prior="pt1", lineage=lin, lineage_links=False)
+        names = {v.name for v in model.free_RVs}
+        assert {"lin_offset_sd", "lin_offset_z"} <= names
+        assert not names & {"lin_delta_z", "lin_drift", "lin_spread"}
+        n_rest = data.n_models - len(lin.row_idx)
+        assert model["theta_zsn_t"].type.shape[-1] == n_rest + lin.n_nodes
+        assert np.isfinite(model.compile_logp()(model.initial_point()))
+        with pytest.raises(ValueError):
+            build_mirt_model(data, K=1, lineage=lin, lineage_links=False, lineage_bm=True)
+
     def test_binomial_n_reads_the_scoring_column(self, data):
         from multiaxis_eci.data import N_ITEMS_FILE, load_binomial_n
         t = pd.read_csv(N_ITEMS_FILE).set_index("benchmark")
