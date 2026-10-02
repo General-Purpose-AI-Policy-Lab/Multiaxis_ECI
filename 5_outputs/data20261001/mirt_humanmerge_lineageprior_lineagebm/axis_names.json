@@ -7,14 +7,14 @@
       "title_fr": null,
       "signature": [],
       "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
         "ARC-AGI",
+        "Chess Puzzles",
         "ARC-AGI-2",
         "DeepSWE",
-        "OTIS Mock AIME 2024-2025",
         "MCP Atlas",
-        "MATH Level 5",
-        "CritPt",
-        "APEX-Agents"
+        "GPQA Diamond"
       ]
     },
     "axis2": {
@@ -22,14 +22,14 @@
       "title_fr": null,
       "signature": [],
       "top_benchmarks": [
-        "WMDP Biology",
-        "WMDP Chemistry",
-        "MMLU Biology",
-        "MMLU Pro Chemistry",
-        "MMLU Pro Biology",
+        "GeoBench",
         "MMLU",
-        "Chess Puzzles",
-        "MMLU-Pro"
+        "MMLU Pro Biology",
+        "WMDP Chemistry",
+        "WMDP Biology",
+        "MMLU Pro Chemistry",
+        "ExploitBench",
+        "GSM8K"
       ]
     },
     "axis3": {
@@ -37,14 +37,14 @@
       "title_fr": null,
       "signature": [],
       "top_benchmarks": [
-        "MirrorCode",
-        "OSWorld",
         "CyScenarioBench",
-        "TriviaQA",
-        "GBAEval",
+        "OSWorld",
+        "WMDP Biology",
+        "MMLU Biology",
+        "WMDP Chemistry",
         "GDPval",
-        "ProofBench",
-        "Furniture Assembly"
+        "GBAEval",
+        "MirrorCode"
       ]
     },
     "axis4": {
@@ -54,11 +54,11 @@
       "top_benchmarks": [
         "DeepResearch Bench",
         "SimpleQA Verified",
-        "OpenBookQA",
+        "TriviaQA",
+        "HellaSwag",
         "EBR-bench",
+        "Balrog",
         "HLE Diamond",
-        "ARC AI2",
-        "CTI-REALM",
         "SimpleBench"
       ]
     }
