@@ -40,6 +40,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP_TRACE,
     FitSpec,
     _aligned_reproducibility,
+    align_to_reference_loadings,
     best_mode_chains,
     crosschain_axis_reproducibility,
     load_axis_titles,
@@ -427,6 +428,11 @@ def render_fit(fit, data, raw, bench, mod):
         print(f"  drop_chains {fit['drop_chains']}: kept {len(keep)} chains", flush=True)
     is_nc = fit.get("kind", "comp") == "nc"
     view = prepare_fit(idata, data)
+    ref = _trace_path(fit).parent / "mirt_loadings.csv"
+    if fit.get("drop_chains") and view.A is not None and view.K >= 2 and ref.exists():
+        # A chain subset ranks its axes in its own order; put them back on the fit's display
+        # frame, as 3_plot_mirt.py does, so axis k and its title match the fit's figures.
+        view = align_to_reference_loadings(view, data, ref)
     # Floored fits are scored with the same fixed-c 3PL link they were fit
     # with. A ceiling-noise fit carries its ESTIMATED `ceiling_d` in the
     # posterior; posterior_predictive_mirt picks that up on its own.
