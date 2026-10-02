@@ -1,11 +1,15 @@
 {
-  "confirmed": false,
-  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "confirmed": true,
+  "how": "Named by hand on 2026-10-02 (user, French titles; English renders translated) from the best-log-density mode (chains 0, 5, 7 of 8; mode B, chains 1-4 and 6, sits 36 nats lower), reading each axis's benchmarks by share of their loading variance on the reference-aligned view. Axes 2 and 3 correlate at 0.94 in this mode and axis 2 has no benchmark of its own (largest share 0.39). A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
   "axes": {
     "axis1": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Fluid Intelligence & Formal Reasoning",
+      "title_fr": "Intelligence fluide et raisonnement formel",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI-2",
+        "MATH Level 5"
+      ],
       "top_benchmarks": [
         "OTIS Mock AIME 2024-2025",
         "MATH Level 5",
@@ -18,9 +22,13 @@
       ]
     },
     "axis2": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Core Scientific Knowledge",
+      "title_fr": "Connaissances scientifiques de base",
+      "signature": [
+        "MMLU",
+        "MMLU Pro Biology",
+        "MMLU Pro Chemistry"
+      ],
       "top_benchmarks": [
         "GeoBench",
         "MMLU",
@@ -33,9 +41,13 @@
       ]
     },
     "axis3": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Dual-Use Agentic Capabilities (Cyber, CBRN)",
+      "title_fr": "Capacités agentiques duales (cyber, CBRN)",
+      "signature": [
+        "CyScenarioBench",
+        "WMDP Biology",
+        "WMDP Chemistry"
+      ],
       "top_benchmarks": [
         "CyScenarioBench",
         "OSWorld",
@@ -48,9 +60,13 @@
       ]
     },
     "axis4": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "General Knowledge",
+      "title_fr": "Connaissances générales",
+      "signature": [
+        "SimpleQA Verified",
+        "TriviaQA",
+        "DeepResearch Bench"
+      ],
       "top_benchmarks": [
         "DeepResearch Bench",
         "SimpleQA Verified",
