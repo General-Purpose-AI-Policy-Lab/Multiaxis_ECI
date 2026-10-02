@@ -1,2 +1,2 @@
 fit,chains,draws,R2,RMSE,elpd_loo,loo_se,eta_rhat,ess_min,ess_med,divergences,khat_gt_0.7
-K=4 · pooled · merge · flagship,3/8,1200,0.9652,0.0425,-17037.1,194.6,1.01,451,1119,11,0.175
+K=4 · pooled · merge · flagship,3/8,1200,0.9654,0.0428,-16969.9,194.2,1.009,465,1136,9,0.164

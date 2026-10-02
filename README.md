@@ -15,19 +15,19 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 The axes carry no names of their own. They are named by hand after the benchmarks that load most on them, in the fit folder's `axis_names.json`, and a refit keeps a name only while its signature benchmarks still define the axis (see [docs/plots.md](docs/plots.md)). The current flagship's four:
 
 1. **Fluid Intelligence & Formal Reasoning** (OTIS Mock AIME, ARC-AGI-2, MATH Level 5)
-2. **Core Scientific Knowledge** (MMLU, MMLU Pro Biology and Chemistry)
+2. **Puzzles & Core Scientific Knowledge** (Chess Puzzles, MMLU, MMLU Pro Biology and Chemistry)
 3. **Dual-Use Agentic Capabilities (Cyber, CBRN)** (CyScenarioBench, WMDP Biology and Chemistry)
 4. **General Knowledge** (SimpleQA Verified, TriviaQA, DeepResearch Bench)
 
-Axes 2 and 3 correlate at 0.94, and no benchmark belongs to axis 2 alone (its largest share is 0.39): it reads as the older text benchmarks' share of axis 3 rather than a separate skill.
+Axes 2 and 3 correlate at 0.97. What sets axis 2 apart is mostly Chess Puzzles (0.64 of its loading on this axis), with Fiction.LiveBench, EnigmaEval and Mystery Game Puzzles; read it with care (see [Limitations](#limitations)).
 
-The eight chains of this fit fall into two posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts follow the best one by log-density, chains 0, 5 and 7 (`analysis.best_mode_chains`).
+The eight chains of this fit fall into two posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts follow the best one by log-density, chains 1, 5 and 7 (`analysis.best_mode_chains`).
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines). Abilities are in human units: the Average Human at 0 and the Top Performer at 1 on every axis.
 
 <img src="docs/figures/forecast_axis1.png" width="760" alt="Axis 1, Fluid Intelligence and Formal Reasoning: frontier forecast against human tiers, one line for reasoning models and one for the others">
 
-<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Core Scientific Knowledge: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Puzzles and Core Scientific Knowledge: frontier forecast against human tiers">
 
 <img src="docs/figures/forecast_axis3.png" width="760" alt="Axis 3, Dual-Use Agentic Capabilities (Cyber, CBRN): frontier forecast against human tiers">
 
@@ -148,8 +148,8 @@ Whether the chains agree on those axes is a different question, with its own num
 
 ## Limitations
 
-- **The K=4 flagship is not fully converged.** It is a short run (2,000 draws after 2,000 tuning steps on each of 8 chains), and its chains fall into two posterior modes: chains 0, 5 and 7, the best by log-density (the figures above), and chains 1 to 4 and 6, 36 nats lower, whose loadings correlate at 0.75 with the first. The best mode converges on its own (identified r-hat of eta 1.010), all chains together do not (1.35). Figures, dashboard and forecasts read the best mode; the whole-fit tables pool every chain.
-- **Axes 2 and 3 overlap.** They correlate at 0.94 in the best mode, and no benchmark puts more than 0.39 of its loading on axis 2. Read axis 2 as the older question-answering benchmarks' part of axis 3 rather than a skill of its own.
+- **The K=4 flagship is not fully converged.** It is a short run (2,000 draws after 2,000 tuning steps on each of 8 chains), and its chains fall into two posterior modes: chains 1, 5 and 7, the best by log-density (the figures above), and chains 0, 2 to 4 and 6, 29 nats lower, whose loadings correlate at 0.74 with the first. The best mode converges on its own (identified r-hat of eta 1.009), all chains together do not (1.31). Figures, dashboard and forecasts read the best mode; the whole-fit tables pool every chain.
+- **Axes 2 and 3 overlap, and axis 2 leans on Chess Puzzles.** They correlate at 0.97 in the best mode. Chess Puzzles carries most of what is specific to axis 2, and a quarter of its scores sit at or below its chance floor, among them strong models run without reasoning and some effort variants that score below lower efforts of the same model, which look like harness failures. Treat axis 2 as provisional.
 - **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), the 2026-10-01 data let some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers; it holds about e^-14 of the posterior mass. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.

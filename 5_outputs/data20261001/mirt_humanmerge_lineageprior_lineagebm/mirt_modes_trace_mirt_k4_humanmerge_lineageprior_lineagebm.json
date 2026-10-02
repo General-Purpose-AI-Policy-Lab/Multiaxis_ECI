@@ -4,41 +4,41 @@
  "K": 4,
  "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
  "chain_delta_logp": [
-  -4.5,
-  -41.3,
-  -38.5,
-  -42.1,
-  -32.3,
+  -32.0,
   0.0,
-  -45.2,
-  -7.3
+  -36.3,
+  -34.3,
+  -21.9,
+  -2.5,
+  -28.5,
+  -1.4
  ],
  "modes": [
   {
    "chains": [
-    0,
+    1,
     5,
     7
    ],
-   "mean_logp": -22614.50659595685,
-   "min_matched_corr": 0.991,
+   "mean_logp": -22589.900651202373,
+   "min_matched_corr": 0.994,
    "label": "A",
    "delta_logp": 0.0,
    "matched_corr_to_best": null
   },
   {
    "chains": [
-    1,
+    0,
     2,
     3,
     4,
     6
    ],
-   "mean_logp": -22650.451748785516,
-   "min_matched_corr": 0.892,
+   "mean_logp": -22619.200424075363,
+   "min_matched_corr": 0.873,
    "label": "B",
-   "delta_logp": -35.9,
-   "matched_corr_to_best": 0.748
+   "delta_logp": -29.3,
+   "matched_corr_to_best": 0.737
   }
  ]
 }

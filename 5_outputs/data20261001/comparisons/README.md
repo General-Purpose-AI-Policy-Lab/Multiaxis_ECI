@@ -11,13 +11,13 @@ Registered cards (2):
 
 Data scope scored on:
 
-- 822 test-takers / 99 benchmarks / 5536 observations
+- 822 test-takers / 99 benchmarks / 5534 observations
 
 ## Comparison table (`gof_table.csv`)
 
 | fit | type | K | free_loadings | R2 | RMSE | MAE | PIT_var | eta_rhat | divergences | max_phi |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| K=4 · pooled · merge · flagship | exploratory | 4 | 396 | 0.9652 | 0.0425 | 0.0289 | 0.0474 | 1.01 | 11 | 0.944 |
+| K=4 · pooled · merge · flagship | exploratory | 4 | 396 | 0.9654 | 0.0428 | 0.0291 | 0.0481 | 1.009 | 9 | 0.971 |
 
 Columns: `type`; `free_loadings` = free loading cells (complexity); `R2`/`RMSE`/
 `MAE` = fit; `PIT_var` = calibration (ideal 0.083, below = under-confident);
@@ -28,7 +28,7 @@ draws, ESS and divergences for every card whose trace is still on disk.
 
 ## Convergence
 
-`eta_rhat` is 1.01 on the one card, against a ≤ 1.01 target. High R² is not trust: read
+`eta_rhat` is 1.009 on the one card, against a ≤ 1.01 target. High R² is not trust: read
 `cmp_convergence` beside `cmp_gof`, and the ESS column of
 `mode_eval_table.csv`.
 

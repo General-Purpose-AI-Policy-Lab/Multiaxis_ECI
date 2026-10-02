@@ -1,6 +1,6 @@
 {
   "confirmed": true,
-  "how": "Named by hand on 2026-10-02 (user, French titles; English renders translated) from the best-log-density mode (chains 0, 5, 7 of 8; mode B, chains 1-4 and 6, sits 36 nats lower), reading each axis's benchmarks by share of their loading variance on the reference-aligned view. Axes 2 and 3 correlate at 0.94 in this mode and axis 2 has no benchmark of its own (largest share 0.39). A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
+  "how": "Named by hand on 2026-10-02 (user, French titles; English renders translated) from the best-log-density mode, reading each axis's benchmarks by share of their loading variance on the reference-aligned view. Refit the same day (release nodes, reasoning-off offsets): the best mode is now chains 1, 5, 7 of 8 (mode B, chains 0, 2-4 and 6, sits 29 nats lower); axes 2 and 3 correlate at 0.97 and axis 2 is led by Chess Puzzles (share 0.64), so it was renamed Puzzles & Core Scientific Knowledge (user, in English; French title translated). A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
   "axes": {
     "axis1": {
       "title": "Fluid Intelligence & Formal Reasoning",
@@ -11,33 +11,34 @@
         "MATH Level 5"
       ],
       "top_benchmarks": [
-        "OTIS Mock AIME 2024-2025",
-        "MATH Level 5",
         "ARC-AGI",
-        "Chess Puzzles",
         "ARC-AGI-2",
         "DeepSWE",
         "MCP Atlas",
-        "GPQA Diamond"
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "APEX-Agents",
+        "CritPt"
       ]
     },
     "axis2": {
-      "title": "Core Scientific Knowledge",
-      "title_fr": "Connaissances scientifiques de base",
+      "title": "Puzzles & Core Scientific Knowledge",
+      "title_fr": "Énigmes et connaissances scientifiques de base",
       "signature": [
+        "Chess Puzzles",
         "MMLU",
         "MMLU Pro Biology",
         "MMLU Pro Chemistry"
       ],
       "top_benchmarks": [
+        "Chess Puzzles",
         "GeoBench",
-        "MMLU",
-        "MMLU Pro Biology",
-        "WMDP Chemistry",
         "WMDP Biology",
+        "WMDP Chemistry",
+        "MMLU Pro Biology",
         "MMLU Pro Chemistry",
-        "ExploitBench",
-        "GSM8K"
+        "AISI Cyber Ranges - The Last Ones",
+        "MMLU"
       ]
     },
     "axis3": {
@@ -50,13 +51,13 @@
       ],
       "top_benchmarks": [
         "CyScenarioBench",
-        "OSWorld",
-        "WMDP Biology",
         "MMLU Biology",
+        "WMDP Biology",
         "WMDP Chemistry",
-        "GDPval",
+        "MirrorCode",
+        "OSWorld",
         "GBAEval",
-        "MirrorCode"
+        "GSM8K"
       ]
     },
     "axis4": {
@@ -68,14 +69,14 @@
         "DeepResearch Bench"
       ],
       "top_benchmarks": [
-        "DeepResearch Bench",
         "SimpleQA Verified",
-        "TriviaQA",
+        "DeepResearch Bench",
         "HellaSwag",
-        "EBR-bench",
-        "Balrog",
+        "TriviaQA",
         "HLE Diamond",
-        "SimpleBench"
+        "EBR-bench",
+        "PIQA",
+        "WinoGrande"
       ]
     }
   }
