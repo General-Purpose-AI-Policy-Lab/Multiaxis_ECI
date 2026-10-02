@@ -243,7 +243,7 @@ qwen3-14b,Alibaba,qwen-open-14b,3-14B,,2025-04-29,bare,yes,6
 qwen3-14b_none,Alibaba,qwen-open-14b,3-14B,,2025-04-29,effort:none,yes,3
 qwen3-235b-a22b,Alibaba,qwen-open-235b,3-235B,,2025-04-29,bare,yes,10
 Qwen3-235B-A22B-Instruct-2507,Alibaba,qwen-open-235b,3-235B 2507,,2025-07-21,bare,yes,9
-Qwen3-235B-A22B-Thinking-2507,Alibaba,qwen-open-235b,3-235B 2507,,2025-07-21,thinking,yes,14
+Qwen3-235B-A22B-Thinking-2507,Alibaba,qwen-open-235b,3-235B 2507,,2025-07-21,thinking,yes,12
 qwen3.5-27B,Alibaba,qwen-open-27b,3.5-27B,,2026-02-24,bare,yes,3
 qwen3.6-27b,Alibaba,qwen-open-27b,3.6-27B,,2026-04-22,bare,yes,6
 qwen3.6-27b_none,Alibaba,qwen-open-27b,3.6-27B,,2026-04-22,effort:none,yes,6
