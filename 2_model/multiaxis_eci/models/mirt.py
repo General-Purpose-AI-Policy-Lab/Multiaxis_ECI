@@ -22,6 +22,7 @@ from multiaxis_eci.config import (
     PRIOR_LINEAGE_DRIFT,
     PRIOR_LINEAGE_DRIFT_BM,
     PRIOR_LINEAGE_OFFSET,
+    PRIOR_LINEAGE_OFFSET_NONE,
     PRIOR_SIGMA_B,
     PRIOR_SIGMA_B_POOLED,
     PRIOR_TAU_ALPHA,
@@ -348,10 +349,24 @@ def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
         # offset[group] would be the same quantity twice, identified only in
         # their sum. Drop the offset rather than sample a redundant funnel.
         return lin.row_idx, psi[lin.node_idx]                           # (R, K)
-    tau_o = pm.HalfNormal("lin_offset_sd", sigma=PRIOR_LINEAGE_OFFSET)
-    offset = tau_o * pm.Normal("lin_offset_z", 0.0, 1.0, shape=(lin.n_groups, K))
+    offset = _variant_offsets(lin, K)
     theta_lin = psi[lin.node_idx] + offset[lin.offset_group]            # (R, K)
     return lin.row_idx, theta_lin
+
+
+def _variant_offsets(lin: LineageStructure, K):
+    """The mean-zero (node, variant) offsets, (n_groups, K). One scale tau_o for every effort
+    level, and a scale of their own for the reasoning-off variants (`lin.offset_none`,
+    effort:none): with the shared tau_o (learned at 0.22) a reasoning-off run scored on one
+    benchmark was pulled toward its release, where switching reasoning off can cost far more
+    than a lower effort does (2026-10-02). Non-centered."""
+    tau_o = pm.HalfNormal("lin_offset_sd", sigma=PRIOR_LINEAGE_OFFSET)
+    z = pm.Normal("lin_offset_z", 0.0, 1.0, shape=(lin.n_groups, K))
+    none = lin.offset_none
+    if none is None or not np.any(none):
+        return tau_o * z
+    tau_n = pm.HalfNormal("lin_offset_none_sd", sigma=PRIOR_LINEAGE_OFFSET_NONE)
+    return pt.switch(pt.as_tensor(none)[:, None], tau_n, tau_o) * z
 
 
 def _release_block(lin: LineageStructure, K, base):
@@ -360,15 +375,13 @@ def _release_block(lin: LineageStructure, K, base):
     The canonical K=1 index's grouping of a release's effort variants, built like the
     lineage prior of the K-axis fit (`_lineage_block`) minus the links between releases: the
     same nodes of 1_curated/lineage_map.csv, the same (node, variant) offset groups and the
-    same single offset scale tau_o ~ HalfNormal(PRIOR_LINEAGE_OFFSET), but each node's level
+    same offset scales (_variant_offsets), but each node's level
     is its own draw from the shared ZeroSumNormal (`base`, one row per node) instead of its
     chain founder's plus increments, so no release is ordered after another. A variant seen on
     one benchmark only (a CritPt score per effort) then sits near its release's level, which
     every run of the release informs, instead of being a free test-taker. Returns
     (row_idx, theta)."""
-    tau_o = pm.HalfNormal("lin_offset_sd", sigma=PRIOR_LINEAGE_OFFSET)
-    offset = tau_o * pm.Normal("lin_offset_z", 0.0, 1.0, shape=(lin.n_groups, K))
-    return lin.row_idx, base[lin.node_idx] + offset[lin.offset_group]
+    return lin.row_idx, base[lin.node_idx] + _variant_offsets(lin, K)[lin.offset_group]
 
 
 def _apply_plt(A, plt_idx, K):

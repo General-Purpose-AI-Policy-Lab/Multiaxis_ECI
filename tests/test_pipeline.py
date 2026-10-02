@@ -2879,6 +2879,15 @@ class TestPipelineIdentity:
         with pytest.raises(ValueError):
             build_mirt_model(data, K=1, lineage=lin, lineage_links=False, lineage_bm=True)
 
+    def test_reasoning_off_variants_get_their_own_offset_scale(self, data):
+        from multiaxis_eci.lineage import build_lineage_structure
+        from multiaxis_eci.models.mirt import build_mirt_model
+        lin = build_lineage_structure(data.mlookup)
+        assert lin.offset_none.shape == (lin.n_groups,) and 0 < lin.offset_none.sum() < lin.n_groups
+        names = {v.name for v in build_mirt_model(data, K=1, lineage=lin,
+                                                  lineage_links=False).free_RVs}
+        assert {"lin_offset_sd", "lin_offset_none_sd"} <= names
+
     def test_binomial_n_reads_the_scoring_column(self, data):
         from multiaxis_eci.data import N_ITEMS_FILE, load_binomial_n
         t = pd.read_csv(N_ITEMS_FILE).set_index("benchmark")

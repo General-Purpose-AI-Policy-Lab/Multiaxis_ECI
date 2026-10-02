@@ -156,6 +156,10 @@ PRIOR_DELTA_HUMAN = 1.0
 PRIOR_LINEAGE_DRIFT  = 0.3    # scale of the positive per-step drift mean mu[k]
 PRIOR_LINEAGE_DELTA  = 1.0    # scale of the per-step regression tolerance s[k]
 PRIOR_LINEAGE_OFFSET = 0.25   # tight scale of the per-axis variant-offset sd tau_o[k]
+# Reasoning-off variants (effort:none) get their own offset scale: one shared tau_o (learned
+# 0.22) pulled a reasoning-off run scored once toward its release by up to 20 ECI-H points,
+# where turning reasoning off can cost much more than a lower effort does (user, 2026-10-02).
+PRIOR_LINEAGE_OFFSET_NONE = 1.0
 
 # Brownian-motion lineage variant: step mean and variance scale with the years
 # between releases (delta_dt) instead of being iid per step. Same structure as

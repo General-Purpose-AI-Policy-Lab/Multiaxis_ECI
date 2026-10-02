@@ -397,7 +397,7 @@ $$
 | $\psi_{\text{node},k}$ | chain ability of a release node on axis $k$. |
 | $\mu_k$ | positive **drift** — the mean per-step improvement (`PRIOR_LINEAGE_DRIFT=0.3`). |
 | $s_k$ | per-step **regression tolerance**: a step can be negative (`PRIOR_LINEAGE_DELTA=1.0`). |
-| $\tau_o$ | tight scale of the per-variant offset $o$ (`PRIOR_LINEAGE_OFFSET=0.25`). |
+| $\tau_o$ | tight scale of the per-variant offset $o$ (`PRIOR_LINEAGE_OFFSET=0.25`). Reasoning-off variants (`effort:none`) have a scale of their own, $\tau_{\text{none}} \sim \text{HalfNormal}(1)$ (`PRIOR_LINEAGE_OFFSET_NONE`), since turning reasoning off can cost far more than a lower effort. |
 | $g(m)$ | the variant group of model $m$. |
 
 *`--lineage-bm` — the flagship's chain prior.* With `--lineage-prior

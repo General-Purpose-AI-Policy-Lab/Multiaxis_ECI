@@ -42,6 +42,9 @@ class LineageStructure:
     n_deltas: int
     n_groups: int
     chain_names: list[str]
+    # (n_groups,) True where the group's variant is reasoning off (effort:none): those offsets
+    # get their own scale (models/mirt._variant_offsets). None = no such group.
+    offset_none: np.ndarray | None = None
 
 
 def build_lineage_structure(mlookup: pd.DataFrame,
@@ -208,4 +211,5 @@ def build_lineage_structure(mlookup: pd.DataFrame,
         row_idx=row_idx, B=B, C=C, node_idx=node_idx, offset_group=offset_group,
         delta_dt=delta_dt, delta_chain=delta_chain, founder_date=founder_date,
         n_chains=n_chains, n_nodes=n_nodes, n_deltas=n_deltas,
-        n_groups=len(grp_keys), chain_names=chain_names)
+        n_groups=len(grp_keys), chain_names=chain_names,
+        offset_none=np.array([v == "effort:none" for _, _, v in grp_keys], dtype=bool))
