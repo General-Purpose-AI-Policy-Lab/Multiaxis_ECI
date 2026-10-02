@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "DeepSWE",
+        "OTIS Mock AIME 2024-2025",
+        "MCP Atlas",
+        "MATH Level 5",
+        "CritPt",
+        "APEX-Agents"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "MMLU Biology",
+        "MMLU Pro Chemistry",
+        "MMLU Pro Biology",
+        "MMLU",
+        "Chess Puzzles",
+        "MMLU-Pro"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "MirrorCode",
+        "OSWorld",
+        "CyScenarioBench",
+        "TriviaQA",
+        "GBAEval",
+        "GDPval",
+        "ProofBench",
+        "Furniture Assembly"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "SimpleQA Verified",
+        "OpenBookQA",
+        "EBR-bench",
+        "HLE Diamond",
+        "ARC AI2",
+        "CTI-REALM",
+        "SimpleBench"
+      ]
+    }
+  }
+}

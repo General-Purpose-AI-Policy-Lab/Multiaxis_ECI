@@ -30,7 +30,7 @@
 - GPQA Main Chemistry
 - GSM8K
 - GSO-Bench
-- HLE
+- HLE Diamond
 - InterCode-CTF
 - LAB-Bench Cloning
 - LAB-Bench LitQA2
@@ -50,10 +50,10 @@
 - OSWorld
 - OSWorld 2.0
 - OTIS Mock AIME 2024-2025
-- PRBench
 - PostTrainBench v1.1
 - SEAL Tool Use (Enterprise)
 - SWE Atlas
+- SWE-Bench Pro V2
 - SimpleQA Verified
 - Terminal Bench 2.0
 - The Agent Company
@@ -75,7 +75,7 @@
 - Remote Labor Index
 - WeirdML v2
 
-## private (13)
+## private (14)
 
 - AISI CTF Suites - Apprentice
 - AISI CTF Suites - Expert
@@ -90,6 +90,7 @@
 - LMCA
 - Mystery Game Puzzles
 - Surface Evolver Bench
+- WeirdML v3
 
 ## open_problems (2)
 

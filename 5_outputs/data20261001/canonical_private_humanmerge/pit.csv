@@ -1,0 +1,621 @@
+obs_idx,model,benchmark,score,pit
+0,claude-3-5-sonnet-20240620,AISI CTF Suites - Apprentice,0.2571072732967866,0.338
+1,claude-3-7-sonnet-20250219,AISI CTF Suites - Apprentice,0.336512555655602,0.4115
+2,claude-3-opus-20240229,AISI CTF Suites - Apprentice,0.1128357039406292,0.258
+3,claude-mythos-preview-early,AISI CTF Suites - Apprentice,0.8621531571857881,0.347
+4,claude-opus-4-20250514,AISI CTF Suites - Apprentice,0.459534824098837,0.4815
+5,claude-opus-4-5-20251101,AISI CTF Suites - Apprentice,0.7268286618982296,0.729
+6,claude-opus-4-6,AISI CTF Suites - Apprentice,0.8099416910847341,0.614
+7,claude-sonnet-4-5-20250929,AISI CTF Suites - Apprentice,0.6228189258507673,0.811
+8,gpt-3.5-turbo-0613,AISI CTF Suites - Apprentice,0.0054708151174422,0.333
+9,gpt-4-turbo-2024-04-09,AISI CTF Suites - Apprentice,0.0938231715448564,0.4475
+10,gpt-4o-2024-05-13,AISI CTF Suites - Apprentice,0.1050070141306051,0.37
+11,gpt-5-2025-08-07,AISI CTF Suites - Apprentice,0.5120988842518557,0.538
+12,gpt-5.2-codex,AISI CTF Suites - Apprentice,0.6149902360407432,0.4715
+13,gpt-5.3-codex,AISI CTF Suites - Apprentice,0.781051436799829,0.7805
+14,gpt-5.4-2026-03-05,AISI CTF Suites - Apprentice,0.7424860415182778,0.451
+15,o1-2024-12-17,AISI CTF Suites - Apprentice,0.3163816390012545,0.5025
+16,o3-2025-04-16,AISI CTF Suites - Apprentice,0.4203913750487167,0.437
+17,claude-mythos-preview-early,AISI CTF Suites - Expert,0.6843300600723842,0.536
+18,claude-opus-4-6,AISI CTF Suites - Expert,0.5803203240249217,0.5695
+19,claude-opus-4-7,AISI CTF Suites - Expert,0.4852576620460583,0.6085
+20,claude-sonnet-4-5-20250929,AISI CTF Suites - Expert,0.2772381899511335,0.1885
+21,gpt-5-2025-08-07,AISI CTF Suites - Expert,0.3767743889642963,0.495
+22,gpt-5.2-codex,AISI CTF Suites - Expert,0.4382855231859139,0.514
+23,gpt-5.3-codex,AISI CTF Suites - Expert,0.5803203240249217,0.796
+24,gpt-5.4-2026-03-05,AISI CTF Suites - Expert,0.5232827268376036,0.4
+25,gpt-5.4-2026-03-05_cyber,AISI CTF Suites - Expert,0.4852576620460583,0.4055
+26,gpt-5.5,AISI CTF Suites - Expert,0.7134080507953305,0.4525
+27,claude-mythos-preview-early,AISI CTF Suites - Practitioner,0.9751202879619532,0.661
+28,claude-opus-4-6,AISI CTF Suites - Practitioner,0.9091356167060364,0.56
+29,claude-opus-4-7,AISI CTF Suites - Practitioner,0.8062442649171487,0.5425
+30,claude-sonnet-4-5-20250929,AISI CTF Suites - Practitioner,0.414809774415946,0.1105
+31,gpt-5-2025-08-07,AISI CTF Suites - Practitioner,0.4371774595874435,0.1295
+32,gpt-5.2-codex,AISI CTF Suites - Practitioner,0.7615088945741542,0.54
+33,gpt-5.3-codex,AISI CTF Suites - Practitioner,0.8576899408115924,0.7295
+34,gpt-5.4-2026-03-05,AISI CTF Suites - Practitioner,0.9382136074289829,0.861
+35,gpt-5.4-2026-03-05_cyber,AISI CTF Suites - Practitioner,0.9013069268960122,0.6815
+36,gpt-5.5,AISI CTF Suites - Practitioner,0.9907776675820014,0.59
+37,claude-3-5-sonnet-20240620,AISI CTF Suites - Technical Non-Expert,0.7928133331541466,0.5985
+38,claude-3-7-sonnet-20250219,AISI CTF Suites - Technical Non-Expert,0.8587980044100635,0.662
+39,claude-3-opus-20240229,AISI CTF Suites - Technical Non-Expert,0.5333481851647781,0.3355
+40,claude-mythos-preview-early,AISI CTF Suites - Technical Non-Expert,0.9751099673018494,0.2955
+41,claude-opus-4-20250514,AISI CTF Suites - Technical Non-Expert,0.8487325460828898,0.485
+42,claude-opus-4-5-20251101,AISI CTF Suites - Technical Non-Expert,0.9751099673018494,0.6995
+43,claude-opus-4-6,AISI CTF Suites - Technical Non-Expert,0.9538771266641964,0.498
+44,claude-sonnet-4-5-20250929,AISI CTF Suites - Technical Non-Expert,0.9426768238031784,0.665
+45,gpt-3.5-turbo-0613,AISI CTF Suites - Technical Non-Expert,0.2280292825738401,0.3755
+46,gpt-4-turbo-2024-04-09,AISI CTF Suites - Technical Non-Expert,0.4886128148217835,0.4335
+47,gpt-4o-2024-05-13,AISI CTF Suites - Technical Non-Expert,0.4338119861516152,0.2115
+48,gpt-5-2025-08-07,AISI CTF Suites - Technical Non-Expert,0.9974776524733469,0.882
+49,gpt-5.2-codex,AISI CTF Suites - Technical Non-Expert,0.9751099673018494,0.753
+50,gpt-5.3-codex,AISI CTF Suites - Technical Non-Expert,0.9538771266641964,0.665
+51,gpt-5.4-2026-03-05,AISI CTF Suites - Technical Non-Expert,0.93139297803106,0.2585
+52,o1-2024-12-17,AISI CTF Suites - Technical Non-Expert,0.6765013702623608,0.3345
+53,o3-2025-04-16,AISI CTF Suites - Technical Non-Expert,0.8431406247900155,0.5405
+55,claude-opus-4-5-20251101,AISI Cyber Ranges - Cooling Tower,0.0857142857142857,0.606
+56,claude-opus-4-6,AISI Cyber Ranges - Cooling Tower,0.1999999999999999,0.8005
+60,gpt-5.3-codex,AISI Cyber Ranges - Cooling Tower,0.1714285714285714,0.8755
+61,claude-mythos-5,AISI Cyber Ranges - The Last Ones,0.8627773212818406,0.61
+62,claude-mythos-preview,AISI Cyber Ranges - The Last Ones,0.7846025569760978,0.5415
+63,claude-mythos-preview-early,AISI Cyber Ranges - The Last Ones,0.6909394107837687,0.5895
+64,claude-opus-4-5-20251101,AISI Cyber Ranges - The Last Ones,0.34375,0.3445
+65,claude-opus-4-6,AISI Cyber Ranges - The Last Ones,0.4875,0.401
+66,claude-opus-4-7,AISI Cyber Ranges - The Last Ones,0.3479710950528071,0.423
+67,claude-sonnet-4-5-20250929,AISI Cyber Ranges - The Last Ones,0.29375,0.724
+68,gpt-4o-2024-05-13,AISI Cyber Ranges - The Last Ones,0.053125,0.418
+69,gpt-5.1-codex-max,AISI Cyber Ranges - The Last Ones,0.30625,0.637
+70,gpt-5.3-codex,AISI Cyber Ranges - The Last Ones,0.34375,0.2165
+71,gpt-5.4-2026-03-05,AISI Cyber Ranges - The Last Ones,0.4282934963868816,0.3525
+72,gpt-5.5,AISI Cyber Ranges - The Last Ones,0.697331851028349,0.4245
+73,gpt-5.5_cyber,AISI Cyber Ranges - The Last Ones,0.7220678154530294,0.5855
+74,gpt-5.6-sol,AISI Cyber Ranges - The Last Ones,0.9087921117502056,0.7795
+75,Inkling_xhigh,Chess Puzzles,0.21,0.5831029075019037
+77,MiniMax-M3,Chess Puzzles,0.14,0.550615273530628
+78,MiniMax-M3_none,Chess Puzzles,0.04,0.28695229983557785
+79,Qwen3-235B-A22B-Thinking-2507,Chess Puzzles,0.12,0.4928725750984471
+80,Qwen3-30B-A3B,Chess Puzzles,0.04,0.4431559699864044
+81,Qwen3-30B-A3B_none,Chess Puzzles,0.01,0.1792909783335719
+82,Qwen3-32B,Chess Puzzles,0.05,0.47198171004632233
+83,Qwen3-32B_none,Chess Puzzles,0.01,0.17436174535872984
+84,claude-3-opus-20240229,Chess Puzzles,0.05,0.6104213451259101
+85,claude-fable-5-1_max,Chess Puzzles,0.47,0.35239756095991376
+86,claude-fable-5_high,Chess Puzzles,0.41,0.38789902399676945
+87,claude-fable-5_low,Chess Puzzles,0.28,0.3253537744892784
+88,claude-fable-5_max,Chess Puzzles,0.41,0.40950371753354536
+89,claude-haiku-4-5-20251001_32K,Chess Puzzles,0.08,0.3765278668886951
+90,claude-opus-4-1-20250805_none,Chess Puzzles,0.07,0.2952269310068265
+91,claude-opus-4-5-20251101_32K,Chess Puzzles,0.12,0.4364381832300712
+92,claude-opus-4-5-20251101_none,Chess Puzzles,0.04,0.2582986686775057
+93,claude-opus-4-6_120K,Chess Puzzles,0.13,0.44977703508776407
+94,claude-opus-4-6_32K,Chess Puzzles,0.17,0.49947259547995154
+95,claude-opus-4-6_64K,Chess Puzzles,0.1,0.4108091599028377
+96,claude-opus-4-6_max,Chess Puzzles,0.14,0.14053944969448387
+97,claude-opus-4-7_low,Chess Puzzles,0.2,0.5066862708529435
+98,claude-opus-4-7_max,Chess Puzzles,0.07,0.03354402666366209
+99,claude-opus-4-7_xhigh,Chess Puzzles,0.3,0.6294271770994919
+100,claude-opus-4-8_low,Chess Puzzles,0.29,0.6245900678806704
+101,claude-opus-4-8_max,Chess Puzzles,0.34,0.4504285225729923
+102,claude-opus-4-8_none,Chess Puzzles,0.13,0.30112562708354834
+103,claude-opus-5_low,Chess Puzzles,0.2,0.1202808246908613
+104,claude-opus-5_max,Chess Puzzles,0.42,0.32132532472742226
+105,claude-opus-5_none,Chess Puzzles,0.33,0.4940348337635087
+106,claude-sonnet-4-5-20250929_32K,Chess Puzzles,0.12,0.4373234688886187
+107,claude-sonnet-4-5-20250929_none,Chess Puzzles,0.04,0.29613058818259613
+108,claude-sonnet-4-6_32K,Chess Puzzles,0.13,0.45762900081192004
+109,claude-sonnet-4-6_high,Chess Puzzles,0.05,0.301955353338398
+110,claude-sonnet-4-6_max,Chess Puzzles,0.03,0.033555726899416556
+111,claude-sonnet-4-6_medium,Chess Puzzles,0.08,0.3721425894044689
+112,claude-sonnet-5_max,Chess Puzzles,0.16,0.14413676138394307
+113,claude-sonnet-5_xhigh,Chess Puzzles,0.35,0.6649384396402386
+114,deepseek-v3.2_thinking,Chess Puzzles,0.14,0.4638391743734964
+115,deepseek-v4-flash-0731_max,Chess Puzzles,0.33,0.6515318641890822
+116,deepseek-v4-flash_none,Chess Puzzles,0.01,0.1843988900880704
+117,deepseek-v4-pro-0813_max,Chess Puzzles,0.47,0.6730557579905277
+118,deepseek-v4-pro_high,Chess Puzzles,0.13,0.6130046224574519
+119,deepseek-v4-pro_max,Chess Puzzles,0.2,0.4968818119684231
+120,deepseek-v4-pro_none,Chess Puzzles,0.07,0.2005333749211233
+121,gemini-2.5-pro,Chess Puzzles,0.2,0.6255183067338713
+122,gemini-3-flash-preview,Chess Puzzles,0.38,0.6678705386245457
+123,gemini-3-flash-preview_high,Chess Puzzles,0.4,0.8802963550399993
+124,gemini-3-pro-preview,Chess Puzzles,0.31,0.8238917643646889
+125,gemini-3.1-flash-lite_high,Chess Puzzles,0.2,0.6239344177109859
+126,gemini-3.1-flash-lite_low,Chess Puzzles,0.25,0.585738131507622
+127,gemini-3.1-flash-lite_minimal,Chess Puzzles,0.24,0.5935678710239574
+128,gemini-3.1-pro-preview,Chess Puzzles,0.55,0.9458477244286989
+129,gemini-3.1-pro-preview_high,Chess Puzzles,0.49,0.8392822815491352
+130,gemini-3.5-flash-lite_high,Chess Puzzles,0.22,0.6100416290119579
+131,gemini-3.5-flash-lite_low,Chess Puzzles,0.18,0.4688164149525328
+132,gemini-3.5-flash-lite_minimal,Chess Puzzles,0.21,0.704315764165663
+133,gemini-3.5-flash_high,Chess Puzzles,0.5,0.9341692658790715
+134,gemini-3.5-flash_low,Chess Puzzles,0.45,0.8375572324627155
+135,gemini-3.5-flash_minimal,Chess Puzzles,0.43,0.6991928756698517
+136,gemini-3.6-flash_high,Chess Puzzles,0.4,0.8172527479519144
+137,gemini-3.6-flash_low,Chess Puzzles,0.43,0.8791271470452104
+138,gemini-3.6-flash_minimal,Chess Puzzles,0.35,0.7365839453890202
+139,gemini-3.7-flash_high,Chess Puzzles,0.47,0.8068945416396404
+140,gemini-3.8-flash_high,Chess Puzzles,0.61,0.9565811148918033
+144,gemma-4-26b-a4b_minimal,Chess Puzzles,0.06,0.31364201124717533
+145,gemma-4-31b-it_minimal,Chess Puzzles,0.05,0.3044285106252296
+146,glm-5.2_low,Chess Puzzles,0.14,0.36628038939324836
+147,glm-5.2_max,Chess Puzzles,0.21,0.45886368735847904
+148,glm-5.2_none,Chess Puzzles,0.06,0.16568054730567652
+149,glm-5.3-flash_max,Chess Puzzles,0.14,0.5880687051282897
+150,glm-5.3_max,Chess Puzzles,0.21,0.2830165197908041
+152,gpt-4-0613,Chess Puzzles,0.04,0.327596511296676
+153,gpt-4-turbo-2024-04-09,Chess Puzzles,0.06,0.7577007746296015
+154,gpt-4.1-2025-04-14,Chess Puzzles,0.06,0.30379230096673615
+155,gpt-4.1-mini-2025-04-14,Chess Puzzles,0.07,0.476309098308585
+157,gpt-5-2025-08-07_high,Chess Puzzles,0.37,0.8723026980717183
+158,gpt-5-2025-08-07_low,Chess Puzzles,0.24,0.6836489533374964
+159,gpt-5-2025-08-07_medium,Chess Puzzles,0.29,0.655442237776102
+160,gpt-5-2025-08-07_minimal,Chess Puzzles,0.16,0.5483828669294758
+161,gpt-5-mini-2025-08-07_high,Chess Puzzles,0.3,0.9293705096413067
+162,gpt-5-mini-2025-08-07_low,Chess Puzzles,0.12,0.4485475837815689
+163,gpt-5-mini-2025-08-07_minimal,Chess Puzzles,0.07,0.3514901552991355
+164,gpt-5-nano-2025-08-07_high,Chess Puzzles,0.27,0.9904702770696595
+165,gpt-5-nano-2025-08-07_low,Chess Puzzles,0.15,0.6494604117892118
+166,gpt-5-nano-2025-08-07_minimal,Chess Puzzles,0.01,0.184338631912095
+167,gpt-5.1-2025-11-13_high,Chess Puzzles,0.32,0.7229154847485116
+168,gpt-5.1-2025-11-13_low,Chess Puzzles,0.14,0.3836340741536056
+169,gpt-5.1-2025-11-13_none,Chess Puzzles,0.17,0.5443745460103344
+170,gpt-5.2-2025-12-11_high,Chess Puzzles,0.4,0.84802004387624
+171,gpt-5.2-2025-12-11_low,Chess Puzzles,0.23,0.8026447737584622
+172,gpt-5.2-2025-12-11_medium,Chess Puzzles,0.4,0.8634375352862153
+173,gpt-5.2-2025-12-11_none,Chess Puzzles,0.04,0.16131611609193286
+174,gpt-5.2-2025-12-11_xhigh,Chess Puzzles,0.49,0.9151290166372517
+175,gpt-5.4-2026-03-05_high,Chess Puzzles,0.38,0.6846452081646722
+176,gpt-5.4-2026-03-05_low,Chess Puzzles,0.2,0.5780245187630808
+177,gpt-5.4-2026-03-05_medium,Chess Puzzles,0.38,0.7407237528760993
+178,gpt-5.4-2026-03-05_none,Chess Puzzles,0.05,0.17049473413398267
+179,gpt-5.4-2026-03-05_xhigh,Chess Puzzles,0.44,0.7578587678769476
+180,gpt-5.4-mini-2026-03-17_high,Chess Puzzles,0.18,0.5115189674147951
+181,gpt-5.4-mini-2026-03-17_none,Chess Puzzles,0.03,0.16964967562412003
+182,gpt-5.4-mini-2026-03-17_xhigh,Chess Puzzles,0.24,0.6001216701699128
+183,gpt-5.4-nano-2026-03-17_high,Chess Puzzles,0.3,0.943991966068969
+184,gpt-5.4-nano-2026-03-17_low,Chess Puzzles,0.17,0.8372986846007953
+185,gpt-5.4-nano-2026-03-17_none,Chess Puzzles,0.03,0.20251198385441585
+186,gpt-5.5_low,Chess Puzzles,0.26,0.5111444176705479
+187,gpt-5.5_none,Chess Puzzles,0.1,0.27895937278281235
+188,gpt-5.6-luna_low,Chess Puzzles,0.21,0.5177226652774952
+189,gpt-5.6-luna_max,Chess Puzzles,0.4,0.8346769687242264
+190,gpt-5.6-luna_none,Chess Puzzles,0.02,0.02007791957517826
+191,gpt-5.6-sol_low,Chess Puzzles,0.27,0.42003417334089366
+192,gpt-5.6-sol_max,Chess Puzzles,0.55,0.6797066100097747
+193,gpt-5.6-sol_none,Chess Puzzles,0.07,0.024860729686471114
+194,gpt-5.6-sol_promax,Chess Puzzles,0.64,0.9011120675341887
+195,gpt-5.6-terra_low,Chess Puzzles,0.22,0.45543905777086685
+196,gpt-5.6-terra_max,Chess Puzzles,0.54,0.8847162903196604
+197,gpt-5.6-terra_none,Chess Puzzles,0.05,0.07417191281423204
+198,gpt-6-astra_max,Chess Puzzles,0.72,0.4392847936652363
+199,gpt-6.1-sol_max,Chess Puzzles,0.61,0.4094048562679692
+200,gpt-oss-120b_high,Chess Puzzles,0.2,0.9381080251868676
+202,gpt-oss-20b_low,Chess Puzzles,0.02,0.22768470237991692
+203,gpt-oss-20b_medium,Chess Puzzles,0.04,0.2899212792816484
+204,grok-4-0709,Chess Puzzles,0.28,0.35538641047643
+205,grok-4.3_high,Chess Puzzles,0.25,0.6770777292583258
+206,grok-4.5_high,Chess Puzzles,0.36,0.7726214737104355
+207,grok-4.6_high,Chess Puzzles,0.4,0.6769109235893408
+208,grok-4.6_xhigh,Chess Puzzles,0.31,0.46540321463888146
+209,inkling-small_xhigh,Chess Puzzles,0.18,0.7826113043805134
+210,kimi-k2.5,Chess Puzzles,0.12,0.3062629020412435
+211,kimi-k2.6,Chess Puzzles,0.26,0.7899751993546669
+212,kimi-k2.7-code,Chess Puzzles,0.21,0.729475297850448
+213,kimi-k3_high,Chess Puzzles,0.25,0.627884707802952
+214,kimi-k3_low,Chess Puzzles,0.2,0.6929386593678729
+215,kimi-k3_max,Chess Puzzles,0.39,0.6306077040350873
+216,muse-spark-1.3_max,Chess Puzzles,0.38,0.7901923499022726
+217,muse-spark-1.3_xhigh,Chess Puzzles,0.35,0.8916816647028695
+218,nemotron-3-ultra,Chess Puzzles,0.12,0.28971693335983023
+219,o1-2024-12-17_high,Chess Puzzles,0.15,0.7310274968027813
+220,o1-2024-12-17_low,Chess Puzzles,0.07,0.3298531326204605
+221,o1-2024-12-17_medium,Chess Puzzles,0.12,0.556578650553721
+222,o3-2025-04-16_high,Chess Puzzles,0.34,0.7588382585897763
+223,o3-2025-04-16_low,Chess Puzzles,0.27,0.583807619641499
+224,o3-2025-04-16_medium,Chess Puzzles,0.38,0.6949023518829665
+225,o3-mini-2025-01-31_high,Chess Puzzles,0.17,0.8257391249721643
+226,o3-mini-2025-01-31_low,Chess Puzzles,0.06,0.3176536496490975
+227,o3-mini-2025-01-31_medium,Chess Puzzles,0.09,0.542629955872677
+228,o4-mini-2025-04-16_high,Chess Puzzles,0.26,0.9238123854211636
+229,o4-mini-2025-04-16_low,Chess Puzzles,0.14,0.4530311218928498
+230,o4-mini-2025-04-16_medium,Chess Puzzles,0.2,0.7004211611118946
+232,qwen3-14b,Chess Puzzles,0.04,0.3907795900616859
+234,qwen3-30b-a3b-instruct-2507,Chess Puzzles,0.02,0.20289907700871396
+235,qwen3-30b-a3b-thinking-2507,Chess Puzzles,0.08,0.5578915127128095
+236,qwen3-8b,Chess Puzzles,0.05,0.7039219248539352
+238,qwen3-max-2025-09-23,Chess Puzzles,0.04,0.2817160112752654
+239,qwen3.5-35b-a3b,Chess Puzzles,0.01,0.06823296327290179
+240,qwen3.5-35b-a3b_none,Chess Puzzles,0.1,0.42186000046847405
+241,qwen3.5-397b-a17b,Chess Puzzles,0.12,0.33766088065134003
+242,qwen3.5-397b-a17b_none,Chess Puzzles,0.13,0.35204914913439345
+243,qwen3.5-9B,Chess Puzzles,0.02,0.16395561994017718
+244,qwen3.5-9B_none,Chess Puzzles,0.12,0.42705679889617615
+245,qwen3.5-flash,Chess Puzzles,0.21,0.6775249864847614
+246,qwen3.5-plus,Chess Puzzles,0.22,0.6763988621668314
+247,qwen3.6-27b,Chess Puzzles,0.22,0.689335229499652
+248,qwen3.6-27b_none,Chess Puzzles,0.09,0.5189285279076002
+249,qwen3.6-35b-a3b,Chess Puzzles,0.26,0.8813822747386252
+250,qwen3.6-35b-a3b_none,Chess Puzzles,0.04,0.06929413442503461
+251,qwen3.6-flash,Chess Puzzles,0.2,0.7326601057757901
+252,qwen3.6-max-preview,Chess Puzzles,0.2,0.4396244637334672
+253,qwen3.6-plus,Chess Puzzles,0.17,0.5701086450195583
+254,qwen3.7-flash,Chess Puzzles,0.23,0.6907793058378459
+255,qwen3.7-flash_none,Chess Puzzles,0.09,0.3297658393705051
+256,qwen3.7-max,Chess Puzzles,0.19,0.33175203655810626
+257,qwen3.7-plus,Chess Puzzles,0.24,0.696296927244459
+258,qwen3.7-plus_none,Chess Puzzles,0.09,0.25532104725693555
+259,qwen3.8-max_xhigh,Chess Puzzles,0.29,0.46543872264445657
+260,claude-mythos-5,CyScenarioBench,0.367,0.673
+261,claude-mythos-preview,CyScenarioBench,0.292,0.731
+262,claude-opus-4-8,CyScenarioBench,0.166,0.727
+266,gpt-5.4-2026-03-05,CyScenarioBench,0.09,0.672
+267,gpt-5.5,CyScenarioBench,0.26,0.777
+268,gpt-5.6-sol,CyScenarioBench,0.28,0.3345
+269,claude-fable-5-1_max,EBR-bench,0.5714285714285714,0.7029365509078422
+270,claude-fable-5_max,EBR-bench,0.395238,0.583
+271,claude-opus-4-1-20250805_none,EBR-bench,0.079365,0.6365
+272,claude-opus-4-5-20251101_128K,EBR-bench,0.1428571428571428,0.4935
+273,claude-opus-4-6_max,EBR-bench,0.126984,0.3195
+274,claude-opus-4-7_max,EBR-bench,0.1904761904761904,0.5185
+275,claude-opus-4-8_max,EBR-bench,0.2857142857142857,0.5519324178738748
+276,claude-opus-5-5_max,EBR-bench,0.7142857142857142,0.7205
+277,claude-opus-5_max,EBR-bench,0.4571428571428571,0.518
+278,claude-sonnet-4-5-20250929_none,EBR-bench,0.0238095238095238,0.5005
+279,gemini-3.1-pro-preview,EBR-bench,0.1428571428571428,0.2195
+280,gemini-3.5-flash_high,EBR-bench,0.0476190476190476,0.021
+281,glm-5.2_max,EBR-bench,0.0952380952380952,0.246
+282,gpt-5-2025-08-07_high,EBR-bench,0.126984,0.438
+283,gpt-5.2-2025-12-11_xhigh,EBR-bench,0.230159,0.5915
+284,gpt-5.4-2026-03-05_xhigh,EBR-bench,0.253968,0.51
+285,gpt-5.5_xhigh,EBR-bench,0.3428571428571428,0.4915
+286,gpt-5.6-sol_max,EBR-bench,0.4476190476190475,0.5875
+287,gpt-6-astra_max,EBR-bench,0.7619047619047619,0.4729301117862573
+288,gpt-6-sol_max,EBR-bench,0.5333333333333333,0.7795
+289,gpt-6.1-sol_max,EBR-bench,0.5428571428571429,0.25
+290,grok-4.6_xhigh,EBR-bench,0.3047619047619047,0.7845
+291,kimi-k2.6,EBR-bench,0.0238095238095238,0.1595
+292,qwen3.7-max,EBR-bench,0.0952380952380952,0.186
+293,DeepSeek-V3.1,Fiction.LiveBench,0.531,0.366
+294,Llama-4-Maverick-17B-128E-Instruct,Fiction.LiveBench,0.364,0.487
+295,Llama-4-Scout-17B-16E-Instruct,Fiction.LiveBench,0.273,0.479
+296,Qwen3-235B-A22B-Instruct-2507,Fiction.LiveBench,0.444,0.424
+297,Qwen3-235B-A22B-Thinking-2507,Fiction.LiveBench,0.688,0.7015
+298,claude-3-7-sonnet-20250219_8K,Fiction.LiveBench,0.531,0.3655
+299,claude-3-7-sonnet-20250219_none,Fiction.LiveBench,0.344,0.3945
+300,claude-opus-4-20250514_none,Fiction.LiveBench,0.375,0.36291582787064963
+301,claude-sonnet-4-20250514_none,Fiction.LiveBench,0.364,0.343
+302,gemini-2.5-flash-lite-preview-06-17_thinking,Fiction.LiveBench,0.219,0.2885
+303,gpt-4.1-2025-04-14,Fiction.LiveBench,0.625,0.6112569126400746
+304,gpt-4.1-mini-2025-04-14,Fiction.LiveBench,0.469,0.513
+305,gpt-4.1-nano-2025-04-14,Fiction.LiveBench,0.188,0.6645
+306,gpt-5-2025-08-07_medium,Fiction.LiveBench,0.969,0.965
+307,gpt-5-mini-2025-08-07_medium,Fiction.LiveBench,0.625,0.6939977841232835
+308,gpt-5-nano-2025-08-07_medium,Fiction.LiveBench,0.219,0.23
+309,grok-4-0709,Fiction.LiveBench,0.969,0.863
+310,kimi-k2.5,Fiction.LiveBench,0.781,0.542
+311,o1-2024-12-17_medium,Fiction.LiveBench,0.531,0.3365
+313,o3-mini-2025-01-31_medium,Fiction.LiveBench,0.438,0.3905
+314,o3-pro-2025-06-10_medium,Fiction.LiveBench,0.889,0.571
+315,o4-mini-2025-04-16_medium,Fiction.LiveBench,0.625,0.37625036502243037
+316,DeepSeek-V3.1_thinking,LMCA,0.2429,0.404
+317,Inkling_xhigh,LMCA,0.3757999999999999,0.468
+318,Llama-3.1-8B-Instruct,LMCA,0.0537,0.176
+319,Llama-4-Maverick-17B-128E-Instruct,LMCA,0.1586999999999999,0.3105
+320,Llama-4-Scout-17B-16E-Instruct,LMCA,0.1196,0.2375
+321,MiniMax-M3,LMCA,0.337,0.5975
+322,Qwen3-235B-A22B-Instruct-2507,LMCA,0.2352,0.4865
+323,Qwen3-235B-A22B-Thinking-2507,LMCA,0.2930999999999999,0.432
+324,Qwen3-30B-A3B,LMCA,0.1582,0.331
+325,Qwen3-32B,LMCA,0.1728,0.3275
+326,claude-3-opus-20240229,LMCA,0.17,0.5535
+327,claude-fable-5-1_high,LMCA,0.6509,0.667
+328,claude-fable-5-1_low,LMCA,0.6346,0.636
+329,claude-fable-5-1_medium,LMCA,0.6531999999999999,0.656
+330,claude-fable-5-1_thinking,LMCA,0.6546,0.6645
+331,claude-fable-5-1_xhigh,LMCA,0.6506000000000001,0.578
+332,claude-fable-5_high,LMCA,0.6114999999999999,0.4425
+333,claude-fable-5_low,LMCA,0.5959,0.7275
+334,claude-fable-5_max,LMCA,0.6034,0.4005
+335,claude-fable-5_medium,LMCA,0.6032,0.639
+336,claude-fable-5_xhigh,LMCA,0.6102000000000001,0.672
+337,claude-haiku-4-5-20251001_thinking,LMCA,0.3094,0.4575
+338,claude-opus-4-1-20250805_thinking,LMCA,0.3707999999999999,0.505
+339,claude-opus-4-20250514_thinking,LMCA,0.3743,0.523
+340,claude-opus-4-5-20251101_high,LMCA,0.4446,0.604
+341,claude-opus-4-6_max,LMCA,0.5576,0.8915
+342,claude-opus-4-7_max,LMCA,0.522,0.774
+343,claude-opus-4-8_max,LMCA,0.5751,0.648
+344,claude-opus-5-5_max,LMCA,0.6823,0.219
+345,claude-opus-5_high,LMCA,0.6367,0.671
+346,claude-opus-5_low,LMCA,0.6258,0.808
+347,claude-opus-5_max,LMCA,0.633,0.381
+348,claude-opus-5_medium,LMCA,0.6293,0.6355
+349,claude-opus-5_xhigh,LMCA,0.6445000000000001,0.7035
+350,claude-sonnet-4-20250514_thinking,LMCA,0.29,0.451
+351,claude-sonnet-4-5-20250929_thinking,LMCA,0.3876,0.52
+352,claude-sonnet-4-6_max,LMCA,0.4650999999999999,0.831
+353,claude-sonnet-5_high,LMCA,0.5002,0.561
+354,claude-sonnet-5_low,LMCA,0.4965,0.58
+355,claude-sonnet-5_max,LMCA,0.493,0.5175
+356,claude-sonnet-5_medium,LMCA,0.4971,0.7825
+357,claude-sonnet-5_xhigh,LMCA,0.4881,0.4945
+358,deepseek-v3.2,LMCA,0.2882,0.4585
+359,deepseek-v4-flash-0731_max,LMCA,0.4172999999999999,0.2325
+360,deepseek-v4-flash_max,LMCA,0.3588,0.4925
+361,deepseek-v4-pro-0813,LMCA,0.4545,0.549
+362,deepseek-v4-pro_max,LMCA,0.412,0.5445
+363,deepseek-v4.1-flash,LMCA,0.4697,0.5475
+364,gemini-2.5-flash-lite-preview-06-17_thinking,LMCA,0.1807,0.5485
+365,gemini-2.5-pro,LMCA,0.3477,0.4515
+366,gemini-3-flash-preview_high,LMCA,0.4313,0.4975
+367,gemini-3.1-flash-lite_high,LMCA,0.3500999999999999,0.424
+368,gemini-3.1-pro-preview_high,LMCA,0.5382,0.4725
+369,gemini-3.1-pro-preview_low,LMCA,0.5118,0.609
+370,gemini-3.1-pro-preview_medium,LMCA,0.528,0.584
+371,gemini-3.5-flash-lite_high,LMCA,0.376,0.469
+372,gemini-3.5-flash_high,LMCA,0.4715,0.466
+373,gemini-3.6-flash_high,LMCA,0.4493,0.3255
+374,gemini-3.7-flash_high,LMCA,0.5038,0.345
+375,gemini-3.7-flash_low,LMCA,0.4709,0.5545
+376,gemini-3.7-flash_medium,LMCA,0.4921999999999999,0.545
+377,gemini-3.8-flash,LMCA,0.5155,0.5805
+378,gemini-3.8-flash_low,LMCA,0.5115999999999999,0.587
+379,gemini-3.8-flash_medium,LMCA,0.529,0.601
+380,gemma-3-12b-it,LMCA,0.0446,0.1685
+381,gemma-3-27b-it,LMCA,0.1227999999999999,0.3945
+382,gemma-3-4b-it,LMCA,0.0278,0.0895
+383,gemma-4-26b-a4b,LMCA,0.2968,0.4575
+384,gemma-4-31b-it,LMCA,0.3925,0.538
+385,glm-5.2_max,LMCA,0.4582,0.677
+386,glm-5.3,LMCA,0.5550999999999999,0.5995
+387,gpt-3.5-turbo-0125,LMCA,0.0965,0.287
+388,gpt-4-0613,LMCA,0.1705999999999999,0.1975
+389,gpt-4-turbo-2024-04-09,LMCA,0.0978,0.2145
+390,gpt-4.1-2025-04-14,LMCA,0.2561,0.3695
+391,gpt-4.1-mini-2025-04-14,LMCA,0.2112,0.361
+392,gpt-4.1-nano-2025-04-14,LMCA,0.0546,0.094
+393,gpt-4o-2024-05-13,LMCA,0.1659,0.6465
+394,gpt-4o-mini-2024-07-18,LMCA,0.1036999999999999,0.1575
+395,gpt-5-2025-08-07_high,LMCA,0.3999,0.337
+396,gpt-5-mini-2025-08-07_high,LMCA,0.342,0.6905
+397,gpt-5-nano-2025-08-07_high,LMCA,0.0793,0.054
+398,gpt-5.1-2025-11-13_high,LMCA,0.4389,0.4465
+399,gpt-5.2-2025-12-11_xhigh,LMCA,0.4391,0.254
+400,gpt-5.4-2026-03-05_xhigh,LMCA,0.5196999999999999,0.383
+401,gpt-5.4-mini-2026-03-17_xhigh,LMCA,0.4079,0.473
+402,gpt-5.4-nano-2026-03-17_xhigh,LMCA,0.3686,0.498
+403,gpt-5.5_xhigh,LMCA,0.5427000000000001,0.191
+404,gpt-5.6-luna_high,LMCA,0.4738,0.573
+405,gpt-5.6-luna_low,LMCA,0.4379,0.6525
+406,gpt-5.6-luna_max,LMCA,0.4854,0.6255
+407,gpt-5.6-luna_medium,LMCA,0.4425,0.786
+408,gpt-5.6-luna_none,LMCA,0.414,0.7355
+409,gpt-5.6-luna_xhigh,LMCA,0.4854,0.721
+410,gpt-5.6-sol_high,LMCA,0.5694,0.624
+411,gpt-5.6-sol_low,LMCA,0.5589,0.7785
+412,gpt-5.6-sol_max,LMCA,0.5843,0.1895
+413,gpt-5.6-sol_medium,LMCA,0.564,0.6055
+414,gpt-5.6-sol_none,LMCA,0.5275,0.744
+415,gpt-5.6-sol_promax,LMCA,0.5921,0.4015
+416,gpt-5.6-sol_xhigh,LMCA,0.5849,0.4975
+417,gpt-5.6-terra_high,LMCA,0.5136999999999999,0.5875
+418,gpt-5.6-terra_low,LMCA,0.493,0.7725
+419,gpt-5.6-terra_max,LMCA,0.5495,0.4585
+420,gpt-5.6-terra_medium,LMCA,0.4964,0.899
+421,gpt-5.6-terra_none,LMCA,0.4650999999999999,0.8755
+422,gpt-5.6-terra_xhigh,LMCA,0.5223,0.494
+423,gpt-6-astra,LMCA,0.6411,0.6415
+424,gpt-6-astra_high,LMCA,0.6384000000000001,0.6465
+425,gpt-6-astra_low,LMCA,0.6219,0.636
+426,gpt-6-astra_medium,LMCA,0.6293,0.6315
+427,gpt-6-astra_xhigh,LMCA,0.6437,0.293
+428,gpt-6-luna_max,LMCA,0.4449,0.555
+429,gpt-6-sol_max,LMCA,0.5908,0.2045
+430,gpt-oss-120b_high,LMCA,0.2214,0.635
+431,gpt-oss-20b_high,LMCA,0.1451,0.45
+432,grok-4.3_high,LMCA,0.3833,0.465
+433,grok-4.5_high,LMCA,0.452,0.4285
+434,grok-4.6_xhigh,LMCA,0.4845,0.335
+435,kimi-k2.6,LMCA,0.3726,0.5095
+436,kimi-k3_max,LMCA,0.5274,0.4385
+437,mistral-medium-2604,LMCA,0.2606,0.4335
+438,muse-spark-1.1_high,LMCA,0.4991,0.8695
+439,muse-spark-1.3,LMCA,0.5387,0.598
+440,nemotron-3-ultra,LMCA,0.369,0.471
+441,o1-2024-12-17_high,LMCA,0.2227,0.3325
+442,o3-2025-04-16_high,LMCA,0.397,0.247
+443,o3-mini-2025-01-31_high,LMCA,0.1896999999999999,0.2655
+444,o3-pro-2025-06-10_high,LMCA,0.3848,0.503
+445,o4-mini-2025-04-16_high,LMCA,0.265,0.4715
+446,qwen2.5-7b-instruct,LMCA,0.0642,0.209
+447,qwen3-14b,LMCA,0.1819,0.376
+448,qwen3-30b-a3b-instruct-2507,LMCA,0.2237,0.4915
+449,qwen3-30b-a3b-thinking-2507,LMCA,0.1953,0.336
+450,qwen3-8b,LMCA,0.0882,0.1705
+451,qwen3-max-2025-09-23,LMCA,0.2827,0.7085
+452,qwen3.5-122b-a10b_none,LMCA,0.3223,0.3935
+453,qwen3.5-35b-a3b,LMCA,0.2946999999999999,0.6635
+454,qwen3.5-397b-a17b,LMCA,0.3789,0.547
+455,qwen3.5-9B,LMCA,0.2447,0.549
+456,qwen3.5-flash,LMCA,0.2914,0.224
+457,qwen3.5-plus,LMCA,0.3636,0.4785
+458,qwen3.6-27b,LMCA,0.3453,0.41
+459,qwen3.6-35b-a3b,LMCA,0.297,0.421
+460,qwen3.6-flash,LMCA,0.3098,0.4335
+461,qwen3.6-max-preview,LMCA,0.4253,0.528
+462,qwen3.6-plus,LMCA,0.3309,0.4435
+463,qwen3.7-max,LMCA,0.4402,0.454
+464,qwen3.7-plus,LMCA,0.3757999999999999,0.4895
+465,qwen3.8-27b,LMCA,0.4135999999999999,0.5305
+466,qwen3.8-max_xhigh,LMCA,0.4624,0.2985
+467,MiniMax-M3,Mystery Game Puzzles,0.07,0.13911300443440344
+468,MiniMax-M3_none,Mystery Game Puzzles,0.08,0.5016963030792654
+469,Qwen3-235B-A22B-Thinking-2507,Mystery Game Puzzles,0.09,0.29163923971975203
+470,claude-fable-5-1_max,Mystery Game Puzzles,0.58,0.6040363880155536
+471,claude-fable-5_max,Mystery Game Puzzles,0.52,0.7333404980819401
+472,claude-opus-4-1-20250805_24K,Mystery Game Puzzles,0.21,0.5468515186372886
+473,claude-opus-4-5-20251101_48K,Mystery Game Puzzles,0.22,0.5474968311591607
+474,claude-opus-4-6_low,Mystery Game Puzzles,0.07,0.3862654471659913
+475,claude-opus-4-6_max,Mystery Game Puzzles,0.25,0.4441466921908786
+476,claude-opus-4-6_none,Mystery Game Puzzles,0.15,0.5119233156861329
+477,claude-opus-4-7_max,Mystery Game Puzzles,0.28,0.5887706338056853
+478,claude-opus-4-7_none,Mystery Game Puzzles,0.13,0.47709733541010196
+479,claude-opus-4-8_max,Mystery Game Puzzles,0.36,0.5006738771155655
+480,claude-opus-4-8_xhigh,Mystery Game Puzzles,0.31,0.5936541937793761
+481,claude-opus-5-5_max,Mystery Game Puzzles,0.71,0.7537664838079258
+482,claude-opus-5_max,Mystery Game Puzzles,0.59,0.8085598113547743
+483,claude-opus-5_none,Mystery Game Puzzles,0.37,0.6104330299491311
+484,claude-sonnet-4-5-20250929_48K,Mystery Game Puzzles,0.17,0.5102887102586142
+485,claude-sonnet-4-6_low,Mystery Game Puzzles,0.16,0.49570967721329584
+486,claude-sonnet-4-6_none,Mystery Game Puzzles,0.14,0.49434180094340163
+487,claude-sonnet-5_max,Mystery Game Puzzles,0.35,0.7673701603688228
+488,claude-sonnet-5_none,Mystery Game Puzzles,0.16,0.503873609251725
+489,deepseek-v4-flash-0731_max,Mystery Game Puzzles,0.34,0.7789265756685554
+490,deepseek-v4-pro-0813_max,Mystery Game Puzzles,0.43,0.5670533207104989
+491,deepseek-v4-pro_none,Mystery Game Puzzles,0.17,0.6594002751407478
+492,gemini-3-flash-preview_high,Mystery Game Puzzles,0.2,0.34377389963578436
+493,gemini-3-flash-preview_low,Mystery Game Puzzles,0.26,0.5754211076749154
+494,gemini-3-flash-preview_minimal,Mystery Game Puzzles,0.25,0.5652664349493421
+495,gemini-3.1-pro-preview_high,Mystery Game Puzzles,0.34,0.46226913369135775
+496,gemini-3.1-pro-preview_low,Mystery Game Puzzles,0.29,0.5010001334470394
+497,gemini-3.1-pro-preview_medium,Mystery Game Puzzles,0.32,0.5363010031883517
+498,gemini-3.5-flash-lite_low,Mystery Game Puzzles,0.19,0.5310835755478005
+499,gemini-3.5-flash-lite_minimal,Mystery Game Puzzles,0.12,0.3832816436499232
+500,gemini-3.5-flash_high,Mystery Game Puzzles,0.32,0.6870730178750821
+501,gemini-3.5-flash_low,Mystery Game Puzzles,0.28,0.4000311826584414
+502,gemini-3.6-flash_high,Mystery Game Puzzles,0.3,0.5879810628775239
+503,gemini-3.6-flash_low,Mystery Game Puzzles,0.23,0.37356540023488843
+504,gemini-3.6-flash_minimal,Mystery Game Puzzles,0.25,0.47103772725235216
+505,gemini-3.7-flash_high,Mystery Game Puzzles,0.37,0.6035895985344133
+506,gemini-3.8-flash_high,Mystery Game Puzzles,0.47,0.8660245949310188
+507,glm-5.2_low,Mystery Game Puzzles,0.19,0.5694061805433765
+508,glm-5.2_medium,Mystery Game Puzzles,0.15,0.4894155073446098
+509,glm-5.2_minimal,Mystery Game Puzzles,0.18,0.5303736479592478
+510,glm-5.2_none,Mystery Game Puzzles,0.18,0.6810386716672967
+511,glm-5.3-flash_max,Mystery Game Puzzles,0.08,0.23544128958363134
+512,glm-5.3_max,Mystery Game Puzzles,0.33,0.6832520287251397
+513,gpt-3.5-turbo-0125,Mystery Game Puzzles,0.03,0.5839051379558213
+514,gpt-4-0613,Mystery Game Puzzles,0.12,0.8269054588898785
+515,gpt-4.1-mini-2025-04-14,Mystery Game Puzzles,0.07,0.47403960037340614
+516,gpt-4o-mini-2024-07-18,Mystery Game Puzzles,0.12,0.965987242184691
+517,gpt-5-2025-08-07_high,Mystery Game Puzzles,0.23,0.5386397304726718
+518,gpt-5-2025-08-07_low,Mystery Game Puzzles,0.16,0.4146641186807002
+519,gpt-5-2025-08-07_medium,Mystery Game Puzzles,0.15,0.14683251508477174
+520,gpt-5-2025-08-07_minimal,Mystery Game Puzzles,0.14,0.47256253672419807
+521,gpt-5-mini-2025-08-07_high,Mystery Game Puzzles,0.05,0.08645606852171474
+522,gpt-5-mini-2025-08-07_medium,Mystery Game Puzzles,0.04,0.14476650766833468
+523,gpt-5-mini-2025-08-07_minimal,Mystery Game Puzzles,0.1,0.4836634276059776
+524,gpt-5-nano-2025-08-07_high,Mystery Game Puzzles,0.08,0.8228697624767357
+525,gpt-5-nano-2025-08-07_low,Mystery Game Puzzles,0.09,0.34615482785061175
+526,gpt-5-nano-2025-08-07_medium,Mystery Game Puzzles,0.09,0.7952702616845266
+527,gpt-5-nano-2025-08-07_minimal,Mystery Game Puzzles,0.05,0.4710498290932695
+528,gpt-5.1-2025-11-13_low,Mystery Game Puzzles,0.19,0.5840911458434915
+529,gpt-5.1-2025-11-13_medium,Mystery Game Puzzles,0.16,0.5226446124731838
+530,gpt-5.1-2025-11-13_none,Mystery Game Puzzles,0.15,0.4680806406748833
+531,gpt-5.2-2025-12-11_high,Mystery Game Puzzles,0.23,0.38710577745655833
+532,gpt-5.2-2025-12-11_low,Mystery Game Puzzles,0.1,0.32602337869448383
+533,gpt-5.2-2025-12-11_medium,Mystery Game Puzzles,0.22,0.3994583950830475
+534,gpt-5.2-2025-12-11_none,Mystery Game Puzzles,0.14,0.6475731182299257
+535,gpt-5.4-2026-03-05_low,Mystery Game Puzzles,0.17,0.47446402116263015
+536,gpt-5.4-2026-03-05_medium,Mystery Game Puzzles,0.28,0.4710621691279118
+537,gpt-5.4-2026-03-05_none,Mystery Game Puzzles,0.16,0.6618509516404024
+538,gpt-5.4-2026-03-05_xhigh,Mystery Game Puzzles,0.37,0.5861737283317978
+539,gpt-5.4-mini-2026-03-17_low,Mystery Game Puzzles,0.08,0.4286872060115887
+540,gpt-5.4-mini-2026-03-17_medium,Mystery Game Puzzles,0.07,0.3893925657424919
+541,gpt-5.4-mini-2026-03-17_none,Mystery Game Puzzles,0.11,0.6129570353322291
+542,gpt-5.4-nano-2026-03-17_high,Mystery Game Puzzles,0.05,0.16529478902851924
+543,gpt-5.4-nano-2026-03-17_low,Mystery Game Puzzles,0.03,0.16621087475890967
+544,gpt-5.4-nano-2026-03-17_medium,Mystery Game Puzzles,0.06,0.3789821327942494
+545,gpt-5.4-nano-2026-03-17_none,Mystery Game Puzzles,0.09,0.5511300137417517
+546,gpt-5.5_high,Mystery Game Puzzles,0.52,0.6997909262420312
+547,gpt-5.5_low,Mystery Game Puzzles,0.28,0.5909079290743856
+548,gpt-5.5_none,Mystery Game Puzzles,0.18,0.6081260523021285
+549,gpt-5.5_xhigh,Mystery Game Puzzles,0.56,0.8949645964581322
+550,gpt-5.6-luna_low,Mystery Game Puzzles,0.17,0.34550195296593617
+551,gpt-5.6-luna_max,Mystery Game Puzzles,0.21,0.2707051478277101
+552,gpt-5.6-luna_medium,Mystery Game Puzzles,0.12,0.1810225673209871
+553,gpt-5.6-luna_none,Mystery Game Puzzles,0.2,0.6818925452531998
+554,gpt-5.6-sol_low,Mystery Game Puzzles,0.26,0.3319517804617574
+555,gpt-5.6-sol_max,Mystery Game Puzzles,0.58,0.818280943639974
+556,gpt-5.6-sol_none,Mystery Game Puzzles,0.33,0.7365188189412458
+557,gpt-5.6-terra_low,Mystery Game Puzzles,0.19,0.2980355190613131
+558,gpt-5.6-terra_max,Mystery Game Puzzles,0.35,0.40087791476750506
+559,gpt-5.6-terra_medium,Mystery Game Puzzles,0.1,0.09064719034079656
+560,gpt-5.6-terra_none,Mystery Game Puzzles,0.14,0.3196161576047244
+561,gpt-6-astra_max,Mystery Game Puzzles,0.84,0.8271801326753832
+562,gpt-6-sol_max,Mystery Game Puzzles,0.56,0.7128085182287149
+563,gpt-6.1-sol_max,Mystery Game Puzzles,0.8,0.9188665097752325
+565,gpt-oss-120b_medium,Mystery Game Puzzles,0.02,0.23830606442223745
+566,grok-4.6_xhigh,Mystery Game Puzzles,0.34,0.585290595380308
+567,inkling-small_xhigh,Mystery Game Puzzles,0.06,0.2542867562186217
+568,kimi-k2.6,Mystery Game Puzzles,0.18,0.5640364196932232
+569,kimi-k2.6_none,Mystery Game Puzzles,0.12,0.4629660749481052
+570,kimi-k3_low,Mystery Game Puzzles,0.12,0.4126646374574085
+571,kimi-k3_max,Mystery Game Puzzles,0.26,0.163303598536751
+572,muse-spark-1.3_max,Mystery Game Puzzles,0.25,0.43755312616866626
+573,muse-spark-1.3_xhigh,Mystery Game Puzzles,0.1414141414141414,0.3355
+574,nemotron-3-ultra,Mystery Game Puzzles,0.2,0.650136744478041
+575,o3-2025-04-16_high,Mystery Game Puzzles,0.29,0.6772262475522987
+576,o3-2025-04-16_medium,Mystery Game Puzzles,0.23,0.17489362528138405
+577,o3-mini-2025-01-31_high,Mystery Game Puzzles,0.07,0.4670775592631016
+578,o4-mini-2025-04-16_high,Mystery Game Puzzles,0.05,0.17072566371064096
+579,qwen3-max-2025-09-23,Mystery Game Puzzles,0.05,0.26980841434873176
+580,qwen3.5-122b-a10b_none,Mystery Game Puzzles,0.17,0.621957405344066
+581,qwen3.5-397b-a17b_none,Mystery Game Puzzles,0.18,0.5934905468863008
+582,qwen3.5-flash,Mystery Game Puzzles,0.2,0.7486859535444127
+583,qwen3.5-flash_none,Mystery Game Puzzles,0.16,0.5168868944097524
+584,qwen3.5-plus,Mystery Game Puzzles,0.16,0.4494774729988844
+585,qwen3.5-plus_none,Mystery Game Puzzles,0.17,0.5094876958074113
+586,qwen3.6-27b_none,Mystery Game Puzzles,0.07,0.3801454581415938
+587,qwen3.6-35b-a3b_none,Mystery Game Puzzles,0.22,0.7851863332012837
+588,qwen3.6-flash,Mystery Game Puzzles,0.12,0.4240241881028439
+589,qwen3.6-flash_none,Mystery Game Puzzles,0.18,0.5189047444951058
+590,qwen3.6-max-preview_none,Mystery Game Puzzles,0.19,0.5120729436823028
+591,qwen3.6-plus_none,Mystery Game Puzzles,0.12,0.47558977448983214
+592,qwen3.7-flash,Mystery Game Puzzles,0.15,0.41335357605237905
+593,qwen3.7-flash_none,Mystery Game Puzzles,0.14,0.5680059134160578
+594,qwen3.7-max,Mystery Game Puzzles,0.32,0.808866630490617
+595,qwen3.7-max_none,Mystery Game Puzzles,0.26,0.5704920320269969
+596,qwen3.7-plus,Mystery Game Puzzles,0.17,0.46472929620321257
+597,qwen3.7-plus_none,Mystery Game Puzzles,0.17,0.6052403482393944
+598,qwen3.8-max_xhigh,Mystery Game Puzzles,0.38,0.7855231584409867
+599,MiniMax-M3,Surface Evolver Bench,0.5499999999999999,0.6175
+600,claude-fable-5_high,Surface Evolver Bench,0.95,0.8495
+601,claude-opus-4-8_high,Surface Evolver Bench,0.875,0.6345
+602,claude-opus-4-8_none,Surface Evolver Bench,0.68125,0.6165
+603,claude-sonnet-5_medium,Surface Evolver Bench,0.6,0.2195
+604,deepseek-v4-pro_high,Surface Evolver Bench,0.4,0.394
+605,deepseek-v4.1-flash_high,Surface Evolver Bench,0.4625,0.382
+606,gemini-3.5-flash_medium,Surface Evolver Bench,0.58125,0.4655
+607,gemini-3.8-flash_high,Surface Evolver Bench,0.76875,0.246
+608,gemma-4-31b-it_none,Surface Evolver Bench,0.3062499999999999,0.39
+609,glm-5.2_high,Surface Evolver Bench,0.55625,0.477
+610,glm-5.3-flash_max,Surface Evolver Bench,0.525,0.6145
+611,gpt-5.5_high,Surface Evolver Bench,0.88125,0.4295
+612,gpt-5.5_medium,Surface Evolver Bench,0.8125,0.57
+613,gpt-5.6-luna_medium,Surface Evolver Bench,0.61875,0.4885
+614,gpt-5.6-sol_xhigh,Surface Evolver Bench,0.93125,0.826
+615,gpt-5.6-terra_xhigh,Surface Evolver Bench,0.8375,0.6175
+616,gpt-oss-120b,Surface Evolver Bench,0.25,0.3585
+617,grok-4.5_high,Surface Evolver Bench,0.74375,0.5025
+618,kimi-k2.7-code,Surface Evolver Bench,0.4875,0.382
+619,kimi-k3,Surface Evolver Bench,0.95,0.728
+620,kimi-k3_max,Surface Evolver Bench,0.93,0.9285
+621,mistral-medium-2604_high,Surface Evolver Bench,0.26875,0.368
+622,muse-spark-1.1_high,Surface Evolver Bench,0.525,0.15
+623,qwen3.6-35b-a3b,Surface Evolver Bench,0.44375,0.3405
+624,qwen3.8-27b_xhigh,Surface Evolver Bench,0.45,0.428
+625,claude-fable-5-1_xhigh,WeirdML v3,0.2597021272727273,0.638
+626,claude-fable-5_xhigh,WeirdML v3,0.1552890606060606,0.4035
+627,claude-opus-4-5-20251101_high,WeirdML v3,0.06517475,0.3265
+628,claude-opus-5-5_xhigh,WeirdML v3,0.3120028142857143,0.736
+629,claude-opus-5_xhigh,WeirdML v3,0.1901117537878787,0.504
+630,deepseek-v4.1-flash_high,WeirdML v3,0.0594633181818181,0.6095
+631,gemini-3.8-flash_high,WeirdML v3,0.0737874909090909,0.08
+632,gpt-5.6-luna_xhigh,WeirdML v3,0.0515795227272727,0.218
+633,gpt-5.6-sol_xhigh,WeirdML v3,0.1499222454545454,0.316
+634,gpt-6-astra_xhigh,WeirdML v3,0.4222023136363637,0.8915
+635,gpt-6-luna_xhigh,WeirdML v3,0.0787412424242424,0.5175
+636,gpt-6-sol_xhigh,WeirdML v3,0.1973175666666666,0.6745
+637,kimi-k3_high,WeirdML v3,0.0726886515151515,0.446
+638,Average Human,EBR-bench,0.5275,0.518

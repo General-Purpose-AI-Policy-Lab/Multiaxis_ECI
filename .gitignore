@@ -13,7 +13,7 @@ build/
 
 # --stream-draws live stores: the same draws as the trace, plus the warmup
 # nutpie's store writes unconditionally. Thousands of chunk files each.
-**/live_draws.zarr/
+**/live_draws*.zarr/
 
 # Generated figures: every fit's figures/ (PNG + html/) under 5_outputs/, regenerable from the
 # traces via 3_fit.py --plots / 4_diagnostics/3_plot_mirt.py; the dashboard stills likewise.

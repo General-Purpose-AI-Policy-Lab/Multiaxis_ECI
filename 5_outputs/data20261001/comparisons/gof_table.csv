@@ -1,0 +1,2 @@
+fit,type,K,free_loadings,R2,RMSE,MAE,PIT_var,eta_rhat,divergences,max_phi
+K=4 · pooled · merge · flagship,exploratory,4,396,0.9648,0.0427,0.029,0.0468,1.346,26,0.945
