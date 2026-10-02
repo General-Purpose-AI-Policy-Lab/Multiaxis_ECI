@@ -784,15 +784,18 @@ def run_exploration(args, parser) -> None:
             # benchmark) coords as the K-axis fit, so a cached trace is safe to
             # reuse only when those dims still match the current data. The K=1
             # GoF (R²/RMSE/MAE) is loaded from the cached JSON instead of
-            # recomputed — no extra forward pass.
-            idata_1d = az.from_netcdf(baseline_path)
-            post = idata_1d.posterior
+            # recomputed — no extra forward pass. Only the sizes and attrs are read, and the
+            # file is closed before a refit writes over it: on 2026-10-02 a refit's save failed
+            # on the still-open cached file ("unable to truncate a file which is already open").
+            import xarray as xr
+            with xr.open_dataset(baseline_path, group="posterior") as post:
+                sizes, attrs = dict(post.sizes), dict(post.attrs)
             # draw > 0 because an interrupted baseline is saved as an
             # aborted 0-draw trace, and the dims of an empty trace still match.
-            cached = (post.sizes.get("draw", 0) > 0
-                      and post.sizes.get("model") == data.n_models
-                      and post.sizes.get("bench") == data.n_benchmarks
-                      and json.loads(post.attrs.get("mirt_beta_binomial", "false"))
+            cached = (sizes.get("draw", 0) > 0
+                      and sizes.get("model") == data.n_models
+                      and sizes.get("bench") == data.n_benchmarks
+                      and json.loads(attrs.get("mirt_beta_binomial", "false"))
                       == spec.beta_binomial)
             if cached:
                 print(f"\nReusing cached K=1 baseline → {baseline_path}", flush=True)
@@ -802,8 +805,8 @@ def run_exploration(args, parser) -> None:
                     print(f"  1D (K=1, cached): R²={m['bayesian_r2']:.3f}  "
                           f"RMSE={m['rmse']:.3f}  MAE={m['mae']:.3f}", flush=True)
             else:
-                print(f"\nCached K=1 dims or likelihood (model={post.sizes.get('model')}, "
-                      f"bench={post.sizes.get('bench')}) don't match current data "
+                print(f"\nCached K=1 dims or likelihood (model={sizes.get('model')}, "
+                      f"bench={sizes.get('bench')}) don't match current data "
                       f"({data.n_models}, {data.n_benchmarks}) — refitting.", flush=True)
         if not cached:
             # The baseline is self-describing too: without the spec attr,
