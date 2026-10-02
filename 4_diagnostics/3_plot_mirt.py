@@ -91,9 +91,12 @@ MAIN_FIGURES = {"forests_per_axis", "forests_per_family", "loadings_per_axis", "
 def chain_split(trace_path, n_chains: int) -> dict | None:
     """Majority and minority chains of a multimodal trace, from the modes file
     `diagnose_chains.py --write-modes` wrote beside it; None when the file is
-    missing or reports a single mode. The majority is the largest mode (ties go
-    to the best log-density); the minority is every other chain, so the two
-    groups partition the trace."""
+    missing or reports a single mode. The "majority" is the mode with the best
+    log-density (ties go to the larger mode), as `diagnose_chains` ranks them:
+    on 2026-10-02 the user chose the best mode over the largest one for the
+    flagship (3 chains, 36 nats above the other 5). The minority is every other
+    chain, so the two groups partition the trace. The names stay: they name the
+    figure folders."""
     p = modes_path(trace_path)
     if not p.exists():
         return None
@@ -101,7 +104,8 @@ def chain_split(trace_path, n_chains: int) -> dict | None:
     modes = doc.get("modes", [])
     if doc.get("trace") != Path(trace_path).name or len(modes) < 2:
         return None
-    best = max(modes, key=lambda m: (len(m["chains"]), m.get("delta_logp") or 0.0))
+    best = max(modes, key=lambda m: (m["delta_logp"] if m.get("delta_logp") is not None
+                                     else float("-inf"), len(m["chains"])))
     majority = sorted(best["chains"])
     minority = sorted(set(range(n_chains)) - set(majority))
     return {"majority": majority, "minority": minority, "n_chains": n_chains}

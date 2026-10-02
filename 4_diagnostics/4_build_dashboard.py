@@ -40,6 +40,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP_TRACE,
     FitSpec,
     _aligned_reproducibility,
+    best_mode_chains,
     crosschain_axis_reproducibility,
     load_axis_titles,
     mirt_identified_ess,
@@ -96,6 +97,16 @@ CMP_DIR = config.COMPARISONS_DIR
 #    "short": "K=4 short",
 #    "type": "exploratory",
 #    "forecast": True},
+def _flagship_drop_chains() -> list[int]:
+    """The flagship chains outside its best-log-density mode (none for a single mode)."""
+    import xarray as xr
+    best = best_mode_chains(FLAGSHIP_TRACE)
+    if best is None:
+        return []
+    with xr.open_dataset(FLAGSHIP_TRACE, group="posterior") as post:
+        return [c for c in range(int(post.sizes["chain"])) if c not in best]
+
+
 FITS = [
     {"name": "k4_humanmerge_flagship",
      "spec": FLAGSHIP,
@@ -112,7 +123,9 @@ FITS = [
               "THE forecasting base (the current flagship)",
      "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
-     "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True},
+     "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True,
+     # The card reads the best-log-density mode only (analysis.FLAGSHIP_CHAINS).
+     "drop_chains": _flagship_drop_chains()},
 ]
 
 # Cards added by `--add` instead of by editing FITS above. Tracked, so a

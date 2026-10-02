@@ -343,19 +343,36 @@ FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
 # `open_flagship` says so when it has not. `FLAGSHIP_TRACE.parent` is the fit's
 # results folder and holds its CSVs and caches.
 FLAGSHIP_TRACE = FLAGSHIP.trace_path
-# One posterior mode over all ten chains (`mirt_modes_<trace-stem>.json`), so
-# every chain is read. The chains do split 6/4 on where the human tiers and 18
-# older/small models sit on the Agentic axis (the post's appendix), but that is
-# a placement split inside one mode, not a second basin. A multimodal flagship
-# would name its majority here and `open_flagship` would default to it.
-FLAGSHIP_CHAINS = None
+# Which chains the flagship's summaries read: "best" is the best-log-density mode
+# of the modes file beside the trace (`diagnose_chains.py --write-modes`), every
+# chain when that file is missing or finds one mode. The 2026-10-01 flagship has
+# two (chains 0/5/7, 36 nats above 1/2/3/4/6); the user chose the best one
+# (2026-10-02), the rule `3_plot_mirt.chain_split` applies to the figures.
+FLAGSHIP_CHAINS = "best"
 # Every flagship summary is a median or an interval, which the thinned draws
 # pin as well as the full 120,000.
 FLAGSHIP_THIN = 10
 
 
+def best_mode_chains(trace_path) -> list[int] | None:
+    """The chains of the best-log-density mode in the modes file beside a trace, or None when
+    the file is missing, names another trace or reports a single mode."""
+    p = Path(trace_path)
+    f = p.parent / f"mirt_modes_{p.stem}.json"
+    if not f.exists():
+        return None
+    doc = json.loads(f.read_text())
+    modes = doc.get("modes", [])
+    if doc.get("trace") != p.name or len(modes) < 2:
+        return None
+    best = max(modes, key=lambda m: (m["delta_logp"] if m.get("delta_logp") is not None
+                                     else float("-inf"), len(m["chains"])))
+    return sorted(best["chains"])
+
+
 def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
-    """The flagship posterior, thinned. `chains=None` reads every chain.
+    """The flagship posterior, thinned. `chains=None` reads every chain, "best" the
+    best-log-density mode (`best_mode_chains`), every chain when there is one mode.
 
     Raises:
         FileNotFoundError: the flagship has not been fitted on the current data generation.
@@ -365,6 +382,8 @@ def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
             f"{FLAGSHIP_TRACE}: the flagship K=4 fit does not exist for this data generation; "
             "run `python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm` first "
             "(the published run sits under 5_outputs/pre_pipeline/).")
+    if chains == "best":
+        chains = best_mode_chains(FLAGSHIP_TRACE)
     return FLAGSHIP.open_posterior(keep=keep, thin=thin, chains=chains,
                                    path=FLAGSHIP_TRACE)
 

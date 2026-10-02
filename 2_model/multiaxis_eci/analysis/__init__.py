@@ -45,6 +45,7 @@ from multiaxis_eci.analysis.fitspec import (
     FLAGSHIP_THIN,
     FLAGSHIP_TRACE,
     FitSpec,
+    best_mode_chains,
     open_flagship,
     spec_json,
 )
@@ -143,5 +144,5 @@ __all__ = [
     "two_regime_forecast", "weighted_line_fit",
     "FitView", "prepare_fit",
     "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS",
-    "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship",
+    "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship", "best_mode_chains",
 ]
