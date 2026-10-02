@@ -10,32 +10,32 @@ The ECI compresses many benchmark scores into one number per model, following th
 
 This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-MIRT**, an item-response model with a Beta likelihood. Every ability comes with its uncertainty, and the human tiers (nine at K=4: six individual tiers from the Average Human to the Top Performer, and three committees) are fitted *inside* the model as test-takers rather than plotted on top of it. One framework serves both the K=4 capability decomposition and the K=1 anchored index, which we call **ECI-H** (ECI with Human baselines) to keep it distinct from Epoch's published ECI.
 
-## Current results: the K=4 flagship on the 2026-09-30 build
+## Current results: the K=4 flagship on the 2026-10-01 build
 
 The axes carry no names of their own. They are named by hand after the benchmarks that load most on them, in the fit folder's `axis_names.json`, and a refit keeps a name only while its signature benchmarks still define the axis (see [docs/plots.md](docs/plots.md)). The current flagship's four:
 
-1. **Fluid Intelligence & Formal Sciences** (ARC-AGI-2, ARC-AGI, OTIS Mock AIME)
-2. **Scientific Knowledge & Reasoning** (WMDP Biology and Chemistry, MMLU)
-3. **General Knowledge & Agentic Research** (DeepResearch Bench, SimpleQA Verified, APEX-Agents; OpenBookQA and ARC (AI2) load on it too)
-4. **Agentic Coding & Cyber** (CyScenarioBench, Cybench, GBAEval)
+1. **Fluid Intelligence & Formal Reasoning** (OTIS Mock AIME, ARC-AGI-2, MATH Level 5)
+2. **Core Scientific Knowledge** (MMLU, MMLU Pro Biology and Chemistry)
+3. **Dual-Use Agentic Capabilities (Cyber, CBRN)** (CyScenarioBench, WMDP Biology and Chemistry)
+4. **General Knowledge** (SimpleQA Verified, TriviaQA, DeepResearch Bench)
 
-Axes 1 and 2 keep the signatures of the 2026-09-08 fit; axes 3 and 4 split the agentic and question-answering benchmarks differently from it, and correlate at 0.90.
+Axes 2 and 3 correlate at 0.94, and no benchmark belongs to axis 2 alone (its largest share is 0.39): it reads as the older text benchmarks' share of axis 3 rather than a separate skill.
 
-The eight chains of this fit fall into two posterior modes (see [Limitations](#limitations)). The figures below follow the larger, chains 1 to 6; the other two chains carry another split of axes 3 and 4, which cannot be put on these axes, so they are not rendered.
+The eight chains of this fit fall into two posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts follow the best one by log-density, chains 0, 5 and 7 (`analysis.best_mode_chains`).
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines). Abilities are in human units: the Average Human at 0 and the Top Performer at 1 on every axis.
 
-<img src="docs/figures/forecast_axis1.png" width="760" alt="Axis 1, Fluid Intelligence and Formal Sciences: frontier forecast against human tiers, one line for reasoning models and one for the others">
+<img src="docs/figures/forecast_axis1.png" width="760" alt="Axis 1, Fluid Intelligence and Formal Reasoning: frontier forecast against human tiers, one line for reasoning models and one for the others">
 
-<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Scientific Knowledge and Reasoning: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Core Scientific Knowledge: frontier forecast against human tiers">
 
-<img src="docs/figures/forecast_axis3.png" width="760" alt="Axis 3, General Knowledge and Agentic Research: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis3.png" width="760" alt="Axis 3, Dual-Use Agentic Capabilities (Cyber, CBRN): frontier forecast against human tiers">
 
-<img src="docs/figures/forecast_axis4.png" width="760" alt="Axis 4, Agentic Coding and Cyber: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis4.png" width="760" alt="Axis 4, General Knowledge: frontier forecast against human tiers">
 
 The 20 benchmarks with the largest share of each axis, their loadings (median and 95% interval) and that share:
 
-<img src="docs/figures/loadings_per_axis.png" width="760" alt="The 20 benchmarks that best define each axis of the 2026-09-30 flagship (loadings, median and 95% interval, coloured by axis share)">
+<img src="docs/figures/loadings_per_axis.png" width="760" alt="The 20 benchmarks that best define each axis of the 2026-10-01 flagship (loadings, median and 95% interval, coloured by axis share)">
 
 `python docs/make_readme_figures.py` redraws these five figures from the current flagship trace, with the builders of the per-fit folders.
 
@@ -65,7 +65,7 @@ Two modeling-stage filters apply at load time: the curated exclusion list below,
 
 What stays in this repository is what belongs to the model, under `1_curated/`: the "easy for humans" exclusion list of the canonical K=1 index, the reviewed lineage map and its overrides, the data-driven SOTA list, the reviewed clips of below-floor scores, the models' openness labels, the optional SimpleQA original column and Epoch's reference ECI table. See [`1_curated/README.md`](1_curated/README.md).
 
-Every output goes under `5_outputs/<data generation>/`, named after the day the pipeline run it was fitted on happened (`config.DATA_TAG`), whatever the day of the fit: the current flagship is `5_outputs/data20260930/mirt_humanmerge_lineageprior_lineagebm/`, the canonical K=1 index `5_outputs/data20260930/canonical_humanmerge/`. A fit on a newer build never overwrites an older one. `5_outputs/pre_pipeline/` holds the post's fits as they were published; the K=4 trace was deleted and is regenerated from `blogpost-frozen` (`5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/REGENERATE.md`).
+Every output goes under `5_outputs/<data generation>/`, named after the day the pipeline run it was fitted on happened (`config.DATA_TAG`), whatever the day of the fit: the current flagship is `5_outputs/data20261001/mirt_humanmerge_lineageprior_lineagebm/`, the canonical K=1 index `5_outputs/data20261001/canonical_humanmerge/`. A fit on a newer build never overwrites an older one. `5_outputs/pre_pipeline/` holds the post's fits as they were published; the K=4 trace was deleted and is regenerated from `blogpost-frozen` (`5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/REGENERATE.md`).
 
 ## Run
 
@@ -77,7 +77,7 @@ python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --draws 100
 
 Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and the 16,000 saved draws pin every median and interval the figures show. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default; `--no-stream-draws` restores the in-memory run), so the machine stays usable during a ten-hour fit; the store is deleted once the thinned trace is saved.
 
-Then find the posterior modes, render the fit's figures (on the majority chains and, separately, the remaining ones when there are several modes; French versions under `fr/`, their SVG twins under `fr/svg/`), and rebuild the dashboard:
+Then find the posterior modes, render the fit's figures (on the best mode's chains and, separately, the remaining ones when there are several modes; French versions under `fr/`, their SVG twins under `fr/svg/`), and rebuild the dashboard:
 
 ```bash
 python 4_diagnostics/diagnose_chains.py --trace <trace> --write-modes
@@ -85,7 +85,7 @@ python 4_diagnostics/3_plot_mirt.py --forecast --trace <trace>
 python 4_diagnostics/4_build_dashboard.py
 ```
 
-The canonical K=1 index, 10,000 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical_humanmerge/`:
+The canonical K=1 index, 2,500 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical_humanmerge/`:
 
 ```bash
 python 3_fit/fit.py --preset canonical --human-merge
@@ -134,7 +134,7 @@ This is the *compensatory* family: a strong skill can make up for a weak one ins
 
 Both are needed. On the post's data, runs without priors split into two sets of axes, the human ordering alone left them in disagreement, and both together brought them into agreement; on leave-one-out cross-validation that model beat the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33. On the 2026-09-08 build, dropping the lineage prior leaves the eight chains on eight separate solutions, hundreds of nats apart (the README of that fit, `5_outputs/data20260908/mirt_humanmerge/README.md`, deleted with the 2026-09-08 outputs on 2026-10-01, stays in the git history); with both priors the chains still fall into three modes (see [Limitations](#limitations)).
 
-Four things are on by default with no flag over them: non-negative loadings, the fixed-c chance floors (the pipeline's `lower_bound`), hierarchical benchmark noise, and the Beta-binomial likelihood. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
+Four things are on by default with no flag over them: non-negative loadings, the fixed-c chance floors (the pipeline's `lower_bound`), hierarchical benchmark noise, and the Beta-binomial likelihood. In the canonical K=1 index, a release's effort variants also share one level, as in the lineage prior but without the links between releases, so a variant scored on one benchmark only sits near its release. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
 
 **The forecast** starts from the models evaluated on an axis, keeps one effort per family (the best) and one release per organization and day, and splits them into reasoning models and the others. Each regime's frontier (the running top two by release date) gets one straight line, fitted on the posterior medians and weighted by their posterior SD; the reasoning line is projected from the first reasoning release to 2030, and crossing dates read the piecewise frontier against each human tier. The full rule: [docs/plots.md](docs/plots.md).
 
@@ -148,8 +148,9 @@ Whether the chains agree on those axes is a different question, with its own num
 
 ## Limitations
 
-- **The K=4 flagship is not fully converged.** It is a short run (2,000 draws after 2,000 tuning steps on each of 8 chains), and its chains fall into two posterior modes: chains 1 to 6 (the figures above) and chains 0 and 7, which sit 13 nats of log-density higher but split axes 3 and 4 differently. Each mode converges on its own (identified r-hat 1.050 and 1.053), all chains together do not (1.21). The figures and forecasts follow the six-chain mode, the larger one, not the best-scoring one; the whole-fit tables pool every chain. `4_diagnostics/diagnose_chains.py` names as its majority the chains matching the best-logp chain, so its verdict row describes the two-chain mode. The canonical K=1 index converges (r-hat 1.0008).
-- **Axes 3 and 4 are the least defined.** Both gather agentic benchmarks and saturated question-answering sets, they correlate at 0.90, their top benchmarks put 0.5 to 0.8 of their loading on them (over 0.9 for axes 1 and 2), and several load on both. Read their forecasts with that in mind.
+- **The K=4 flagship is not fully converged.** It is a short run (2,000 draws after 2,000 tuning steps on each of 8 chains), and its chains fall into two posterior modes: chains 0, 5 and 7, the best by log-density (the figures above), and chains 1 to 4 and 6, 36 nats lower, whose loadings correlate at 0.75 with the first. The best mode converges on its own (identified r-hat of eta 1.010), all chains together do not (1.35). Figures, dashboard and forecasts read the best mode; the whole-fit tables pool every chain.
+- **Axes 2 and 3 overlap.** They correlate at 0.94 in the best mode, and no benchmark puts more than 0.39 of its loading on axis 2. Read axis 2 as the older question-answering benchmarks' part of axis 3 rather than a skill of its own.
+- **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), the 2026-10-01 data let some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers; it holds about e^-14 of the posterior mass. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
 - **Calibration.** The predictive intervals come out wider than the data requires (PIT variance 0.048 at K=4 against 0.083 for a calibrated model), which makes the model more conservative than it should be.

@@ -88,7 +88,7 @@ A fit's flags become one tag, and the tag names the results folder and the trace
 ```
 flags    --K 4 --human-merge --lineage-prior --lineage-bm
 tag      _humanmerge_lineageprior_lineagebm
-results  5_outputs/data20260930/mirt_humanmerge_lineageprior_lineagebm/
+results  5_outputs/data20261001/mirt_humanmerge_lineageprior_lineagebm/
 trace      ├── trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 figures    └── figures/k4/            (PNG; html/ beneath it)
 ```
@@ -140,7 +140,7 @@ and copies the deliverables, French included, into that folder (`GROUP=country` 
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --trace \
-  5_outputs/data20260930/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+  5_outputs/data20261001/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 ```
 
 Figures land in the fit's own `figures/k{K}/`, one PNG each with the HTML twin
@@ -151,8 +151,8 @@ destination. Full catalogue: [plots.md](plots.md).
 ### Plot everything
 
 ```bash
-python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260930/ --dry-run   # decisions only
-python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20260930/             # render
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261001/ --dry-run   # decisions only
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261001/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder

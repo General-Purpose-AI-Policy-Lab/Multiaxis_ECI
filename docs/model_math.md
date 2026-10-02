@@ -417,6 +417,8 @@ removed: roughly one release per year per vendor cannot pin a rate). Constants:
 `PRIOR_LINEAGE_DRIFT_BM = 1.0` (logits/year) and `PRIOR_LINEAGE_DELTA_BM = 2.0`
 (logits/$\sqrt{\text{year}}$). The mean-zero variant offsets are unchanged.
 
+**Release nodes (canonical $K=1$ index).** The canonical fit keeps the nodes and variant offsets of the lineage prior and drops its chains: each release node $n$ has its own level $\psi_n$, drawn in the shared ZeroSumNormal with the unstructured models, and a run gets $\theta_m = \psi_{n(m)} + o_{g(m)}$ with the same $\tau_o$. No release is placed after another; a run's effort variants share their release's level (`models/mirt._release_block`).
+
 ### 5.5 Rotation identification (signed family only)
 
 Two mutually exclusive ways to remove the rotation freedom of the signed
