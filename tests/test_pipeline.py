@@ -529,10 +529,12 @@ class TestAnalysis:
         assert expected.issubset(df.columns)
         # One row per SOTA family that survives the filters, its best effort;
         # families with no surviving test-taker are skipped (with a warning print).
-        from multiaxis_eci.data import model_family
+        # Families are products (`model_product`): a pro mode is its own row, so
+        # gpt-5.6-sol_promax stands for gpt-5.6-sol-pro, not gpt-5.6-sol.
+        from multiaxis_eci.data import model_product
         assert 0 < len(df) <= len(SOTA_FAMILIES)
         assert set(df["family"]).issubset(SOTA_FAMILIES) and df["family"].is_unique
-        assert (df["model"].map(model_family) == df["family"]).all()
+        assert (df["model"].map(model_product) == df["family"]).all()
         model_dates, _ = analysis._release_dates(raw_df)
         for _, row in df.iterrows():
             expected_date = model_dates.get(row["model"])
