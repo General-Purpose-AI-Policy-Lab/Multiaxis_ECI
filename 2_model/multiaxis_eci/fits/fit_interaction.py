@@ -67,7 +67,11 @@ from multiaxis_eci.models.mirt_interaction import (  # noqa: E402
     build_mirt_interaction_model,
 )
 from multiaxis_eci.persistence import save_df, save_json, save_trace  # noqa: E402
-from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_interaction  # noqa: E402
+from multiaxis_eci.ppc import (  # noqa: E402
+    compute_gof,
+    pointwise_log_lik,
+    posterior_predictive_mirt_interaction,
+)
 
 RESULTS_DIR = _RESULTS_ROOT / "mirt_interaction"
 FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
@@ -259,7 +263,7 @@ def main():
     y_rep = posterior_predictive_mirt_interaction(idata, data, floor_c=floor_c)
     mu = posterior_predictive_mirt_interaction(idata, data, return_mean=True,
                                                floor_c=floor_c)
-    gof = compute_gof(y_rep, data, mu)
+    gof = compute_gof(y_rep, data, mu, pointwise_log_lik(idata))
 
     theta = idata.posterior["theta"].values.reshape(-1, data.n_models, K)
     fscores = factor_scores_df(theta, data.mlookup["model"].tolist(), data.is_human)

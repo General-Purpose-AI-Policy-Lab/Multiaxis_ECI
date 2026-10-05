@@ -13,16 +13,20 @@ from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 
 # ── Goodness of fit ───────────────────────────────────────────────────────
 def pit_hist_fig(pit: np.ndarray, n_bins: int = 20, *, style: FigureStyle = DASHBOARD,
-                 title: str | None = "PIT histogram", h0_band: bool = True,
-                 note: bool = True) -> go.Figure:
+                 title: str | None = "", h0_band: bool = True,
+                 note: bool = True, loo: bool = True) -> go.Figure:
     """PIT histogram against the uniform density: calibration in one panel.
 
-    u_n = P(Y_rep <= y_n) under the posterior predictive; a calibrated fit puts the bars flat on
+    u_n = P(Y_rep <= y_n) under the leave-one-out predictive (`loo`, ppc.compute_gof's
+    PSIS-LOO weights, the default) or, `loo=False`, the in-sample one, for a trace without
+    pointwise log-likelihood; a calibrated fit puts the bars flat on
     the dotted density-1 line. `h0_band` shades the 95% band a uniform sample of this size would
     stay in; `note` writes n and the PIT variance under the x title (uniform 1/12: a variance
     below it means intervals wider than the data needs). `title=None` leaves the description to
     the caption.
     """
+    if title == "":
+        title = "LOO-PIT histogram" if loo else "PIT histogram (in-sample)"
     n = len(pit)
     p = 1 / n_bins
     se = np.sqrt(p * (1 - p) / n)
@@ -45,7 +49,8 @@ def pit_hist_fig(pit: np.ndarray, n_bins: int = 20, *, style: FigureStyle = DASH
     fig.add_trace(go.Scatter(x=[0, 1], y=[1.0, 1.0], mode="lines",
                              line=dict(color="#444", width=style.trend, dash="dot"),
                              name="calibrated (uniform)", hoverinfo="skip"))
-    xtitle = "PIT  u<sub>n</sub> = P(Y<sub>rep</sub> ≤ y<sub>n</sub>)"
+    xtitle = ("LOO-PIT  u<sub>n</sub> = P(Y<sub>rep</sub> ≤ y<sub>n</sub> | y<sub>−n</sub>)"
+              if loo else "PIT  u<sub>n</sub> = P(Y<sub>rep</sub> ≤ y<sub>n</sub>)")
     if note:
         xtitle += (f'<br><span style="font-size:{style.font_note}px">n = {n}, '
                    f"variance {pit.var():.3f} (uniform 1/12 ≈ 0.083)</span>")
@@ -64,7 +69,8 @@ def pit_hist_fig(pit: np.ndarray, n_bins: int = 20, *, style: FigureStyle = DASH
     return apply_fonts(fig, style)
 
 
-def pit_ecdf_fig(pit: np.ndarray) -> go.Figure:
+def pit_ecdf_fig(pit: np.ndarray, loo: bool = True) -> go.Figure:
+    name = "LOO-PIT" if loo else "PIT (in-sample)"
     sorted_pit = np.sort(pit)
     ecdf_y = np.arange(1, len(pit) + 1) / len(pit)
     ks_band = 1.358 / np.sqrt(len(pit))
@@ -84,10 +90,10 @@ def pit_ecdf_fig(pit: np.ndarray) -> go.Figure:
     ))
     fig.add_trace(go.Scatter(
         x=sorted_pit, y=ecdf_y, mode="lines",
-        line=dict(color="#1f77b4", width=2), name="PIT empirical CDF",
+        line=dict(color="#1f77b4", width=2), name=f"{name} empirical CDF",
     ))
     fig.update_layout(
-        title="PIT empirical CDF",
+        title=f"{name} empirical CDF",
         xaxis_title="u", yaxis_title="F(u)",
         template="plotly_white",
         height=480, width=640,

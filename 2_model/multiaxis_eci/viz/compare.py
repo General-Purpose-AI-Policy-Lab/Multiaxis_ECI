@@ -55,8 +55,10 @@ def cmp_convergence_fig(tab: pd.DataFrame,
 
 
 def cmp_pit_ecdf_fig(results: list,
-                     title: str = "Calibration: PIT ECDF vs perfect (hugs diagonal = calibrated)") -> go.Figure:
-    """PIT ECDF overlay vs the diagonal. `results`: list of dicts with 'fit' + 'pit'."""
+                     title: str = "Calibration: LOO-PIT ECDF vs perfect (hugs diagonal = calibrated)"
+                     ) -> go.Figure:
+    """LOO-PIT ECDF overlay vs the diagonal (`GoFResults.pit`: leave-one-out whenever the trace
+    carries its pointwise log-likelihood). `results`: list of dicts with 'fit' + 'pit'."""
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="perfect",
                              line=dict(color="#888", dash="dash")))
@@ -64,7 +66,7 @@ def cmp_pit_ecdf_fig(results: list,
         p = np.sort(np.asarray(r["pit"]))
         ecdf = np.arange(1, len(p) + 1) / len(p)
         fig.add_trace(go.Scatter(x=p, y=ecdf, mode="lines", name=r["fit"], line=dict(width=1.6)))
-    fig.update_layout(title=dict(text=title, x=0.5), xaxis_title="PIT",
+    fig.update_layout(title=dict(text=title, x=0.5), xaxis_title="LOO-PIT",
                       yaxis_title="empirical CDF", template="plotly_white", height=600, width=760)
     return fig
 

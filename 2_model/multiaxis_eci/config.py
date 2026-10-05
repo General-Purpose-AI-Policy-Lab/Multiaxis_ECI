@@ -145,6 +145,12 @@ SG_MODEL_NAME = "Skilled Generalist"
 # variants each relocated the Skilled Generalist instability without removing
 # it; the original hard prior is the reference condition for hypothesis tests.)
 PRIOR_DELTA_HUMAN = 1.0
+# sd of each human root's base level (Average Human, High School Qualifier), a private Normal outside
+# the models' ZeroSumNormal (user, 2026-10-05). Humans are no draw of the model population: inside it,
+# the 2026-10-03 flagship kept Average Human at about 4.5 sd on its extreme axis with a posterior sd of
+# 0.55, so the unit prior pulled it about a third of the way back toward the models, and the human
+# crossing dates with it. 3 leaves the scores to place them; the tiers above follow through delta_h.
+PRIOR_HUMAN_ROOT = 3.0
 
 # Lineage prior (models/mirt.py, build_mirt_model(..., lineage=...)). Within a
 # vendor-tier release chain, a release's per-axis ability is
@@ -160,6 +166,47 @@ PRIOR_LINEAGE_OFFSET = 0.25   # tight scale of the per-axis variant-offset sd ta
 # 0.22) pulled a reasoning-off run scored once toward its release by up to 20 ECI-H points,
 # where turning reasoning off can cost much more than a lower effort does (user, 2026-10-02).
 PRIOR_LINEAGE_OFFSET_NONE = 1.0
+
+# Effort means (the fits' default since 2026-10-03, --no-effort-means opts out;
+# models/mirt._variant_offsets): the variant offsets get a mean
+# per effort level, mu[level, k] = m[level] * u[k], one level scale m along one shared effort
+# direction u (a unit vector in the K-axis space), and keep ONE scale tau_o for the spread
+# around it (no separate tau_none). The prior-tail audit of the 2026-10-01 K=4 fit put every
+# reasoning-off offset at -3 to -4 sd on the reasoning axis in all eight chains and the
+# effort:high+ ones at +0.4 on average: a mean-zero offset was fitting a systematic shift
+# (user decision 2026-10-02). The levels are unordered.
+#
+# The reference (mu = 0, psi is the release's level there) is REASONING OFF, the one setting
+# every model has (user, 2026-10-02): a bare release kept for reference meant reasoning off in a
+# 2023 model, default reasoning in o3 and an unknown mix in a hybrid, and 25 chains mixed the
+# three, so a lineage step across the reasoning era (GPT-4.1 -> GPT-5) carried the reasoning
+# gain. At the reference: the non-reasoning run modes (EFFORT_OFF_VARIANTS: effort:none, GPT's
+# Instant and Chat models, DeepSeek's chat endpoint and Qwen3's Instruct-2507 as `non-thinking`)
+# and the runs naming no effort (bare, instruct, preview, effort:unknown...) of a NON-REASONING
+# release. The same runs of a release that always reasons take `thinking` (reasoning on, effort
+# unspecified: o-series and gpt-oss default to medium, Gemini 2.5 Pro and Grok 4 cannot turn it
+# off; in the data such a bare run sits within 0.2 ECI-H of its release's effort runs on
+# average); those of a hybrid release, whose mode is unknown, `unspecified`
+# (EFFORT_DEFAULT_LEVEL, keyed on the regime of 1_curated/model_regimes.csv). A release with no
+# reasoning-off run (o3) then has its psi extrapolated through the shared effort means.
+EFFORT_OFF_VARIANTS = frozenset({"effort:none", "non-reasoning", "non-thinking", "instant", "chat"})
+EFFORT_LEVEL_OF = {
+    "effort:minimal": "minimal", "effort:low": "low", "effort:medium": "medium",
+    "effort:high": "high", "effort:xhigh": "xhigh", "effort:max": "max",
+    "thinking": "thinking", "reasoning": "thinking",
+}
+EFFORT_DEFAULT_LEVEL = {"reasoning": "thinking", "undetermined": "unspecified"}
+# (m, u) and (-m, -u) give the same means: no level is constrained, the sign is fixed after
+# sampling (models.mirt.align_effort_sign: mean of m over the levels > 0).
+# The pretrained checkpoint of a release (its post-trained model at the reference) gets a mean
+# of its own, a free K-vector rather than a point on the effort direction: pretraining against
+# post-training trades knowledge for reasoning, which no effort level does (the 2026-10-01
+# audit: base offsets +0.2 sd on the knowledge axes, instruct ones -0.1).
+BASE_VARIANT = "base"
+EFFORT_TOKEN_LEVEL = "token"       # every token:<N>k variant: one level plus a slope in log2(N)
+EFFORT_TOKEN_REF = 16_000          # the budget at which a token variant sits at m["token"]
+PRIOR_EFFORT_MEAN = 1.0            # Normal scale of each level's m and of the base vector (theta units)
+PRIOR_EFFORT_TOKEN_SLOPE = 0.5     # Normal scale of the per-doubling token-budget slope
 
 # Brownian-motion lineage variant: step mean and variance scale with the years
 # between releases (delta_dt) instead of being iid per step. Same structure as
@@ -332,8 +379,10 @@ REASONING_FAMILY_PATTERNS = [
 # before the patterns and the models table, so a match here is always a non-reasoning model.
 NON_REASONING_PATTERNS = [
     r"-instruct-2507", r"qwen3-coder", r"qwen3-next-.*-instruct", r"qwen3-omni-.*-instruct",
-    r"^qwen3-max-2025-09-23", r"non-reasoning", r"-instant($|[_-])", r"_chat$", r"_none$",
+    r"^qwen3-max-2025-09-23", r"-instant($|[_-])", r"_chat$", r"_none$",
 ]
+# (`non-reasoning` went on 2026-10-05 with the one model it matched, grok-4-1-fast-non-reasoning,
+# whose only score was SimpleBench's mode-less Grok 4.1 Fast row, kept as the reasoning model.)
 
 # Lines hybrid by design (thinking optional), named by their release ids: a release of these that
 # thinks on some runs is hybrid even where the data shows no run without thinking, so its bare
@@ -386,6 +435,11 @@ REFERENCE_ECI_DATES: dict[str, str] = {
 
 PPC_SEED      = 42
 PIT_TIE_SEED  = 0
+# LOO-PIT (ppc.compute_gof): an observation whose PSIS Pareto k exceeds this is left out of the
+# calibration summaries and figures, its importance weights too unstable to stand for a refit
+# without it (Vehtari et al. 2024). On the 2026-10-03 fits: 14.5% of the K=4 flagship's
+# observations (test-takers with few scores), 3.7% of the canonical K=1's.
+PIT_PARETO_K_MAX = 0.7
 DENSITY_SEED  = 1
 
 # ── Raw-C mode ─────────────────────────────────────────────────────────────

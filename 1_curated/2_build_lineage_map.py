@@ -66,13 +66,23 @@ CODENAME_CHAIN = {'sol': 'gpt-sol', 'terra': 'gpt-terra', 'luna': 'gpt-luna', 'a
 # node, which it would inflate (`data.model_product` keeps it apart the same way).
 PRO_MODE = re.compile(r'_pro(max|unknown|high|low|medium|xhigh|none|minimal)$', re.I)
 OUT_HARNESS = re.compile(r'cowork|web-?app|heavy|chatgpt agent| agent$', re.I)
+# An effort suffix in Epoch's machine-name grammar ('_xhigh', '_thinking', '_16K', '_promax' apart).
+EFFORT_SUFFIX = r'_(?:none|minimal|low|medium|high|xhigh|max|thinking|unknown|\d+[kK])$'
 OUT_MODALITY = re.compile(r'audio|-live|live-preview|robotics|video|llava|omni|realtime|voxtral', re.I)
+# Fine-tunes the pipeline keeps in their release's family but which are other models: the
+# cyber-permissive tier (GPT-5.4-Cyber, GPT-5.5 cyber: lowered refusals, scored on cyber
+# benchmarks only) and DeepSeek-V3.2-Speciale (RL on reasoning data only, relaxed length
+# penalty, no tools). A variant of the release's node, they would pull its level toward a
+# gain that is theirs; free test-takers instead (user, 2026-10-02). Variant tag kept. So is
+# OpenAI's computer-use model (Operator's CUA), which fell onto the gpt spine as node '?'.
+OUT_FINETUNE = re.compile(r'_cyber\b|speciale|computer-use', re.I)
 
 def classify(mv, org):
     t = norm(mv); tl = t.lower(); ol = (str(org) if isinstance(org, str) else '').lower()
     # ---- harness / modality (any vendor) ----
     if OUT_HARNESS.search(mv): return dict(vendor='', chain='', node='', variant='harness', in_chain='no')
     if OUT_MODALITY.search(tl) and 'deep' not in tl: return dict(vendor='', chain='', node='', variant='modality', in_chain='no')
+    if OUT_FINETUNE.search(tl): return dict(vendor='', chain='', node='', variant=variant(t), in_chain='no')
 
     # ================= ANTHROPIC =================
     if 'anthropic' in ol or 'claude' in tl or 'fable' in tl or 'mythos' in tl:
@@ -124,9 +134,11 @@ def classify(mv, org):
         # Claude 1 / 2 and Instant carry no tier: two lines of their own (user, 2026-10-01),
         # 1.3 -> 2.0 -> 2.1 and instant 1.1 -> 1.2.
         mo = re.search(r'claude-(instant-)?(\d\.\d)', tl)
+        # 'instant' names the product line here, not a run mode (variant() reads '-instant'
+        # as GPT's non-reasoning chat model): the line and its nodes carry it, the run is bare.
         if mo and mo.group(1):
             return dict(vendor='Anthropic', chain='claude-instant', node=f'instant {mo.group(2)}',
-                        variant=v, in_chain='yes')
+                        variant='bare', in_chain='yes')
         if mo:
             return dict(vendor='Anthropic', chain='claude', node=mo.group(2), variant=v, in_chain='yes')
         return dict(vendor='Anthropic', chain='', node='claude-legacy', variant='', in_chain='no')
@@ -154,12 +166,14 @@ def classify(mv, org):
                 # route independent (matches the standalone codex-mini handling).
                 if 'mini' in tl:
                     return dict(vendor='OpenAI', chain='', node=f'{ver}-codex-mini', variant=v, in_chain='no')
-                # '-max' is a higher-effort variant of the same codex release, not a
-                # new node: tag it (variant() only catches '_max'/'(max', not the
-                # hyphen form) so it shares the base node's psi instead of posing as
-                # a 'bare' base release.
-                vv = 'effort:max' if re.search(r'-max\b', tl) else v
-                return dict(vendor='OpenAI', chain='codex', node=f'{ver}-codex', variant=vv, in_chain='yes')
+                # '-codex-max' is a model of its own, not an effort level: GPT-5.1-Codex-Max
+                # (2025-11-19) is trained for long agentic runs with compaction and replaced
+                # 5.1-Codex as Codex's default. Its own node, after 5.1-Codex on the spine
+                # (user, 2026-10-02; it was the effort:max variant of 5.1-codex).
+                # (?![a-z0-9]), not \b: an effort suffix ('codex-max_xhigh') follows a word char.
+                if re.search(r'-codex-max(?![a-z0-9])', tl):
+                    return dict(vendor='OpenAI', chain='codex', node=f'{ver}-codex-max', variant=v, in_chain='yes')
+                return dict(vendor='OpenAI', chain='codex', node=f'{ver}-codex', variant=v, in_chain='yes')
             # standalone codex without a gpt-<ver> prefix (e.g. codex-mini-2025-05-16):
             # OpenAI, but independent (no version to chain on).
             return dict(vendor='OpenAI', chain='', node=('codex-mini' if 'mini' in tl else 'codex'), variant=v, in_chain='no')
@@ -246,6 +260,8 @@ def classify(mv, org):
             node = '3-mini-beta' if 'beta' in tl else '3-mini'
             return dict(vendor='xAI', chain='grok-mini', node=node, variant=v, in_chain='yes')
         if 'code' in tl: return dict(vendor='xAI', chain='', node='grok-code-fast-1', variant=v, in_chain='no')
+        # Grok Build, xAI's coding-agent model, a product of its own like grok-code-fast-1.
+        if 'build' in tl: return dict(vendor='xAI', chain='', node='grok-build', variant=v, in_chain='no')
         if 'fast' in tl:
             ver = '4.1' if '4-1' in tl else '4'
             return dict(vendor='xAI', chain='grok-fast', node=f'{ver}-fast', variant=v, in_chain='yes')
@@ -306,7 +322,10 @@ def classify(mv, org):
         # deepseek-chat (V3.2) alias — 'chat' as a bare substring would steal it.
         for vv,lab in [('v3.2','V3.2'),('v3p2','V3.2'),('v3-0324','V3-0324'),('v3.1','V3.1'),('v3p1','V3.1'),
                        ('v3','V3'),('v2.5','V2.5'),('v2','V2'),('llm','LLM-67b'),('chat','V3.2')]:
-            if vv in tl: return dict(vendor='DeepSeek', chain='deepseek-v', node=lab, variant=v, in_chain='yes')
+            # The deepseek-chat endpoint serves the release's non-thinking mode (deepseek-reasoner
+            # its thinking one): a run mode of the node, not the bare release (user, 2026-10-02).
+            if vv in tl: return dict(vendor='DeepSeek', chain='deepseek-v', node=lab,
+                                     variant='non-thinking' if vv == 'chat' else v, in_chain='yes')
 
     # ================= ALIBABA QWEN =================
     if 'alibaba' in ol or 'qwen' in tl or 'qwq' in tl:
@@ -353,6 +372,10 @@ def classify(mv, org):
             # carries -chat / -instruct: two models of one node, never one test-taker.
             if qver(tl) in ('1', '1.5', '2', '2.5') and not re.search(r'chat|instruct', tl):
                 v = 'base'
+            # The 2507 refresh split the hybrid into two checkpoints: Instruct-2507 is the
+            # non-thinking one, the counterpart of a hybrid release's reasoning-off run.
+            if '2507' in tl and 'instruct' in tl:
+                v = 'non-thinking'
             node = f'{qver(tl)}-{sz}B' + (' 2507' if '2507' in tl else '')
             return dict(vendor='Alibaba', chain=f'qwen-open-{sz}b', node=node, variant=v, in_chain='yes')
         return dict(vendor='Alibaba', chain='', node=f'qwen-open-{sz}b', variant=v, in_chain='no')
@@ -361,6 +384,9 @@ def classify(mv, org):
     if 'moonshot' in ol or 'kimi' in tl:
         v = variant(t)
         if 'audio' in tl: return dict(vendor='Moonshot', chain='', node='kimi-audio', variant='', in_chain='no')
+        # A code model, off the general spine (user, 2026-10-02): Kimi K2.7 Code was the only
+        # K2.7 run, so the node goes with it, as CodeQwen left the Qwen 7B spine.
+        if re.search(r'[-_ ]code(?![a-z])', tl): return dict(vendor='Moonshot', chain='', node='kimi-code', variant='', in_chain='no')
         # Ahead of the 'thinking' test: a thinking run of a NEW generation is a
         # variant of that generation, not a node of the previous one. Without a
         # branch here a new K<n> falls to the K2 default and shares K2's node.
@@ -560,9 +586,14 @@ def main(out_path=None, report=True):
     # earliest release still on it.
     OVERRIDES = ROOT / '1_curated/lineage_node_overrides.csv'
     ov = pd.read_csv(OVERRIDES, keep_default_na=False, dtype=str).set_index('raw_string')
-    hit = out.raw_string.isin(ov.index)
+    # A row names one spelling; the release's other effort runs follow it (a score moved to
+    # its effort by the pipeline, 'gemini-2.5-pro-preview-06-05_thinking', is a new spelling
+    # of the reviewed release), unless they have a row of their own.
+    key = out.raw_string.where(out.raw_string.isin(ov.index),
+                               out.raw_string.str.replace(EFFORT_SUFFIX, '', regex=True))
+    hit = key.isin(ov.index)
     for col in ['chain', 'node', 'parent', 'node_date']:
-        out.loc[hit, col] = out.loc[hit, 'raw_string'].map(ov[col])
+        out.loc[hit, col] = key[hit].map(ov[col])
     stale = sorted(set(ov.index) - set(out.raw_string))
     print(f'\noverrides applied: {hit.sum()}/{len(ov)} from {OVERRIDES.name}')
     if stale:

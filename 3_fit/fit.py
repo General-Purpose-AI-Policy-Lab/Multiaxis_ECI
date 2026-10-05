@@ -70,7 +70,7 @@ from multiaxis_eci.data import (
     release_time_covariate,
 )
 from multiaxis_eci.lineage import build_lineage_structure
-from multiaxis_eci.models.mirt import build_mirt_model
+from multiaxis_eci.models.mirt import align_effort_sign, build_mirt_model
 from multiaxis_eci.persistence import (
     load_trace,
     save_df,
@@ -80,7 +80,7 @@ from multiaxis_eci.persistence import (
     save_trace,
     thin_trace,
 )
-from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt
+from multiaxis_eci.ppc import compute_gof, pointwise_log_lik, posterior_predictive_mirt
 from multiaxis_eci.viz import (
     DEFAULT_HUMAN_BANDS,
     all_models_forest_fig,
@@ -140,7 +140,7 @@ TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-06-15", 61, "Claude 3.5 So
 
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                 lineage_bm=False, lineage_links=True, variant_offsets=True,
-                loading_prior="signed", floor_c=None,
+                effort_means=False, loading_prior="signed", floor_c=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
                 binomial_n=None, pooled_noise=False, shared_base_zsn=True, time_t=None,
                 theta_t_cells=False, theta_pos=False, link="linear",
@@ -153,6 +153,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
     if lineage:
         tag += (", release nodes (no links)" if not lineage_links
                 else ", Brownian lineage prior" if lineage_bm else ", lineage prior")
+        if effort_means:
+            tag += ", effort means"
     if time_t is not None:
         tag += ", time prior"
     if floor_c is not None:
@@ -183,6 +185,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
                              human_order=human_order, lineage=lineage,
                              lineage_bm=lineage_bm, lineage_links=lineage_links,
                              variant_offsets=variant_offsets,
+                             effort_means=effort_means,
                              floor_c=floor_c,
                              ceiling_noise=ceiling_noise, known_se=known_se,
                              censor_eps=censor_eps, binomial_n=binomial_n,
@@ -244,6 +247,11 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None, lineage=None,
         for group in ("warmup_posterior", "warmup_sample_stats"):
             if group in idata.groups():
                 delattr(idata, group)
+        # The effort means' mirror copies, put on one side before anything reads them
+        # (checkpoint, r-hat, the saved trace).
+        flipped = align_effort_sign(idata.posterior)
+        if flipped is not None:
+            print(f"  effort sign: draws flipped per chain {flipped.tolist()}", flush=True)
         if spec_attrs:
             # The full attr set is stamped HERE, before the checkpoint save, so
             # a recovered checkpoint is exactly as self-describing as a finished
@@ -301,6 +309,8 @@ def run_canonical(args) -> None:
                           "the reference eci_data.csv names don't match "
                           "0_input/benchmarks.csv")
 
+    # The effort means sit on the release nodes' variant offsets: none without the nodes.
+    args.effort_means = args.effort_means and args.release_nodes
     if args.no_humans and (args.human_merge or args.human_prior):
         raise ValueError("--no-humans and the ordered-human priors cannot compose: there are no "
                          "human test-takers left to order.")
@@ -329,6 +339,8 @@ def run_canonical(args) -> None:
         scope_tag += "_betalik"
     if not args.release_nodes:
         scope_tag += "_noreleases"
+    elif not args.effort_means:
+        scope_tag += "_noeffortmeans"
     if args.human_merge:
         scope_tag += "_humanmerge"
     elif args.human_prior:
@@ -435,6 +447,7 @@ def run_canonical(args) -> None:
         trace, _ = sample_mirt(data, 1, sample_kw, loading_prior="pt1",
                                human_order=human_order, censor_eps=censor_eps,
                                lineage=releases, lineage_links=False,
+                               effort_means=args.effort_means,
                                binomial_n=load_binomial_n(data) if beta_binomial else None,
                                save_thin=args.save_thin,
                                stream_path=(trace_path.parent / "live_draws.zarr"
@@ -442,6 +455,7 @@ def run_canonical(args) -> None:
         trace.posterior.attrs["mirt_loading_prior"] = "pt1"
         trace.posterior.attrs["mirt_beta_binomial"] = json.dumps(beta_binomial)
         trace.posterior.attrs["mirt_release_nodes"] = json.dumps(releases is not None)
+        trace.posterior.attrs["mirt_effort_means"] = json.dumps(bool(args.effort_means))
         if args.censor_bounds:
             trace.posterior.attrs["mirt_censor_bounds"] = json.dumps(True)
         if args.keep_isolated:
@@ -490,9 +504,9 @@ def run_canonical(args) -> None:
     print("\n── Posterior predictive + GoF ───────────────────────────────────")
     y_rep_flat = posterior_predictive_mirt(trace, data)
     mu_flat = posterior_predictive_mirt(trace, data, return_mean=True)
-    gof = compute_gof(y_rep_flat, data, mu_flat)
+    gof = compute_gof(y_rep_flat, data, mu_flat, pointwise_log_lik(trace))
     save_json(gof.metrics, results_dir / "gof.json")
-    save_pit(gof.pit, data, results_dir / "pit.csv")
+    save_pit(gof.pit_all, data, results_dir / "pit.csv", pareto_k=gof.pareto_k)
     for k, v in gof.metrics.items():
         fmt = f"{v:.4f}" if isinstance(v, float) else str(v)
         print(f"   {k:34s} {fmt}")
@@ -569,8 +583,9 @@ def run_canonical(args) -> None:
                     label_positions={**TIMELINE_BENCH_LABELS, **TIMELINE_MODEL_LABELS}),
                  "capability_timeline", sub)
 
-    save_fig(pit_hist_fig(gof.pit), "calibration_pit_histogram", figures_dir)
-    save_fig(pit_ecdf_fig(gof.pit), "calibration_pit_ecdf", figures_dir)
+    loo = gof.metrics["pit_kind"] == "loo"
+    save_fig(pit_hist_fig(gof.pit, loo=loo), "calibration_pit_histogram", figures_dir)
+    save_fig(pit_ecdf_fig(gof.pit, loo=loo), "calibration_pit_ecdf", figures_dir)
     save_fig(density_overlay_fig(y_rep_flat, data.scores), "ppc_score_density", figures_dir)
 
     hover = [
@@ -651,6 +666,7 @@ def run_exploration(args, parser) -> None:
     if lineage:
         attrs["mirt_lineage_chains"] = json.dumps(lineage.chain_names)
         attrs["mirt_lineage_bm"] = json.dumps(bool(args.lineage_bm))
+        attrs["mirt_effort_means"] = json.dumps(spec.effort_means)
     if time_t is not None:
         attrs["mirt_time_prior"] = json.dumps(True)
     if args.drop_benchmarks:
@@ -688,7 +704,8 @@ def run_exploration(args, parser) -> None:
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
     idata_k, conv_k = sample_mirt(data, spec.K, sample_kw,
                                   human_order=human_order, lineage=lineage,
-                                  lineage_bm=spec.lineage_bm, time_t=time_t,
+                                  lineage_bm=spec.lineage_bm,
+                                  effort_means=spec.effort_means, time_t=time_t,
                                   loading_prior=spec.loading_prior, floor_c=floor_c,
                                   ceiling_noise=spec.ceiling_noise,
                                   known_se=spec.known_se,
@@ -758,17 +775,17 @@ def run_exploration(args, parser) -> None:
               .to_string(index=False))
 
     # ── PPC goodness-of-fit + residual analysis ───────────────────────────
-    # PSIS-LOO is unreliable here (≈5 obs/model → most points high Pareto-k),
-    # so we use the same PPC-based GoF the canonical pipeline uses: Bayesian
-    # R², RMSE, MAE on posterior-predictive draws, plus per-observation
-    # residuals for the residual-per-benchmark diagnostic.
+    # The same PPC-based GoF the canonical pipeline uses: Bayesian R², RMSE, MAE on
+    # posterior-predictive draws, per-observation residuals for the residual-per-benchmark
+    # diagnostic, and the LOO-PIT (PSIS weights; 14.5% of the 2026-10-03 flagship's
+    # observations have Pareto k > 0.7 and are left out of its summaries).
 
     def gof_report(idata, label, gtag):
         y_rep = posterior_predictive_mirt(idata, data, floor_c=floor_c,
                                           n_eff=n_eff)
         mu = posterior_predictive_mirt(idata, data, floor_c=floor_c,
                                        n_eff=n_eff, return_mean=True)
-        gof = compute_gof(y_rep, data, mu)
+        gof = compute_gof(y_rep, data, mu, pointwise_log_lik(idata))
         save_json(gof.metrics, results_dir / f"mirt_gof_{gtag}.json")
         m = gof.metrics
         print(f"  {label}: R²={m['bayesian_r2']:.3f}  RMSE={m['rmse']:.3f}  "
@@ -1067,6 +1084,14 @@ def main():
                              "grouping of a release's effort variants around one level (the "
                              "lineage map's nodes and variant offsets, without the links between "
                              "releases). Emits the `_noreleases` scope token")
+    parser.add_argument("--no-effort-means", dest="effort_means", action="store_false",
+                        help="mean-zero variant offsets with a scale of their own for reasoning-off "
+                             "runs, instead of the default mean per effort level (m[level] times one "
+                             "shared effort direction, unordered levels, reasoning off at zero, a "
+                             "token-budget slope, a vector of its own for the pretrained base "
+                             "checkpoints) with one offset spread tau_o (models/mirt._variant_offsets). "
+                             "Both modes, where there are variant offsets (the lineage prior, the "
+                             "release nodes); emits `_noeffortmeans`")
     parser.add_argument("--beta-likelihood", dest="beta_binomial", action="store_false",
                         help="the Beta density on every benchmark, instead of the default "
                              "Beta-binomial on the benchmarks whose score is a share of N "

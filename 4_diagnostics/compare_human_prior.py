@@ -53,7 +53,11 @@ from multiaxis_eci.analysis import post_stats, trace_axis_names  # noqa: E402
 from multiaxis_eci.config import HUMAN_ORDER  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
 from multiaxis_eci.persistence import save_df  # noqa: E402
-from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt  # noqa: E402
+from multiaxis_eci.ppc import (  # noqa: E402
+    compute_gof,
+    pointwise_log_lik,
+    posterior_predictive_mirt,
+)
 from multiaxis_eci.viz import save_fig  # noqa: E402
 
 OUT = ROOT / "archive" / "results_old" / "mirt_humanprior" / "comparison"
@@ -102,7 +106,7 @@ def summarize(path, data):
 
     yrep = posterior_predictive_mirt(idata, data)
     mu = posterior_predictive_mirt(idata, data, return_mean=True)
-    gof = compute_gof(yrep, data, mu)
+    gof = compute_gof(yrep, data, mu, pointwise_log_lik(idata))
     human_obs = data.is_human[data.model_idx]
     r = data.scores - gof.y_pred_mean
     rmse_hum = float(np.sqrt((r[human_obs] ** 2).mean())) if human_obs.any() else float("nan")

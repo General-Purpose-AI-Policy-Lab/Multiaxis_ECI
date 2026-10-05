@@ -345,12 +345,14 @@ ZeroSumNormal so the location stays pinned):
 order (each tier has a parent tier; roots have none):
 
 $$
-\theta_{\text{root},k} \sim \mathcal{N}(0,1),
+\theta_{\text{root},k} \sim \mathcal{N}(0,3^2),
 \qquad
 \theta_{\text{child},k} = \theta_{\text{parent},k} + \delta_{e,k},
 \qquad
 \delta_{e,k} \sim \mathrm{HalfNormal}(\text{PRIOR\_DELTA\_HUMAN}=1).
 $$
+
+The roots are private bases outside the models' ZeroSumNormal, with sd 3 (`config.PRIOR_HUMAN_ROOT`, 2026-10-05): humans are no draw of the model population, and inside it the unit prior held Average Human 4 to 5 sd from the models on its extreme axis of the 2026-10-03 flagship, about a third of the way back from where its scores put it. They stay on the models' scale and axes: their scores on the shared benchmarks place them.
 
 Because each increment $\delta_{e,k}\ge 0$, every child tier is **$\ge$ its
 parent on every axis** (hard monotone). Tiers on different branches share no
@@ -417,7 +419,49 @@ removed: roughly one release per year per vendor cannot pin a rate). Constants:
 `PRIOR_LINEAGE_DRIFT_BM = 1.0` (logits/year) and `PRIOR_LINEAGE_DELTA_BM = 2.0`
 (logits/$\sqrt{\text{year}}$). The mean-zero variant offsets are unchanged.
 
-**Release nodes (canonical $K=1$ index).** The canonical fit keeps the nodes and variant offsets of the lineage prior and drops its chains: each release node $n$ has its own level $\psi_n$, drawn in the shared ZeroSumNormal with the unstructured models, and a run gets $\theta_m = \psi_{n(m)} + o_{g(m)}$ with the same $\tau_o$. No release is placed after another; a run's effort variants share their release's level (`models/mirt._release_block`).
+*Effort means — a mean per effort level (the default since 2026-10-03; `--no-effort-means` opts out).* The offsets above are mean-zero, but the
+prior-tail audit of the 2026-10-01 flagship put every reasoning-off offset at $-3$ to $-4$ sd
+on the reasoning axis in all eight chains, and the `effort:high`-and-above ones at $+0.4$ on
+average: a systematic shift fitted as noise. With the effort means the offset of a group $g$
+at effort level $\ell(g)$ is
+
+$$
+o_{g,k} = \big(m_{\ell(g)} + \beta_{\text{tok}}\,\log_2(b_g/16\text{k})\big)\,u_k + \tau_o\,z_{g,k},
+\qquad m_\ell \sim \mathcal{N}(0, 1),\quad \beta_{\text{tok}} \sim \mathcal{N}(0, 0.5),
+$$
+
+with one direction $u = v/\lVert v\rVert$, $v \sim \mathcal{N}(0, I_K)$, shared by every level
+(rank one), and one spread $\tau_o$ for every group: $\tau_{\text{none}}$ is dropped. The levels
+(`config.EFFORT_LEVEL_OF`) are `minimal`, `low`, `medium`, `high`, `xhigh`, `max`, `thinking`
+(with `reasoning`), `unspecified` and `token`, whose budget $b_g$ adds the per-doubling slope
+$\beta_{\text{tok}}$. They are **unordered**.
+
+The reference, $m = 0$, is **reasoning off**, the one setting every model has, so $\psi$ means
+the same thing in every chain: a release's level without test-time reasoning. At the reference
+sit the non-reasoning run modes (`config.EFFORT_OFF_VARIANTS`: `effort:none`, `non-reasoning`,
+`non-thinking` for DeepSeek's chat endpoint and Qwen3's Instruct-2507 checkpoints, GPT's
+`instant` and `chat` models) and the runs naming no effort (`bare`, `instruct`, `preview`,
+`effort:unknown`) of a non-reasoning release. The same runs of a release that always reasons
+take `thinking` (reasoning on, effort unspecified; such a bare run sits within 0.2 ECI-H of its
+release's effort runs on average), those of a hybrid release `unspecified` (its mode unknown),
+per the reviewed regime of `1_curated/model_regimes.csv` (`lineage.effort_level`). A bare
+release kept for the reference had meant reasoning off in a 2023 model, default reasoning in o3
+and an unknown mix in a hybrid, and 25 chains mixed the three, so a step across the reasoning
+era (GPT-4.1 to GPT-5) carried the reasoning gain. The price: a release with no reasoning-off
+run (o3, gpt-oss, Gemini 2.5 Pro) has its $\psi$ extrapolated through the shared effort means.
+
+A release's pretrained checkpoint (`base`) gets a free mean vector of its own,
+$\mu_{\text{base}} \sim \mathcal{N}(0, I_K)$, off the effort direction: pretraining against post-training trades knowledge for reasoning, which no effort
+level does. Every $m_\ell \sim \mathcal{N}(0, 1)$. $(m, u)$ and $(-m, -u)$ give the same means, likelihood and prior density, so the sampler sees two mirror copies; the sign is fixed after sampling, draw by draw, by flipping $(m, u)$ wherever the mean of $m$ over the levels is negative (`models/mirt.align_effort_sign`), so $u$ points from reasoning off toward more effort. This is the folded prior a sign constraint would give, without its boundary: a HalfNormal on $m_{\text{high}}$, the gauge until 2026-10-05, trapped one chain of the 2026-10-03 flagship in the mirror half with $m_{\text{high}}$ at 0. Crossing between the copies would take every effort mean through zero at once, and no chain of that fit came near it, so the flip never splits a chain. At $K=1$ there is no direction ($u = 1$) and no mirror. A free mean per (level, axis) was set aside: it would slide between correlated loading
+columns as a per-axis $\tau_o$ did. Extra parameters: 10 at $K=1$ (9 levels, the slope and the
+base mean, less $\tau_{\text{none}}$), 17 at $K=4$ (adding the direction and the
+base vector). Readouts: `effort_mu` (level x axis), `effort_dir`, `effort_token_slope`,
+`variant_base_mu` (`models/mirt._variant_offsets`). The cyber fine-tunes,
+DeepSeek-V3.2-Speciale, OpenAI's computer-use model and Kimi K2.7 Code are out of the chains
+(free test-takers), and Claude Instant is a product line whose runs are `bare`
+(`1_curated/2_build_lineage_map.py`).
+
+**Release nodes (canonical $K=1$ index).** The canonical fit keeps the nodes and variant offsets of the lineage prior and drops its chains: each release node $n$ has its own level $\psi_n$, drawn in the shared ZeroSumNormal with the unstructured models, and a run gets $\theta_m = \psi_{n(m)} + o_{g(m)}$ with the same $\tau_o$ (and the same effort means). No release is placed after another; a run's effort variants share their release's level (`models/mirt._release_block`).
 
 ### 5.5 Rotation identification (signed family only)
 

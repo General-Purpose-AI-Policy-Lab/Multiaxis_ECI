@@ -54,7 +54,11 @@ from multiaxis_eci.data import load_eci_data  # noqa: E402
 from multiaxis_eci.models.mirt_nc import build_mirt_nc_model  # noqa: E402
 from multiaxis_eci.models.qmatrix import QMATRIX_VARIANTS, axes_as_list  # noqa: E402
 from multiaxis_eci.persistence import save_df, save_json, save_trace  # noqa: E402
-from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_nc  # noqa: E402
+from multiaxis_eci.ppc import (  # noqa: E402
+    compute_gof,
+    pointwise_log_lik,
+    posterior_predictive_mirt_nc,
+)
 
 RESULTS_DIR = _RESULTS_ROOT / "mirt_nc"
 FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
@@ -250,7 +254,7 @@ def main():
     idr = mirt_identified_rhat_nc(idata, data)
     y_rep = posterior_predictive_mirt_nc(idata, data)
     mu = posterior_predictive_mirt_nc(idata, data, return_mean=True)
-    gof = compute_gof(y_rep, data, mu)
+    gof = compute_gof(y_rep, data, mu, pointwise_log_lik(idata))
 
     theta = idata.posterior["theta"].values.reshape(-1, data.n_models, Keff)
     fscores = factor_scores_df(theta, data.mlookup["model"].tolist(), data.is_human)

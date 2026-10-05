@@ -78,7 +78,11 @@ def load_live_draws(path: Path):
     n = int(done.argmin()) if not done.all() else done.size
     if n == 0:
         raise ValueError(f"{path}: no chain has finished a post-warmup draw yet.")
-    return idata.isel(draw=slice(0, n))
+    idata = idata.isel(draw=slice(0, n))
+    # The stream holds the draws as sampled: the effort sign is fixed here as in fit.py.
+    from multiaxis_eci.models.mirt import align_effort_sign
+    align_effort_sign(idata.posterior)
+    return idata
 
 
 def save_summary(trace, path: Path) -> None:
@@ -94,9 +98,11 @@ def save_json(payload: dict, path: Path) -> None:
         json.dump(payload, f, indent=2, default=_json_default)
 
 
-def save_pit(pit: np.ndarray, data: ECIData, path: Path) -> None:
+def save_pit(pit: np.ndarray, data: ECIData, path: Path,
+             pareto_k: np.ndarray | None = None) -> None:
     """PIT skips the boundary-clipped rows (exact 0s and scores ≥ 1 - ECI_EPS)
-    — emit only the rows it was computed on, via the same mask ppc uses."""
+    — emit only the rows it was computed on, via the same mask ppc uses. A LOO-PIT
+    (`GoFResults.pit_all`) comes with its PSIS `pareto_k` per row, written beside it."""
     from multiaxis_eci.ppc import boundary_mask
     nonzero = ~boundary_mask(data)
     df = pd.DataFrame({
@@ -106,6 +112,8 @@ def save_pit(pit: np.ndarray, data: ECIData, path: Path) -> None:
         "score":     data.scores[nonzero],
         "pit":       pit,
     })
+    if pareto_k is not None:
+        df["pareto_k"] = pareto_k
     df.to_csv(path, index=False)
 
 

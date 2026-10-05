@@ -55,7 +55,11 @@ from multiaxis_eci.data import (  # noqa: E402
 from multiaxis_eci.lineage import build_lineage_structure  # noqa: E402
 from multiaxis_eci.models.mirt_sparse import build_mirt_sparse_model  # noqa: E402
 from multiaxis_eci.persistence import save_df, save_json, save_trace  # noqa: E402
-from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt_sparse  # noqa: E402
+from multiaxis_eci.ppc import (  # noqa: E402
+    compute_gof,
+    pointwise_log_lik,
+    posterior_predictive_mirt_sparse,
+)
 
 RESULTS_DIR = _RESULTS_ROOT / "mirt_sparse"
 FIGURES_DIR = RESULTS_DIR / FIGURES_DIRNAME
@@ -176,7 +180,7 @@ def main():
     idr = mirt_identified_rhat_sparse(idata, data)
     y_rep = posterior_predictive_mirt_sparse(idata, data)
     mu = posterior_predictive_mirt_sparse(idata, data, return_mean=True)
-    gof = compute_gof(y_rep, data, mu)
+    gof = compute_gof(y_rep, data, mu, pointwise_log_lik(idata))
 
     theta = idata.posterior["theta"].values.reshape(-1, data.n_models, K)
     fscores = factor_scores_df(theta, data.mlookup["model"].tolist(), data.is_human)

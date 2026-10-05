@@ -46,7 +46,7 @@ def _slug(s: str) -> str:
 
 
 def build_gof_figures(scores, y_pred_mean, yrep, pit, hover, bench_of_obs,
-                      residual_mask=None, include_ecdf: bool = False,
+                      residual_mask=None, include_ecdf: bool = False, pit_loo: bool = True,
                       model_of_obs=None, eta_of_obs=None,
                       floor=None, ceiling=None) -> dict:
     """Shared goodness-of-fit figure set — the core figures 3_fit/fit.py, `plot_mirt`
@@ -62,10 +62,10 @@ def build_gof_figures(scores, y_pred_mean, yrep, pit, hover, bench_of_obs,
     figs = {
         "gof_pred_vs_observed":     pred_vs_obs_fig(scores, y_pred_mean, hover),
         "gof_posterior_predictive": density_overlay_fig(yrep, scores),
-        "gof_pit":                  pit_hist_fig(pit),
+        "gof_pit":                  pit_hist_fig(pit, loo=pit_loo),
     }
     if include_ecdf:
-        figs["gof_pit_ecdf"] = pit_ecdf_fig(pit)
+        figs["gof_pit_ecdf"] = pit_ecdf_fig(pit, loo=pit_loo)
     if model_of_obs is not None:
         figs["gof_bench_scores_vs_pred"] = benchmark_obs_vs_pred_fig(
             scores, yrep, model_of_obs, bench_of_obs)
@@ -295,6 +295,7 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                .mean(("chain", "draw")).values))
     figs.update(build_gof_figures(data.scores, gof.y_pred_mean, yrep, gof.pit,
                                   hover, bench_of_obs,
+                                  pit_loo=gof.metrics.get("pit_kind") == "loo",
                                   model_of_obs=[mod[m] for m in data.model_idx],
                                   eta_of_obs=eta_of_obs, floor=floor, ceiling=ceiling))
 

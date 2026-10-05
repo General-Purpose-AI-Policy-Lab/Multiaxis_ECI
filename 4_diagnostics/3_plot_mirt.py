@@ -59,7 +59,11 @@ from multiaxis_eci.analysis import (  # noqa: E402
     trace_loading_prior,
 )
 from multiaxis_eci.data import PROCESSED_FILE, model_organization  # noqa: E402
-from multiaxis_eci.ppc import compute_gof, posterior_predictive_mirt  # noqa: E402
+from multiaxis_eci.ppc import (  # noqa: E402
+    compute_gof,
+    pointwise_log_lik,
+    posterior_predictive_mirt,
+)
 from multiaxis_eci.viz import (  # noqa: E402
     alignment_methods_fig,
     axes_frontier_fig,
@@ -133,7 +137,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     if idata is None:
         # The spec is known before deciding which variables to pull.
         spec = _spec_of(trace_path)
-        idata = spec.open_posterior(keep=PLOT_VARS, thin=thin, path=trace_path)
+        idata = spec.open_posterior(keep=PLOT_VARS, thin=thin, path=trace_path, log_lik=True)
     else:
         spec = FitSpec.from_trace(idata, trace_path)
     # Per-fit artefacts (the alignment CSV, the K=1 baseline) are looked up
@@ -189,14 +193,14 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff)
         mu = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff,
                                        return_mean=True)
-        gof = compute_gof(yrep, data, mu)
+        gof = compute_gof(yrep, data, mu, pointwise_log_lik(idata))
         figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                  forecast=forecast, axis_titles=axis_titles,
                                  doc_variants=True)
         # A figure's document twin (`key__svg`) is not a figure of its own: it only replaces
         # the French SVG of `key`.
         svg_twins = {k[:-len("__svg")]: figs.pop(k) for k in list(figs) if k.endswith("__svg")}
-        figs["pit_ecdf"] = pit_ecdf_fig(gof.pit)
+        figs["pit_ecdf"] = pit_ecdf_fig(gof.pit, loo=gof.metrics["pit_kind"] == "loo")
 
         # ── signed extras: the rotation-method comparison (four independent
         # post-hoc identifications of the same trace), read from the CSV

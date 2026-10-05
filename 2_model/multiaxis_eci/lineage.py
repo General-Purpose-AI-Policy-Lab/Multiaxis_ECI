@@ -10,14 +10,26 @@ Pure numpy/pandas — no PyMC. See LINEAGE_PLAN.md.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
 
-from multiaxis_eci.config import CURATED_DIR
+from multiaxis_eci.config import (
+    BASE_VARIANT,
+    CURATED_DIR,
+    EFFORT_DEFAULT_LEVEL,
+    EFFORT_LEVEL_OF,
+    EFFORT_OFF_VARIANTS,
+    EFFORT_TOKEN_LEVEL,
+    EFFORT_TOKEN_REF,
+)
 
 LINEAGE_MAP = CURATED_DIR / "lineage_map.csv"
+# The reviewed reasoning regime of every run (1_curated/4_build_model_regimes.py): where a run
+# names no effort, it decides the run's effort level.
+MODEL_REGIMES = CURATED_DIR / "model_regimes.csv"
 
 
 @dataclass(frozen=True)
@@ -45,6 +57,64 @@ class LineageStructure:
     # (n_groups,) True where the group's variant is reasoning off (effort:none): those offsets
     # get their own scale (models/mirt._variant_offsets). None = no such group.
     offset_none: np.ndarray | None = None
+    # The effort level of each group for the effort means (models/mirt._variant_offsets with
+    # effort_means=True): (n_groups,) index into effort_levels, -1 at the reference, reasoning off
+    # (`effort_level`). effort_levels lists only the levels some group carries, in config order,
+    # then `unspecified` and the token level.
+    offset_level: np.ndarray | None = None
+    effort_levels: tuple[str, ...] = ()
+    # (n_groups,) log2(budget / config.EFFORT_TOKEN_REF) of a token:<N>k group, 0 elsewhere.
+    offset_log2_tokens: np.ndarray | None = None
+    # (n_groups,) True where the group is a release's pretrained checkpoint (config.BASE_VARIANT),
+    # which the effort means give a mean vector of its own.
+    offset_base: np.ndarray | None = None
+
+
+_TOKEN_VARIANT = re.compile(r"token:(\d+(?:\.\d+)?)k")
+
+
+def effort_level(variant: str, regime: str | None = None) -> tuple[str | None, float]:
+    """(effort level, log2(budget / EFFORT_TOKEN_REF)) of a run; level None at the reference,
+    reasoning off (config.EFFORT_OFF_VARIANTS, and the runs of a non-reasoning release).
+
+    A token:<N>k variant is the token level at its budget; an unreadable token label raises
+    rather than sitting silently at the reference. A named effort is its level. A run naming
+    none (bare, instruct, preview, effort:unknown...) reads its reasoning `regime`
+    (1_curated/model_regimes.csv): `thinking` in a release that always reasons, `unspecified`
+    in a hybrid one, the reference otherwise. The pretrained `base` checkpoint stays at the
+    reference here; the effort means give it a vector of its own (`offset_base`)."""
+    if variant.startswith("token:"):
+        hit = _TOKEN_VARIANT.fullmatch(variant)
+        if hit is None:
+            raise ValueError(f"token variant {variant!r} does not read as token:<N>k")
+        return EFFORT_TOKEN_LEVEL, float(np.log2(float(hit.group(1)) * 1000 / EFFORT_TOKEN_REF))
+    if variant in EFFORT_OFF_VARIANTS or variant == BASE_VARIANT:
+        return None, 0.0
+    if variant in EFFORT_LEVEL_OF:
+        return EFFORT_LEVEL_OF[variant], 0.0
+    return EFFORT_DEFAULT_LEVEL.get(regime), 0.0
+
+
+def group_regime(regimes) -> str | None:
+    """One regime for a (node, variant) group's runs: undetermined if any run is, else
+    reasoning if any run is, else the non-reasoning regime (None when no run is known)."""
+    known = {r for r in regimes if isinstance(r, str)}
+    for r in ("undetermined", "reasoning", "non-reasoning"):
+        if r in known:
+            return r
+    return None
+
+
+def _effort_indices(variants: list[str], regimes: list[str | None]):
+    """offset_level, effort_levels and offset_log2_tokens for the groups' variants."""
+    read = [effort_level(v, r) for v, r in zip(variants, regimes)]
+    order = (list(dict.fromkeys(EFFORT_LEVEL_OF.values()))
+             + [lv for lv in EFFORT_DEFAULT_LEVEL.values() if lv not in EFFORT_LEVEL_OF.values()]
+             + [EFFORT_TOKEN_LEVEL])
+    present = tuple(lv for lv in order if any(r[0] == lv for r in read))
+    pos = {lv: i for i, lv in enumerate(present)}
+    level = np.array([-1 if lv is None else pos[lv] for lv, _ in read], dtype=int)
+    return level, present, np.array([t for _, t in read], dtype=float)
 
 
 def build_lineage_structure(mlookup: pd.DataFrame,
@@ -207,9 +277,18 @@ def build_lineage_structure(mlookup: pd.DataFrame,
     offset_group = np.array([grp_pos[(c, nd, v)]
                              for c, nd, v in zip(m["chain"], m["node"], m["variant"])])
 
+    regime_of = (pd.read_csv(MODEL_REGIMES).set_index("model_version")["regime"]
+                 if MODEL_REGIMES.exists() else pd.Series(dtype=str))
+    runs_of = m.groupby(["chain", "node", "variant"])["raw_string"].agg(list)
+    offset_level, effort_levels, offset_log2_tokens = _effort_indices(
+        [v for _, _, v in grp_keys],
+        [group_regime(regime_of.reindex(runs_of[k]).tolist()) for k in grp_keys])
     return LineageStructure(
         row_idx=row_idx, B=B, C=C, node_idx=node_idx, offset_group=offset_group,
         delta_dt=delta_dt, delta_chain=delta_chain, founder_date=founder_date,
         n_chains=n_chains, n_nodes=n_nodes, n_deltas=n_deltas,
         n_groups=len(grp_keys), chain_names=chain_names,
-        offset_none=np.array([v == "effort:none" for _, _, v in grp_keys], dtype=bool))
+        offset_none=np.array([v == "effort:none" for _, _, v in grp_keys], dtype=bool),
+        offset_level=offset_level, effort_levels=effort_levels,
+        offset_log2_tokens=offset_log2_tokens,
+        offset_base=np.array([v == BASE_VARIANT for _, _, v in grp_keys], dtype=bool))

@@ -51,6 +51,11 @@ class FitSpec:
     human_merge: bool = False
     lineage_prior: bool = False
     lineage_bm: bool = False
+    # A mean per effort level on the lineage prior's variant offsets, along one effort direction,
+    # with one offset spread (models/mirt._variant_offsets). The default since 2026-10-03 (user):
+    # ON carries no token, the opt-out emits `_noeffortmeans`. It needs the lineage prior and is
+    # off without it. A trace from before that day was fit without it (`from_trace`).
+    effort_means: bool = True
     time_prior: bool = False
     theta_t: bool = False
     theta_pos: bool = False
@@ -95,6 +100,8 @@ class FitSpec:
             raise ValueError(
                 "--lineage-bm re-indexes the lineage increments by time; it "
                 "needs --lineage-prior.")
+        if self.effort_means and not self.lineage_prior:
+            object.__setattr__(self, "effort_means", False)
         if self.censor_bounds and self.beta_binomial:
             object.__setattr__(self, "beta_binomial", False)
 
@@ -112,6 +119,7 @@ class FitSpec:
         elif self.human_prior: tag += "_humanprior"
         if self.lineage_prior: tag += "_lineageprior"
         if self.lineage_bm: tag += "_lineagebm"
+        if self.lineage_prior and not self.effort_means: tag += "_noeffortmeans"
         if self.time_prior: tag += "_timeprior"
         if self.theta_t: tag += "_thetat"
         if self.theta_pos: tag += "_thetapos"
@@ -180,6 +188,7 @@ class FitSpec:
                 K=args.K, loading_prior=args.loading_prior, link=args.link,
                 human_prior=args.human_prior, human_merge=args.human_merge,
                 lineage_prior=args.lineage_prior, lineage_bm=args.lineage_bm,
+                effort_means=args.effort_means,
                 time_prior=args.time_prior, theta_t=args.theta_t,
                 theta_pos=args.theta_pos,
                 no_sg=args.no_sg,
@@ -225,8 +234,10 @@ class FitSpec:
         if post.attrs.get("mirt_spec"):
             d = json.loads(post.attrs["mirt_spec"])
             d["drop_benchmarks"] = tuple(d.get("drop_benchmarks") or ())
-            # A spec written before the Beta-binomial existed was fit with the Beta.
+            # A spec written before the Beta-binomial existed was fit with the Beta, one written
+            # before the effort means became the default (2026-10-03) without them.
             d.setdefault("beta_binomial", False)
+            d.setdefault("effort_means", False)
             spec = FitSpec(**d)
         else:
             attr = _attr_flags(post)
@@ -241,7 +252,7 @@ class FitSpec:
             tag = _folder_tag(trace_path)
             # Without mirt_spec the trace predates the Beta-binomial: the Beta, unless an attr says so.
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
-                                   "beta_binomial": False, **attr})
+                                   "beta_binomial": False, "effort_means": False, **attr})
             if is_baseline:
                 spec = _baseline_spec(spec)
         if not is_baseline:
@@ -303,7 +314,8 @@ class FitSpec:
         return load_binomial_n(data) if self.beta_binomial else None
 
     # ── lazy posterior access ───────────────────────────────────────────────
-    def open_posterior(self, keep=None, thin: int = 1, chains=None, path=None):
+    def open_posterior(self, keep=None, thin: int = 1, chains=None, path=None,
+                       log_lik: bool = False):
         """The trace's posterior as an InferenceData holding only `keep`, thinned.
 
         The flagship trace is 38 GB against 26 GB of RAM, so a consumer names the
@@ -311,16 +323,29 @@ class FitSpec:
         trace are skipped, so one `keep` list covers every link variant.
         Attributes survive the subset, so `prepare_fit` still reads the display
         rotation, the axis names and the loading prior off the posterior.
+        `log_lik` also reads the pointwise log-likelihood, thinned and subset the same way,
+        for the LOO-PIT (ppc.pointwise_log_lik); a trace without that group returns without.
         """
         import xarray as xr
-        with xr.open_dataset(path or self.trace_path, group="posterior") as post:
-            sub = post if keep is None else post[[v for v in keep if v in post]]
+
+        def _subset(ds):
             if thin > 1:
-                sub = sub.isel(draw=slice(None, None, thin))
+                ds = ds.isel(draw=slice(None, None, thin))
             if chains is not None:
-                sub = sub.isel(chain=chains)
-            sub = sub.load()
-        return az.InferenceData(posterior=sub)
+                ds = ds.isel(chain=chains)
+            return ds.load()
+
+        trace = path or self.trace_path
+        with xr.open_dataset(trace, group="posterior") as post:
+            sub = _subset(post if keep is None else post[[v for v in keep if v in post]])
+        groups = {"posterior": sub}
+        if log_lik:
+            try:
+                with xr.open_dataset(trace, group="log_likelihood") as ll:
+                    groups["log_likelihood"] = _subset(ll)
+            except (OSError, KeyError, ValueError):
+                pass
+        return az.InferenceData(**groups)
 
 
 # ── the flagship fit ────────────────────────────────────────────────────────
@@ -415,6 +440,8 @@ def _attr_flags(post) -> dict:
         out["lineage_prior"] = True
     if json.loads(a.get("mirt_lineage_bm", "false")):
         out["lineage_bm"] = True
+    if "mirt_effort_means" in a:
+        out["effort_means"] = bool(json.loads(a["mirt_effort_means"]))
     if a.get("mirt_time_prior"):
         out["time_prior"] = True
     if a.get("mirt_theta_t_cells"):
@@ -486,9 +513,13 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["human_merge"] = True
     elif take("_humanprior"):
         out["human_prior"] = True
-    for tok, fl in (("_lineageprior", "lineage_prior"), ("_lineagebm", "lineage_bm"),
-                    ("_timeprior", "time_prior"), ("_thetat", "theta_t"),
-                    ("_thetapos", "theta_pos")):
+    for tok, fl in (("_lineageprior", "lineage_prior"), ("_lineagebm", "lineage_bm")):
+        if take(tok):
+            out[fl] = True
+    if take("_noeffortmeans"):
+        out["effort_means"] = False
+    for tok, fl in (("_timeprior", "time_prior"),
+                    ("_thetat", "theta_t"), ("_thetapos", "theta_pos")):
         if take(tok):
             out[fl] = True
     for tok, fl in (("_noSG", "no_sg"), ("_excluded", "apply_exclusions"),
@@ -543,7 +574,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
 # flags are the folder's.
 _BASELINE_OFF = dict(loading_prior="normal", link="linear",
                      human_prior=False, human_merge=False,
-                     lineage_prior=False, lineage_bm=False, time_prior=False,
+                     lineage_prior=False, lineage_bm=False, effort_means=False,
+                     time_prior=False,
                      theta_t=False, theta_pos=False, private_bases=False,
                      pooled_noise=False)
 
@@ -579,9 +611,10 @@ def _check_round_trip(spec: FitSpec, trace_path: Path) -> None:
     # still round-trip exactly (both sides emit the same opt-out token). Every
     # other flag is compared strictly.
     # `beta_binomial` too: ON is untagged, and every trace from before 2026-10-01 sits in an
-    # untagged folder with a Beta likelihood.
+    # untagged folder with a Beta likelihood. And `effort_means`, untagged when ON since
+    # 2026-10-03, every lineage trace from before sitting in an untagged folder without them.
     if replace(got, floors=want.floors, pooled_noise=want.pooled_noise,
-               beta_binomial=want.beta_binomial) != want:
+               beta_binomial=want.beta_binomial, effort_means=want.effort_means) != want:
         raise ValueError(f"spec round-trip failed: folder tag {folder_tag!r} names "
                          f"a different flag set than the recovered spec, whose own "
                          f"tag is {spec.tag!r}")

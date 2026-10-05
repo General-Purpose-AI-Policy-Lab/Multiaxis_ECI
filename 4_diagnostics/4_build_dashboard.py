@@ -63,6 +63,7 @@ from multiaxis_eci.data import (  # noqa: E402
 from multiaxis_eci.persistence import save_df  # noqa: E402
 from multiaxis_eci.ppc import (  # noqa: E402
     compute_gof,
+    pointwise_log_lik,
     posterior_predictive_mirt,
     posterior_predictive_mirt_nc,
 )
@@ -446,7 +447,7 @@ def render_fit(fit, data, raw, bench, mod):
     mu = (posterior_predictive_mirt_nc(idata, data, return_mean=True) if is_nc
           else posterior_predictive_mirt(idata, data, floor_c=floor_c,
                                          n_eff=n_eff, return_mean=True))
-    gof = compute_gof(yrep, data, mu)
+    gof = compute_gof(yrep, data, mu, pointwise_log_lik(idata))
     figures = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                 forecast=fit.get("forecast", False),
                                 axis_titles=(load_axis_titles(_trace_path(fit).parent, view, data)

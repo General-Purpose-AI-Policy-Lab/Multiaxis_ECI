@@ -87,6 +87,7 @@ from multiaxis_eci.ppc import (
     boundary_mask,
     compute_gof,
     pit_values,
+    pointwise_log_lik,
     posterior_predictive_mirt,
     posterior_predictive_mirt_nc,
 )
@@ -656,6 +657,62 @@ class TestPPC:
         assert pit.shape == ((~excl).sum(),)
         assert (0.0 <= pit).all() and (pit <= 1.0).all()
 
+    @staticmethod
+    def _with_log_lik(trace, data):
+        """The synthetic trace plus the Beta pointwise log-likelihood of its own draws."""
+        import arviz as az
+        import xarray as xr
+        from scipy.stats import beta
+        mu = posterior_predictive_mirt(trace, data, return_mean=True)
+        phi = trace.posterior["phi_b"].values.reshape(mu.shape[0], -1)[:, data.bench_idx]
+        y = np.clip(data.scores, 1e-4, 1 - 1e-4)
+        ll = beta.logpdf(y, mu * phi, (1 - mu) * phi)
+        c, d = trace.posterior.sizes["chain"], trace.posterior.sizes["draw"]
+        grp = xr.Dataset({"obs": (("chain", "draw", "obs_dim_0"), ll.reshape(c, d, -1))})
+        return az.InferenceData(posterior=trace.posterior, log_likelihood=grp)
+
+    def test_pointwise_log_lik_is_aligned_with_the_predictive(self, synth_trace, data):
+        idata = self._with_log_lik(synth_trace, data)
+        assert pointwise_log_lik(synth_trace) is None
+        full = pointwise_log_lik(idata)
+        assert full.shape == (200, data.n_obs)
+        thin = pointwise_log_lik(idata, max_draws=50)
+        sel = np.linspace(0, 199, 50).astype(int)
+        assert np.array_equal(thin, full[sel])
+        assert posterior_predictive_mirt(idata, data, max_draws=50).shape == thin.shape
+
+    def test_loo_pit_reweights_the_draws(self, synth_trace, data):
+        y_rep = posterior_predictive_mirt(synth_trace, data)
+        excl = boundary_mask(data)
+        # Flat log-likelihood: every LOO weight is 1/S, so the PIT is the in-sample one.
+        flat, _ = pit_values(y_rep, data.scores, excl, log_lik_flat=np.zeros_like(y_rep))
+        assert np.allclose(flat, pit_values(y_rep, data.scores, excl))
+        ll = pointwise_log_lik(self._with_log_lik(synth_trace, data))
+        loo, k = pit_values(y_rep, data.scores, excl, log_lik_flat=ll)
+        assert loo.shape == k.shape == ((~excl).sum(),)
+        assert (0.0 <= loo).all() and (loo <= 1.0).all() and np.isfinite(k).all()
+        # Leaving an observation out moves its predictive away from it: the LOO-PIT sits
+        # further from 0.5 than the in-sample PIT on average.
+        ins = pit_values(y_rep, data.scores, excl)
+        assert np.abs(loo - 0.5).mean() > np.abs(ins - 0.5).mean()
+
+    def test_gof_reads_the_loo_pit(self, synth_trace, data):
+        from multiaxis_eci.config import PIT_PARETO_K_MAX
+        idata = self._with_log_lik(synth_trace, data)
+        y_rep = posterior_predictive_mirt(idata, data)
+        # The synthetic draws are not fitted to the scores, so their full log-likelihood
+        # puts every Pareto k above the cut; a tempered one keeps some rows in.
+        ll = 0.05 * pointwise_log_lik(idata)
+        gof = compute_gof(y_rep, data, log_lik_flat=ll)
+        assert gof.metrics["pit_kind"] == "loo" and gof.pit.size > 0
+        assert np.isfinite(gof.metrics["ks_stat"])
+        assert gof.pit_all.shape == gof.pareto_k.shape == ((~boundary_mask(data)).sum(),)
+        assert gof.metrics["pit_n"] == gof.pit.size == (gof.pareto_k <= PIT_PARETO_K_MAX).sum()
+        assert gof.metrics["pit_n_pareto_k_high"] + gof.pit.size == gof.pit_all.size
+        assert compute_gof(y_rep, data).metrics["pit_kind"] == "in-sample"
+        with pytest.raises(ValueError):
+            compute_gof(y_rep, data, log_lik_flat=pointwise_log_lik(idata, max_draws=50))
+
     def test_boundary_mask_covers_both_edges(self, data):
         from multiaxis_eci.config import ECI_EPS
         m = boundary_mask(data)
@@ -885,6 +942,8 @@ class TestPersistence:
         df = pd.read_csv(out)
         assert len(df) == (~boundary_mask(data)).sum()
         assert set(["obs_idx", "model", "benchmark", "score", "pit"]).issubset(df.columns)
+        save_pit(gof.pit_all, data, out, pareto_k=np.zeros(len(df)))
+        assert "pareto_k" in pd.read_csv(out).columns
 
 
 # ───────────────────────── CLI ─────────────────────────────────────────────
@@ -1595,22 +1654,24 @@ class TestMIRT:
             build_mirt_model(data, K=2, lineage_bm=True)
 
     def test_structured_bases_share_one_zerosumnormal(self, data):
-        """Human roots and chain founders are sliced out of ONE ZeroSumNormal
-        that also holds the unstructured models, so neither has a private
-        Normal base and the sum-to-zero spans every starting point. Its width
-        must account for all three groups."""
+        """Chain founders are sliced out of ONE ZeroSumNormal that also holds the
+        unstructured models, so the sum-to-zero spans every model starting point;
+        the human roots are private Normal(0, PRIOR_HUMAN_ROOT) bases outside it
+        (2026-10-05)."""
         lin = build_lineage_structure(data.mlookup)
         m = build_mirt_model(data, K=3, human_order=HUMAN_ORDER, lineage=lin)
         free = {v.name for v in m.free_RVs}
         assert "theta_zsn_t" in free
         assert not {"theta_rest_t", "theta_t"} & free      # no separate anchor
-        assert {"theta_h_base", "lin_base"} <= {v.name for v in m.deterministics}
+        assert "lin_base" in {v.name for v in m.deterministics}
+        assert "theta_h_base" in free
         n_human = sum(t in set(data.mlookup["model"]) for t in HUMAN_ORDER)
         n_rest = data.n_models - n_human - len(lin.row_idx)
-        zsn = m["theta_zsn_t"]
-        # rest rows + one root per human tree + one founder per chain
-        assert zsn.type.shape[1] > n_rest
-        assert zsn.type.shape[1] <= n_rest + n_human + lin.n_chains
+        # rest rows + one founder per chain, no human root
+        assert m["theta_zsn_t"].type.shape[1] == n_rest + lin.n_chains
+        from multiaxis_eci.config import PRIOR_HUMAN_ROOT
+        draws = pm.draw(m["theta_h_base"], draws=400, random_seed=1)
+        assert 2.5 < draws.std() < 3.5 and PRIOR_HUMAN_ROOT == 3.0
 
     def test_time_prior_shifts_theta_by_beta_times_year(self, data):
         """The time prior adds beta[k]*t[m] to theta and nothing else. Evaluated
@@ -1668,11 +1729,10 @@ class TestMIRT:
             build_mirt_model(data, K=2, time_t=np.zeros(data.n_models + 1))
 
     def test_private_bases_keeps_the_zerosumnormal_to_unstructured_rows(self, data):
-        """shared_base_zsn=False samples each human root and chain founder as a
-        private Normal(0, 1) and narrows the ZeroSumNormal to the unstructured
-        rows. Free-parameter count and initial-point logp are identical to the
-        default, so the golden-logp locks cannot see the swap and this is the
-        only check on the branch."""
+        """shared_base_zsn=False samples each chain founder as a private
+        Normal(0, 1) (the human roots are private in either setting) and narrows
+        the ZeroSumNormal to the unstructured rows. This is the only check on the
+        branch."""
         lin = build_lineage_structure(data.mlookup)
         m = build_mirt_model(data, K=3, human_order=HUMAN_ORDER, lineage=lin,
                              shared_base_zsn=False)
@@ -1690,8 +1750,8 @@ class TestMIRT:
         2026-07-05 as the hypothesis-matrix reference condition.)"""
         m = build_mirt_model(data, K=2, human_order=HUMAN_ORDER)
         assert "delta_h" in {v.name for v in m.free_RVs}
-        # Root levels are sliced out of the shared ZeroSumNormal.
-        assert "theta_h_base" in {v.name for v in m.deterministics}
+        # Root levels are private bases, outside the models' ZeroSumNormal.
+        assert "theta_h_base" in {v.name for v in m.free_RVs}
         names = data.mlookup.sort_values("model_idx")["model"].tolist()
         idx = {t: names.index(t) for t in HUMAN_ORDER if t in names}
         assert len(idx) >= 2, "fixture data lost its human tiers"
@@ -2450,8 +2510,8 @@ class TestFitSpec:
     def test_spec_json_round_trip(self):
         spec = analysis.FitSpec(
             K=3, loading_prior="signed", link="loglog", human_merge=True,
-            lineage_prior=True, lineage_bm=True, time_prior=True, theta_t=True,
-            theta_pos=True, no_sg=True,
+            lineage_prior=True, lineage_bm=True, effort_means=True, time_prior=True,
+            theta_t=True, theta_pos=True, no_sg=True,
             apply_exclusions=True, cyber=True, simpleqa_original=True,
             drop_benchmarks=("FrontierMath v1", "AlgoTune"), private_bases=True,
             floors=True, ceiling_noise=True, known_se=True,
@@ -2538,7 +2598,7 @@ class TestFitSpec:
     ])
     def test_tag_round_trips_through_parse_tag(self, kwargs):
         from multiaxis_eci.analysis.fitspec import _parse_tag
-        prereq = {"lineage_bm": {"lineage_prior": True}}
+        prereq = {"lineage_bm": {"lineage_prior": True}, "effort_means": {"lineage_prior": True}}
         for f in list(kwargs):
             kwargs.update(prereq.get(f, {}))
         spec = analysis.FitSpec(K=2, **kwargs)
@@ -2645,6 +2705,24 @@ class TestFitSpec:
     def test_flag_conflicts_raise(self):
         with pytest.raises(ValueError):
             analysis.FitSpec(K=2, lineage_bm=True)
+        # Effort means need the lineage prior: off without it, never an error.
+        assert not analysis.FitSpec(K=2, effort_means=True).effort_means
+
+    def test_effort_means_are_the_untagged_default(self):
+        spec = analysis.FitSpec(K=4, human_merge=True, lineage_prior=True, lineage_bm=True)
+        assert spec.effort_means and spec == analysis.FLAGSHIP
+        assert spec.tag == "_humanmerge_lineageprior_lineagebm"
+        off = dataclasses.replace(spec, effort_means=False)
+        assert off.tag == "_humanmerge_lineageprior_lineagebm_noeffortmeans"
+        for s in (spec, off):
+            idata = self._idata(K=4, attrs={"mirt_spec": analysis.spec_json(s)})
+            assert analysis.FitSpec.from_trace(idata, s.trace_path) == s
+        # A trace from before the default (no effort_means in its spec) was fit without them,
+        # and still sits in the untagged folder.
+        legacy = json.loads(analysis.spec_json(spec)); legacy.pop("effort_means")
+        idata = self._idata(K=4, attrs={"mirt_spec": json.dumps(legacy)})
+        assert not analysis.FitSpec.from_trace(idata, spec.trace_path).effort_means
+        assert not spec.baseline_spec().effort_means
 
 
 
@@ -2888,6 +2966,140 @@ class TestPipelineIdentity:
                                                   lineage_links=False).free_RVs}
         assert {"lin_offset_sd", "lin_offset_none_sd"} <= names
 
+    def test_effort_levels_read_off_the_variant_labels(self, data):
+        """The reference is reasoning off: the non-reasoning run modes, and a run naming no
+        effort in a non-reasoning release; the same run reads `thinking` in a release that
+        always reasons and `unspecified` in a hybrid one."""
+        from multiaxis_eci.lineage import build_lineage_structure, effort_level
+        for off in ("effort:none", "non-reasoning", "non-thinking", "instant", "chat"):
+            assert effort_level(off, "reasoning") == (None, 0.0), off
+        assert effort_level("bare", "non-reasoning") == (None, 0.0)
+        assert effort_level("instruct", None)[0] is None
+        assert effort_level("bare", "reasoning")[0] == "thinking"
+        assert effort_level("effort:unknown", "reasoning")[0] == "thinking"
+        assert effort_level("bare", "undetermined")[0] == "unspecified"
+        assert effort_level("base", "reasoning")[0] is None        # its own vector instead
+        assert effort_level("effort:high", "undetermined")[0] == "high"
+        assert effort_level("token:16k") == ("token", 0.0)
+        assert effort_level("token:64k") == ("token", 2.0)
+        with pytest.raises(ValueError):
+            effort_level("token:lots")
+        lin = build_lineage_structure(data.mlookup)
+        assert lin.offset_level.shape == lin.offset_log2_tokens.shape == (lin.n_groups,)
+        assert {"high", "thinking", "unspecified", "token"} <= set(lin.effort_levels)
+        assert "none" not in lin.effort_levels
+        # Read off the reviewed regimes: o3's bare run reasons, Llama 3.1 405B's does not,
+        # Opus 4's bare run is of unknown mode.
+        row_of = {mdl: i for i, mdl in enumerate(data.mlookup["model"])}   # as the builder reads it
+        for name, want in (("o3-2025-04-16", "thinking"), ("Llama-3.1-405B-Instruct", None),
+                           ("claude-opus-4-20250514", "unspecified"),
+                           ("claude-opus-4-20250514_none", None)):
+            pos = int(np.flatnonzero(lin.row_idx == row_of[name])[0])
+            lvl = lin.offset_level[lin.offset_group[pos]]
+            got = None if lvl == -1 else lin.effort_levels[lvl]
+            assert got == want, (name, got)
+        assert set(np.unique(lin.offset_level)) <= set(range(-1, len(lin.effort_levels)))
+        assert (lin.offset_level == -1).any()
+        token = lin.effort_levels.index("token")
+        assert (lin.offset_log2_tokens[lin.offset_level != token] == 0.0).all()
+
+    def test_effort_means_on_the_release_nodes(self, data):
+        """K=1: one free m per level (no direction, no mirror), a token slope, and a single
+        offset spread: tau_none is gone."""
+        from multiaxis_eci.lineage import build_lineage_structure
+        from multiaxis_eci.models.mirt import build_mirt_model
+        lin = build_lineage_structure(data.mlookup)
+        model = build_mirt_model(data, K=1, loading_prior="pt1", lineage=lin,
+                                 lineage_links=False, effort_means=True)
+        names = {v.name for v in model.free_RVs}
+        assert {"effort_m", "effort_token_slope", "variant_base_mu", "lin_offset_sd",
+                "lin_offset_z"} <= names
+        assert not names & {"lin_offset_none_sd", "effort_m_gauge", "effort_dir_z"}
+        assert model["effort_m"].type.shape == (len(lin.effort_levels),)
+        assert np.isfinite(model.compile_logp()(model.initial_point()))
+        with pytest.raises(ValueError):
+            build_mirt_model(data, K=1, effort_means=True)
+
+    def test_effort_means_are_rank_one_without_a_sign_constraint(self, data):
+        """K=2 chains: every level's mean lies along one unit direction, no level is
+        constrained (the sign is fixed after sampling); a reference group's offset keeps a mean
+        of zero."""
+        from multiaxis_eci.lineage import build_lineage_structure
+        from multiaxis_eci.models.mirt import build_mirt_model
+        lin = build_lineage_structure(data.mlookup)
+        model = build_mirt_model(data, K=2, lineage=lin, lineage_bm=True, effort_means=True)
+        names = {v.name for v in model.free_RVs}
+        assert {"effort_m", "effort_dir_z", "effort_token_slope"} <= names
+        assert not names & {"lin_offset_none_sd", "effort_m_gauge"}
+        assert model["effort_m"].type.shape == (len(lin.effort_levels),)
+        ip = model.initial_point()
+        assert np.isfinite(model.compile_logp()(ip))
+        assert np.isfinite(model.compile_dlogp()(ip)).all()
+        mu, u, m = pm.draw([model["effort_mu"], model["effort_dir"], model["effort_m"]],
+                           draws=50, random_seed=3)
+        assert np.allclose(np.linalg.norm(u, axis=1), 1.0)
+        assert np.linalg.matrix_rank(mu[0], tol=1e-9) == 1
+        assert np.allclose(mu, m[:, :, None] * u[:, None, :])
+        # Per group: zero at the reference, the level's mean elsewhere, and a token group's
+        # mean moves along the same direction with log2 of its budget.
+        from multiaxis_eci.models.mirt import _effort_means
+        with pm.Model(coords={"latent": [0, 1]}):
+            per_group = _effort_means(lin, 2)
+            draws = pm.draw([per_group, pm.modelcontext(None)["effort_mu"],
+                             pm.modelcontext(None)["effort_dir"],
+                             pm.modelcontext(None)["effort_token_slope"],
+                             pm.modelcontext(None)["variant_base_mu"]], random_seed=5)
+        g, mu, u, slope, base_mu = draws
+        # The pretrained checkpoints: their own vector, off the effort direction.
+        base = lin.offset_base
+        assert base.any() and (lin.offset_level[base] == -1).all()
+        assert np.allclose(g[base], base_mu)
+        ref = (lin.offset_level == -1) & ~base
+        assert np.all(g[ref] == 0.0)
+        token = lin.effort_levels.index("token")
+        plain = (lin.offset_level != -1) & (lin.offset_level != token)
+        assert np.allclose(g[plain], mu[lin.offset_level[plain]])
+        tok = lin.offset_level == token
+        assert np.allclose(g[tok], mu[token] + slope * lin.offset_log2_tokens[tok, None] * u)
+
+
+    def test_effort_mirror_copies_are_one_posterior_and_align(self, data):
+        """(m, u) and (-m, -u) have the same log-density, and align_effort_sign puts every draw
+        on the side where the mean of m is positive without moving effort_mu."""
+        import xarray as xr
+
+        from multiaxis_eci.lineage import build_lineage_structure
+        from multiaxis_eci.models.mirt import align_effort_sign, build_mirt_model
+        lin = build_lineage_structure(data.mlookup)
+        model = build_mirt_model(data, K=2, lineage=lin, lineage_bm=True, effort_means=True)
+        logp = model.compile_logp()
+        ip = model.initial_point()
+        ip["effort_m"] = np.linspace(-0.3, 1.2, len(lin.effort_levels))
+        ip["effort_dir_z"] = np.array([0.8, -0.4])
+        ip["effort_token_slope"] = np.array(0.2)
+        mirror = {**ip, **{k: -ip[k] for k in ("effort_m", "effort_dir_z",
+                                                 "effort_token_slope")}}
+        assert np.isclose(logp(ip), logp(mirror))
+        mu, u, m, v, slope = pm.draw([model["effort_mu"], model["effort_dir"],
+                                      model["effort_m"], model["effort_dir_z"],
+                                      model["effort_token_slope"]], draws=40, random_seed=7)
+        dims = lambda *rest: ("chain", "draw", *rest)  # noqa: E731
+        post = xr.Dataset({
+            "effort_mu": (dims("effort_level", "latent"), mu.reshape(2, 20, *mu.shape[1:])),
+            "effort_dir": (dims("latent"), u.reshape(2, 20, -1)),
+            "effort_m": (dims("effort_level"), m.reshape(2, 20, -1)),
+            "effort_dir_z": (dims("v"), v.reshape(2, 20, -1)),
+            "effort_token_slope": (dims(), slope.reshape(2, 20)),
+        })
+        before = post.copy(deep=True)
+        flipped = align_effort_sign(post)
+        assert flipped.sum() == (m.mean(1) < 0).sum() > 0
+        assert (post["effort_m"].mean("effort_level") >= 0).all()
+        m_al, u_al = post["effort_m"].values, post["effort_dir"].values
+        assert np.allclose(m_al[..., :, None] * u_al[..., None, :], before["effort_mu"].values)
+        assert np.allclose(post["effort_dir"], post["effort_dir_z"]
+                           / np.sqrt((post["effort_dir_z"] ** 2).sum("v")))
+        assert align_effort_sign(xr.Dataset({"effort_m": before["effort_m"]})) is None
     def test_binomial_n_reads_the_scoring_column(self, data):
         from multiaxis_eci.data import N_ITEMS_FILE, load_binomial_n
         t = pd.read_csv(N_ITEMS_FILE).set_index("benchmark")

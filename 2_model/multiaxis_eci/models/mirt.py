@@ -15,8 +15,12 @@ import pytensor.tensor as pt
 from multiaxis_eci.config import (
     CONTINUOUS_EPS,
     ECI_EPS,
+    EFFORT_TOKEN_LEVEL,
     PRIOR_ALPHA,
     PRIOR_DELTA_HUMAN,
+    PRIOR_EFFORT_MEAN,
+    PRIOR_EFFORT_TOKEN_SLOPE,
+    PRIOR_HUMAN_ROOT,
     PRIOR_LINEAGE_DELTA,
     PRIOR_LINEAGE_DELTA_BM,
     PRIOR_LINEAGE_DRIFT,
@@ -75,7 +79,8 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                     shared_base_zsn: bool = True,
                     time_t=None,
                     theta_t_cells: bool = False,
-                    lineage_links: bool = True):
+                    lineage_links: bool = True,
+                    effort_means: bool = False):
     """Stitch the structured theta blocks and the unstructured rows into ONE
     ZeroSumNormal.
 
@@ -83,22 +88,30 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     drops the links between releases: every node gets its own base in the ZeroSumNormal
     instead of its chain founder's level plus increments (see _release_block).
 
+    effort_means=True gives those variant offsets a mean per effort level, along one shared
+    effort direction (see _variant_offsets), in the chains and the release nodes alike.
+
     Human tiers and lineage chains are each a base level plus increments along
-    a path. Those bases (human roots, chain founders) sit INSIDE the same
-    per-axis ZeroSumNormal as the unstructured models: every starting point is
-    drawn from one population, and the sum-to-zero pins the overall location,
-    which is otherwise free (theta reaches the likelihood only through
-    A·theta − D). A ZeroSumNormal entry has sd sqrt(1 − 1/n) ~ 1 at these
-    sizes, i.e. the unit scale a private Normal(0, 1) base would give, minus
-    the free level. With no structured blocks this is the plain
-    single-ZeroSumNormal path over every model.
+    a path. The chain founders sit INSIDE the same per-axis ZeroSumNormal as the
+    unstructured models: every model starting point is drawn from one population,
+    and the sum-to-zero pins the overall location, which is otherwise free (theta
+    reaches the likelihood only through A·theta − D). A ZeroSumNormal entry has
+    sd sqrt(1 − 1/n) ~ 1 at these sizes, i.e. the unit scale a private Normal(0, 1)
+    base would give, minus the free level. With no structured blocks this is the
+    plain single-ZeroSumNormal path over every model.
+
+    The human roots are not drawn from the model population: each is a private
+    Normal(0, config.PRIOR_HUMAN_ROOT = 3) base, outside the zero-sum (user,
+    2026-10-05). Inside it, Average Human sat 4 to 5 sd from the models on its
+    extreme axis of the 2026-10-03 flagship and the unit prior pulled it a third
+    of the way back. Humans stay on the models' scale and axes all the same:
+    their scores on the shared benchmarks place them.
 
     shared_base_zsn=False: the ZeroSumNormal spans only the unstructured rows
-    and each base is a private Normal(0, 1). Same marginal scale per base; the
-    sum-to-zero then constrains a strictly smaller set, so the single location
-    pin covers less of the population, and that share moves with the data scope.
-    Both settings give the same free-parameter count and the same initial-point
-    log-probability, so no golden-logp lock distinguishes them.
+    and each chain founder is a private Normal(0, 1). Same marginal scale per
+    base; the sum-to-zero then constrains a strictly smaller set, so the single
+    location pin covers less of the population, and that share moves with the
+    data scope.
 
     time_t: per-model centered release year (data.release_time_covariate). Adds
     a per-axis linear trend to the theta prior MEAN,
@@ -166,17 +179,14 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     if not shared_base_zsn and rest.size == 0:
         raise ValueError("shared_base_zsn=False needs unstructured rows to carry "
                          "the ZeroSumNormal location pin; every model is structured.")
-    n_shared = rest.size + (n_roots + n_chains if shared_base_zsn else 0)
+    n_shared = rest.size + (n_chains if shared_base_zsn else 0)
     zsn = (_theta_t_cells(n_shared, K) if theta_t_cells
            else pm.ZeroSumNormal("theta_zsn_t", sigma=1.0, shape=(K, n_shared)).T)
     theta_full = pt.zeros((n_models, K))
     theta_full = pt.set_subtensor(theta_full[rest, :], zsn[:rest.size])
     cut = rest.size
     if human_struct is not None:
-        base_h = (pm.Deterministic("theta_h_base", zsn[cut:cut + n_roots])
-                  if shared_base_zsn else
-                  pm.Normal("theta_h_base", 0.0, 1.0, shape=(n_roots, K)))
-        cut += n_roots
+        base_h = pm.Normal("theta_h_base", 0.0, PRIOR_HUMAN_ROOT, shape=(n_roots, K))
         rows_h, theta_h = _human_block(human_struct, K, base_h)
         theta_full = pt.set_subtensor(theta_full[rows_h, :], theta_h)
     if lin is not None:
@@ -184,8 +194,10 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                   if shared_base_zsn else
                   pm.Normal("lin_base", 0.0, 1.0, shape=(n_chains, K)))
         rows_l, theta_l = (_lineage_block(lin, K, base_l, bm=lineage_bm,
-                                          variant_offsets=variant_offsets)
-                           if lineage_links else _release_block(lin, K, base_l))
+                                          variant_offsets=variant_offsets,
+                                          effort_means=effort_means)
+                           if lineage_links else
+                           _release_block(lin, K, base_l, effort_means=effort_means))
         theta_full = pt.set_subtensor(theta_full[rows_l, :], theta_l)
     return finish(theta_full)
 
@@ -293,7 +305,7 @@ def _human_block(struct, K, base):
 
 
 def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
-                   variant_offsets: bool = True):
+                   variant_offsets: bool = True, effort_means: bool = False):
     """Release chains: psi[node] = founder + cumulative increments; each row's
     theta = psi[node] + a tight mean-zero variant offset. Vectorized (no
     per-chain loop) via the precomputed incidence matrices. `base` is the
@@ -319,7 +331,8 @@ def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
     stray chain in an inferior basin. Per-vendor realized rates stay readable
     post-hoc off the trace as (psi_last - psi_founder)/span.
 
-    Either way the variant offsets stay mean-zero: effort variants are never
+    Either way the variant offsets stay mean-zero unless effort_means=True (a mean per effort
+    level, see _variant_offsets): effort variants are never
     ordered, and each (node, variant) offset is its own draw, sharing ONE scalar
     sd tau_o across axes. Per-axis tau_o[k] is not identified here: offsets
     reach the likelihood as sum_k A[b,k]*offset[g,k], and two loading columns of
@@ -349,19 +362,59 @@ def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
         # offset[group] would be the same quantity twice, identified only in
         # their sum. Drop the offset rather than sample a redundant funnel.
         return lin.row_idx, psi[lin.node_idx]                           # (R, K)
-    offset = _variant_offsets(lin, K)
+    offset = _variant_offsets(lin, K, effort_means)
     theta_lin = psi[lin.node_idx] + offset[lin.offset_group]            # (R, K)
     return lin.row_idx, theta_lin
 
 
-def _variant_offsets(lin: LineageStructure, K):
-    """The mean-zero (node, variant) offsets, (n_groups, K). One scale tau_o for every effort
-    level, and a scale of their own for the reasoning-off variants (`lin.offset_none`,
-    effort:none): with the shared tau_o (learned at 0.22) a reasoning-off run scored on one
-    benchmark was pulled toward its release, where switching reasoning off can cost far more
-    than a lower effort does (2026-10-02). Non-centered."""
+def _variant_offsets(lin: LineageStructure, K, effort_means: bool = False):
+    """The (node, variant) offsets, (n_groups, K). Non-centered.
+
+    Default: mean-zero offsets, one scale tau_o for every effort level and a scale of their
+    own for the reasoning-off variants (`lin.offset_none`, effort:none): with the shared tau_o
+    (learned at 0.22) a reasoning-off run scored on one benchmark was pulled toward its
+    release, where switching reasoning off can cost far more than a lower effort does
+    (2026-10-02).
+
+    effort_means=True gives the offsets a mean per effort level instead, and drops tau_none:
+
+        offset[g, k] = (m[level(g)] + slope * log2(budget_g / 16k)) * u[k] + tau_o * z[g, k]
+
+    one scalar m per level (lin.effort_levels, unordered, Normal(0, PRIOR_EFFORT_MEAN)) along
+    ONE effort direction u shared by every level, a unit vector in the K-axis space, and a
+    per-doubling slope for the token-budget variants along the same direction. The
+    reference groups (`lin.offset_level` == -1: reasoning off, see lineage.effort_level) keep
+    a mean of zero, so psi is the release's level with reasoning off, the one setting every
+    model has; a release that always reasons has its psi extrapolated through these means.
+    tau_o is then the spread of a release's offset around its level's mean, alone for every
+    group.
+
+    Rank one rather than a free mean per (level, axis): offsets reach the likelihood as
+    sum_k A[b, k] * offset[g, k], and two loading columns of the 2026-10-01 flagship
+    correlate at 0.94, so a free per-axis mean would slide between them as a per-axis tau_o
+    did (ESS 12, r-hat 1.86). Here only u carries axis detail, pinned by every effort level
+    at once. u = v / |v| with v ~ Normal(0, I): the radius |v| is prior-only.
+
+    (m, u) and (-m, -u) give the same means, the same likelihood and the same prior density:
+    every m is a plain Normal and the sampler is left with the two mirror copies. The sign is
+    fixed after sampling (`align_effort_sign`, draw by draw, so u points from reasoning off
+    toward more effort). A HalfNormal on `high` was the gauge until 2026-10-05: its boundary
+    trapped one chain of the 2026-10-03 flagship in the mirror half with m_high at 0 and the
+    other levels squeezed (5 reasoning-off offsets back at -3.5 sd). No chain of that fit
+    approached the plane between the copies (u never turned, |v| > 0.8), so a draw-by-draw
+    flip restores the folded prior exactly. At K=1 there is no direction (u = 1) and no
+    mirror.
+
+    A release's pretrained checkpoint (`lin.offset_base`, its post-trained model being the
+    reference) gets a free mean vector of its own, Normal(0, PRIOR_EFFORT_MEAN) per axis, off
+    the effort direction: pretraining against post-training trades knowledge for reasoning.
+    """
     tau_o = pm.HalfNormal("lin_offset_sd", sigma=PRIOR_LINEAGE_OFFSET)
     z = pm.Normal("lin_offset_z", 0.0, 1.0, shape=(lin.n_groups, K))
+    if effort_means:
+        if lin.offset_level is None:
+            return tau_o * z
+        return _effort_means(lin, K) + tau_o * z
     none = lin.offset_none
     if none is None or not np.any(none):
         return tau_o * z
@@ -369,7 +422,58 @@ def _variant_offsets(lin: LineageStructure, K):
     return pt.switch(pt.as_tensor(none)[:, None], tau_n, tau_o) * z
 
 
-def _release_block(lin: LineageStructure, K, base):
+def _effort_means(lin: LineageStructure, K):
+    """The effort means of `_variant_offsets(effort_means=True)`, (n_groups, K): rank one along
+    the effort direction, plus the base checkpoints' own mean vector."""
+    means = pt.zeros((lin.n_groups, K))
+    if lin.offset_base is not None and lin.offset_base.any():
+        base_mu = pm.Normal("variant_base_mu", 0.0, PRIOR_EFFORT_MEAN, dims="latent")
+        means = means + pt.as_tensor(lin.offset_base.astype(float))[:, None] * base_mu[None, :]
+    levels = list(lin.effort_levels)
+    if not levels:
+        return means
+    L = len(levels)
+    model = pm.modelcontext(None)
+    if "effort_level" not in model.coords:
+        model.add_coord("effort_level", levels)
+    m = pm.Normal("effort_m", 0.0, PRIOR_EFFORT_MEAN, shape=L)
+    if K == 1:
+        u = pt.ones(1)
+    else:
+        # Started off the origin, where the direction is undefined (0 / 0).
+        v = pm.Normal("effort_dir_z", 0.0, 1.0, shape=K, initval=np.ones(K))
+        u = pm.Deterministic("effort_dir", v / pt.sqrt(pt.sum(v ** 2)), dims="latent")
+    pm.Deterministic("effort_mu", m[:, None] * u[None, :], dims=("effort_level", "latent"))
+    # One extra slot at the end holds the reference's zero, so level -1 gathers it.
+    scale = pt.concatenate([m, pt.zeros(1)])[pt.as_tensor(lin.offset_level)]
+    if EFFORT_TOKEN_LEVEL in levels:
+        slope = pm.Normal("effort_token_slope", 0.0, PRIOR_EFFORT_TOKEN_SLOPE)
+        scale = scale + slope * pt.as_tensor(lin.offset_log2_tokens)
+    return means + scale[:, None] * u[None, :]
+
+
+# The variables (m, u) flips to (-m, -u): the direction's raw draw goes with it, the token
+# slope too (it scales u like a level does). effort_mu and every offset are unchanged.
+EFFORT_SIGN_VARS = ("effort_m", "effort_dir_z", "effort_dir", "effort_token_slope")
+
+
+def align_effort_sign(posterior):
+    """Fix the sign of the effort means draw by draw, in place: (m, u) -> (-m, -u) wherever
+    the mean of m over the levels is negative, so u points from reasoning off toward more
+    effort in every draw (`_effort_means`). The flip leaves effort_mu, the offsets and the
+    likelihood unchanged. A no-op without an effort direction (K=1, or no effort means).
+    Returns the number of flipped draws per chain (None when there is nothing to align)."""
+    if "effort_dir" not in posterior or "effort_m" not in posterior:
+        return None
+    m = posterior["effort_m"]
+    flip = m.mean([d for d in m.dims if d not in ("chain", "draw")]) < 0
+    for name in EFFORT_SIGN_VARS:
+        if name in posterior:
+            posterior[name] = posterior[name].where(~flip, -posterior[name])
+    return flip.sum("draw").values
+
+
+def _release_block(lin: LineageStructure, K, base, effort_means: bool = False):
     """Release nodes without the chains: theta = base[node] + the variant offset.
 
     The canonical K=1 index's grouping of a release's effort variants, built like the
@@ -381,7 +485,8 @@ def _release_block(lin: LineageStructure, K, base):
     one benchmark only (a CritPt score per effort) then sits near its release's level, which
     every run of the release informs, instead of being a free test-taker. Returns
     (row_idx, theta)."""
-    return lin.row_idx, base[lin.node_idx] + _variant_offsets(lin, K)[lin.offset_group]
+    offset = _variant_offsets(lin, K, effort_means)
+    return lin.row_idx, base[lin.node_idx] + offset[lin.offset_group]
 
 
 def _apply_plt(A, plt_idx, K):
@@ -448,6 +553,7 @@ def build_mirt_model(data: ECIData, K: int,
                       lineage_bm: bool = False,
                       lineage_links: bool = True,
                       variant_offsets: bool = True,
+                      effort_means: bool = False,
                       pin_benchmark: str | None = None,
                       plt_founders: list[str] | None = None,
                       floor_c: np.ndarray | None = None,
@@ -553,6 +659,9 @@ def build_mirt_model(data: ECIData, K: int,
     chains: each node is its own draw from the shared ZeroSumNormal (_release_block). The
     canonical K=1 index uses it so a release's effort variants share its level, as in the
     K-axis fit, without ordering any release after another.
+    effort_means=True (with a lineage structure and its variant offsets): the offsets get a
+    mean per effort level, m[level] * u along one shared effort direction u, and one spread
+    tau_o for every group in place of tau_o and tau_none (_variant_offsets).
 
     Both are priors on theta only, and both compose with any loading_prior. The
     human roots and chain founders join the unstructured models inside one
@@ -797,6 +906,9 @@ def build_mirt_model(data: ECIData, K: int,
     if lineage_bm and not lineage_links:
         raise ValueError("lineage_bm scales the links between releases; lineage_links=False "
                          "has none")
+    if effort_means and (lineage is None or not variant_offsets):
+        raise ValueError("effort_means puts a mean on the variant offsets; it needs a lineage "
+                         "structure with its variant offsets")
 
     if loading_prior == "signed" and (human_order or lineage):
         import warnings
@@ -932,7 +1044,8 @@ def build_mirt_model(data: ECIData, K: int,
             lin=lineage, lineage_bm=lineage_bm,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,
-            theta_t_cells=theta_t_cells, lineage_links=lineage_links)
+            theta_t_cells=theta_t_cells, lineage_links=lineage_links,
+            effort_means=effort_means)
         # Likelihood-side ability. Raw theta stays the reported ability (it
         # carries the location pin and the order structure); the positive copy
         # is what eta reads, so with A >= 0 an axis can only add to a score,

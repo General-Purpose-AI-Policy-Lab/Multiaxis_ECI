@@ -1,67 +1,8 @@
 benchmark,model_version,is_human,original_score,lower_bound,clipped_score,release_date,taker_class
 ARC AI2,opt-1.3b,False,0.232,0.25,0.25,2022-05-11,old/weak
-Chess Puzzles,DeepSeek-R1-Distill-Qwen-1.5B,False,0.0,0.0496,0.0496,2025-01-20,old/weak
-Chess Puzzles,Llama-2-13b-chat,False,0.0,0.0496,0.0496,2023-07-18,old/weak
-Chess Puzzles,Llama-3.1-8B-Instruct,False,0.0,0.0496,0.0496,2024-07-23,old/weak
-Chess Puzzles,Llama-3.2-1B-Instruct,False,0.0,0.0496,0.0496,2024-09-24,old/weak
-Chess Puzzles,Meta-Llama-3-8B-Instruct,False,0.0,0.0496,0.0496,2024-04-18,old/weak
-Chess Puzzles,Mistral-7B-Instruct-v0.3,False,0.0,0.0496,0.0496,2024-05-27,old/weak
-Chess Puzzles,Phi-3-mini-4k-instruct,False,0.0,0.0496,0.0496,2024-04-23,old/weak
-Chess Puzzles,deepseek-llm-67b-chat,False,0.0,0.0496,0.0496,2023-11-29,old/weak
-Chess Puzzles,gemma-3-12b-it,False,0.0,0.0496,0.0496,2025-03-12,old/weak
-Chess Puzzles,gemma-3-1b-it,False,0.0,0.0496,0.0496,2025-03-12,old/weak
-Chess Puzzles,gemma-3-27b-it,False,0.0,0.0496,0.0496,2025-03-12,old/weak
-Chess Puzzles,gemma-3-4b-it,False,0.0,0.0496,0.0496,2025-03-12,old/weak
-Chess Puzzles,glm-4.7-flash,False,0.0,0.0496,0.0496,2026-01-19,frontier
-Chess Puzzles,glm-4.7-flash_none,False,0.0,0.0496,0.0496,2026-01-19,frontier
-Chess Puzzles,gpt-3.5-turbo-0125,False,0.0,0.0496,0.0496,2024-01-25,old/weak
-Chess Puzzles,gpt-4o-mini-2024-07-18,False,0.0,0.0496,0.0496,2024-07-18,old/weak
-Chess Puzzles,gpt-oss-20b_high,False,0.0,0.0496,0.0496,2025-08-05,frontier
-Chess Puzzles,granite-4.0-1b,False,0.0,0.0496,0.0496,2025-10-28,frontier
-Chess Puzzles,granite-4.0-350m,False,0.0,0.0496,0.0496,2025-10-28,frontier
-Chess Puzzles,granite-4.0-micro,False,0.0,0.0496,0.0496,2025-10-02,frontier
-Chess Puzzles,llama-2-7b-chat,False,0.0,0.0496,0.0496,2023-07-18,old/weak
-Chess Puzzles,mistral-small-3-2501,False,0.0,0.0496,0.0496,2025-01-30,old/weak
-Chess Puzzles,qwen2.5-32b-instruct,False,0.0,0.0496,0.0496,2024-09-17,old/weak
-Chess Puzzles,qwen2.5-7b-instruct,False,0.0,0.0496,0.0496,2024-09-19,old/weak
-Chess Puzzles,qwen3-1.7b_none,False,0.0,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,qwen3-14b_none,False,0.0,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,qwen3-8b_none,False,0.0,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,qwen3.5-2b_none,False,0.0,0.0496,0.0496,2026-02-24,frontier
-Chess Puzzles,DeepSeek-R1-Distill-Qwen-14B,False,0.01,0.0496,0.0496,2025-01-20,old/weak
-Chess Puzzles,DeepSeek-R1-Distill-Qwen-32B,False,0.01,0.0496,0.0496,2025-01-20,old/weak
-Chess Puzzles,Qwen3-30B-A3B_none,False,0.01,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,Qwen3-32B_none,False,0.01,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,deepseek-v4-flash_none,False,0.01,0.0496,0.0496,2026-04-24,frontier
-Chess Puzzles,gpt-5-nano-2025-08-07_minimal,False,0.01,0.0496,0.0496,2025-08-07,frontier
-Chess Puzzles,mistral-small-3.1-2503,False,0.01,0.0496,0.0496,2025-03-17,old/weak
-Chess Puzzles,mistral-small-3.2-2506,False,0.01,0.0496,0.0496,2025-06-20,frontier
-Chess Puzzles,phi-4,False,0.01,0.0496,0.0496,2024-12-12,old/weak
-Chess Puzzles,qwen3-4b_none,False,0.01,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,qwen3.5-35b-a3b,False,0.01,0.0496,0.0496,2026-02-24,frontier
-Chess Puzzles,gpt-5.6-luna_none,False,0.02,0.0496,0.0496,2026-07-09,frontier
-Chess Puzzles,gpt-oss-20b_low,False,0.02,0.0496,0.0496,2025-08-05,frontier
-Chess Puzzles,qwen3-30b-a3b-instruct-2507,False,0.02,0.0496,0.0496,2025-07-29,frontier
-Chess Puzzles,qwen3.5-9B,False,0.02,0.0496,0.0496,2026-02-24,frontier
-Chess Puzzles,claude-sonnet-4-6_max,False,0.03,0.0496,0.0496,2026-02-17,frontier
-Chess Puzzles,deepseek-r1-0528-qwen3-8b,False,0.03,0.0496,0.0496,2025-05-29,old/weak
-Chess Puzzles,gpt-5.4-mini-2026-03-17_none,False,0.03,0.0496,0.0496,2026-03-17,frontier
-Chess Puzzles,gpt-5.4-nano-2026-03-17_none,False,0.03,0.0496,0.0496,2026-03-17,frontier
-Chess Puzzles,magistral-small-2509,False,0.03,0.0496,0.0496,2025-09-18,frontier
-Chess Puzzles,MiniMax-M3_none,False,0.04,0.0496,0.0496,2026-06-01,frontier
-Chess Puzzles,Qwen3-30B-A3B,False,0.04,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,claude-opus-4-5-20251101_none,False,0.04,0.0496,0.0496,2025-11-24,frontier
-Chess Puzzles,claude-sonnet-4-5-20250929_none,False,0.04,0.0496,0.0496,2025-09-29,frontier
-Chess Puzzles,gpt-4-0613,False,0.04,0.0496,0.0496,2023-06-13,old/weak
-Chess Puzzles,gpt-5.2-2025-12-11_none,False,0.04,0.0496,0.0496,2025-12-11,frontier
-Chess Puzzles,gpt-oss-20b_medium,False,0.04,0.0496,0.0496,2025-08-05,frontier
-Chess Puzzles,qwen3-14b,False,0.04,0.0496,0.0496,2025-04-29,old/weak
-Chess Puzzles,qwen3-4b-instruct-2507,False,0.04,0.0496,0.0496,2025-08-06,frontier
-Chess Puzzles,qwen3-max-2025-09-23,False,0.04,0.0496,0.0496,2025-09-24,frontier
-Chess Puzzles,qwen3.6-35b-a3b_none,False,0.04,0.0496,0.0496,2026-04-14,frontier
 Furniture Assembly,qwen3.8-max-0902_xhigh,False,0.2,0.3,0.3,2026-09-01,frontier
 Furniture Assembly,grok-4.7_xhigh,False,0.2083333333333333,0.3,0.3,2026-09-21,frontier
-Furniture Assembly,kimi-k2.6,False,0.2166666666666666,0.3,0.3,2026-04-20,frontier
+Furniture Assembly,kimi-k2.6_thinking,False,0.2166666666666666,0.3,0.3,2026-04-20,frontier
 Furniture Assembly,grok-4.5_high,False,0.225,0.3,0.3,2026-07-08,frontier
 Furniture Assembly,gemini-3.6-flash_high,False,0.2333333333333333,0.3,0.3,2026-07-21,frontier
 Furniture Assembly,gemini-3.1-pro-preview_high,False,0.2666666666666666,0.3,0.3,2026-02-19,frontier
@@ -106,7 +47,7 @@ Mystery Game Puzzles,o4-mini-2025-04-16_high,False,0.05,0.0922,0.0922,2025-04-16
 Mystery Game Puzzles,qwen3-max-2025-09-23,False,0.05,0.0922,0.0922,2025-09-24,frontier
 Mystery Game Puzzles,gpt-5.4-nano-2026-03-17_medium,False,0.06,0.0922,0.0922,2026-03-17,frontier
 Mystery Game Puzzles,inkling-small_xhigh,False,0.06,0.0922,0.0922,2026-07-15,frontier
-Mystery Game Puzzles,MiniMax-M3,False,0.07,0.0922,0.0922,2026-06-01,frontier
+Mystery Game Puzzles,MiniMax-M3_thinking,False,0.07,0.0922,0.0922,2026-06-01,frontier
 Mystery Game Puzzles,claude-opus-4-6_low,False,0.07,0.0922,0.0922,2026-02-05,frontier
 Mystery Game Puzzles,gpt-4.1-mini-2025-04-14,False,0.07,0.0922,0.0922,2025-04-14,old/weak
 Mystery Game Puzzles,gpt-5.4-mini-2026-03-17_medium,False,0.07,0.0922,0.0922,2026-03-17,frontier

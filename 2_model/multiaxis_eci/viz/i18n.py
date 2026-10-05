@@ -82,6 +82,9 @@ FR_TABLE: list[tuple[str, str]] = [
     ("Top models, frontier releases and human tiers per axis",
      "Meilleurs modèles, sorties frontière et niveaux humains par axe"),
     ("frontier releases (shown even when wide)", "sorties frontière (même larges)"),
+    # Before "PIT histogram", which it contains.
+    ("LOO-PIT histogram", "Histogramme LOO-PIT"),
+    ("PIT histogram (in-sample)", "Histogramme PIT (sur l'échantillon d'apprentissage)"),
     ("PIT histogram", "Histogramme PIT"),
     ("95% band under H0", "bande à 95 % sous H0"),
     ("(uniform 1/12", "(uniforme 1/12"),

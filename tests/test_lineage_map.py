@@ -189,6 +189,9 @@ def test_a_product_sits_on_one_node(chained):
     ("gpt-6-astra_xhigh", "OpenAI", "gpt-astra", "astra 6"),
     ("gpt-7-astra_proxhigh", "OpenAI", "pro", "pro 7"),
     ("gpt-5.4-pro-2026-03-05_xhigh", "OpenAI", "pro", "pro 5.4"),
+    ("gpt-5.1-codex-max", "OpenAI", "codex", "5.1-codex-max"),   # a model, not an effort
+    ("gpt-5.1-codex", "OpenAI", "codex", "5.1-codex"),
+    ("deepseek-chat", "DeepSeek", "deepseek-v", "V3.2"),
 ])
 def test_builder_reads_versions_off_names(builder, name, org, chain, node):
     got = builder.classify(name, org)
@@ -210,6 +213,12 @@ def test_unknown_generation_is_unrouted(builder, name, org):
     ("Qwen2.5-72B", "Alibaba", "base"),
     ("qwen2.5-72b-instruct", "Alibaba", "bare"),
     ("MiniMax-M3_xhigh", "MiniMax", "effort:xhigh"),
+    ("claude-instant-1.2", "Anthropic", "bare"),         # the product line, not a run mode
+    ("deepseek-chat", "DeepSeek", "non-thinking"),       # the non-thinking endpoint
+    ("deepseek-llm-67b-chat", "DeepSeek", "bare"),       # a chat model, not the endpoint
+    ("Qwen3-235B-A22B-Instruct-2507", "Alibaba", "non-thinking"),
+    ("Qwen3-235B-A22B-Thinking-2507", "Alibaba", "thinking"),
+    ("gpt-5.1-codex-max", "OpenAI", "bare"),
 ])
 def test_run_variants_get_their_own_group(builder, name, org, variant):
     assert builder.classify(name, org)["variant"] == variant
@@ -223,6 +232,12 @@ def test_run_variants_get_their_own_group(builder, name, org, variant):
     ("CodeQwen1.5-7B", "Alibaba"),   # a code model, off the general 7B spine
     ("Llama-3.1-405B-Instruct_bio-llama", "Meta"),   # a fine-tune, not the release
     ("qwen3.8-2.4t-a95b_xhigh", "Alibaba"),          # a size in trillions
+    ("gpt-5.4-2026-03-05_cyber", "OpenAI"),          # the cyber-permissive fine-tune
+    ("gpt-5.5_cyber", "OpenAI"),
+    ("DeepSeek-V3.2-Speciale", "DeepSeek"),          # a reasoning-only RL fine-tune
+    ("computer-use-preview-2025-03-11", "OpenAI"),   # the computer-use agent model
+    ("kimi-k2.7-code", "Moonshot"),                  # a code model, off the general spine
+    ("kimi-k2.7-code_xhigh", "Moonshot"),
 ])
 def test_other_models_stay_out_of_the_chain(builder, name, org):
     assert builder.classify(name, org)["in_chain"] == "no"

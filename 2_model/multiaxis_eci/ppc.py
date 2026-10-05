@@ -1,5 +1,14 @@
 """Posterior predictive checks and goodness-of-fit metrics.
 
+The calibration check is the leave-one-out PIT: u_n = P(Y_rep <= y_n) under the predictive of
+a fit WITHOUT observation n, approximated by Pareto-smoothed importance sampling of the
+posterior draws (PSIS-LOO, weights from the pointwise log-likelihood). The in-sample PIT it
+replaced scores each observation against a posterior that has seen it, which pulls u toward
+0.5 (a hump on the 2026-10-03 flagship, 196 draws in the first decile for 513 expected) and
+cannot tell an over-wide predictive from that overfit. Observations with Pareto k above
+config.PIT_PARETO_K_MAX are left out of the summaries; a trace without a log_likelihood group
+falls back to the in-sample PIT, and the metrics say which one they hold (`pit_kind`).
+
 PIT excludes the boundary-clipped rows on BOTH sides (exact zeros and scores
 at/above 1 - ECI_EPS): the model never saw those observed values, and an
 exact-1 row would land at PIT = 1 by construction (every Beta draw is < 1).
@@ -13,7 +22,7 @@ import numpy as np
 from scipy.special import expit
 from scipy.stats import kstest
 
-from multiaxis_eci.config import ECI_EPS, PIT_TIE_SEED, PPC_SEED
+from multiaxis_eci.config import ECI_EPS, PIT_PARETO_K_MAX, PIT_TIE_SEED, PPC_SEED
 from multiaxis_eci.data import ECIData
 
 
@@ -21,8 +30,10 @@ from multiaxis_eci.data import ECIData
 class GoFResults:
     y_rep_flat: np.ndarray     # (n_samples, n_obs) posterior predictive draws
     y_pred_mean: np.ndarray    # (n_obs,) posterior predictive mean per observation
-    pit: np.ndarray            # (n_non_boundary,) PIT values, boundary rows excluded
+    pit: np.ndarray            # the PIT values the summaries read: LOO, reliable k only
     metrics: dict
+    pit_all: np.ndarray | None = None    # (n_non_boundary,) every PIT, boundary rows excluded
+    pareto_k: np.ndarray | None = None   # (n_non_boundary,) PSIS k per row; None in-sample
 
 
 def _flatten_over_chains(arr: np.ndarray) -> np.ndarray:
@@ -279,19 +290,56 @@ def boundary_mask(data: ECIData) -> np.ndarray:
     return data.zero_score_mask | (data.scores >= 1.0 - ECI_EPS)
 
 
+def pointwise_log_lik(trace, max_draws: int = 2000) -> np.ndarray | None:
+    """(S, n_obs) pointwise log-likelihood draws, flattened and thinned exactly as the
+    posterior predictives above thin the posterior (`_pull_flat` with the same `max_draws`),
+    so row s of both is the same draw. None when the trace has no log_likelihood group (a
+    posterior-only subset, a fit sampled without it): the PIT is then in-sample."""
+    if "log_likelihood" not in trace.groups():
+        return None
+    ll = trace.log_likelihood
+    if "chain" not in ll.dims or ll.sizes["chain"] != trace.posterior.sizes["chain"] \
+            or ll.sizes["draw"] != trace.posterior.sizes["draw"]:
+        return None
+    names = list(ll.data_vars)
+    if len(names) != 1:
+        return None
+    arr = _flatten_over_chains(ll[names[0]].values)
+    sel = _thin_sel(arr.shape[0], max_draws)
+    return arr[sel] if sel is not None else arr
+
+
+def loo_weights(log_lik_flat: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """PSIS-LOO importance weights: (S, n) normalised weights per observation, each column
+    the draws reweighted toward the posterior without that observation, and (n,) Pareto k
+    (above ~0.7 the weights are too heavy-tailed to trust)."""
+    import arviz as az  # heavy import, only here
+    lw, k = az.psislw(-np.asarray(log_lik_flat, dtype=np.float64).T)
+    return np.exp(np.asarray(lw)).T, np.asarray(k)
+
+
 def pit_values(y_rep_flat: np.ndarray,
                 scores: np.ndarray,
                 exclude_mask: np.ndarray,
-                tie_seed: int = PIT_TIE_SEED) -> np.ndarray:
+                tie_seed: int = PIT_TIE_SEED,
+                log_lik_flat: np.ndarray | None = None):
     """PIT u_n = P(Y_rep ≤ y_n), skipping the rows in `exclude_mask`
-    (the boundary-clipped observations — see `boundary_mask`)."""
+    (the boundary-clipped observations — see `boundary_mask`).
+
+    With `log_lik_flat` (aligned with `y_rep_flat`, see `pointwise_log_lik`) the PIT is
+    leave-one-out: each draw weighs by its PSIS-LOO weight for that observation, and the
+    return is (pit, pareto_k). Without it, the in-sample PIT (uniform weights) alone."""
     nonzero = ~exclude_mask
     y_rep_u = y_rep_flat[:, nonzero]
     y_obs_u = scores[nonzero][None, :]
 
     rng = np.random.default_rng(tie_seed)
     tie_break = rng.uniform(size=y_rep_u.shape)
-    return ((y_rep_u < y_obs_u) + tie_break * (y_rep_u == y_obs_u)).mean(axis=0)
+    below = (y_rep_u < y_obs_u) + tie_break * (y_rep_u == y_obs_u)
+    if log_lik_flat is None:
+        return below.mean(axis=0)
+    w, k = loo_weights(np.asarray(log_lik_flat)[:, nonzero])
+    return np.clip((w * below).sum(axis=0), 0.0, 1.0), k
 
 
 def _bayesian_r2(mu_flat: np.ndarray | None, scores: np.ndarray,
@@ -318,12 +366,27 @@ def _bayesian_r2(mu_flat: np.ndarray | None, scores: np.ndarray,
 
 
 def compute_gof(y_rep_flat: np.ndarray, data: ECIData,
-                mu_flat: np.ndarray | None = None) -> GoFResults:
+                mu_flat: np.ndarray | None = None,
+                log_lik_flat: np.ndarray | None = None) -> GoFResults:
+    """Fit metrics and the calibration PIT. `log_lik_flat` (`pointwise_log_lik` of the same
+    trace, same `max_draws`) makes the PIT leave-one-out, summarised on the rows whose Pareto
+    k stays at or below config.PIT_PARETO_K_MAX; without it the PIT is in-sample."""
     y_pred_mean = y_rep_flat.mean(axis=0)
-    pit = pit_values(y_rep_flat, data.scores, boundary_mask(data))
+    if log_lik_flat is not None and log_lik_flat.shape != y_rep_flat.shape:
+        raise ValueError(f"log-likelihood draws {log_lik_flat.shape} do not match the "
+                         f"predictive draws {y_rep_flat.shape}: thin both with the same "
+                         "max_draws")
+    if log_lik_flat is None:
+        pit_all, pareto_k = pit_values(y_rep_flat, data.scores, boundary_mask(data)), None
+        pit = pit_all
+    else:
+        pit_all, pareto_k = pit_values(y_rep_flat, data.scores, boundary_mask(data),
+                                       log_lik_flat=log_lik_flat)
+        pit = pit_all[pareto_k <= PIT_PARETO_K_MAX]
     resid = data.scores - y_pred_mean
 
-    ks_stat, ks_p = kstest(pit, "uniform")
+    # Every row above the k cut (a posterior far from its data) leaves nothing to summarise.
+    ks_stat, ks_p = kstest(pit, "uniform") if pit.size else (float("nan"), float("nan"))
 
     # Posterior probability that the zero-score rows would be replicated at or
     # below the diagnostic threshold — calibration check for the boundary points.
@@ -345,10 +408,15 @@ def compute_gof(y_rep_flat: np.ndarray, data: ECIData,
         "bayesian_r2":                 _bayesian_r2(mu_flat, data.scores, resid),
         "ks_stat":                     float(ks_stat),
         "ks_p":                        float(ks_p),
-        "pit_mean":                    float(pit.mean()),
-        "pit_var":                     float(pit.var()),
+        "pit_mean":                    float(pit.mean()) if pit.size else float("nan"),
+        "pit_var":                     float(pit.var()) if pit.size else float("nan"),
+        "pit_kind":                    "in-sample" if pareto_k is None else "loo",
+        "pit_n":                       int(pit.size),
+        "pit_n_pareto_k_high":         0 if pareto_k is None
+                                       else int((pareto_k > PIT_PARETO_K_MAX).sum()),
         "zero_pred_below_threshold":   zero_below_c,
     }
     return GoFResults(
         y_rep_flat=y_rep_flat, y_pred_mean=y_pred_mean, pit=pit, metrics=metrics,
+        pit_all=pit_all, pareto_k=pareto_k,
     )
