@@ -1,10 +1,9 @@
 # 4. Diagnostics
 
-Post-fit tools, all command-line scripts. They read a fitted trace (the
-canonical one at `5_outputs/<data generation>/canonical_humanmerge/trace.nc`, from
-`python 3_fit/fit.py --preset canonical --human-merge`, the human tier order every analysis
-passes since 2026-09-14; a run without it writes to plain `canonical/`. Exploration traces
-sit in the `mirt*/` folders beside it).
+Post-fit tools, all command-line scripts. They read a fitted trace, usually
+`5_outputs/<data generation>/canonical_humanmerge/trace.nc` (`python 3_fit/fit.py --preset
+canonical --human-merge`, see [docs/cli.md](../docs/cli.md)); exploration traces sit in the
+`mirt*/` folders beside it.
 
 The four numbered scripts are the reproduction path, in order. The rest is a
 toolbox with no order to it, reached for when a fit looks wrong. The curated-data
@@ -19,7 +18,7 @@ Commands and their options: [`../docs/cli.md`](../docs/cli.md).
 | Script | Purpose |
 |---|---|
 | `1_frontier_gap.py` | Open-weights vs closed frontier (or US vs CN with `--group country`) on one K=1 canonical trace, in ECI-H: records per group, the months each open record trails the closed frontier (per posterior draw), one trend line per group through its records with the gap and the lag it implies today (gap over the closed slope), human-tier crossings. One benchmark access scope per run (`--access all|public|semi_private|private`); a class scope is linked onto the all-benchmarks fit through its closed OpenAI, Anthropic and Google models |
-| `2_plot_frontier_gap.py` | The scopes side by side, from what step 1 wrote: frontier panels, the months-behind figure (its French render in the lab's print style), the table of the three lags per scope (every quantity and the differences between scopes in its CSV, crossing dates as CSV) |
+| `2_plot_frontier_gap.py` | The scopes side by side, from what step 1 wrote: frontier panels, the months-behind figure (its static renders, English and French, in the lab's print style; from 2024, axis cut at 20 months), the table of the three lags per scope (every quantity and the differences between scopes in its CSV, crossing dates as CSV) |
 | `3_plot_mirt.py` | Single-fit deep-dive figures for one MIRT trace → the fit's `figures/k{K}/` |
 | `4_build_dashboard.py` | Build the all-fits interactive dashboard → repo-root `index.html` (+ the data generation's `comparisons/*.csv`). Card registry: `6_writeups/dashboard/dashboard_fits.json` |
 
@@ -41,6 +40,7 @@ trace as a card, then build.
 | `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit. Historical: archived traces, flat `HUMAN_ORDER`, not re-runnable and not affected by the 2026-09-14 move to `--human-merge` for analyses |
 | `forecast_only.py` | Re-render only the frontier-forecast figures of one dashboard card |
 | `plot_lineage.py` | Reference render of the lineage prior's structure, as a multi-page PDF |
+| `lineage_regressions.py` | ECI-H along every lineage edge of `1_curated/lineage_map.csv`, flagged drops first; `tests/test_lineage_map.py` fails on a flagged edge not listed in `1_curated/lineage_reviewed_exceptions.csv` |
 
 ## Toolbox: audit the inputs
 

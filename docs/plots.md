@@ -7,7 +7,7 @@ which command produces it, what each figure shows, and the four reading
 conventions a figure cannot state on its own.
 
 Model math and priors: [model_math.md](model_math.md). Flags, tags and the
-fit CLI: [../README.md](../README.md).
+fit CLI: [cli.md](cli.md).
 
 ## Where figures go
 
@@ -18,8 +18,8 @@ All paths below sit under `5_outputs/<data generation>/` (`config.RESULTS_DIR`),
 | `mirt{tag}/figures/k{K}/` | `4_diagnostics/3_plot_mirt.py`, and `3_fit/fit.py --plots` | no |
 | `canonical_humanmerge/figures/` | `3_fit/fit.py --preset canonical --human-merge` (the order every analysis passes; without the flag, `canonical/figures/`) | no |
 | `comparisons/figures/` | `4_diagnostics/1_frontier_gap.py`, `2_plot_frontier_gap.py` | no |
-| `5_outputs/open_closed_frontier/` (+ `fr/`, `fr/svg/`) | `5_outputs/open_closed_frontier/make_plots.sh` (copies the frontier-gap deliverables out of `comparisons/`) | **yes**, except `*.html` |
-| `5_outputs/us_cn_frontier/` (+ `fr/`, `fr/svg/`) | `5_outputs/us_cn_frontier/make_plots.sh` (the same script with `GROUP=country`, French print figure on all and private benchmarks) | **yes**, except `*.html` |
+| `5_outputs/open_closed_frontier/` (+ `svg/`, `fr/`, `fr/svg/`) | `5_outputs/open_closed_frontier/make_plots.sh` (copies the frontier-gap deliverables out of `comparisons/`) | **yes**, except `*.html` |
+| `5_outputs/us_cn_frontier/` (+ `svg/`, `fr/`, `fr/svg/`) | `5_outputs/us_cn_frontier/make_plots.sh` (the same script with `GROUP=country`, print figures on public and private benchmarks) | **yes**, except `*.html` |
 | `diagnostics/` | `residual_corr.py`, `diagnose_chains.py --fig`, `align_mirt.py` | no |
 | `dashboard_stills/` | `4_diagnostics/4_build_dashboard.py --png` / `--pdf` | no |
 | `index.html` (repo root) | `4_diagnostics/4_build_dashboard.py` | **yes** |
@@ -91,7 +91,7 @@ Computed on the **whole** fit, never on a plot-side subset.
 |---|---|
 | `gof_pred_vs_observed` | posterior-mean prediction against observed score, one point per observation. Points off the diagonal are misfit; a bend in the cloud is a link problem, a widening is a noise problem |
 | `gof_posterior_predictive` | the replicated score density overlaid on the observed one. The two should have the same shape, including the pile-up near 0 and 1 |
-| `gof_pit` | histogram of the probability integral transform. Flat means calibrated. A U shape means the predictive is too narrow, a dome means too wide |
+| `gof_pit` | histogram of the leave-one-out probability integral transform (PSIS-LOO; observations with Pareto k > 0.7 left out). Flat means calibrated. A U shape means the predictive is too narrow, a dome means too wide |
 | `pit_ecdf` | the same PIT as a cumulative curve against the uniform diagonal. Reads small deviations that the histogram's binning hides. Single-fit CLI only; the dashboard card carries the cross-fit `cmp_pit_ecdf` instead |
 | `gof_bench_scores_vs_pred` | per benchmark (dropdown), models ranked by observed score, with the predictive median and its percentile band. Systematic misfit reads as the two marker sets separating; the band width shows how much of the gap the fit calls benchmark noise |
 | `gof_bench_icc` | per benchmark (dropdown), the fitted item characteristic curve mu = c + (d−c)·sigma(eta) drawn against the observed scores, with each model placed on that benchmark's logit scale. Dots hugging the curve mean the benchmark is well predicted; vertical bias or wide scatter flags misfit. Compensatory linear-link fits only, since the product and log-logistic links have no single eta |
@@ -191,15 +191,15 @@ top benchmarks still contain one of its signature benchmarks (`axis_names.json`)
 
 ## Memory
 
-**The flagship trace is 38 GB against 26 GB of RAM**, so it cannot be opened
-whole. Every figure in this catalogue is a median or an interval, and 20,000
+**Traces are written thinned** (`config.SAVE_THIN` = 5; the flagship's is
+under 1 GB), and the readers can thin further. Every figure in this catalogue is a median or an interval, and 20,000
 draws pin those as well as 200,000, so thinning costs nothing that a figure
 shows.
 
-- `--thin N` on `plot_mirt.py` keeps every n-th draw.
+- `--thin N` on `3_plot_mirt.py` keeps every n-th draw.
 - **Folder mode picks the thin itself**, one kept draw per 2 GB of file:
-  `thin = max(1, round(size_bytes / 2e9))`. The flagship gets thin 19, a
-  20 GB trace gets 10, anything under 3 GB gets 1. An explicit `--thin` wins.
+  `thin = max(1, round(size_bytes / 2e9))`. A trace under 3 GB, every
+  current one, gets 1. An explicit `--thin` wins.
 - **One child process per trace** in folder mode, so the OS reclaims all of
   the memory between fits and one out-of-memory kill costs one fit rather
   than the sweep.

@@ -21,6 +21,7 @@ unmarked to both.
 | `--sampler {pymc,nutpie,numpyro}` | NUTS backend. Default `nutpie` |
 | `--target-accept X` | `[expl]` default 0.95. Raise toward 0.99 if divergences appear |
 | `--seed N` | `[expl]` override seed 42. Nutpie is deterministic given seed + data + model, so a multi-run recipe must vary this |
+| `--save-thin N` | write every n-th draw to the trace file (default `config.SAVE_THIN` = 5); convergence and the tables use the full run, 1 keeps everything |
 | `--stream-draws` / `--no-stream-draws` | on by default: nutpie writes every draw to `<fit>/live_draws.zarr` as it lands instead of holding the run in RAM (a 10,000 x 8 K=4 run sat at 13 GB in memory on 2026-09-11; streamed, it needs a few hundred MB while sampling and about 8 GB of free disk, warmup included). A killed run keeps what it had (`persistence.load_live_draws` reads a partial store); the store is deleted once the thinned trace is saved. `--no-stream-draws` keeps the old in-RAM behaviour |
 
 **Model**
@@ -38,7 +39,7 @@ unmarked to both.
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
 | `--time-prior` | `[expl]` add a learned per-axis linear trend in release year to the theta prior MEAN, so a thinly-evaluated model is shrunk toward its era's level rather than the whole population's. The slope is signed and centered at zero, so a flat population reduces to the plain prior |
 | `--theta-t` | `[expl]` cell-wise leptokurtic theta: each (model, axis) cell of the exchangeable block gets a Student-t(4) marginal (direct closed-form density, no extra latents) instead of a Gaussian one |
-| `--private-bases` | `[expl]` give each human root and chain founder a private Normal(0,1) base and let the ZeroSumNormal span only the unstructured rows. Same marginal scale; changes how much of the population the location pin carries |
+| `--private-bases` | `[expl]` give each chain founder a private Normal(0,1) base and let the ZeroSumNormal span only the unstructured rows (human roots always have their own Normal(0, `PRIOR_HUMAN_ROOT` = 3) base). Same marginal scale; changes how much of the population the location pin carries |
 
 **Data scope**
 
@@ -50,6 +51,7 @@ unmarked to both.
 | `--access CLASS` | `[canon]` keep one access class of benchmarks only (the `access` column of `0_input/benchmarks.csv`): `public`, `semi_private`, `private`, or `nonpublic` for everything but public; results go to `canonical_<CLASS>/`. The ECI anchors must keep observations in the class (checked before sampling) |
 | `--open-only` / `--closed-only` | `[canon]` aliases of `--access public` / `--access nonpublic` |
 | `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
+| `--no-humans` | `[canon]` leave the human baselines out, a pure model-vs-model scale (the two anchors are models); with `--include-all-benchmarks` the easy-for-humans exclusions come back. Writes to `canonical_nohumans/` |
 | `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
 | `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
 | `--eci-data-only` | `[canon]` fit `1_curated/eci_data.csv`, the original reference ECI dataset, instead of the pipeline's score view |
@@ -130,12 +132,18 @@ finds side by side (panels, the months-behind figure, the table of the three lag
 scope; every quantity and the differences between scopes in its CSV, the crossing dates
 in theirs) with no trace loaded; `--y-range LO,HI` pins the panels' axis. Every figure is
 also written in French under `comparisons/figures/fr/` (`<stem>_fr.png`, the vector twin
-in `fr/svg/`), the `viz.i18n` string walk over the finished English figure, except the
-months-behind figure, drawn again in the lab's print style (`viz.frontier_gap_print`,
-matplotlib, the lab's marks); `--print-scopes all,private` keeps only those curves in it.
+in `fr/svg/`), the `viz.i18n` string walk over the finished English figure. The
+months-behind PNG, English and French, is drawn again in the lab's print style
+(`viz.frontier_gap_print`, matplotlib, the lab's marks; English vector twin in `svg/`); its
+HTML twin stays the interactive Plotly figure. `--print-scopes public,private` keeps only
+those curves in the print figures. The months-behind figures start in 2024
+(`viz.frontier_gap.GAP_START`, the panels too) and cut their axis at 20 months
+(`LAG_Y_MAX`; an interval above runs off the top); record dots that overlap are drawn as
+one disc split into sectors, one per colour, and the named records drop the MoE
+active-parameter count, `Instruct` and Qwen's checkpoint month.
 The write-ups' `5_outputs/open_closed_frontier/make_plots.sh` runs both over the four scopes
 and copies the deliverables, French included, into that folder (`GROUP=country` into
-`5_outputs/us_cn_frontier/`, whose own `make_plots.sh` sets it with `PRINT_SCOPES=all,private`).
+`5_outputs/us_cn_frontier/`, whose own `make_plots.sh` sets it with `PRINT_SCOPES=public,private`).
 
 ## Plot a fit
 
@@ -158,8 +166,8 @@ python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261001/            
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder
 also works. It auto-thins by file size, one kept draw per 2 GB, and `--thin`
-overrides: the 38 GB K=4 trace gets thin 19, which is what fits it in 26 GB of
-RAM. One child process per trace, so a single failure does not end the sweep.
+overrides. Fits write their traces already thinned (`--save-thin`, default
+`config.SAVE_THIN` = 5, the flagship's is under 1 GB), so it rarely exceeds 1. One child process per trace, so a single failure does not end the sweep.
 
 ## Diagnose a fit
 
@@ -224,7 +232,7 @@ selector, per-fit figures rendered lazily, and a cross-fit comparison view
 comes from cache. Open `index.html` in a browser; no server needed.
 
 The tracked `index.html` cannot be rebuilt from a fresh clone: it renders from
-the `.nc` traces, which are gitignored (the K=4 trace alone runs to tens of GB) and must
+the `.nc` traces, which are gitignored (the K=4 trace alone is about 0.6 GB, thinned) and must
 be re-fitted first. Treat the committed dashboard as a published artifact of the
 snapshot it was built from, not as something the repo regenerates on demand.
 `--png` / `--pdf` also dump stills to the data generation's `dashboard_stills/`.

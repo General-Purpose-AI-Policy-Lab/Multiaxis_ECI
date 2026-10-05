@@ -36,6 +36,14 @@ SCOPE_TITLES = {"all": "All benchmarks", "public": "Public benchmarks",
 PANELS_HORIZON = "2027-07-01"
 
 
+# The gap figures open on the first of January 2024 (user, 2026-10-05): the earlier records (2023's
+# Baichuan, LLaMA, Yi...) stay in the series, the curves and the records CSV, off the figure.
+GAP_START = pd.Timestamp("2024-01-01")
+# ... and their months-behind axis stops at 20 months for legibility (user, 2026-10-05): the few
+# intervals reaching higher run off the top.
+LAG_Y_MAX = 20.0
+
+
 def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                         window: tuple[str, str] | None = None, today=None,
                         title: str | None = None, group_titles: dict | None = None,
@@ -55,7 +63,8 @@ def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle 
     if window is None:
         first = min(pd.Timestamp(g.tl["release_date"].min()) for s in scopes
                     for g in (results[s].leader, results[s].follower) if len(g.tl))
-        window = ((first - pd.Timedelta(days=120)).strftime("%Y-%m-%d"), PANELS_HORIZON)
+        window = (max(first - pd.Timedelta(days=120), GAP_START).strftime("%Y-%m-%d"),
+                  PANELS_HORIZON)
     fig = make_subplots(rows=len(scopes), cols=1, shared_xaxes=True, vertical_spacing=0.07,
                         subplot_titles=[scope_titles.get(s, s) for s in scopes])
     fig.update_annotations(font_size=style.font_axis)
@@ -182,7 +191,7 @@ def _label_font(style: FigureStyle) -> int:
     """Type size of the record names. Read off `font_tier`, the scale's margin-label size, rather
     than off `font_note`: the names are the figure's third register, not a footnote, and at the
     POST scale a footnote's size would be the one thing on the panel still asking to be zoomed."""
-    return max(int(round(style.font_tier * 0.78)), 8)
+    return max(int(round(style.font_tier * 0.62)), 8)   # 0.78 until 2026-10-05 (user: smaller)
 
 
 # Records drawn but not named on the months-behind figure: releases of little note beside a named
@@ -207,7 +216,15 @@ def _record_label(raw: str) -> str:
     name = pretty_model_name(raw.split("_", 1)[0])
     # Vendor casing the generic prettifier misses: DeepSeek, and version tokens (K2, V3.2).
     name = re.sub(r"\bDeepseek\b", "DeepSeek", name)
-    return re.sub(r"\b([kv])(\d[\d.]*)\b", lambda m: m.group(1).upper() + m.group(2), name)
+    name = re.sub(r"\b([kv])(\d[\d.]*)\b", lambda m: m.group(1).upper() + m.group(2), name)
+    # Shorter where the name carries what the record does not need (user, 2026-10-05): a MoE's
+    # active parameters (A22B), "Instruct", and Qwen's checkpoint month (2507); and the casing a
+    # lower-case id leaves (qwen, 32b, Wizardlm).
+    name = re.sub(r"\s+A\d+B\b|\s+Instruct\b", "", name, flags=re.I)
+    name = re.sub(r"^(qwen.*?)\s+\d{4}$", r"\1", name, flags=re.I)
+    name = re.sub(r"^qwen", "Qwen", name)
+    name = re.sub(r"\b(\d+(?:\.\d+)?)b\b", r"\1B", name)
+    return name.replace("Wizardlm", "WizardLM")
 
 
 def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
@@ -247,6 +264,46 @@ def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
                             smooth_months / 12.0)
     lo, hi = np.nanpercentile(curves, [10, 90], axis=0)
     return grid_d, np.nanmedian(curves, axis=0), lo, hi
+
+
+def _split_dots(results: dict, drawn: list[str], w0, w1, to_px_x, to_px_y, dot_px: float,
+                overlap: float = 0.7):
+    """Groups of record dots (circles) closer than `overlap` of a diameter, in pixels, that carry
+    more than one scope colour: -> ([(x, y, colours)] one per group, at its centre; the set of
+    (scope, name) dots it hides). Two dots of one colour that touch stay plain dots."""
+    dots = []
+    for s in drawn:
+        df = results[s].lag_df
+        ok = df["lag_months_median"].notna() & (df["release_date"] >= w0) & (df["release_date"] <= w1)
+        for c in ("censored", "backcast"):
+            if c in df:
+                ok &= ~df[c].astype(bool)
+        for _, r in df[ok].iterrows():
+            dots.append((s, r["name"], pd.Timestamp(r["release_date"]), float(r["lag_months_median"])))
+    if not dots:
+        return [], set()
+    xy = np.array([(to_px_x(d), to_px_y(v)) for _, _, d, v in dots])
+    seen, out, hidden = set(), [], set()
+    for i in range(len(dots)):
+        if i in seen:
+            continue
+        g, todo = [i], [i]
+        seen.add(i)
+        while todo:
+            j = todo.pop()
+            for k in np.where(np.hypot(*(xy - xy[j]).T) < overlap * dot_px)[0]:
+                if k not in seen:
+                    seen.add(k)
+                    g.append(k)
+                    todo.append(k)
+        cols = list(dict.fromkeys(SCOPE_COLORS.get(dots[k][0], "#555") for k in sorted(g)))
+        if len(cols) < 2:
+            continue
+        x_mean = min(dots[k][2] for k in g) + (max(dots[k][2] for k in g) - min(dots[k][2] for k in g)) / 2
+        y_mean = float(np.mean([dots[k][3] for k in g]))
+        out.append((x_mean, y_mean, cols))
+        hidden |= {(dots[k][0], dots[k][1]) for k in g}
+    return out, hidden
 
 
 def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
@@ -292,7 +349,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
         first = pd.Timestamp(results[base].lag_df["release_date"].min())
         # ... and closes on the first of January after today, so the axis ends on a labelled
         # year rather than trailing off a few months past the last one.
-        window = ((first - pd.Timedelta(days=120)).strftime("%Y-%m-%d"),
+        window = (max(first - pd.Timedelta(days=120), GAP_START).strftime("%Y-%m-%d"),
                   f"{today_d.year + 1}-01-01")
     w0, w1 = pd.Timestamp(window[0]), pd.Timestamp(window[1])
 
@@ -336,15 +393,24 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     font_lab = _label_font(style)
     band_px = 0.0
     if label_scope in drawn:
-        band_px = _label_band_px(_record_names(results[label_scope].lag_df)[1], font_lab)
+        named = results[label_scope].lag_df
+        band_px = _label_band_px(_record_names(named[named["release_date"] >= w0])[1], font_lab)
     band_px = min(band_px, 0.45 * plot_h)
-    top = y_hi + 0.10 * span
+    top = min(y_hi + 0.10 * span, LAG_Y_MAX)
     band_top = min(0.0, y_lo) - 0.015 * span
     scale = (plot_h - band_px) / max(top - band_top, 1e-9)          # pixels per month
     y_range = (band_top - band_px / scale, top)
 
     to_px_x = lambda t: (pd.Timestamp(t) - w0).days / max((w1 - w0).days, 1) * plot_w  # noqa: E731
     from_px_x = lambda px: w0 + pd.Timedelta(days=px / plot_w * (w1 - w0).days)        # noqa: E731
+
+    # Dots that overlap (the same record once per scope, or two records of one date and lag) share
+    # one disc, one sector per scope colour, as in the print figure (user, 2026-10-05). The
+    # plotting area is fixed above, so overlap is read in pixels here; the hidden dots keep their
+    # hover, the sectors are pixel-sized shapes anchored on the group's centre.
+    dot_px = style.marker
+    split, hidden = _split_dots(results, drawn, w0, w1, to_px_x,
+                                lambda v: (v - y_range[0]) * scale, dot_px)
 
     fig = go.Figure()
     ends = []            # (value, name, colour, where the line ends) per scope, for the margin
@@ -372,10 +438,11 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             # (2021) is drawn off the left edge and would otherwise key a marker nobody sees.
             if ((sub["release_date"] >= w0) & (sub["release_date"] <= w1)).any():
                 shapes_seen.add(key)
+            opacity = [0.0 if not key and (scope, n) in hidden else 1.0 for n in sub["name"]]
             fig.add_trace(go.Scatter(
                 x=sub["release_date"], y=sub["lag_months_median"], mode="markers",
                 legendgroup=scope, name=f"{name}: records", showlegend=False,
-                marker=dict(color=col, size=style.marker + 1, symbol=symbol,
+                marker=dict(color=col, size=dot_px, symbol=symbol, opacity=opacity,
                             line=dict(width=1.5 if key else 1, color=col if key else "white")),
                 error_y=dict(type="data", symmetric=False,
                              array=sub["lag_hdi50_high"] - sub["lag_months_median"],
@@ -413,8 +480,9 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                             line=dict(width=1.0 if filled else 1.5,
                                       color="white" if filled else KEY_COLOR))))
     if label_scope in drawn:
-        _record_labels(fig, results[label_scope].lag_df, style, to_px_x, from_px_x, plot_w,
-                       band_top)
+        named = results[label_scope].lag_df
+        _record_labels(fig, named[named["release_date"] >= w0], style, to_px_x, from_px_x,
+                       plot_w, band_top)
     _line_end_labels(fig, ends, style, y_range, plot_w, plot_h)
     fig.add_hline(y=0, line=dict(color="#999", width=style.refline))
     fig.add_vline(x=today_d.strftime("%Y-%m-%d"),
@@ -441,6 +509,17 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
                      range=list(y_range), tickvals=ticks, gridcolor="#d8d8d8", zeroline=False)
     # The marker key goes in the right margin, above the scope names and flush with them: what a
     # dot and a hollow diamond mean is read beside the lines, not in a band over the panel.
+    for x, y, cols in split:
+        step = 2 * np.pi / len(cols)
+        for n, col in enumerate(cols):
+            a0 = np.pi / 2 - n * step                    # first sector from the top, clockwise
+            t = np.linspace(a0 - step, a0, 16)
+            r = 0.55 * dot_px
+            pts = " ".join(f"L {r * np.cos(a):.2f},{r * np.sin(a):.2f}" for a in t)
+            fig.add_shape(type="path", path=f"M 0,0 {pts} Z", xref="x", yref="y",
+                          xsizemode="pixel", ysizemode="pixel", xanchor=x, yanchor=y,
+                          fillcolor=col, line=dict(color="white", width=0.6), layer="above")
+
     fig.update_layout(template="plotly_white", width=style.width, height=height, margin=margin,
                       legend=dict(orientation="v", yanchor="top", y=1.0, xanchor="left",
                                   x=1.0 + lead_px / plot_w, bgcolor="rgba(0,0,0,0)",

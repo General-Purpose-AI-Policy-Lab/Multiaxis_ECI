@@ -1,6 +1,6 @@
 # Benchmarks by access class (canonical scope, curated exclusions applied)
 
-## public (59)
+## public (58)
 
 - APEX-Agents
 - ARC AI2
@@ -15,7 +15,6 @@
 - Cybench
 - CyberGym
 - DTBench
-- DeepResearch Bench
 - DeepSWE
 - DrugDiscoveryBench
 - ExploitBench
@@ -65,7 +64,7 @@
 ## semi_private (10)
 
 - CritPt
-- FrontierCode
+- DeepResearch Bench
 - FrontierMath Tier 4 v2
 - FrontierMath Tiers 1-3 v2
 - MCP Atlas
@@ -83,10 +82,10 @@
 - AISI CTF Suites - Technical Non-Expert
 - AISI Cyber Ranges - Cooling Tower
 - AISI Cyber Ranges - The Last Ones
-- Chess Puzzles
 - CyScenarioBench
 - EBR-bench
 - Fiction.LiveBench
+- FrontierCode
 - LMCA
 - Mystery Game Puzzles
 - Surface Evolver Bench

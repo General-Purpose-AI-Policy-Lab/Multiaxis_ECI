@@ -9,7 +9,7 @@ loaded.
   frontier_gap_<group>_table       the summary table (PNG, CSV and Markdown), with the change of
                                    every quantity against the all-benchmarks scope
 
-  python 4_diagnostics/2_plot_frontier_gap.py [--group openness|country] [--today YYYY-MM-DD] [--print-scopes all,private]
+  python 4_diagnostics/2_plot_frontier_gap.py [--group openness|country] [--today YYYY-MM-DD] [--print-scopes public,private]
 """
 from __future__ import annotations
 
@@ -186,7 +186,7 @@ def main():
     ap.add_argument("--group", default="openness", choices=list(GROUP_TITLES))
     ap.add_argument("--today", default=None, help="pin the today line (default: the wall clock)")
     ap.add_argument("--print-scopes", default=None, metavar="S1,S2",
-                    help="the scopes the French print figure draws, e.g. all,private "
+                    help="the scopes the print figures (EN, FR) draw, e.g. public,private "
                          "(default: every scope found)")
     ap.add_argument("--y-range", default=None, metavar="LO,HI",
                     help="fix the panels' ECI-H range (default: read off the candidates)")
@@ -235,10 +235,21 @@ def main():
     unknown = [s for s in print_scopes if s not in results]
     if unknown:
         raise SystemExit(f"--print-scopes: no result for {unknown} (have {scopes})")
-    fr_fig = lag_fig_print(results, print_scopes, today=args.today, label_scope="all", group=kind,
+    # The named records sit on the "all benchmarks" dots when that curve is drawn, else on the
+    # first curve's.
+    label_scope = "all" if "all" in print_scopes else print_scopes[0]
+    fr_fig = lag_fig_print(results, print_scopes, today=args.today, label_scope=label_scope, group=kind,
                            counts={s: len(by_class[s]) for s in print_scopes if s in by_class})
     save_print(fr_fig, figures_dir / "fr" / f"{stem}_lag_fr.png",
                figures_dir / "fr" / "svg" / f"{stem}_lag_fr.svg")
+    # The English PNG is the same house-style figure in English, over the Plotly render (whose
+    # HTML twin stays the interactive one): one look in both languages, overlapping dots drawn as
+    # one split disc (user, 2026-10-05).
+    (figures_dir / "svg").mkdir(parents=True, exist_ok=True)
+    en_fig = lag_fig_print(results, print_scopes, today=args.today, label_scope=label_scope,
+                           group=kind, lang="en",
+                           counts={s: len(by_class[s]) for s in print_scopes if s in by_class})
+    save_print(en_fig, figures_dir / f"{stem}_lag.png", figures_dir / "svg" / f"{stem}_lag.svg")
 
     cx_all = []
     for s in scopes:

@@ -2,7 +2,7 @@
 
 A multi-axis, Bayesian version of the **Epoch Capabilities Index** ([ECI](https://epoch.ai/eci)) with human baselines fitted inside the model, and the frontier forecasts it supports.
 
-The method was published in [*Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines*](https://gpaipolicylab.org/blog-5) (GPAI Policy Lab, 2026-09-07). That post was fitted on the pre-pipeline dataset, and its code, data and results are frozen on the branch [`blogpost-frozen`](https://github.com/General-Purpose-AI-Policy-Lab/Multiaxis_ECI/tree/blogpost-frozen); its tables stay on `main` under `5_outputs/pre_pipeline/`. `main` has moved on since: the data now comes from [`benchmark-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/benchmark-data-pipeline), the human tiers follow one merged partial order, the forecast fits reasoning and non-reasoning models separately, and the flagship was refitted on the pipeline build of 2026-09-30 (feeds refreshed on 2026-09-29). This README describes `main`; where a number comes from the post, it says so.
+The method was published in [*Multi-Axis Bayesian Epoch Capabilities Index with Human Baselines*](https://gpaipolicylab.org/blog-5) (GPAI Policy Lab, 2026-09-07). That post was fitted on the pre-pipeline dataset, and its code, data and results are frozen on the branch [`blogpost-frozen`](https://github.com/General-Purpose-AI-Policy-Lab/Multiaxis_ECI/tree/blogpost-frozen); its tables stay on `main` under `5_outputs/pre_pipeline/`. `main` has moved on since: the data now comes from [`benchmark-data-pipeline`](https://github.com/General-Purpose-AI-Policy-Lab/benchmark-data-pipeline), the human tiers follow one merged partial order, the forecast fits reasoning and non-reasoning models separately, and the current data generation is the pipeline run of 2026-10-01 (commit 956c91b, rebuilt 2026-10-05). This README describes `main`; where a number comes from the post, it says so.
 
 ## The idea
 
@@ -39,7 +39,7 @@ The 20 benchmarks with the largest share of each axis, their loadings (median an
 
 `python docs/make_readme_figures.py` redraws these five figures from the current flagship trace, with the builders of the per-fit folders.
 
-The K=4 fit sees 5,413 observations, 776 test-takers and 99 benchmarks; the canonical K=1 index, which also applies the curated exclusions, 4,353 / 694 / 85. The post's fits saw 4,923 / 829 / 96 and 4,184 / 781 / 88.
+The K=4 fit sees 5,161 observations, 859 test-takers and 98 benchmarks; the canonical K=1 index, which also applies the curated exclusions, 4,091 observations on 84 benchmarks. The post's fits saw 4,923 / 829 / 96 and 4,184 / 781 / 88.
 
 ## Setup
 
@@ -82,7 +82,7 @@ Then find the posterior modes, render the fit's figures (on the best mode's chai
 ```bash
 python 4_diagnostics/diagnose_chains.py --trace <trace> --write-modes
 python 4_diagnostics/3_plot_mirt.py --forecast --trace <trace>
-python 4_diagnostics/4_build_dashboard.py
+python 4_diagnostics/4_build_dashboard.py --force-all
 ```
 
 The canonical K=1 index, 2,500 draws x 8 chains, writing the full ECI-H deliverables to `5_outputs/<data generation>/canonical_humanmerge/`:
@@ -100,11 +100,11 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 ```
 .
 ├── 0_input/             # step 0: the pipeline's views and tables, synced (all_scores_flat, human_baselines, models, benchmarks, manifest, provenance)
-├── 1_curated/           # step 1: inputs specific to this model, and the three builders (SOTA list, lineage map, model openness)
+├── 1_curated/           # step 1: inputs specific to this model, and its builder scripts (SOTA list, lineage map, model openness, ...)
 ├── 2_model/multiaxis_eci/  # step 2: the library: config, data loading, models, analysis, figures, sync
 ├── 3_fit/fit.py         # step 3: the fit CLI (canonical preset + exploration)
 ├── 4_diagnostics/       # step 4: post-fit tools, the numbered four in reproduction order
-├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace, figures/; pre_pipeline/ holds the post's fits, us_cn_frontier/ the US vs Chinese frontier note (open_closed_frontier/, the open-weights vs closed one, kept on the 2026-09-29 data)
+├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace, figures/; pre_pipeline/ holds the post's fits, open_closed_frontier/ and us_cn_frontier/ the open-weights vs closed and US vs Chinese frontier notes
 ├── 6_writeups/          # step 6: the post's figure scripts (6_writeups/blogpost/), the dashboard's card registry
 ├── internal_evals/      # the lab's own scoring runs (LAB-Bench cloning through OpenRouter); needs OPENROUTER_API_KEY
 ├── archive/             # kept for the record, not maintained: notebooks (one-off investigations), results_old (superseded fits)
@@ -134,7 +134,7 @@ This is the *compensatory* family: a strong skill can make up for a weak one ins
 
 Both are needed. On the post's data, runs without priors split into two sets of axes, the human ordering alone left them in disagreement, and both together brought them into agreement; on leave-one-out cross-validation that model beat the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33. On the 2026-09-08 build, dropping the lineage prior leaves the eight chains on eight separate solutions, hundreds of nats apart (the README of that fit, `5_outputs/data20260908/mirt_humanmerge/README.md`, deleted with the 2026-09-08 outputs on 2026-10-01, stays in the git history); with both priors the chains still fall into three modes (see [Limitations](#limitations)).
 
-Four things are on by default with no flag over them: non-negative loadings, the fixed-c chance floors (the pipeline's `lower_bound`), hierarchical benchmark noise, and the Beta-binomial likelihood. In the canonical K=1 index, a release's effort variants also share one level, as in the lineage prior but without the links between releases, so a variant scored on one benchmark only sits near its release. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
+On by default with no flag over them: non-negative loadings, the Beta-binomial likelihood and the effort means (a release's effort levels as one learned direction); the K-axis fits also apply the fixed-c chance floors (the pipeline's `lower_bound`) and hierarchical benchmark noise, which the canonical index leaves out. In the canonical K=1 index, a release's effort variants also share one level, as in the lineage prior but without the links between releases, so a variant scored on one benchmark only sits near its release. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
 
 **The forecast** starts from the models evaluated on an axis, keeps one effort per family (the best) and one release per organization and day, and splits them into reasoning models and the others. Each regime's frontier (the running top two by release date) gets one straight line, fitted on the posterior medians and weighted by their posterior SD; the reasoning line is projected from the first reasoning release to 2030, and crossing dates read the piecewise frontier against each human tier. The full rule: [docs/plots.md](docs/plots.md).
 

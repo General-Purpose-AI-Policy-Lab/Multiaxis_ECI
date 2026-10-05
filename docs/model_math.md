@@ -9,7 +9,10 @@ the mean $\mu$:
 - **KD 3PL** — KD with a fixed per-benchmark chance floor.
 
 Everything else (the Beta likelihood, the priors on difficulty, noise, and
-abilities) is shared. This document defines every symbol.
+abilities) is shared. This document defines every symbol. By default the
+item-scored benchmarks enter through the Beta-binomial of §2.3 and the
+continuous ones through the Beta below; `--beta-likelihood` puts every score
+on the Beta (with the clipping of §2.2).
 
 ---
 
@@ -75,7 +78,7 @@ is $4\sigma_b^2\,\mu(1-\mu)$.
 **Validity constraint:** $\phi_b>0$ requires $\sigma_b < \tfrac12$; the prior
 (Section 5) keeps $\sigma_b$ well below that.
 
-### 2.2 Boundary clipping
+### 2.2 Boundary clipping (Beta-scored observations)
 
 The Beta has open support $(0,1)$, but a handful of scores are exactly $0$ or
 $1$. Those (and only those) are clipped inward before being passed as the
@@ -417,7 +420,7 @@ a Brownian motion with drift observed at the release dates, under **one shared
 per-axis drift rate** (a per-vendor pooled rate was fitted 2026-07-27 and
 removed: roughly one release per year per vendor cannot pin a rate). Constants:
 `PRIOR_LINEAGE_DRIFT_BM = 1.0` (logits/year) and `PRIOR_LINEAGE_DELTA_BM = 2.0`
-(logits/$\sqrt{\text{year}}$). The mean-zero variant offsets are unchanged.
+(logits/$\sqrt{\text{year}}$). The mean-zero variant offsets (`--no-effort-means` only, see below) are unchanged.
 
 *Effort means — a mean per effort level (the default since 2026-10-03; `--no-effort-means` opts out).* The offsets above are mean-zero, but the
 prior-tail audit of the 2026-10-01 flagship put every reasoning-off offset at $-3$ to $-4$ sd
@@ -534,6 +537,6 @@ c_{b_n} + (1-c_{b_n})\,\sigma\!\big(\sum_k A_{b_n,k}\theta_{m_n,k} - D_{b_n}\big
 $$
 
 with the same $y_n\sim\mathrm{Beta}(\mu_n\phi_{b_n},(1-\mu_n)\phi_{b_n})$,
-$\phi_b = \tfrac{1}{4\sigma_b^2}-1$, boundary clipping at $\varepsilon=10^{-3}$,
+$\phi_b = \tfrac{1}{4\sigma_b^2}-1$, boundary clipping at $\varepsilon=10^{-3}$ (or the Beta-binomial of §2.3 on item-scored benchmarks, the default),
 and the priors of Section 5 throughout. 1D is KD at $K=1$; KD is KD 3PL at
 $c\equiv 0$.

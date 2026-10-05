@@ -1045,8 +1045,8 @@ def main():
                              "(comma-separated, exact names). For targeted sensitivity "
                              "runs, e.g. the GBAEval+VPCT basin-flip test")
     parser.add_argument("--private-bases", action="store_true",
-                        help="[exploration] give each human root and chain founder "
-                             "a private Normal(0,1) base and let the ZeroSumNormal "
+                        help="[exploration] give each chain founder (human roots always have "
+                             "their own) a private Normal(0,1) base and let the ZeroSumNormal "
                              "span only the unstructured rows. Same marginal scale; "
                              "changes how much of the population the location pin "
                              "covers")

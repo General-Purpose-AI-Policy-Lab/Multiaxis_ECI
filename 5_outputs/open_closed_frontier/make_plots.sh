@@ -1,8 +1,8 @@
 #!/bin/zsh
 # Open-weights vs closed frontier on ECI-H, by benchmark access class (all / public / semi-private /
 # private): the per-scope step on each canonical trace, the cross-scope figures and tables, then a
-# copy of the deliverables into this folder — English at the top level, French under fr/ with the
-# vector twins the lab's site embeds in fr/svg/.
+# copy of the deliverables into this folder — English at the top level (vector twin of the print
+# figure in svg/), French under fr/ with the vector twins the lab's site embeds in fr/svg/.
 #
 # Prerequisites: the four K=1 fits of the current data generation, with the human tier order every
 # analysis passes (--human-merge, decision 2026-09-14),
@@ -22,7 +22,7 @@ cd "$(dirname "$0")/../.."
 PY=.venv/bin/python
 GROUP=${GROUP:-openness}          # GROUP=country for the US vs CN cut (5_outputs/us_cn_frontier/make_plots.sh)
 OUT=5_outputs/$([[ $GROUP == country ]] && echo us_cn_frontier || echo open_closed_frontier)
-PRINT_SCOPES=${PRINT_SCOPES:-}    # PRINT_SCOPES=all,private: the curves of the French print figure
+PRINT_SCOPES=${PRINT_SCOPES:-}    # PRINT_SCOPES=public,private: the curves of the print figures (EN, FR)
 P=(); [[ -n "$PRINT_SCOPES" ]] && P=(--print-scopes "$PRINT_SCOPES")
 TODAY=${TODAY:-}                  # TODAY=2026-09-29 pins the today line
 SCOPE_SUFFIX=${SCOPE_SUFFIX-_humanmerge}   # the merged tier order; SCOPE_SUFFIX= reads plain canonical*/
@@ -40,6 +40,7 @@ F=$GEN/comparisons/figures
 mkdir -p "$OUT/fr/svg"
 for name in panels lag table; do
   cp "$F/frontier_gap_${GROUP}_$name.png" "$OUT/"
+  [[ -f "$F/svg/frontier_gap_${GROUP}_$name.svg" ]] && mkdir -p "$OUT/svg" && cp "$F/svg/frontier_gap_${GROUP}_$name.svg" "$OUT/svg/"
   cp "$F/fr/frontier_gap_${GROUP}_${name}_fr.png" "$OUT/fr/"          # French renders
   cp "$F/fr/svg/frontier_gap_${GROUP}_${name}_fr.svg" "$OUT/fr/svg/"  # ... and their vector twins
 done

@@ -2,7 +2,7 @@
 
 The question of [Ihle (2026), *How far behind are open models?*](https://www.lesswrong.com/posts/rJcCrXyEsJKmmDpWG/how-far-behind-are-open-models), asked on our ECI-H scale instead of per-benchmark score thresholds: how many months does the open-weights frontier trail the closed one, and does the answer change with the access class of the benchmarks?
 
-Data generation 2026-10-01 (pipeline commit `6b68fe1`: the run of 2026-10-01, rebuilt in place on 2026-10-02 without two faulty Kaggle rows), today pinned at 2026-10-01. Figures and tables are copies of `5_outputs/data20261001/comparisons/frontier_gap_openness_*`; French versions in `fr/`, vector twins in `fr/svg/`; the French months-behind figure is drawn in the lab's print style, with its marks (`viz.frontier_gap_print`).
+Data generation 2026-10-01 (pipeline commit `956c91b`: the run of 2026-10-01, rebuilt on 2026-10-05 after the review of the scores with no effort suffix, Chess Puzzles out), today pinned at 2026-10-01. Figures and tables are copies of `5_outputs/data20261001/comparisons/frontier_gap_openness_*`; French versions in `fr/`. The months-behind figure, English and French, is drawn in the lab's print style (`viz.frontier_gap_print`, vector twins in `svg/` and `fr/svg/`; the `.html` twin is the interactive one): from 2024, axis cut at 20 months (a few intervals run off the top), overlapping record dots drawn as one disc split by colour.
 
 ![Months behind](frontier_gap_openness_lag.png)
 
@@ -10,13 +10,13 @@ Data generation 2026-10-01 (pipeline commit `6b68fe1`: the run of 2026-10-01, re
 
 Open-weights records of the last twelve months, median [80% interval]:
 
-| | All (85) | Public (59) | Semi-private (10) | Private (14) |
+| | All (84) | Public (58) | Semi-private (10) | Private (14) |
 |---|---|---|---|---|
-| Months behind the closed frontier | 7.7 [7.1, 8.6] | 6.9 [5.8, 8.0] | 7.8 [6.8, 9.4] | 10.3 [8.3, 11.8] |
+| Months behind the closed frontier | 6.9 [6.2, 7.7] | 5.6 [4.6, 6.8] | 7.2 [6.2, 8.2] | 8.2 [6.5, 9.5] |
 
-- **About eight months.** On all benchmarks the open records of the last year sit where the closed frontier stood 7.7 months earlier; the trend lines through the records say the same order of magnitude (10.7 [9.3, 12.1] months today, gap over the closed slope). The closed frontier gains 22.2 ECI-H a year against 16.1 for open weights: the gap in points is widening.
-- **Private benchmarks show a longer lag**, 3.4 [0.9, 5.6] months more than public benchmarks (two fits on disjoint benchmarks, so an independent comparison). This is Ihle's direction (8-10 months private, 4-6 public).
-- **Semi-private and public are close** (7.8 and 6.9 months).
+- **About seven months.** On all benchmarks the open records of the last year sit where the closed frontier stood 6.9 months earlier; the trend lines through the records say the same order of magnitude (9.5 [8.0, 10.9] months today, gap over the closed slope). The closed frontier gains 22.9 ECI-H a year against 18.0 for open weights: the gap in points is widening.
+- **Private benchmarks show a longer lag**, 2.4 [0.6, 4.2] months more than public benchmarks (two fits on disjoint benchmarks, so an independent comparison). This is Ihle's direction (8-10 months private, 4-6 public).
+- **Semi-private sits in between** (7.2 months, against 5.6 on public and 8.2 on private).
 
 The three lags per scope: [`frontier_gap_openness_table.md`](frontier_gap_openness_table.md); every quantity (slopes, gaps in ECI-H) and the differences between scopes, private − public among them, in [`frontier_gap_openness_table.csv`](frontier_gap_openness_table.csv).
 
@@ -24,7 +24,7 @@ The three lags per scope: [`frontier_gap_openness_table.md`](frontier_gap_openne
 
 ## Method
 
-- **Fits.** The canonical K=1 ECI-H fit on its 85 benchmarks (`--human-merge`, 8 x 2,500 draws) and three quick fits (4 x 2,000) on one access class each. The index leaves out, besides the benchmarks built to be easy for humans, the six mainly visual ones (VISTA, GeoBench, BlueprintBench 2, VisualToolBench, EnigmaEval, Furniture Assembly: humans at or above the best models, a few labs' vision models favoured, open models rarely scored). Classes come from the pipeline: a scored set anyone can download without a human reviewing the request is public (an automatic gate counts), a held-out scored set with a released sample is semi-private (an illustrative example is not a sample), a set never released or given on reviewed request is private. The classes agree with Ihle's on all 17 benchmarks of his post. List: [`frontier_gap_openness_benchmark_classes.md`](frontier_gap_openness_benchmark_classes.md).
+- **Fits.** The canonical K=1 ECI-H fit on its 84 benchmarks (`--human-merge`, 8 x 2,500 draws) and three quick fits (4 x 2,000) on one access class each. The index leaves out, besides the benchmarks built to be easy for humans, the six mainly visual ones (VISTA, GeoBench, BlueprintBench 2, VisualToolBench, EnigmaEval, Furniture Assembly: humans at or above the best models, a few labs' vision models favoured, open models rarely scored). Classes come from the pipeline: a scored set anyone can download without a human reviewing the request is public (an automatic gate counts), a held-out scored set with a released sample is semi-private (an illustrative example is not a sample), a set never released or given on reviewed request is private. The classes agree with Ihle's on all 17 benchmarks of his post. List: [`frontier_gap_openness_benchmark_classes.md`](frontier_gap_openness_benchmark_classes.md).
 - **One scale.** The all-benchmarks fit is pinned by its two anchors (Claude 3.5 Sonnet Oct 2024 = 130, GPT-5 medium = 150). Each class fit is linked onto it through the closed OpenAI, Anthropic and Google models with at least four scores in the class (mean-sigma, per draw): the anchors alone hold two to four scores per class, other labs' models may be tuned to some benchmarks, and linking through open models would erase the difference being measured.
 - **Open or closed** (`1_curated/model_openness.csv`): open when the weights are downloadable at release or within 30 days (GLM-5.3 open, grok-2 closed), and a hosted version of open weights is open (Qwen3.5-Plus).
 - **Records.** Candidates are dated releases with at least two scores in the scope; a group's frontier is the running maximum of posterior-median ECI-H, one effort per family and one release per day. In a class, an open record only counts if the release is within 5 ECI-H of the open record of its date on all benchmarks (in 2024 the open "records" on private benchmarks were Llama 3.1 8B and Pixtral 12B, the open models that happened to be scored).
@@ -33,8 +33,8 @@ The three lags per scope: [`frontier_gap_openness_table.md`](frontier_gap_openne
 
 ## Caveats
 
-- Class fits are quick fits (max r̂ ≤ 1.022, at most 16 divergences out of 8,000, on private). The private fit's own tables read ECI-H off Claude 3.7 Sonnet and GPT-5 medium (`--anchors`): Claude 3.5 Sonnet has no private score left.
-- Open coverage is thin outside public benchmarks: 52 open candidates on private benchmarks against 145 closed, 8 records.
+- Class fits are quick fits (max r̂ ≤ 1.034, at most 24 divergences out of 8,000, on semi-private). The private fit's own tables read ECI-H off Claude 3.7 Sonnet and GPT-5 medium (`--anchors`): Claude 3.5 Sonnet has no private score left.
+- Open coverage is thin outside public benchmarks: 23 open candidates on private benchmarks against 96 closed, 6 records.
 - Gaps in ECI-H points depend on the linking; lags in months do not (any positive affine map per draw leaves them unchanged).
 - The human tiers of a class are placed by the few baselines left in it; on private benchmarks they sit implausibly high, and no number here reads them.
 - The frontier accelerates over 2024-2026, so a straight line through the records is a summary, not a model; the record lags are the headline.
