@@ -338,6 +338,8 @@ All goldens were re-pinned again the same day when five more human baselines joi
 (50 -> 55 rows: Furniture Assembly Average Human 0.63 and Top Performer 0.84, LMCA Domain Expert 0.87,
 DTBench Domain Expert 0.9867, FrontierMath Erdos Domain Expert 0.0), and once more when Cybench's
 Committee of Domain Experts row went from 1.0 to 0.75 (a top-25 competition team). Data only.
+The human-order goldens moved later on 2026-10-06 when the tier increment prior widened from
+HalfNormal(1) to HalfNormal(2) (config.PRIOR_DELTA_HUMAN): model math, by decision.
 The Beta-binomial golden moved once more when human scores stopped being clamped to
 [ECI_EPS, 1 - ECI_EPS] in data.py: a human 1.0 on an item-scored benchmark now enters as k = N,
 like a machine 1.0 (the Beta goldens clip in the builders, so they did not move).
@@ -474,7 +476,7 @@ class TestGoldenLogp:
         model = build_mirt_model(data, K=3, loading_prior="normal",
                                  human_order=HUMAN_ORDER_MERGED)
         np.testing.assert_allclose(
-            total_logp(model), -84856.257982, rtol=self.RTOL)
+            total_logp(model), -85254.103825, rtol=self.RTOL)
 
     def test_mirt_k3_signed_lineage_bm(self, data):
         model = build_mirt_model(
@@ -506,7 +508,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True,
             plt_founders=[bench[5], bench[10], bench[20]])
         np.testing.assert_allclose(
-            perturbed_logp(model), -70083.3945, rtol=self.RTOL)
+            perturbed_logp(model), -69891.739723, rtol=self.RTOL)
 
     def test_mirt_k3_normal_time_prior(self, data):
         # Config lock only: at the initial point time_beta = 0, so the trend
@@ -520,7 +522,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=lin, time_t=release_time_covariate(data.mlookup, lin))
         np.testing.assert_allclose(
-            total_logp(model), -148923.801819, rtol=self.RTOL)
+            total_logp(model), -149321.647662, rtol=self.RTOL)
 
     def test_mirt_k3_signed_theta_t(self, data):
         # Config lock: at the initial point every t cell is 0 and re-centering
@@ -541,7 +543,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), theta_t_cells=True)
         np.testing.assert_allclose(
-            total_logp(model), -148962.83002, rtol=self.RTOL)
+            total_logp(model), -149360.675863, rtol=self.RTOL)
 
     def test_mirt_k3_normal_theta_pos(self, data):
         # Formula lock: at the initial point theta = 0 but softplus(0) = log 2,
@@ -584,7 +586,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), known_se=True)
         np.testing.assert_allclose(
-            total_logp(model), -134906.092431, rtol=self.RTOL)
+            total_logp(model), -135303.938274, rtol=self.RTOL)
 
     def test_mirt_k3_normal_pooled_knownse(self, data):
         # The production combo: pooled noise on top of the known-SE split. At the
@@ -597,7 +599,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup), known_se=True,
             pooled_noise=True)
         np.testing.assert_allclose(
-            total_logp(model), -172388.801367, rtol=self.RTOL)
+            total_logp(model), -172880.864145, rtol=self.RTOL)
 
     def test_mirt_k3_signed_floors(self, data_all):
         from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
@@ -624,7 +626,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(clipped.mlookup), lineage_bm=True,
             floor_c=floors, ceiling_noise=True)
         np.testing.assert_allclose(
-            total_logp(model), -195742.506059, rtol=self.RTOL)
+            total_logp(model), -195861.176711, rtol=self.RTOL)
 
     def test_mirt_k3_anchored(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial

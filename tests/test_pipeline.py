@@ -1785,6 +1785,11 @@ class TestMIRT:
         2026-07-05 as the hypothesis-matrix reference condition.)"""
         m = build_mirt_model(data, K=2, human_order=HUMAN_ORDER)
         assert "delta_h" in {v.name for v in m.free_RVs}
+        # The increment sigma is the builder's argument, not a module constant.
+        sd = pm.draw(build_mirt_model(data, K=2, human_order=HUMAN_ORDER,
+                                      human_delta_sd=0.5)["delta_h"],
+                     draws=4000, random_seed=0).std()
+        assert abs(sd - 0.5 * np.sqrt(1 - 2 / np.pi)) < 0.03
         # Root levels are private bases, outside the models' ZeroSumNormal.
         assert "theta_h_base" in {v.name for v in m.free_RVs}
         names = data.mlookup.sort_values("model_idx")["model"].tolist()
@@ -2550,10 +2555,31 @@ class TestFitSpec:
             apply_exclusions=True, cyber=True, simpleqa_original=True,
             drop_benchmarks=("FrontierMath v1", "AlgoTune"), private_bases=True,
             floors=True, ceiling_noise=True, known_se=True,
-            pooled_noise=True, censor_bounds=True, keep_isolated=True)
+            pooled_noise=True, censor_bounds=True, keep_isolated=True,
+            human_delta_sd=1.5)
         idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(spec)})
         got = analysis.FitSpec.from_trace(idata, spec.trace_path)
         assert got == spec
+
+    def test_human_delta_sd_travels_with_the_trace(self):
+        # The config sets the tier increment sigma once; a fit records it in its spec, and a
+        # reader takes the trace's value: a spec saved before the field existed reads as 1.0,
+        # the spec-less canonical K=1 trace carries it as its own attr.
+        from multiaxis_eci.analysis.fitspec import LEGACY_HUMAN_DELTA_SD, trace_human_delta_sd
+        from multiaxis_eci.config import PRIOR_DELTA_HUMAN
+        assert analysis.FitSpec(K=3).human_delta_sd == PRIOR_DELTA_HUMAN
+        spec = analysis.FitSpec(K=3, human_merge=True)
+        old = json.loads(analysis.spec_json(spec))
+        old.pop("human_delta_sd")
+        idata = self._idata(K=3, attrs={"mirt_spec": json.dumps(old)})
+        assert analysis.FitSpec.from_trace(idata, spec.trace_path).human_delta_sd == 1.0
+        assert trace_human_delta_sd(idata.posterior) == LEGACY_HUMAN_DELTA_SD == 1.0
+        idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(
+            analysis.FitSpec(K=3, human_merge=True, human_delta_sd=2.5))})
+        assert trace_human_delta_sd(idata.posterior) == 2.5
+        assert trace_human_delta_sd(self._idata(
+            K=1, attrs={"mirt_human_delta_sd": "0.75"}).posterior) == 0.75
+        assert trace_human_delta_sd(self._idata(K=1).posterior) == 1.0
 
     def test_folder_tag_fallback(self):
         # No attrs at all: the folder tag carries the flags that never had one.

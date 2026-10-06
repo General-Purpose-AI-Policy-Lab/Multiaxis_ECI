@@ -62,6 +62,7 @@ from multiaxis_eci.analysis.human_ident import (
     human_axis_contraction,
     human_scale_axes,
     identified_tiers,
+    increment_contraction,
     view_human_contraction,
 )
 from multiaxis_eci.analysis.regimes import (
@@ -145,7 +146,8 @@ __all__ = [
     "loadings_forest_df", "nc_difficulty_timeline_df",
     "ForecastResult", "mirt_frontier_forecast", "mirt_crossover_df",
     "axis_forecast_inputs", "crossover_table", "forest_frames",
-    "human_axis_contraction", "human_scale_axes", "identified_tiers", "view_human_contraction",
+    "human_axis_contraction", "human_scale_axes", "identified_tiers", "increment_contraction",
+    "view_human_contraction",
     "human_unit_affine", "rescale_frame", "rescale_forecast", "rescale_theta", "ability_label",
     "family_best", "frontier_topk", "is_reasoning", "one_per_org_day", "reasoning_mask", "regime_crossover_df",
     "two_regime_forecast", "weighted_line_fit",

@@ -73,6 +73,7 @@ def _theta_t_cells(n_rows: int, K: int, nu: float = PRIOR_THETA_T_NU):
 
 
 def _assemble_theta(n_models: int, K: int, human_struct=None,
+                    human_delta_sd: float = PRIOR_DELTA_HUMAN,
                     lin: LineageStructure | None = None,
                     lineage_bm: bool = False,
                     variant_offsets: bool = True,
@@ -187,7 +188,7 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     cut = rest.size
     if human_struct is not None:
         base_h = pm.Normal("theta_h_base", 0.0, PRIOR_HUMAN_ROOT, shape=(n_roots, K))
-        rows_h, theta_h = _human_block(human_struct, K, base_h)
+        rows_h, theta_h = _human_block(human_struct, K, base_h, human_delta_sd)
         theta_full = pt.set_subtensor(theta_full[rows_h, :], theta_h)
     if lin is not None:
         base_l = (pm.Deterministic("lin_base", zsn[cut:cut + n_chains])
@@ -275,7 +276,7 @@ def _human_structure(human_order, model_names):
     return rows, R, P, len(roots), groups
 
 
-def _human_block(struct, K, base):
+def _human_block(struct, K, base, delta_sd: float = PRIOR_DELTA_HUMAN):
     """Partially ordered human tiers: each tier = its root's `base` level plus
     a HalfNormal increment for every tier on the root→tier path (HARD — child
     >= parent on every axis). Where a tier has SEVERAL parents its theta is the
@@ -295,7 +296,7 @@ def _human_block(struct, K, base):
     Generalist instability around without removing it — see the arc-mode
     procedural log. The original is the reference condition.)"""
     rows, R, P, _, groups = struct
-    delta = pm.HalfNormal("delta_h", sigma=PRIOR_DELTA_HUMAN,
+    delta = pm.HalfNormal("delta_h", sigma=delta_sd,
                           shape=(P.shape[1], K))
     by_path = pt.dot(pt.as_tensor(R), base) + pt.dot(pt.as_tensor(P), delta)
     if all(len(g) == 1 for g in groups):     # single-parent tree: no max at all
@@ -549,6 +550,7 @@ def build_mirt_model(data: ECIData, K: int,
                       anchors: dict | None = None,
                       loading_prior: str = "normal",
                       human_order: dict[str, str | None] | list[str] | None = None,
+                      human_delta_sd: float = PRIOR_DELTA_HUMAN,
                       lineage: LineageStructure | None = None,
                       lineage_bm: bool = False,
                       lineage_links: bool = True,
@@ -646,6 +648,9 @@ def build_mirt_model(data: ECIData, K: int,
     them, theta = max(parents) + the increment; see _human_block for the kink
     that buys.
 
+    human_delta_sd: sigma of the HalfNormal increment between ordered tiers. The fit's
+    value travels in FitSpec.human_delta_sd (and so in the trace's mirt_spec); a caller
+    rebuilding a model from a trace passes the spec's, never the config's.
     lineage: optional release-chain structure (see lineage.py). Chained models get
     psi[node] + variant offset, where psi follows founder + cumulative SOFT
     (Normal, can regress) increments along the chain. Disjoint from human_order.
@@ -1041,6 +1046,7 @@ def build_mirt_model(data: ECIData, K: int,
         theta = _assemble_theta(
             data.n_models, K,
             human_struct=_human_structure(human_order, coords["model"]),
+            human_delta_sd=human_delta_sd,
             lin=lineage, lineage_bm=lineage_bm,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,

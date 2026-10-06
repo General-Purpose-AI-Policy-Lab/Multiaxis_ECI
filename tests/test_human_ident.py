@@ -12,7 +12,9 @@ from multiaxis_eci.analysis.human_ident import (
     human_axis_contraction,
     human_scale_axes,
     identified_tiers,
+    increment_contraction,
 )
+from multiaxis_eci.config import PRIOR_DELTA_HUMAN
 
 
 @dataclass
@@ -43,7 +45,8 @@ def _fit(human_obs):
 def test_only_dominant_benchmarks_place_a_tier():
     # Many scores on benchmark 1 (axis share 0.9 on axis 0, 0.1 on axis 1): with the full
     # loadings they would pin axis 1 too; kept to the dominant axis they do not.
-    A, theta, data = _fit([("Average Human", 1)] * 6 + [("Domain Expert", 0)] * 3)
+    A, theta, data = _fit([("Average Human", 1)] * 6 + [("Average Human", 0)] * 3
+                          + [("Domain Expert", 0)] * 3)
     c = human_axis_contraction(A, theta, data, ORDER)
     assert list(c.index) == ["Average Human", "Domain Expert", "Top Performer"]
     assert (c[0] > 0.5).all()                       # Top Performer through its parents
@@ -79,6 +82,24 @@ def test_tiers_and_scale_follow_the_contraction():
     np.testing.assert_allclose(origin[0], np.median(th[:, 2, 0]))
     assert human_unit_affine(th, data, np.array([False, False])) is None
     assert ability_label((origin, unit), human=False) == "ability (fitted scale)"
+
+
+def test_increment_placed_only_when_the_step_is():
+    """The step test reads theta_tier - max(parents) off the draws: a step as wide as the
+    HalfNormal prior is not placed, a narrow one is; the root always passes."""
+    _, _, data = _fit([("Average Human", 0)])
+    rng = np.random.default_rng(1)
+    S = 4000
+    th = np.zeros((S, 5, 2))
+    th[:, 2, :] = rng.normal(0.0, 0.3, (S, 2))                       # Average Human
+    prior_step = np.abs(rng.normal(0, PRIOR_DELTA_HUMAN, (S, 2)))    # the prior itself
+    th[:, 3, :] = th[:, 2, :] + np.column_stack([rng.normal(1.0, 0.1, S), prior_step[:, 1]])
+    th[:, 4, :] = th[:, 3, :] + prior_step                           # Top Performer: prior only
+    c = increment_contraction(th, data, ORDER)
+    assert (c.loc["Average Human"] == 1.0).all()
+    assert c.loc["Domain Expert", 0] > 0.9 and abs(c.loc["Domain Expert", 1]) < 0.1
+    assert (c.loc["Top Performer"].abs() < 0.1).all()
+    assert identified_tiers(c, 0) == {"Average Human", "Domain Expert"}
 
 
 def test_no_order_no_test():

@@ -28,6 +28,7 @@ from multiaxis_eci.config import (
     FIGURES_DIRNAME,
     HUMAN_ORDER,
     HUMAN_ORDER_MERGED,
+    PRIOR_DELTA_HUMAN,
     RESULTS_DIR,
     SG_MODEL_NAME,
 )
@@ -41,6 +42,10 @@ _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
 # Another K of the same flag set gets a `_k<K>` folder (2026-10-06; until then only the
 # figures were split by K, and a K=3 test run wrote over the K=4 fit's tables).
 UNTOKENED_K = 4
+
+# The tier increment sigma of every fit saved before FitSpec carried it (2026-10-06): the
+# config value until that day. A trace whose mirt_spec lacks the field was sampled with it.
+LEGACY_HUMAN_DELTA_SD = 1.0
 
 
 @dataclass(frozen=True)
@@ -98,6 +103,11 @@ class FitSpec:
     # Chess Puzzles. The default (ON) carries no token; the opt-out emits `_betalik`. A
     # censored fit (`censor_bounds`) is a Beta variant and turns it off.
     beta_binomial: bool = True
+    # sigma of the HalfNormal increment between ordered human tiers (models.mirt._human_block).
+    # Not a CLI flag and not in the tag: the config's value is the default, and the spec
+    # carries it into the trace (mirt_spec) so a rebuilt model or a figure reads the value the
+    # trace was sampled with. A spec without it predates the field (LEGACY_HUMAN_DELTA_SD).
+    human_delta_sd: float = PRIOR_DELTA_HUMAN
 
     def __post_init__(self):
         # The cross-flag constraint the model cannot express on its own. Checked
@@ -246,6 +256,7 @@ class FitSpec:
             # before the effort means became the default (2026-10-03) without them.
             d.setdefault("beta_binomial", False)
             d.setdefault("effort_means", False)
+            d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
             spec = FitSpec(**d)
         else:
             attr = _attr_flags(post)
@@ -260,7 +271,8 @@ class FitSpec:
             tag = _folder_tag(trace_path)
             # Without mirt_spec the trace predates the Beta-binomial: the Beta, unless an attr says so.
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
-                                   "beta_binomial": False, "effort_means": False, **attr})
+                                   "beta_binomial": False, "effort_means": False,
+                                   "human_delta_sd": LEGACY_HUMAN_DELTA_SD, **attr})
             if is_baseline:
                 spec = _baseline_spec(spec)
         if not is_baseline:
@@ -646,6 +658,20 @@ def _check_dims(idata, data) -> None:
                 f"trace has {int(sizes[dim])} {what} but this scope has {n} — the "
                 "trace was fit on a different data generation and cannot be "
                 "indexed against it.")
+
+
+def trace_human_delta_sd(post) -> float:
+    """The tier increment sigma a posterior was sampled with: its mirt_spec's, else the
+    `mirt_human_delta_sd` attr the spec-less canonical K=1 fit writes, else
+    LEGACY_HUMAN_DELTA_SD for a trace saved before either existed. Reads attrs only, so it
+    serves a FitView or a bare posterior group as well as `FitSpec.from_trace`."""
+    a = post.attrs
+    spec = json.loads(a["mirt_spec"]) if a.get("mirt_spec") else {}
+    if "human_delta_sd" in spec:
+        return float(spec["human_delta_sd"])
+    if a.get("mirt_human_delta_sd"):
+        return float(json.loads(a["mirt_human_delta_sd"]))
+    return LEGACY_HUMAN_DELTA_SD
 
 
 def spec_json(spec: FitSpec) -> str:

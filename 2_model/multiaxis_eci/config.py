@@ -139,12 +139,21 @@ HUMAN_ORDER_MERGED = {
 # cross-family straddler). --no-sg drops its OBSERVATIONS at fit time; the tier
 # stays in HUMAN_ORDER (prior-only theta). See data.drop_model_observations.
 SG_MODEL_NAME = "Skilled Generalist"
-# sigma of the HalfNormal increment between adjacent tiers (z-score space, before
-# tau scaling). 1.0 = weakly informative — enforces the ordering but lets the
-# data drive the gap sizes. (Reverted 2026-07-05: the soft / pooled / Student-t
-# variants each relocated the Skilled Generalist instability without removing
-# it; the original hard prior is the reference condition for hypothesis tests.)
-PRIOR_DELTA_HUMAN = 1.0
+# sigma of the HalfNormal increment between adjacent tiers, on the theta scale.
+# Weakly informative: it enforces the ordering and leaves the gap sizes to the
+# data where there are some. This is the one place the value is set: a fit
+# records it in its spec (FitSpec.human_delta_sd, the trace's mirt_spec), and
+# whatever reads a trace back uses the trace's value. (Reverted 2026-07-05: the
+# soft / pooled / Student-t variants each relocated the Skilled Generalist
+# instability without removing it; the original hard prior is the reference
+# condition for hypothesis tests.)
+# 2.0 since 2026-10-06 (user): on the K=4 flagship the gaps of the thinly scored
+# tiers (Top Performer, the committees, High School Top Performer) reproduced the
+# HalfNormal(1) itself, so the prior set them; a wider prior lets them sit where
+# their few scores put them, and a tier its scores do not place is not drawn
+# (analysis.human_ident). One scale per gap, not a learned shared one: nothing
+# says two tiers are as far apart as two others.
+PRIOR_DELTA_HUMAN = 2.0
 # sd of each human root's base level (Average Human, High School Qualifier), a private Normal outside
 # the models' ZeroSumNormal (user, 2026-10-05). Humans are no draw of the model population: inside it,
 # the 2026-10-03 flagship kept Average Human at about 4.5 sd on its extreme axis with a posterior sd of

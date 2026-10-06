@@ -116,6 +116,7 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
         censor_eps = None if censor_eps is None else np.asarray(censor_eps)[keep]
     model = build_mirt_model(
         fit_data, spec.K, loading_prior=spec.loading_prior, human_order=spec.human_order,
+        human_delta_sd=spec.human_delta_sd,
         lineage=lineage, lineage_bm=spec.lineage_bm, effort_means=spec.effort_means,
         floor_c=floor_c, ceiling_noise=spec.ceiling_noise, known_se=spec.known_se,
         censor_eps=censor_eps, binomial_n=binomial_n, pooled_noise=spec.pooled_noise,

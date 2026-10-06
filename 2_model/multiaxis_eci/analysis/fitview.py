@@ -12,6 +12,7 @@ from multiaxis_eci.analysis.factors import (
     trace_axis_names,
     trace_loading_prior,
 )
+from multiaxis_eci.analysis.fitspec import trace_human_delta_sd
 from multiaxis_eci.analysis.human_ident import trace_human_order
 from multiaxis_eci.analysis.rotation import align_rotations
 from multiaxis_eci.data import ECIData
@@ -59,11 +60,12 @@ class FitView:
     # the loading prior (and getting it subtly different, per site).
     phi_is_promax: bool = False
     # Axis-free inputs of `analysis.human_ident`: the per-benchmark medians of D and phi_b
-    # over the view's draws, and the human tier order the fit was sampled with. None when the
-    # trace lacks them (non-comp fits, fits without human tiers).
+    # over the view's draws, and the human tier order and increment sigma the fit was sampled
+    # with. None when the trace lacks them (non-comp fits, fits without human tiers).
     D_med: np.ndarray | None = None
     phi_med: np.ndarray | None = None
     human_order: dict | list | None = None
+    human_delta_sd: float | None = None
 
     def require_A(self) -> np.ndarray:
         if self.A is None:
@@ -131,4 +133,5 @@ def prepare_fit(idata, data: ECIData) -> FitView:
                    is_nc=False, anchored=anchored, rotated=rotated,
                    A=A, tau=tau, phi_is_promax=phi_is_promax,
                    D_med=med("D"), phi_med=med("phi_b"),
-                   human_order=trace_human_order(idata))
+                   human_order=trace_human_order(idata),
+                   human_delta_sd=trace_human_delta_sd(post))
