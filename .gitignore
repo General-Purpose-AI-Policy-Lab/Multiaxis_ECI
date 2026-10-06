@@ -100,5 +100,7 @@ texput.log
 
 # Local environment and scratch
 .venv/
+# local uv resolution; the pins live in pyproject.toml
+uv.lock
 tmp*/
 tmp_*
