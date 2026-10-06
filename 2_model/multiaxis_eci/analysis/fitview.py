@@ -12,6 +12,7 @@ from multiaxis_eci.analysis.factors import (
     trace_axis_names,
     trace_loading_prior,
 )
+from multiaxis_eci.analysis.human_ident import trace_human_order
 from multiaxis_eci.analysis.rotation import align_rotations
 from multiaxis_eci.data import ECIData
 
@@ -57,6 +58,12 @@ class FitView:
     # and table builders read this instead of re-deriving the predicate from
     # the loading prior (and getting it subtly different, per site).
     phi_is_promax: bool = False
+    # Axis-free inputs of `analysis.human_ident`: the per-benchmark medians of D and phi_b
+    # over the view's draws, and the human tier order the fit was sampled with. None when the
+    # trace lacks them (non-comp fits, fits without human tiers).
+    D_med: np.ndarray | None = None
+    phi_med: np.ndarray | None = None
+    human_order: dict | list | None = None
 
     def require_A(self) -> np.ndarray:
         if self.A is None:
@@ -117,6 +124,11 @@ def prepare_fit(idata, data: ECIData) -> FitView:
     Phi, rotated, phi_is_promax = Phi_raw, False, False
     if signed_res is not None and signed_res.Phi is not None:
         Phi, phi_is_promax = signed_res.Phi, True
+    post = idata.posterior
+    med = lambda v: (post[v].median(("chain", "draw")).values   # noqa: E731
+                     if v in post else None)
     return FitView(theta=theta, Phi=Phi, Phi_raw=Phi_raw, names=names, K=K,
                    is_nc=False, anchored=anchored, rotated=rotated,
-                   A=A, tau=tau, phi_is_promax=phi_is_promax)
+                   A=A, tau=tau, phi_is_promax=phi_is_promax,
+                   D_med=med("D"), phi_med=med("phi_b"),
+                   human_order=trace_human_order(idata))

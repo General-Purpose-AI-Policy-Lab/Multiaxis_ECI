@@ -259,8 +259,11 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
         has_hdi = {"hdi_low", "hdi_high"} <= set(hs.columns)
         # Standalone, the cloud's whiskers are not drawn, so only its points set the range.
         drawn = tl[in_fit] if standalone else tl
-        lo = min(float(drawn["hdi_low"].min()), float(tl["mean"].min()), float(hs["mean"].min()))
-        hi = max(float(drawn["hdi_high"].max()), float(tl["mean"].max()), float(hs["mean"].max()))
+        # An axis no tier is placed on (analysis.human_ident) has an empty `hs`.
+        lo = min([float(drawn["hdi_low"].min()), float(tl["mean"].min())]
+                 + ([float(hs["mean"].min())] if len(hs) else []))
+        hi = max([float(drawn["hdi_high"].max()), float(tl["mean"].max())]
+                 + ([float(hs["mean"].max())] if len(hs) else []))
         pad = 0.06 * (hi - lo)
         # More air above than below: the trend and its band leave the panel through the top,
         # and the topmost tier name needs room.
@@ -297,8 +300,9 @@ def frontier_trend_fig(per_axis: dict, axes: list[str], titles: dict | None = No
                                yref=f"y{'' if i == 1 else i}", text=text["today"],
                                showarrow=False, xanchor="right", yanchor="top", xshift=-5,
                                yshift=-4, font=dict(size=style.font_note, color=INK_MUTED))
-        _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels,
-                     quiet=standalone)
+        if len(hs):
+            _tier_labels(fig, hs, i, "y" if i == 1 else f"y{i}", ylim, style, labels,
+                         quiet=standalone)
         fig.update_yaxes(title_text=y_label or text["ability"], range=list(ylim),
                          gridcolor="#f0f0f0" if standalone else "#eeeeee",
                          zeroline=False, row=i, col=1)

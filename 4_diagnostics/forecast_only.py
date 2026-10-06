@@ -97,6 +97,24 @@ def _load_theta(trace: Path, drop_chains=None) -> np.ndarray:
     return theta
 
 
+def _load_human_ident_inputs(trace: Path, drop_chains=None):
+    """What `analysis.human_ident` needs beside theta: the loadings in the same rank-tracked
+    frame as `_load_theta` (the permutation is read off A alone), the medians of D and phi_b,
+    and the tier order. Small next to theta, so read afresh each run."""
+    ds = xr.open_dataset(trace, group="posterior", engine="h5netcdf")
+    if drop_chains:
+        ds = ds.sel(chain=[c for c in ds.chain.values if c not in drop_chains])
+    A, tau = ds["A"].values, ds["tau_A"].values
+    med = {v: (ds[v].median(("chain", "draw")).values if v in ds else None)
+           for v in ("D", "phi_b")}
+    order = json.loads(ds.attrs.get("mirt_human_order") or "null")   # human_ident.trace_human_order
+    ds.close()
+    S = A.shape[0] * A.shape[1]
+    A, tau = A.reshape(S, *A.shape[2:]), tau.reshape(S, tau.shape[2])
+    A, _, _ = canonicalize_factors(A, np.zeros((S, 1, A.shape[2])), tau, rank_track=True)
+    return A, med["D"], med["phi_b"], order
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--fit", default=DEFAULT_FIT, help="registry `name`")
@@ -126,8 +144,10 @@ def main():
     theta = np.asarray(_load_theta(trace, fit.get("drop_chains")), dtype=np.float64)
 
     names = card["result"]["axis_names"]
+    A, D_med, phi_med, human_order = _load_human_ident_inputs(trace, fit.get("drop_chains"))
     view = FitView(theta=theta, Phi=None, Phi_raw=None, names=names,
-                   K=theta.shape[2], is_nc=False, anchored=False, rotated=False)
+                   K=theta.shape[2], is_nc=False, anchored=False, rotated=False,
+                   A=A, D_med=D_med, phi_med=phi_med, human_order=human_order)
     figs = forecast_figures(view, data, raw, names, theta)
     if not figs:
         sys.exit("no forecast figures produced — is this a K=1 or human-free fit?")

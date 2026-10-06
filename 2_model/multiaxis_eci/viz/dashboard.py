@@ -127,14 +127,24 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     theta = signed_frames["oblique"].theta if signed_frames else view.theta
     A = signed_frames["oblique"].A if signed_frames else view.A
     # Human units for the ability-side figures (analysis.scale): the filters run on the
-    # fitted scale, the finished frames are re-expressed; loadings stay fitted.
+    # fitted scale, the finished frames are re-expressed; loadings stay fitted. A tier is drawn
+    # only on the axes its scores place it on (analysis.human_ident); an axis whose anchors are
+    # not placed keeps the fitted scale.
+    from multiaxis_eci.analysis.human_ident import (
+        drop_unidentified,
+        human_scale_axes,
+        view_human_contraction,
+    )
     from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
-    affine = human_unit_affine(theta, data)
-    y_label = ability_label(affine)
+    contraction = view_human_contraction(view, data, theta=theta, A=A)
+    human_axes = human_scale_axes(contraction, K)
+    affine = human_unit_affine(theta, data, human_axes)
     tag = "_oblique" if signed_frames else ""
     for k in range(K):
         disp = titles.get(names[k], names[k])
-        hstat = rescale_frame(mirt_human_axis_stats(theta, k, data), k, affine)
+        y_label = ability_label(affine, human=bool(human_axes[k]))
+        hstat = rescale_frame(drop_unidentified(mirt_human_axis_stats(theta, k, data), k,
+                                                contraction), k, affine)
         tl = rescale_frame(mirt_model_timeline_df(theta, k, data, raw, A_draws=A), k, affine)
         if not tl.empty:
             fig = capability_timeline_fig(tl, human_stats=hstat,
@@ -203,12 +213,21 @@ def forecast_figures(view, data, raw, names, th_fc,
     K = view.K
     titles = axis_titles or {}
     from multiaxis_eci.analysis import axis_forecast_inputs, crossover_table
+    from multiaxis_eci.analysis.human_ident import (
+        drop_unidentified,
+        human_scale_axes,
+        view_human_contraction,
+    )
     from multiaxis_eci.analysis.scale import (
         human_unit_affine,
         rescale_forecast,
         rescale_frame,
     )
-    affine = human_unit_affine(th_fc, data)
+    # Tiers only on the axes their scores place them on, crossings included; an axis whose
+    # anchors are not placed keeps the fitted scale (analysis.human_ident).
+    contraction = view_human_contraction(view, data, theta=th_fc)
+    human_axes = human_scale_axes(contraction, K)
+    affine = human_unit_affine(th_fc, data, human_axes)
     for k in range(K):
         disp = titles.get(names[k], names[k])
         # The candidates evaluated on the axis (`candidate_mask`,
@@ -221,18 +240,28 @@ def forecast_figures(view, data, raw, names, th_fc,
                                           A_draws=view.A)
         except ValueError:
             continue
-        cx = crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8))
+        cx = drop_unidentified(
+            crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8)),
+            k, contraction, col="tier")
         # Crossings are read on the fitted scale; the drawn panel is in human units.
         inputs = {"fc": rescale_forecast(inputs["fc"], k, affine),
                   "tl": rescale_frame(inputs["tl"], k, affine),
-                  "hs": rescale_frame(inputs["hs"], k, affine)}
+                  "hs": rescale_frame(drop_unidentified(inputs["hs"], k, contraction),
+                                      k, affine)}
         slug = _slug(names[k])
         # Read without a caption, so the figure explains itself (`standalone`). The ability
         # caption names the axis (the SVG twin has no title) and leaves out the scale's
-        # anchors: the tier lines already mark Average Human at 0 and Top Performer at 1.
+        # anchors: the tier lines already mark Average Human at 0 and Top Performer at 1. An
+        # axis without placed tiers says it is on the fitted scale and that no tier is drawn.
         kind = titles.get(names[k], "").partition(": ")[2]
-        trend = dict(title=disp, subtitle="Frontier forecast against human tiers",
-                     y_label=f"Ability: {kind}" if kind else "Ability", standalone=True,
+        y_label = f"Ability: {kind}" if kind else "Ability"
+        if human_axes[k]:
+            subtitle = "Frontier forecast against human tiers"
+        else:
+            y_label += " (fitted scale)"
+            subtitle = ("Frontier forecast; no human tier drawn: "
+                        "no human score on a benchmark that measures this axis")
+        trend = dict(title=disp, subtitle=subtitle, y_label=y_label, standalone=True,
                      style=READABLE)
         figs[f"forecast_{k+1}_{slug}"] = frontier_trend_fig(
             {names[k]: inputs}, [names[k]], {names[k]: disp}, **trend)
@@ -241,9 +270,10 @@ def forecast_figures(view, data, raw, names, th_fc,
             doc = {**inputs, "hs": hs[hs["name"].isin(DOC_TIERS)]}
             figs[f"forecast_{k+1}_{slug}__svg"] = frontier_trend_fig(
                 {names[k]: doc}, [names[k]], {names[k]: disp}, tier_intervals=True, **trend)
-        figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
-            cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
-            title=f"Forecast: {disp} (crossing dates)")
+        if len(cx):
+            figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
+                cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
+                title=f"Forecast: {disp} (crossing dates)")
     return figs
 
 
@@ -339,16 +369,28 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
         # post's forest figure: same candidates as the timelines and the
         # forecast (`candidate_mask`), 95% intervals.
         from multiaxis_eci.analysis import forest_frames
+        from multiaxis_eci.analysis.human_ident import (
+            drop_unidentified,
+            human_scale_axes,
+            view_human_contraction,
+        )
         from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
-        affine = human_unit_affine(view.theta, data)
+        contraction = view_human_contraction(view, data)
+        human_axes = human_scale_axes(contraction, K)
+        affine = human_unit_affine(view.theta, data, human_axes)
+        # One shared x caption: the human-unit one, flagged when an axis keeps the fitted scale.
         x_title = f"{ability_label(affine)} (median, 95% interval)"
-        frames = [rescale_frame(f, k, affine) for k, f in enumerate(
-            forest_frames(view, data, raw, A_draws=view.A))]
+        if affine is not None and not human_axes.all():
+            x_title += "; " + ", ".join((titles or {}).get(names[k], names[k])
+                                        for k in np.where(~human_axes)[0]) + ": fitted scale"
+        frames = [rescale_frame(drop_unidentified(f, k, contraction), k, affine)
+                  for k, f in enumerate(forest_frames(view, data, raw, A_draws=view.A))]
         figs["forests_per_axis"] = forest_grid_fig(
             frames, [(titles or {}).get(n, n) for n in names], x_title=x_title)
         # The same forest at the level of releases: one row per family, its best effort.
-        fam = [rescale_frame(f, k, affine) for k, f in enumerate(
-            forest_frames(view, data, raw, by_family=True, A_draws=view.A))]
+        fam = [rescale_frame(drop_unidentified(f, k, contraction), k, affine)
+               for k, f in enumerate(forest_frames(view, data, raw, by_family=True,
+                                                   A_draws=view.A))]
         figs["forests_per_family"] = forest_grid_fig(
             fam, [(titles or {}).get(n, n) for n in names], x_title=x_title,
             title="Top releases (best effort), frontier releases and human tiers per axis")

@@ -59,6 +59,10 @@ from multiaxis_eci.analysis import (  # noqa: E402
     rescale_theta,
     trace_loading_prior,
 )
+from multiaxis_eci.analysis.human_ident import (  # noqa: E402
+    human_scale_axes,
+    view_human_contraction,
+)
 from multiaxis_eci.data import PROCESSED_FILE, model_organization  # noqa: E402
 from multiaxis_eci.ppc import (  # noqa: E402
     compute_gof,
@@ -210,7 +214,9 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                     break
 
         # ── single-fit comparative views (informed timelines) ────────────────────
-        affine = human_unit_affine(view.theta, data)
+        # Human units only on the axes whose anchor tiers the data place (analysis.human_ident).
+        affine = human_unit_affine(view.theta, data, human_scale_axes(
+            view_human_contraction(view, data), view.K))
         if n_axes >= 2:
             axis_tl = {k: rescale_frame(mirt_model_timeline_df(view.theta, k, data, raw,
                                                               A_draws=view.A), k, affine)

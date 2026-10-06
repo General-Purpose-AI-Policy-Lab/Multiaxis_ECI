@@ -339,6 +339,19 @@ MIN_AXIS_COVERAGE = 1.0
 ABILITY_SCALE = "human"
 HUMAN_UNIT_ANCHORS = ("Average Human", "Top Performer")
 
+# Which human tiers the figures place on which axis (analysis.human_ident, user decision
+# 2026-10-06). A tier is drawn on axis k when the human scores on benchmarks that MOSTLY
+# measure k (axis share >= HUMAN_AXIS_SHARE_MIN), propagated along the tier order, shrink its
+# prior variance on k by at least HUMAN_AXIS_CONTRACTION_MIN. Counting every benchmark instead
+# lets thirty small loadings pin the tier by linear extrapolation alone: on the 2026-10-05 K=4
+# flagship no human score sits on a cyber benchmark, yet the full information put the tiers
+# 5 to 11 model sd below every model on the cyber axis. The share threshold is stable from
+# 0.5 to 0.6; at 0.4 WMDP Biology (share 0.49) alone would place the Domain Expert in cyber.
+# On an axis where an anchor tier of HUMAN_UNIT_ANCHORS is not drawn, the figures keep the
+# fitted scale.
+HUMAN_AXIS_SHARE_MIN = 0.5
+HUMAN_AXIS_CONTRACTION_MIN = 0.5
+
 # The frontier-forecast fit shared by the dashboard, the memo and the blog post
 # (analysis.regimes, user decision 2026-09-10): the running top-`top_k` frontier of
 # posterior MEDIANS of one effort per family (the best on the axis) and one release

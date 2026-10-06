@@ -7,6 +7,10 @@ and that of the Top Performer tier at 1 (`config.HUMAN_UNIT_ANCHORS`), so a mode
 halfway between the two on that axis and a slope of 0.3 per year means the frontier gains
 three tenths of the human span a year.
 
+On an axis where the anchors are not placed by the data (`analysis.human_ident`: no human
+score on a benchmark that mostly measures it), the medians only extrapolate, so that axis keeps
+the fitted scale: origin 0, unit 1, and the caption says so (`ability_label(human=False)`).
+
 The map is one affine transform per axis, fixed by the two anchor medians, applied to finished
 summaries (timeline frames, forecast bands, forest rows): quantiles are equivariant under it,
 so intervals, records and crossing dates keep their meaning, and the candidate filters
@@ -27,25 +31,31 @@ ABILITY_LABEL = {
     "en": f"ability ({HUMAN_UNIT_ANCHORS[0]} = 0, {HUMAN_UNIT_ANCHORS[1]} = 1)",
     "fr": "capacité (Humain médian = 0, Meilleur performeur = 1)",
 }
+FITTED_LABEL = {"en": "ability (fitted scale)", "fr": "capacité (échelle ajustée)"}
 _FRAME_COLS = ("mean", "hdi_low", "hdi_high")
 
 
-def human_unit_affine(theta: np.ndarray, data: ECIData):
+def human_unit_affine(theta: np.ndarray, data: ECIData, human_axes: np.ndarray | None = None):
     """Per-axis (origin, unit) arrays of shape (K,) such that `(x - origin) / unit` puts the
-    Average Human median at 0 and the Top Performer median at 1; None when the scale is off,
-    an anchor tier is not a test-taker of the fit, or the two medians are not ordered on some
-    axis (the unit would flip)."""
+    Average Human median at 0 and the Top Performer median at 1 on the `human_axes` (bool (K,),
+    `human_ident.human_scale_axes`; None = every axis) and is the identity on the others; None
+    when the scale is off, an anchor tier is not a test-taker of the fit, no axis is a human
+    axis, or the two medians are not ordered on a human axis (the unit would flip)."""
     if ABILITY_SCALE != "human":
         return None
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     lo_name, hi_name = HUMAN_UNIT_ANCHORS
     if lo_name not in names or hi_name not in names:
         return None
+    K = theta.shape[2]
+    human = np.ones(K, dtype=bool) if human_axes is None else np.asarray(human_axes, dtype=bool)
+    if not human.any():
+        return None
     origin = np.median(theta[:, names.index(lo_name), :], axis=0)
     unit = np.median(theta[:, names.index(hi_name), :], axis=0) - origin
-    if not (unit > 0).all():
+    if not (unit[human] > 0).all():
         return None
-    return origin, unit
+    return np.where(human, origin, 0.0), np.where(human, unit, 1.0)
 
 
 def rescale_frame(df: pd.DataFrame, k: int, affine) -> pd.DataFrame:
@@ -86,8 +96,9 @@ def rescale_theta(theta: np.ndarray, affine) -> np.ndarray:
     return (theta - origin[None, None, :]) / unit[None, None, :]
 
 
-def ability_label(affine, lang: str = "en", base: str | None = None) -> str:
-    """The ability axis caption: the human-unit label when `affine` is set, else `base`."""
+def ability_label(affine, lang: str = "en", base: str | None = None, human: bool = True) -> str:
+    """The ability axis caption: the human-unit label when `affine` is set and the axis is a
+    human axis, the fitted-scale label when `affine` is set but the axis is not, else `base`."""
     if affine is not None:
-        return ABILITY_LABEL[lang]
+        return ABILITY_LABEL[lang] if human else FITTED_LABEL[lang]
     return base or ("ability" if lang == "en" else "capacité")
