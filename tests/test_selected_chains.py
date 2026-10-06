@@ -128,3 +128,27 @@ def test_the_dashboard_cache_key_sees_the_axis_names_and_the_frame(tmp_path):
         {k: v for k, v in after.items() if k != "inputs"}
     (tmp_path / "mirt_loadings.csv").write_text("benchmark,axis\n")
     assert bd._fingerprint(trace)["inputs"] != after["inputs"]
+
+
+def test_the_forecast_only_view_is_the_cards(tmp_path, monkeypatch):
+    """forecast_only builds its view as the card does: the card's chains, then the fit's
+    display frame and the axis titles, so its panels cannot sit on other axes."""
+    from types import SimpleNamespace
+
+    import xarray as xr
+    fo = load("4_diagnostics/forecast_only.py")
+    trace = tmp_path / "trace_mirt_k4_x.nc"
+    xr.Dataset({"A": (("chain", "draw"), np.zeros((6, 2)))}).to_netcdf(trace, group="posterior")
+    (tmp_path / "mirt_loadings.csv").write_text("benchmark,axis,loading_median\n")
+    calls = []
+    spec = SimpleNamespace(open_posterior=lambda keep, chains, path: calls.append(("open", chains)))
+    view = SimpleNamespace(A=np.zeros((1, 2, 4)), K=4)
+    monkeypatch.setattr(fo, "_trace_path", lambda fit: trace)
+    monkeypatch.setattr(fo, "prepare_fit", lambda idata, data: view)
+    monkeypatch.setattr(fo, "align_to_reference_loadings",
+                        lambda v, data, ref: calls.append(("align", ref.name)) or v)
+    monkeypatch.setattr(fo, "load_axis_titles",
+                        lambda folder, v, data: calls.append(("titles",)) or {"axis1": "T"})
+    out, titles = fo.card_view({"spec": spec, "drop_chains": [0, 3]}, None)
+    assert calls == [("open", [1, 2, 4, 5]), ("align", "mirt_loadings.csv"), ("titles",)]
+    assert out is view and titles == {"axis1": "T"}

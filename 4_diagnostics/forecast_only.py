@@ -1,45 +1,47 @@
 """Re-render ONLY the frontier-forecast figures of one dashboard card.
 
 `4_build_dashboard.py --force <fit>` re-renders the whole card: posterior
-predictive over every draw, LOO, ESS on the log-likelihood. On the 10x20000
-flagship that is ~25 minutes, and none of it is touched by a change to the
-forecast rule. This path reads the abilities alone, rebuilds the 3 figures per
-axis through `viz.dashboard.forecast_figures` (the SAME function the card uses,
-so the two cannot drift), patches them into the cached card and re-emits
-index.html from the caches.
+predictive over every draw, LOO, ESS on the log-likelihood. None of it is
+touched by a change to the forecast rule. This path reads the posterior
+variables the abilities need (no log-likelihood), builds the card's view the
+way the card does, rebuilds the forecast figures through
+`viz.dashboard.forecast_figures` (the SAME function the card uses, so the two
+cannot drift), patches them into the cached card and re-emits index.html from
+the caches.
 
     python 4_diagnostics/forecast_only.py                    # flagship
     python 4_diagnostics/forecast_only.py --fit <name> --no-html
 
-The ability array is cached to `theta_view_<trace stem>.<key>.f32.npy` beside
-the trace, keyed on the trace's (size, mtime) and the dropped chains. Building it reads A, theta and tau_A out of the trace and applies the
-same per-draw canonicalisation `prepare_fit` does; every later run memory-maps
-the cache. float32 costs ~1e-7 on a scale whose posterior SDs are ~0.3.
+The view is the card's own (`card_view`): `prepare_fit` on the card's chains,
+put back on the fit's display frame (`mirt_loadings.csv`) when the card keeps a
+chain subset, and titled from `axis_names.json`. Until 2026-10-06 this script
+rank-tracked the axes by itself and left the titles out, so its panels could
+sit in another axis order than the rest of the card and read "Axis k".
 
 Only valid for a compensatory fit whose FitView frame is the raw/rank-tracked
 one (normal loading prior). A signed fit forecasts in the promax frame, which
-needs the loadings, so this path refuses it and sends you back to
-build_dashboard.
+needs the oblique alignment the full card computes, so this path refuses it and
+sends you back to build_dashboard.
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
 import pickle
 import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
-from multiaxis_eci.analysis.factors import canonicalize_factors  # noqa: E402
-from multiaxis_eci.analysis.fitview import FitView  # noqa: E402
+from multiaxis_eci.analysis import (  # noqa: E402
+    align_to_reference_loadings,
+    load_axis_titles,
+    prepare_fit,
+)
 from multiaxis_eci.scripts import load as _load_script  # noqa: E402
 
 _bd = _load_script("4_diagnostics/4_build_dashboard.py")
@@ -48,71 +50,28 @@ _trace_path, all_fits = _bd._trace_path, _bd.all_fits
 from multiaxis_eci.viz.dashboard import forecast_figures  # noqa: E402
 
 DEFAULT_FIT = "k4_humanmerge_flagship"
+# What prepare_fit and the human-tier placement read; the log-likelihood, the bulk of
+# the trace, is left on disk.
+VIEW_VARS = ("A", "theta", "tau_A", "D", "phi_b")
 
 
-def _theta_cache_path(trace: Path, drop_chains=None) -> Path:
-    """Cache file for one (trace revision, kept chains) pair.
-
-    The key carries the trace's (size, mtime) — the identity
-    `build_dashboard._fingerprint` uses — so a re-fit at the same tag never
-    serves the old abilities, and the dropped chains, because they are dropped
-    before the array is built."""
-    st = trace.stat()
-    key = json.dumps({"size": st.st_size, "mtime": int(st.st_mtime),
-                      "drop_chains": sorted(drop_chains or [])}, sort_keys=True)
-    h = hashlib.sha256(key.encode()).hexdigest()[:12]
-    return trace.with_name(f"theta_view_{trace.stem}.{h}.f32.npy")
-
-
-def _load_theta(trace: Path, drop_chains=None) -> np.ndarray:
-    """(S, M, K) abilities in the FitView frame, from cache or from the trace.
-
-    Reads only A / theta / tau_A out of the posterior group — a few GB against
-    the trace's tens, because the log-likelihood and the deterministic eta are
-    the bulk and neither is needed here.
-    """
-    cache = _theta_cache_path(trace, drop_chains)
-    if cache.exists():
-        print(f"  theta cache: {cache.name}", flush=True)
-        return np.load(cache, mmap_mode="r")
-
-    print(f"  no theta cache for this trace revision — rebuilding from "
-          f"{trace.name} …", flush=True)
-    ds = xr.open_dataset(trace, group="posterior", engine="h5netcdf")
-    if drop_chains:
-        ds = ds.sel(chain=[c for c in ds.chain.values if c not in drop_chains])
-    A = ds["A"].values
-    theta = ds["theta"].values
-    tau = ds["tau_A"].values
-    ds.close()
-    S = A.shape[0] * A.shape[1]
-    A, theta, tau = (A.reshape(S, *A.shape[2:]), theta.reshape(S, *theta.shape[2:]),
-                     tau.reshape(S, tau.shape[2]))
-    # rank_track=True is what prepare_fit picks for a normal-prior, unanchored
-    # fit: axes are permuted per draw by tau energy before anything is summarised.
-    _, theta, _ = canonicalize_factors(A, theta, tau, rank_track=True)
-    theta = theta.astype(np.float32)
-    np.save(cache, theta)
-    print(f"  wrote {cache.name} ({theta.nbytes / 1e9:.1f} GB)", flush=True)
-    return theta
-
-
-def _load_human_ident_inputs(trace: Path, drop_chains=None):
-    """What `analysis.human_ident` needs beside theta: the loadings in the same rank-tracked
-    frame as `_load_theta` (the permutation is read off A alone), the medians of D and phi_b,
-    and the tier order. Small next to theta, so read afresh each run."""
-    ds = xr.open_dataset(trace, group="posterior", engine="h5netcdf")
-    if drop_chains:
-        ds = ds.sel(chain=[c for c in ds.chain.values if c not in drop_chains])
-    A, tau = ds["A"].values, ds["tau_A"].values
-    med = {v: (ds[v].median(("chain", "draw")).values if v in ds else None)
-           for v in ("D", "phi_b")}
-    order = json.loads(ds.attrs.get("mirt_human_order") or "null")   # human_ident.trace_human_order
-    ds.close()
-    S = A.shape[0] * A.shape[1]
-    A, tau = A.reshape(S, *A.shape[2:]), tau.reshape(S, tau.shape[2])
-    A, _, _ = canonicalize_factors(A, np.zeros((S, 1, A.shape[2])), tau, rank_track=True)
-    return A, med["D"], med["phi_b"], order
+def card_view(fit, data):
+    """The card's view and axis titles, built as `4_build_dashboard.render_fit` builds them:
+    the card's chains (its `drop_chains` left out), `prepare_fit`, the display frame of
+    `mirt_loadings.csv` for a chain subset, the titles of `axis_names.json`."""
+    trace = _trace_path(fit)
+    drop = set(fit.get("drop_chains") or [])
+    with xr.open_dataset(trace, group="posterior") as post:
+        n_chains = int(post.sizes["chain"])
+    chains = [c for c in range(n_chains) if c not in drop] if drop else None
+    idata = fit["spec"].open_posterior(keep=VIEW_VARS, chains=chains, path=trace)
+    view = prepare_fit(idata, data)
+    ref = trace.parent / "mirt_loadings.csv"
+    if drop and view.A is not None and view.K >= 2 and ref.exists():
+        view = align_to_reference_loadings(view, data, ref)
+    titles = (load_axis_titles(trace.parent, view, data)
+              if view.A is not None and view.K >= 2 else None)
+    return view, titles
 
 
 def main():
@@ -140,15 +99,8 @@ def main():
     data = fit["spec"].load_data()[0]
     from multiaxis_eci.data import PROCESSED_FILE, SCORE_COLUMNS
     raw = pd.read_csv(PROCESSED_FILE)[SCORE_COLUMNS]
-    trace = _trace_path(fit)
-    theta = np.asarray(_load_theta(trace, fit.get("drop_chains")), dtype=np.float64)
-
-    names = card["result"]["axis_names"]
-    A, D_med, phi_med, human_order = _load_human_ident_inputs(trace, fit.get("drop_chains"))
-    view = FitView(theta=theta, Phi=None, Phi_raw=None, names=names,
-                   K=theta.shape[2], is_nc=False, anchored=False, rotated=False,
-                   A=A, D_med=D_med, phi_med=phi_med, human_order=human_order)
-    figs = forecast_figures(view, data, raw, names, theta)
+    view, titles = card_view(fit, data)
+    figs = forecast_figures(view, data, raw, view.names, view.theta, axis_titles=titles)
     if not figs:
         sys.exit("no forecast figures produced — is this a K=1 or human-free fit?")
 

@@ -40,7 +40,7 @@ trace as a card, then build.
 | `residual_corr.py` | Is 1D capability sufficient? Observed minus model-implied benchmark correlations (see below) |
 | `ppca_explained_variance.py` | PPCA scree / explained-variance report on logit scores |
 | `compare_human_prior.py` | Ordered-human-prior vs independent-theta comparison on the confirmed Q-matrix fit. Historical: archived traces, flat `HUMAN_ORDER`, not re-runnable and not affected by the 2026-09-14 move to `--human-merge` for analyses |
-| `forecast_only.py` | Re-render only the frontier-forecast figures of one dashboard card |
+| `forecast_only.py` | Re-render only the frontier-forecast figures of one dashboard card, on the card's own view (its chains, the display frame of `mirt_loadings.csv`, the axis titles) |
 | `plot_lineage.py` | Reference render of the lineage prior's structure, as a multi-page PDF |
 | `lineage_regressions.py` | ECI-H along every lineage edge of `1_curated/lineage_map.csv`, flagged drops first; `tests/test_lineage_map.py` fails on a flagged edge not listed in `1_curated/lineage_reviewed_exceptions.csv` |
 
