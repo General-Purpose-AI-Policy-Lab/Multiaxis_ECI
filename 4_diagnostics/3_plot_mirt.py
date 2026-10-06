@@ -112,6 +112,8 @@ def chain_split(trace_path, n_chains: int) -> dict | None:
     if majority is None:
         return None
     minority = sorted(set(range(n_chains)) - set(majority))
+    if not minority:  # a selection of every chain: one group, nothing to split
+        return None
     return {"majority": majority, "minority": minority, "n_chains": n_chains}
 
 

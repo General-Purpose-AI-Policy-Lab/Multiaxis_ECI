@@ -102,6 +102,8 @@ CMP_DIR = config.COMPARISONS_DIR
 def _flagship_drop_chains() -> list[int]:
     """The flagship chains outside its best-log-density mode (none for a single mode)."""
     import xarray as xr
+    if not FLAGSHIP_TRACE.exists():   # read at import: --list must work without the trace
+        return []
     best = best_mode_chains(FLAGSHIP_TRACE)
     if best is None:
         return []
@@ -114,10 +116,9 @@ FITS = [
      "spec": FLAGSHIP,
      "trace_path": FLAGSHIP_TRACE,
      # The card renders the flagship fit of the CURRENT data generation
-     # (analysis.FLAGSHIP_TRACE; on the 2026-09-08 build, 5,307 obs / 802
-     # takers / 97 benchmarks, 8x10,000 draws, three modes). The blog post's
-     # 2026-08 run (4,923 obs / 829 takers / 96 benchmarks, 10x12,000 draws,
-     # one basin, R² 0.9643) is under 5_outputs/pre_pipeline/ and on the
+     # (analysis.FLAGSHIP_TRACE; its size and modes are on the card). The blog
+     # post's 2026-08 run (4,923 obs / 829 takers / 96 benchmarks, 10x12,000
+     # draws, one basin, R² 0.9643) is under 5_outputs/pre_pipeline/ and on the
      # blogpost-frozen branch.
      "label": "K=4 · full exploration scope · positive loadings · "
               "raw rank-tracked axes (no rotation) · "
@@ -126,7 +127,7 @@ FITS = [
      "short": "K=4 · pooled · merge · flagship",
      "type": "exploratory",
      "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True,
-     # The card reads the best-log-density mode only (analysis.FLAGSHIP_CHAINS).
+     # The card reads the chains every deliverable reads (analysis.best_mode_chains).
      "drop_chains": _flagship_drop_chains()},
 ]
 

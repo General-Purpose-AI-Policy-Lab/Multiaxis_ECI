@@ -4,9 +4,9 @@ A human tier is a test-taker scored on a handful of benchmarks, tied to the othe
 ordering prior (models.mirt._human_block). Its posterior on an axis can be narrow without any
 of its scores measuring that axis: a compensatory fit pins theta_k through the small k-loadings
 of benchmarks that mostly measure other axes, by linear extrapolation. On the 2026-10-05 K=4
-flagship no human score is on a cyber benchmark, and the tiers still sit 5 to 11 model sd below
-every model on the cyber axis with posterior sd around 1, so neither the posterior sd nor the
-model-based information flags them.
+flagship no human score was on a cyber benchmark (Cybench and InterCode-CTF rows joined on
+2026-10-06), and the tiers still sat 5 to 11 model sd below every model on the cyber axis with
+posterior sd around 1, so neither the posterior sd nor the model-based information flagged them.
 
 The test here asks how much the scores on benchmarks that MOSTLY measure axis k (axis share >=
 `config.HUMAN_AXIS_SHARE_MIN`) tell about each tier on k, once carried along the tier order:
