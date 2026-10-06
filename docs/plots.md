@@ -206,6 +206,8 @@ shows.
 - `analysis.open_flagship()` is the flagship reader every downstream script
   uses, and `analysis.FLAGSHIP_TRACE` is the one path any of them names. It
   defaults to `FLAGSHIP_CHAINS` and `FLAGSHIP_THIN` (10). `FLAGSHIP_CHAINS` is
-  `"best"`: the best-log-density mode of the modes file (`best_mode_chains`),
-  every chain when there is one mode. A caller passes `chains=None` on purpose
+  `"best"`: the modes file's `selected_chains` when it carries one (a subset
+  chosen on other evidence, with its reason; the flagship's is {2, 4, 5}, the
+  converged sub-group of its best mode), else its best-log-density mode
+  (`best_mode_chains`), every chain when there is one mode. A caller passes `chains=None` on purpose
   to read every chain of a multimodal flagship.

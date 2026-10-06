@@ -73,6 +73,7 @@ from multiaxis_eci.lineage import build_lineage_structure
 from multiaxis_eci.models.mirt import align_effort_sign, build_mirt_model
 from multiaxis_eci.persistence import (
     load_trace,
+    merge_chains,
     save_df,
     save_json,
     save_pit,
@@ -624,6 +625,14 @@ def run_exploration(args, parser) -> None:
     }
     if args.seed is not None:
         sample_kw["random_seed"] = args.seed
+    if args.merge_chains:
+        if args.seed is None or args.seed == SAMPLE_KW["random_seed"]:
+            parser.error("--merge-chains: give the added chains their own --seed")
+        if not args.merge_chains.exists():
+            parser.error(f"--merge-chains: {args.merge_chains} not found")
+        if args.merge_chains.resolve() == spec.trace_path.resolve():
+            parser.error("--merge-chains: copy the earlier trace out of the fit folder first; "
+                         "this run writes over it")
 
     data, floor_c, n_eff = spec.load_data()
     print(f"\nData: {data.n_obs} obs / {data.n_models} models / "
@@ -720,7 +729,15 @@ def run_exploration(args, parser) -> None:
                                   stream_path=(results_dir / "live_draws.zarr"
                                                if stream else None),
                                   spec_attrs=attrs)
-    save_trace(thin_trace(idata_k, args.save_thin), spec.trace_path)
+    if args.merge_chains:
+        # Chains added to an earlier run: from here on, the tables, the GoF and the saved
+        # trace read every chain of both runs (already thinned, so nothing is thinned again).
+        idata_k = merge_chains(load_trace(args.merge_chains), thin_trace(idata_k, args.save_thin))
+        print(f"\n── chains merged: {idata_k.posterior.sizes['chain']} in all "
+              f"(the first from {args.merge_chains}) ──", flush=True)
+        save_trace(idata_k, spec.trace_path)
+    else:
+        save_trace(thin_trace(idata_k, args.save_thin), spec.trace_path)
 
     # ── Factors: the same identity decision every figure gets ─────────────
     # prepare_fit owns it (per-draw alignment for the signed family, the raw
@@ -962,6 +979,11 @@ def main():
                              "--preset canonical → <data generation>/canonical_humanprior/). A "
                              "sensitivity variant of --human-merge, which supersedes it; analyses "
                              "use --human-merge.")
+    parser.add_argument("--merge-chains", type=Path, default=None, metavar="TRACE",
+                        help="[exploration] add this run's chains to TRACE, an earlier run of "
+                             "the same fit copied out of the fit folder (the run overwrites the "
+                             "folder's trace): the saved trace and every table then cover both "
+                             "runs' chains. Needs a --seed other than the earlier run's")
     parser.add_argument("--save-thin", type=int, default=config.SAVE_THIN,
                         help="write every n-th draw to the trace file (default "
                              f"config.SAVE_THIN = {config.SAVE_THIN}); convergence and the "

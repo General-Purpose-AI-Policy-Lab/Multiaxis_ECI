@@ -54,6 +54,40 @@ def load_trace(path: Path):
     return az.from_netcdf(str(path))
 
 
+def merge_chains(earlier, later):
+    """`earlier`'s chains followed by `later`'s, as one trace: how chains are added to a fit.
+
+    Both must be the same fit (identical `mirt_spec`, same draws per chain and the same save
+    thinning, every other dimension equal); `later`'s chains are renumbered after `earlier`'s.
+    Only the groups both traces carry are kept, with `earlier`'s attributes. Raises ValueError
+    when the two cannot be one fit.
+    """
+    pa, pb = earlier.posterior.attrs, later.posterior.attrs
+    for key in ("mirt_spec", "mirt_save_thin"):
+        if pa.get(key) != pb.get(key):
+            raise ValueError(f"merge_chains: {key} differs ({pa.get(key)!r} vs {pb.get(key)!r})")
+    if earlier.posterior.sizes["draw"] != later.posterior.sizes["draw"]:
+        raise ValueError("merge_chains: different draws per chain "
+                         f"({earlier.posterior.sizes['draw']} vs {later.posterior.sizes['draw']})")
+    import xarray as xr  # only needed here
+    n0 = earlier.posterior.sizes["chain"]
+    groups = {}
+    for name in earlier.groups():
+        if name not in later.groups():
+            continue
+        a, b = getattr(earlier, name), getattr(later, name)
+        if "chain" not in a.dims:
+            groups[name] = a
+            continue
+        b = b.assign_coords(chain=np.arange(n0, n0 + b.sizes["chain"]))
+        a = a.assign_coords(chain=np.arange(n0))
+        common = [v for v in a.data_vars if v in b.data_vars]
+        merged = xr.concat([a[common], b[common]], dim="chain", join="exact")
+        merged.attrs = dict(a.attrs)
+        groups[name] = merged
+    return az.InferenceData(**groups)
+
+
 def load_live_draws(path: Path):
     """Read a `--stream-draws` zarr store, INCLUDING one still being written.
 

@@ -380,15 +380,23 @@ FLAGSHIP_THIN = 10
 
 
 def best_mode_chains(trace_path) -> list[int] | None:
-    """The chains of the best-log-density mode in the modes file beside a trace, or None when
-    the file is missing, names another trace or reports a single mode."""
+    """The chains every deliverable of a trace reads, from the modes file beside it: its
+    `selected_chains` when the file carries that choice (a subset picked on evidence the mode
+    split does not hold, with its reason under `why`), else the best-log-density mode (ties to
+    the larger). None when the file is missing, names another trace or reports a single mode
+    and no selection."""
     p = Path(trace_path)
     f = p.parent / f"mirt_modes_{p.stem}.json"
     if not f.exists():
         return None
     doc = json.loads(f.read_text())
+    if doc.get("trace") != p.name:
+        return None
+    selected = doc.get("selected_chains")
+    if selected:
+        return sorted(selected["chains"])
     modes = doc.get("modes", [])
-    if doc.get("trace") != p.name or len(modes) < 2:
+    if len(modes) < 2:
         return None
     best = max(modes, key=lambda m: (m["delta_logp"] if m.get("delta_logp") is not None
                                      else float("-inf"), len(m["chains"])))

@@ -1,29 +1,26 @@
 # SOTA families (release = base model + snapshot), newest first; written by 1_curated/1_compute_sota.py, do not edit
 gpt-6.1-sol
 claude-sonnet-5-5
-claude-opus-5-5
 gpt-6-sol
+claude-opus-5-5
 gpt-6-astra
 gemini-3.8-flash
 claude-fable-5-1
 gemini-3.7-flash
 claude-opus-5
 gemini-3.6-flash
-gpt-5.6-sol-pro
 gpt-5.6-sol
-claude-mythos-5
+gpt-5.6-sol-pro
 claude-fable-5
+claude-mythos-5
 gemini-3.5-flash
-gpt-5.5-pro
 claude-mythos-preview
 claude-mythos-preview-early
 gpt-5.4-pro@2026-03-05
 gpt-5.4@2026-03-05
 gemini-3.1-pro-preview
-claude-opus-4-6
 gpt-5.3-codex
-gemini-3-flash-preview
-gpt-5.2@2025-12-11
+claude-opus-4-6
 claude-opus-4-5@2025-11-01
 gemini-3-pro-preview
 gpt-5@2025-08-07
@@ -31,11 +28,12 @@ o3-pro@2025-06-10
 o3@2025-04-16
 gemini-2.5-pro-exp-03-25
 o1@2024-12-17
-o1-preview@2024-09-12
 o1-mini@2024-09-12
+o1-preview@2024-09-12
 claude-3-5-sonnet@2024-06-20
 gpt-4o@2024-05-13
 claude-3-opus@2024-02-29
+gpt-4-0125-preview
 gpt-4-0314
 PaLM 540B
 text-davinci-002

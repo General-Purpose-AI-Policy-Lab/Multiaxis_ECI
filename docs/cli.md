@@ -21,6 +21,7 @@ unmarked to both.
 | `--sampler {pymc,nutpie,numpyro}` | NUTS backend. Default `nutpie` |
 | `--target-accept X` | `[expl]` default 0.95. Raise toward 0.99 if divergences appear |
 | `--seed N` | `[expl]` override seed 42. Nutpie is deterministic given seed + data + model, so a multi-run recipe must vary this |
+| `--merge-chains TRACE` | `[expl]` add this run's chains to TRACE, an earlier run of the same fit copied out of the fit folder (the run overwrites the folder's trace): the saved trace and every table cover both runs' chains. Needs its own `--seed`. The flagship's 15 chains are 8 (seed 42) + 7 (seed 43) |
 | `--save-thin N` | write every n-th draw to the trace file (default `config.SAVE_THIN` = 5); convergence and the tables use the full run, 1 keeps everything |
 | `--stream-draws` / `--no-stream-draws` | on by default: nutpie writes every draw to `<fit>/live_draws.zarr` as it lands instead of holding the run in RAM (a 10,000 x 8 K=4 run sat at 13 GB in memory on 2026-09-11; streamed, it needs a few hundred MB while sampling and about 8 GB of free disk, warmup included). A killed run keeps what it had (`persistence.load_live_draws` reads a partial store); the store is deleted once the thinned trace is saved. `--no-stream-draws` keeps the old in-RAM behaviour |
 

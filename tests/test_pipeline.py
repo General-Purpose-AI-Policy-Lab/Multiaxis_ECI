@@ -1346,31 +1346,37 @@ class TestMIRT:
     def test_rank_track_orders_by_tau_and_preserves_eta(self):
         rng = np.random.default_rng(0)
         S, B, K = 5, 4, 3
-        A = np.abs(rng.normal(size=(S, B, K)))
+        base = np.abs(rng.normal(size=(B, K)))             # one posterior: draws share structure
+        A = base + np.abs(rng.normal(0, 0.01, size=(S, B, K)))
         th = rng.normal(size=(S, 6, K))
         tau = np.tile([0.2, 0.9, 0.5], (S, 1))            # desc order: 1,2,0
         A2, th2, tau2 = canonicalize_factors(A, th, tau)
         assert np.allclose(tau2, np.tile([0.9, 0.5, 0.2], (S, 1)))
         assert np.allclose(_eta(A2, th2), _eta(A, th))    # relabel preserves fit
 
-    def test_rank_track_sorts_each_draw_independently(self):
-        """The sort key VARIES across draws here, so a regression from the
-        per-draw argsort to one global permutation (which the constant-key
-        fixtures above cannot distinguish) fails this test. This is the
-        identification path the flagship (normal-prior, rank-tracked) fit
-        rides, so it gets its own lock."""
+    def test_rank_track_follows_collinearity_not_strength(self):
+        """Each draw is the same four axes, of near-equal strength, filed in a random column
+        order: tracking puts every draw back in one frame (the axis of each benchmark group
+        is the same everywhere), where sorting each draw by strength would mix them. This is
+        the identification path of the normal-prior flagship, so it gets its own lock."""
         rng = np.random.default_rng(7)
-        S, B, M, K = 6, 4, 5, 3
-        A = np.abs(rng.normal(size=(S, B, K)))
+        S, M, K, per = 40, 5, 4, 6
+        base = np.zeros((K * per, K))
+        for k in range(K):                                 # one benchmark group per axis
+            base[k * per:(k + 1) * per, k] = 1.0 + 0.02 * k
+        A = np.empty((S, K * per, K))
         th = rng.normal(size=(S, M, K))
-        tau = np.abs(rng.normal(size=(S, K))) + 0.1        # distinct order per draw
-        A2, th2, tau2 = canonicalize_factors(A, th, tau)
+        perms = np.array([rng.permutation(K) for _ in range(S)])
+        for s_ in range(S):
+            A[s_] = (base + np.abs(rng.normal(0, 0.05, base.shape)))[:, perms[s_]]
+            th[s_] = th[s_][:, perms[s_]]
+        tau = np.full((S, K), 0.8)                         # one shared scale: energy decides
+        A2, th2, _ = canonicalize_factors(A, th, tau)
         assert np.allclose(_eta(A2, th2), _eta(A, th))
-        for s in range(S):                                 # each draw on its own
-            order = np.argsort(-tau[s])
-            assert np.array_equal(tau2[s], tau[s][order])
-            assert np.array_equal(A2[s], A[s][:, order])
-            assert np.array_equal(th2[s], th[s][:, order])
+        groups = np.array([[int(np.argmax(A2[s_, k * per:(k + 1) * per].sum(0)))
+                            for k in range(K)] for s_ in range(S)])
+        assert (groups == groups[0]).all(), "every draw files each group on the same axis"
+        assert list(groups[0]) == [3, 2, 1, 0], "axes numbered from the strongest"
 
     def test_rank_track_false_is_identity(self):
         rng = np.random.default_rng(0)

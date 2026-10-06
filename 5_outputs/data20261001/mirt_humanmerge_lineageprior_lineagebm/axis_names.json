@@ -1,82 +1,81 @@
 {
   "confirmed": true,
-  "how": "Named by hand on 2026-10-02 (user, French titles; English renders translated) from the best-log-density mode, reading each axis's benchmarks by share of their loading variance on the reference-aligned view. Refit the same day (release nodes, reasoning-off offsets): the best mode is now chains 1, 5, 7 of 8 (mode B, chains 0, 2-4 and 6, sits 29 nats lower); axes 2 and 3 correlate at 0.97 and axis 2 is led by Chess Puzzles (share 0.64), so it was renamed Puzzles & Core Scientific Knowledge (user, in English; French title translated). A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
+  "how": "Named by hand on 2026-10-06 (user, French titles; English renders translated) on the K=4 refit of run 20261001 rebuilt on 2026-10-05, 15 chains (8 seed 42 + 7 seed 43, merged with fit.py --merge-chains). The posterior has five modes; the names are read on the best one (mode A, chains 0, 1, 2, 4, 5: best log-density) and hold on its converged sub-group {2, 4, 5}, which every deliverable reads since 2026-10-06 (the modes file's selected_chains: best integrated LOO), with the axes tracked across draws by the collinearity of their loading columns (rotation.canonicalize_factors, 2026-10-06). The top benchmarks are those of chains 2, 4, 5 by share of their loading variance. A title is applied only while one of its signature benchmarks stays among the axis's top benchmarks by share.",
   "axes": {
     "axis1": {
-      "title": "Fluid Intelligence & Formal Reasoning",
-      "title_fr": "Intelligence fluide et raisonnement formel",
+      "title": "Fluid Intelligence & Formal Sciences",
+      "title_fr": "Intelligence fluide & Sciences formelles",
       "signature": [
-        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI",
         "ARC-AGI-2",
-        "MATH Level 5"
+        "OTIS Mock AIME 2024-2025"
       ],
       "top_benchmarks": [
         "ARC-AGI",
         "ARC-AGI-2",
-        "DeepSWE",
-        "MCP Atlas",
+        "VPCT",
+        "AudioMultiChallenge",
         "OTIS Mock AIME 2024-2025",
+        "CritPt",
         "MATH Level 5",
-        "APEX-Agents",
-        "CritPt"
+        "CadEval"
       ]
     },
     "axis2": {
-      "title": "Puzzles & Core Scientific Knowledge",
-      "title_fr": "Énigmes et connaissances scientifiques de base",
+      "title": "Cyber Capabilities",
+      "title_fr": "Capacités cyber",
       "signature": [
-        "Chess Puzzles",
-        "MMLU",
-        "MMLU Pro Biology",
-        "MMLU Pro Chemistry"
+        "ExploitBench",
+        "CyScenarioBench",
+        "Cybench"
       ],
       "top_benchmarks": [
-        "Chess Puzzles",
-        "GeoBench",
-        "WMDP Biology",
-        "WMDP Chemistry",
-        "MMLU Pro Biology",
-        "MMLU Pro Chemistry",
+        "CL-bench",
+        "ExploitBench",
+        "CyScenarioBench",
+        "Furniture Assembly",
         "AISI Cyber Ranges - The Last Ones",
-        "MMLU"
+        "CL-bench Life",
+        "FrontierSWE v2",
+        "Cybench"
       ]
     },
     "axis3": {
-      "title": "Dual-Use Agentic Capabilities (Cyber, CBRN)",
-      "title_fr": "Capacités agentiques duales (cyber, CBRN)",
+      "title": "General & Scientific Knowledge",
+      "title_fr": "Connaissances générales et scientifiques",
       "signature": [
-        "CyScenarioBench",
-        "WMDP Biology",
-        "WMDP Chemistry"
+        "ARC AI2",
+        "OpenBookQA",
+        "MMLU"
       ],
       "top_benchmarks": [
-        "CyScenarioBench",
+        "ARC AI2",
+        "OpenBookQA",
+        "GSM8K",
         "MMLU Biology",
-        "WMDP Biology",
-        "WMDP Chemistry",
-        "MirrorCode",
-        "OSWorld",
-        "GBAEval",
-        "GSM8K"
+        "MMLU",
+        "SimpleQA Verified",
+        "GeoBench",
+        "GPQA Main Chemistry"
       ]
     },
     "axis4": {
-      "title": "General Knowledge",
-      "title_fr": "Connaissances générales",
+      "title": "Agentic Capabilities & Programming",
+      "title_fr": "Capacités agentiques & Programmation",
       "signature": [
-        "SimpleQA Verified",
-        "TriviaQA",
-        "DeepResearch Bench"
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents"
       ],
       "top_benchmarks": [
-        "SimpleQA Verified",
-        "DeepResearch Bench",
-        "HellaSwag",
-        "TriviaQA",
-        "HLE Diamond",
-        "EBR-bench",
-        "PIQA",
-        "WinoGrande"
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents",
+        "BlueprintBench 2",
+        "FrontierCode",
+        "GSO-Bench",
+        "CTI-REALM",
+        "EBR-bench"
       ]
     }
   }

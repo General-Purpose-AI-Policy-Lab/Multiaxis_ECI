@@ -14,24 +14,24 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 
 The axes carry no names of their own. They are named by hand after the benchmarks that load most on them, in the fit folder's `axis_names.json`, and a refit keeps a name only while its signature benchmarks still define the axis (see [docs/plots.md](docs/plots.md)). The current flagship's four:
 
-1. **Fluid Intelligence & Formal Reasoning** (OTIS Mock AIME, ARC-AGI-2, MATH Level 5)
-2. **Puzzles & Core Scientific Knowledge** (Chess Puzzles, MMLU, MMLU Pro Biology and Chemistry)
-3. **Dual-Use Agentic Capabilities (Cyber, CBRN)** (CyScenarioBench, WMDP Biology and Chemistry)
-4. **General Knowledge** (SimpleQA Verified, TriviaQA, DeepResearch Bench)
+1. **Fluid Intelligence & Formal Sciences** (ARC-AGI, ARC-AGI-2, OTIS Mock AIME, with VPCT, CritPt, MATH Level 5)
+2. **Cyber Capabilities** (ExploitBench, CyScenarioBench, Cybench, with AISI Cyber Ranges, CyberGym, CL-bench)
+3. **General & Scientific Knowledge** (ARC AI2, OpenBookQA, MMLU, with GSM8K, SimpleQA Verified, GPQA and MMLU biology and chemistry)
+4. **Agentic Capabilities & Programming** (OSWorld, SWE Atlas, APEX-Agents, with BlueprintBench 2, FrontierCode, GSO-Bench)
 
-Axes 2 and 3 correlate at 0.97. What sets axis 2 apart is mostly Chess Puzzles (0.64 of its loading on this axis), with Fiction.LiveBench, EnigmaEval and Mystery Game Puzzles; read it with care (see [Limitations](#limitations)).
+The four axes are distinct: their largest correlation is 0.57 (axes 1 and 4). Each benchmark is assigned to the axes by the share of its loading variance, and the axes are tracked across posterior draws by the collinearity of their loading columns (see [Reading the results](#reading-the-results)).
 
-The eight chains of this fit fall into two posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts follow the best one by log-density, chains 1, 5 and 7 (`analysis.best_mode_chains`).
+The fit has 15 chains, and they fall into five posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read chains 2, 4 and 5: the converged core of the mode with the best log-density, and the group of chains that predicts held-out scores best (the modes file's `selected_chains`, read by `analysis.best_mode_chains`).
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines). Abilities are in human units: the Average Human at 0 and the Top Performer at 1 on every axis.
 
-<img src="docs/figures/forecast_axis1.png" width="760" alt="Axis 1, Fluid Intelligence and Formal Reasoning: frontier forecast against human tiers, one line for reasoning models and one for the others">
+<img src="docs/figures/forecast_axis1.png" width="760" alt="Axis 1, Fluid Intelligence and Formal Sciences: frontier forecast against human tiers, one line for reasoning models and one for the others">
 
-<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Puzzles and Core Scientific Knowledge: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis2.png" width="760" alt="Axis 2, Cyber Capabilities: frontier forecast against human tiers">
 
-<img src="docs/figures/forecast_axis3.png" width="760" alt="Axis 3, Dual-Use Agentic Capabilities (Cyber, CBRN): frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis3.png" width="760" alt="Axis 3, General and Scientific Knowledge: frontier forecast against human tiers">
 
-<img src="docs/figures/forecast_axis4.png" width="760" alt="Axis 4, General Knowledge: frontier forecast against human tiers">
+<img src="docs/figures/forecast_axis4.png" width="760" alt="Axis 4, Agentic Capabilities and Programming: frontier forecast against human tiers">
 
 The 20 benchmarks with the largest share of each axis, their loadings (median and 95% interval) and that share:
 
@@ -75,9 +75,16 @@ The K=4 flagship at full length, 10,000 draws after 2,000 tuning steps on each o
 python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --draws 10000 --tune 2000
 ```
 
+The current flagship is shorter: 2,000 x 2,000 on 8 chains, then 7 more chains added with another seed, so that more starting points explore the modes (copy the trace out of the fit folder first, as the run writes over it):
+
+```bash
+python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --chains 7 --seed 43 \
+    --merge-chains <copy of the 8-chain trace>
+```
+
 Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and the 16,000 saved draws pin every median and interval the figures show. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default; `--no-stream-draws` restores the in-memory run), so the machine stays usable during a ten-hour fit; the store is deleted once the thinned trace is saved.
 
-Then find the posterior modes, render the fit's figures (on the best mode's chains and, separately, the remaining ones when there are several modes; French versions under `fr/`, their SVG twins under `fr/svg/`), and rebuild the dashboard:
+Then find the posterior modes, render the fit's figures (on the chains the deliverables read and, separately, the remaining ones when there are several modes; French versions under `fr/`, their SVG twins under `fr/svg/`), and rebuild the dashboard. The deliverables read the best mode by log-density, or the `selected_chains` of the modes file when it names a subset (the flagship's: chains 2, 4, 5, picked on `4_diagnostics/integrated_loo.py`):
 
 ```bash
 python 4_diagnostics/diagnose_chains.py --trace <trace> --write-modes
@@ -132,7 +139,7 @@ This is the *compensatory* family: a strong skill can make up for a weak one ins
 - `--human-merge` sets a **hard** partial order on the human tiers. A Domain Expert is at least as good as a Skilled Generalist, a committee at least as good as its members, on every axis. It says nothing about the size of the gaps, and leaves genuinely incomparable tiers unordered.
 - `--lineage-prior --lineage-bm` add a **soft** prior along each vendor's release chain. A release is nudged above its predecessor, more over a longer gap, but can regress if the data says so. Thinking-effort variants attach to their base release and are not ordered among themselves.
 
-Both are needed. On the post's data, runs without priors split into two sets of axes, the human ordering alone left them in disagreement, and both together brought them into agreement; on leave-one-out cross-validation that model beat the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33. On the 2026-09-08 build, dropping the lineage prior leaves the eight chains on eight separate solutions, hundreds of nats apart (the README of that fit, `5_outputs/data20260908/mirt_humanmerge/README.md`, deleted with the 2026-09-08 outputs on 2026-10-01, stays in the git history); with both priors the chains still fall into three modes (see [Limitations](#limitations)).
+Both are needed. On the post's data, runs without priors split into two sets of axes, the human ordering alone left them in disagreement, and both together brought them into agreement; on leave-one-out cross-validation that model beat the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33. On the 2026-09-08 build, dropping the lineage prior leaves the eight chains on eight separate solutions, hundreds of nats apart (the README of that fit, `5_outputs/data20260908/mirt_humanmerge/README.md`, deleted with the 2026-09-08 outputs on 2026-10-01, stays in the git history); with both priors the chains still fall into several modes (see [Limitations](#limitations)).
 
 On by default with no flag over them: non-negative loadings, the Beta-binomial likelihood and the effort means (a release's effort levels as one learned direction); the K-axis fits also apply the fixed-c chance floors (the pipeline's `lower_bound`) and hierarchical benchmark noise, which the canonical index leaves out. In the canonical K=1 index, a release's effort variants also share one level, as in the lineage prior but without the links between releases, so a variant scored on one benchmark only sits near its release. Each has an opt-out documented in [docs/cli.md](docs/cli.md).
 
@@ -140,7 +147,7 @@ On by default with no flag over them: non-negative loadings, the Beta-binomial l
 
 ## Reading the results
 
-**Axes have no fixed names, so they are labelled after sampling.** Swapping two axes leaves every prediction unchanged, because the swap moves the loadings `A` and the abilities `theta` together and only their product reaches the likelihood. Each draw picks its own labels, and they are fixed afterwards: within every draw axes are sorted strongest first. So "axis 2" means "the second strongest axis" in every draw.
+**Axes have no fixed names, so they are labelled after sampling.** Swapping two axes leaves every prediction unchanged, because the swap moves the loadings `A` and the abilities `theta` together and only their product reaches the likelihood. Each draw picks its own labels, and they are fixed afterwards by collinearity: every draw's axes are permuted so that their loading columns line up with a common reference (an axis is recognised by which benchmarks load on it), and the axes are then numbered from the strongest. Until 2026-10-06 each draw was sorted by strength instead, which mixed the axes once their strengths came within a few percent of each other, as the four of the current flagship do.
 
 Whether the chains agree on those axes is a different question, with its own number. Each chain's mean loading columns are matched to the pooled mean over every permutation and sign (all 24 of them at K=4), and the median correlation is reported per axis. Nothing is relabelled by this; the number says which axis the chains disagree about, which the identified r-hat cannot. Convergence is judged on identified quantities only (`eta`, `D`, `sigma_b`), because raw per-axis r-hat on `A` and `theta` is permutation-inflated.
 
@@ -148,12 +155,12 @@ Whether the chains agree on those axes is a different question, with its own num
 
 ## Limitations
 
-- **The K=4 flagship is not fully converged.** It is a short run (2,000 draws after 2,000 tuning steps on each of 8 chains), and its chains fall into two posterior modes: chains 1, 5 and 7, the best by log-density (the figures above), and chains 0, 2 to 4 and 6, 29 nats lower, whose loadings correlate at 0.74 with the first. The best mode converges on its own (identified r-hat of eta 1.009); the other does not (1.24), its five chains agreeing less among themselves (loading correlation 0.87, against 0.99 within the best mode). Figures, dashboard and forecasts read the best mode; the whole-fit tables pool every chain.
-- **Axes 2 and 3 overlap, and axis 2 leans on Chess Puzzles.** They correlate at 0.97 in the best mode. Chess Puzzles carries most of what is specific to axis 2, and a quarter of its scores sit at or below its chance floor, among them strong models run without reasoning and some effort variants that score below lower efforts of the same model, which look like harness failures. Treat axis 2 as provisional.
+- **The K=4 posterior is multimodal.** Its 15 chains (2,000 draws after 2,000 tuning steps each; 8 with seed 42, then 7 with seed 43, merged with `fit.py --merge-chains`) fall into five modes. The fluid-intelligence axis is the same in all of them; they differ in how agentic, cyber, scientific and hard-math benchmarks share the other axes. The best by log-density (chains 0, 1, 2, 4, 5) was reached by none of the seven later chains; the others sit 36 to 80 nats lower. Within it, chains 2, 4 and 5 agree (identified r-hat 1.03 to 1.06 on eta, 1.08 on the difficulties) while 0 and 1 drift on the chemistry and biology loadings. The same model at K=3 is multimodal too and predicts held-out scores much worse (304 ± 29 elpd), so the modes are not an extra axis but discrete ways, under non-negative loadings, of carving the same space.
+- **Choosing the mode.** PSIS-LOO cannot rank the modes: 14% of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) takes that to about 5% and ranks the chain groups at equal draws: chains 2, 4, 5 first, chains 0 and 1 at -7 ± 4, the second mode at -10 ± 8, the three others at -15 to -29 on the observations reliable everywhere. The differences are modest; the deliverables read chains 2, 4, 5, and the whole-fit tables follow them too.
 - **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), the 2026-10-01 data let some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers; it holds about e^-14 of the posterior mass. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
-- **Calibration.** The predictive intervals come out wider than the data requires (PIT variance 0.048 at K=4 against 0.083 for a calibrated model), which makes the model more conservative than it should be.
+- **Calibration.** The predictive intervals come out wider than the data requires (leave-one-out PIT variance 0.067 at K=4 against 0.083 for a calibrated model), which makes the model somewhat more conservative than it should be.
 
 ## Resources
 

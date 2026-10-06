@@ -14,21 +14,62 @@ from multiaxis_eci.data import ECIData
 
 # ── MIRT factor post-processing ─────────────────────────────────────────────
 
+def _collinearity_permutations(A: np.ndarray, iters: int = 5) -> np.ndarray:
+    """Per draw, the axis permutation that makes its loading columns most collinear with a
+    common reference: (S, K) with perm[s, k] = the draw's column that becomes axis k.
+
+    Columns are compared by cosine (unit-norm loading vectors), so an axis is recognised by
+    WHICH benchmarks load on it, not by how much. The reference starts at the first draw and
+    is re-estimated as the mean of the aligned unit columns until it stops moving. Every
+    permutation is scored at once for K <= 6; larger K uses the Hungarian assignment per draw.
+    """
+    import itertools
+    S, _, K = A.shape
+    unit = A / np.maximum(np.linalg.norm(A, axis=1, keepdims=True), 1e-12)
+    ref = unit[0]
+    perms_all = np.array(list(itertools.permutations(range(K)))) if K <= 6 else None
+    perms = np.tile(np.arange(K), (S, 1))
+    for _ in range(iters):
+        sims = np.einsum("sbj,bk->sjk", unit, ref)            # (S, source, target) cosine
+        if perms_all is not None:
+            score = sims[:, perms_all, np.arange(K)].sum(axis=2)    # (S, n_perms)
+            new = perms_all[np.argmax(score, axis=1)]
+        else:
+            new = np.empty((S, K), dtype=int)
+            for i in range(S):
+                row, col = linear_sum_assignment(-sims[i])
+                new[i, col] = row
+        aligned = np.take_along_axis(unit, new[:, None, :], axis=2).mean(axis=0)
+        aligned /= np.maximum(np.linalg.norm(aligned, axis=0, keepdims=True), 1e-12)
+        done = np.array_equal(new, perms) and np.allclose(aligned, ref)
+        perms, ref = new, aligned
+        if done:
+            break
+    return perms
+
+
 def canonicalize_factors(A_draws: np.ndarray,
-                          theta_draws: np.ndarray,
-                          tau_draws: np.ndarray,
-                          rank_track: bool = True):
-    """Rank-track a non-negative MIRT factor posterior (permutation fix).
+                         theta_draws: np.ndarray,
+                         tau_draws: np.ndarray,
+                         rank_track: bool = True):
+    """Track the axes of a non-negative MIRT factor posterior across draws (permutation fix).
 
     Parameters
     ----------
     A_draws     : (S, B, K) loadings per posterior draw.
     theta_draws : (S, M, K) abilities per posterior draw.
     tau_draws   : (S, K) per-axis scale (tau_A) per draw.
-    rank_track  : if True (default), sort axes by tau_A (descending) within
-        each draw so "axis r" is "the r-th strongest axis" everywhere. Set
-        False for ANCHORED fits, where axis identity is already pinned by the
-        anchors — rank-tracking would scramble that fixed identity across draws.
+    rank_track  : if True (default), give each axis one identity across draws, then number
+        the axes from the strongest. Set False for ANCHORED fits, where axis identity is
+        already pinned by the anchors.
+
+    Identity is collinearity: each draw's axes are permuted so that its loading columns line up
+    with a common reference (`_collinearity_permutations`), and the aligned axes are then
+    ordered by their mean tau_A, or by their mean loading energy (sum_b A[b,k]^2) when tau_A is
+    one scalar shared by the axes. Until 2026-10-06 each draw was SORTED by that key instead,
+    which only tracks an axis while the strengths are well apart: on the K=4 flagship of
+    2026-10-05 the four energies sat within 15% of each other, the order changed from draw to
+    draw, and every displayed axis averaged pieces of the four real ones.
 
     Returns (A, theta, tau) with the same shapes. No sign step is needed:
     non-negative loadings have no sign-flip symmetry to resolve.
@@ -37,24 +78,18 @@ def canonicalize_factors(A_draws: np.ndarray,
     theta = np.asarray(theta_draws, dtype=float).copy()
     tau = np.asarray(tau_draws, dtype=float).copy()
 
-    if not rank_track:
+    if not rank_track or A.shape[2] < 2:
         return A, theta, tau
 
-    # Rank-tracking: by default, sort axes by tau (descending) within each draw.
-    # If tau is constant across axes per draw (non-ARD model with shared scalar
-    # tau_A broadcast to (K,)), tau carries no within-draw ordering signal, so
-    # we fall back to loading energy (sum_b A[b,k]^2) per draw — the realised
-    # axis magnitudes. Detection: max per-draw range of tau across axes ≈ 0.
+    perm = _collinearity_permutations(A)                       # (S, K)
+    A = np.take_along_axis(A, perm[:, None, :], axis=2)
+    theta = np.take_along_axis(theta, perm[:, None, :], axis=2)
+    tau = np.take_along_axis(tau, perm, axis=1)
+
     tau_range = tau.max(axis=1) - tau.min(axis=1)
-    if tau_range.max() < 1e-6:
-        key = (A ** 2).sum(axis=1)                          # (S, K) loading energy
-    else:
-        key = tau
-    order = np.argsort(-key, axis=1)                        # (S, K)
-    A = np.take_along_axis(A, order[:, None, :], axis=2)
-    theta = np.take_along_axis(theta, order[:, None, :], axis=2)
-    tau = np.take_along_axis(tau, order, axis=1)
-    return A, theta, tau
+    key = ((A ** 2).sum(axis=1) if tau_range.max() < 1e-6 else tau).mean(axis=0)
+    order = np.argsort(-key, kind="stable")
+    return A[:, :, order], theta[:, :, order], tau[:, order]
 
 
 def align_factor_signs(A_draws: np.ndarray, theta_draws: np.ndarray):
