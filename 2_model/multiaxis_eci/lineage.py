@@ -68,6 +68,11 @@ class LineageStructure:
     # (n_groups,) True where the group is a release's pretrained checkpoint (config.BASE_VARIANT),
     # which the effort means give a mean vector of its own.
     offset_base: np.ndarray | None = None
+    # (n_nodes,) each node's predecessor (index into the node order), -1 for a chain's founder,
+    # and its reviewed release date. Post-fit reads only: a node nobody names as predecessor is
+    # the current tip of its line (`analysis.forests`).
+    node_parent: np.ndarray | None = None
+    node_date: np.ndarray | None = None
 
 
 _TOKEN_VARIANT = re.compile(r"token:(\d+(?:\.\d+)?)k")
@@ -291,4 +296,7 @@ def build_lineage_structure(mlookup: pd.DataFrame,
         offset_none=np.array([v == "effort:none" for _, _, v in grp_keys], dtype=bool),
         offset_level=offset_level, effort_levels=effort_levels,
         offset_log2_tokens=offset_log2_tokens,
-        offset_base=np.array([v == BASE_VARIANT for _, _, v in grp_keys], dtype=bool))
+        offset_base=np.array([v == BASE_VARIANT for _, _, v in grp_keys], dtype=bool),
+        node_parent=np.array([-1 if parent_of[k] is None else node_pos[parent_of[k]]
+                              for k in node_keys], dtype=int),
+        node_date=np.array([date_of[k] for k in node_keys], dtype="datetime64[ns]"))

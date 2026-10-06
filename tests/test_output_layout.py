@@ -25,9 +25,13 @@ def test_output_tree_is_dated_first():
 def test_fitspec_folders_sit_under_the_data_generation():
     spec = analysis.FitSpec(K=4, human_merge=True, lineage_prior=True, lineage_bm=True)
     assert spec.results_dir == config.RESULTS_DIR / "mirt_humanmerge_lineageprior_lineagebm"
-    # K is in the figures folder, not the results folder: two Ks of one flag set
-    # share their tables and traces but never their figures.
     assert spec.figures_dir == spec.results_dir / "figures" / "k4"
+    # Another K of the same flags gets its own folder, so its tables never land on K=4's,
+    # and the folder still parses back to the same flag set.
+    k3 = analysis.FitSpec(K=3, human_merge=True, lineage_prior=True, lineage_bm=True)
+    assert k3.results_dir == config.RESULTS_DIR / "mirt_humanmerge_lineageprior_lineagebm_k3"
+    assert analysis.fitspec._folder_tag(k3.trace_path) == "_humanmerge_lineageprior_lineagebm"
+    assert analysis.fitspec._folder_tag(config.RESULTS_DIR / "mirt_k2" / "t.nc") == ""
     assert spec.trace_path.parent == spec.results_dir
     # A legacy folder name with the data suffix still parses back to the same spec.
     tag = analysis.fitspec._folder_tag(

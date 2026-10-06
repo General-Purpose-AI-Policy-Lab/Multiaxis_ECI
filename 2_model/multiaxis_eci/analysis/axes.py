@@ -20,6 +20,10 @@ import numpy as np
 import pandas as pd
 
 AXIS_NAMES_FILE = "axis_names.json"
+# Smallest correlation between a chain subset's loading column and the display frame's axis
+# it is put on: below it the subset carries another axis, not the same one relabelled. The
+# same 0.8 that splits the chains into modes (diagnose_chains.MATCH_THRESH).
+AXIS_MATCH_MIN = 0.8
 
 
 def axis_top_benchmarks(view, data, top_n: int = 5) -> dict[str, list[str]]:
@@ -128,19 +132,29 @@ def align_to_reference_loadings(view, data, loadings_csv: Path):
     `prepare_fit` ranks the axes by loading energy WITHIN whatever draws it is given, and a
     chain group ranks them in its own order. Matching each column to the fit-level
     `mirt_loadings.csv` medians by correlation puts panel k back on the axis panel k carries
-    everywhere else (the axis names file included). Raises SystemExit when the match is not a
-    permutation: two subset axes closest to the same reference axis means the subset does not
-    carry the fit's solution, and no relabelling would make its figures comparable.
+    everywhere else (the axis names file included). The columns are paired by the assignment
+    that maximises the summed correlation, and SystemExit is raised when a pair falls below
+    `AXIS_MATCH_MIN`: the subset then carries another solution, and no relabelling would make
+    its figures comparable (3_plot_mirt leaves such a minority out; for the chains the
+    deliverables read, `diagnose_chains.py --write-tables` puts the frame on those chains).
     """
+    from scipy.optimize import linear_sum_assignment
+
     pooled = (pd.read_csv(loadings_csv)
               .pivot(index="benchmark", columns="axis", values="loading_median"))
     bench = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
-    P = pooled.loc[bench, sorted(pooled.columns)].values
+    # axis10 after axis9, not after axis1
+    cols = sorted(pooled.columns, key=lambda c: int("".join(filter(str.isdigit, c)) or 0))
+    P = pooled.loc[bench, cols].values
     M = np.median(view.require_A(), axis=0)
     corr = np.corrcoef(P.T, M.T)[:P.shape[1], P.shape[1]:]
-    perm = corr.argmax(axis=1)
-    if sorted(perm) != list(range(P.shape[1])):
-        raise SystemExit(f"axis match is not a permutation: {perm}\n{corr.round(3)}")
+    _, perm = linear_sum_assignment(-corr)
+    matched = corr[np.arange(len(perm)), perm]
+    if matched.min() < AXIS_MATCH_MIN:
+        raise SystemExit(f"axis match below {AXIS_MATCH_MIN} (display axis -> subset column "
+                         f"{(perm + 1).tolist()}, r {matched.round(2).tolist()}); is "
+                         f"{loadings_csv.name} on the chains this subset belongs to?\n"
+                         f"{corr.round(3)}")
     print("  display axis -> subset column: "
           + ", ".join(f"{k + 1}->{s + 1} (r {corr[k, s]:+.2f})" for k, s in enumerate(perm)))
     changes = {"theta": view.theta[:, :, perm], "A": view.A[:, :, perm]}

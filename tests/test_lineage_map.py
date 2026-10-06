@@ -264,3 +264,20 @@ def test_no_unreviewed_regression(exceptions):
         "(python 4_diagnostics/lineage_regressions.py lists every edge):\n" + "\n".join(
             f"  {r.chain}: {r.parent} -> {r.child} [{r.variant}] {r.parent_run} {r.parent_eci:.1f} "
             f"-> {r.child_run} {r.child_eci:.1f} (n={r.n_parent}/{r.n_child})" for r in unreviewed))
+
+
+def test_line_tips_follow_the_map():
+    """The forests' frontier releases are the tips of the lineage lines, read off the map, so a
+    data update brings its new releases without a hand-kept list (2026-10-06)."""
+    from types import SimpleNamespace
+
+    from multiaxis_eci.analysis.forests import line_tips
+    runs = ["claude-mythos-preview", "claude-mythos-5", "claude-fable-5", "claude-fable-5-1",
+            "claude-fable-5-1_max", "claude-opus-5", "claude-opus-5-5"]
+    data = SimpleNamespace(mlookup=pd.DataFrame({"model": sorted(runs)}))
+    chain_of, tips = line_tips(data)
+    names = sorted(runs)
+    tip_runs = {names[int(r)] for _, rows in tips for r in rows}
+    assert tip_runs == {"claude-mythos-5", "claude-fable-5-1", "claude-fable-5-1_max",
+                        "claude-opus-5-5"}
+    assert len(set(chain_of.values())) == 2

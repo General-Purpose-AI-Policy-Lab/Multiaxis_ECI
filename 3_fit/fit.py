@@ -21,6 +21,7 @@ drivers in fits/.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -604,6 +605,67 @@ def run_canonical(args) -> None:
 
 # ── Exploration: the K-axis MIRT campaign driver ────────────────────────────
 
+def data_fingerprint(data, floor_c, binomial_n) -> str:
+    """A hash of what the likelihood sees: test-takers and benchmarks in order, every observation
+    (who, where, score after clipping), the chance floors and the item counts. Stamped on each
+    trace as `mirt_data_fingerprint`. The data generation's tag survives a pipeline rebuild in
+    place, and the dimension sizes survive a changed score or item count; this does not."""
+    h = hashlib.sha256()
+    for names in (data.mlookup.sort_values("model_idx")["model"],
+                  data.blookup.sort_values("benchmark_idx")["benchmark"]):
+        h.update("\x1f".join(map(str, names)).encode())
+    for a in (data.model_idx, data.bench_idx, data.scores, floor_c, binomial_n):
+        if a is not None:
+            h.update(np.ascontiguousarray(np.asarray(a, dtype=float)).tobytes())
+    return h.hexdigest()[:16]
+
+
+def write_axis_tables(view, data, results_dir: Path, loading_prior: str):
+    """The fit-level axis tables: tau spectrum, factor correlation, loadings, factor scores.
+    `mirt_loadings.csv` is also the display frame every chain subset is put back on
+    (`align_to_reference_loadings`), so on a multimodal fit these are rewritten on the chains
+    the deliverables read (`diagnose_chains.py --write-tables`). Returns (tau, corr, loadings).
+
+    tau is a PRE-rotation quantity: rotation mixes axes and would scramble the per-axis scales.
+    Bifactor exception: its tau_A is [tau_g, tau_hs, tau_hs, ...], the specifics sharing one
+    global scale by construction, so the realised per-axis strength is read off the loading
+    column norms instead (which also shows a specific the data did not need collapsing)."""
+    bench_names = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
+    model_names = data.mlookup.sort_values("model_idx")["model"].tolist()
+    tau_spec = tau_spectrum_df(
+        np.linalg.norm(view.A, axis=1) if loading_prior == "bifactor" else view.tau)
+    save_df(tau_spec, results_dir / "mirt_tau_spectrum.csv")
+    corr = factor_corr_df(view.Phi)
+    save_df(corr.reset_index().rename(columns={"index": "axis"}),
+            results_dir / "mirt_factor_corr.csv")
+    loadings = loadings_table(view.A, bench_names, data.bench_category)
+    save_df(loadings, results_dir / "mirt_loadings.csv")
+    save_df(factor_scores_df(view.theta, model_names, is_human=data.is_human),
+            results_dir / "mirt_factor_scores.csv")
+    return tau_spec, corr, loadings
+
+
+def retire_chain_selection(trace_path: Path) -> None:
+    """Set aside the modes file of the trace this fit replaces. Its `selected_chains` name chains
+    of the old run, and `diagnose_chains --write-modes` keeps a selection while the trace's file
+    name matches, which a refit with the same flags always does. A file with a selection is
+    renamed after the day it was last written, so the reasoning under `why` stays on disk; a
+    computed split without one is removed. (The axis names stay: a title is applied only while
+    its signature benchmarks still define the axis.)"""
+    path = trace_path.parent / f"mirt_modes_{trace_path.stem}.json"
+    if not path.exists():
+        return
+    if not json.loads(path.read_text()).get("selected_chains"):
+        path.unlink()
+        return
+    stamp = time.localtime(path.stat().st_mtime)
+    kept = path.with_name(f"{path.stem}_{time.strftime('%Y-%m-%d', stamp)}{path.suffix}")
+    if kept.exists():  # a second refit on the same day keeps both
+        kept = path.with_name(f"{path.stem}_{time.strftime('%Y-%m-%dT%H%M', stamp)}{path.suffix}")
+    path.rename(kept)
+    print(f"  {path.name}: its chain selection belongs to the replaced trace, kept as {kept.name}")
+
+
 def run_exploration(args, parser) -> None:
     # The spec owns the fit's identity: its tag, its folders, its trace name and
     # the data scope it is fit on. Nothing here re-derives any of those.
@@ -706,6 +768,28 @@ def run_exploration(args, parser) -> None:
     attrs["mirt_beta_binomial"] = json.dumps(spec.beta_binomial)
     censor_eps = load_boundary_eps(data) if args.censor_bounds else None
     binomial_n = spec.binomial_n(data)
+    fingerprint = data_fingerprint(data, floor_c, binomial_n)
+    attrs["mirt_data_fingerprint"] = fingerprint
+    if args.merge_chains:
+        # Checked before sampling: a mismatch found after the run costs the whole run.
+        import xarray as xr
+        with xr.open_dataset(args.merge_chains, group="posterior") as post:
+            earlier, saved = dict(post.attrs), int(post.sizes["draw"])
+        thin = int(earlier.get("mirt_save_thin", 1))
+        wrong = [f"{key} ({earlier.get(key)!r} there, {attrs[key]!r} here)"
+                 for key in ("mirt_spec", "mirt_data_fingerprint")
+                 if earlier.get(key) != attrs[key]]
+        if thin != args.save_thin:
+            wrong.append(f"save thinning ({thin} there, {args.save_thin} here)")
+        if saved != -(-sample_kw["draws"] // args.save_thin):
+            wrong.append(f"draws ({saved} saved every {thin}th there, "
+                         f"{sample_kw['draws']} here)")
+        if wrong:
+            parser.error(f"--merge-chains: {args.merge_chains} is not this fit: "
+                         + "; ".join(wrong))
+    # From here the trace path is written over (the crash checkpoint first), so the chain
+    # selection made on the trace being replaced goes now.
+    retire_chain_selection(spec.trace_path)
 
     # Streaming is nutpie's zarr storage; the other backends keep their own traces.
     stream = args.stream_draws and args.sampler == "nutpie"
@@ -748,17 +832,7 @@ def run_exploration(args, parser) -> None:
         # Names are given by hand: write the template beside the trace if it is missing.
         propose_axis_names(view, data, results_dir)
 
-    # tau spectrum is a PRE-rotation quantity: rotation mixes axes and would
-    # scramble the per-axis scales, so dimensionality is read here, first.
-    # Bifactor exception: its tau_A is [tau_g, tau_hs, tau_hs, ...] — the
-    # specifics share one global scale by construction, so tau cannot tell them
-    # apart. Realised per-axis strength lives in the loading column norms (the
-    # horseshoe's local scales are per cell), and that is also what shows a
-    # specific the data did not need collapsing to an empty column.
-    tau_spec = tau_spectrum_df(
-        np.linalg.norm(view.A, axis=1) if args.loading_prior == "bifactor"
-        else view.tau)
-    save_df(tau_spec, results_dir / "mirt_tau_spectrum.csv")
+    tau_spec, corr, loadings = write_axis_tables(view, data, results_dir, args.loading_prior)
     print("\n── tau_A spectrum (gap ratio flags the live/dead break) ──")
     print(tau_spec.to_string(index=False, float_format=lambda x: f"{x:.3f}"))
 
@@ -770,20 +844,11 @@ def run_exploration(args, parser) -> None:
         else "promax-aligned bundle (per draw)" if lp == "signed" and view.K > 1
         else "raw bundle (rank-tracked, no rotation)")
 
-    corr = factor_corr_df(view.Phi)
-    save_df(corr.reset_index().rename(columns={"index": "axis"}),
-            results_dir / "mirt_factor_corr.csv")
     phi_label = ("promax factor correlation Phi (oblique — NOT the raw "
                  "ability correlation)" if view.phi_is_promax
                  else "factor correlation Phi (off-diag = axis-ability overlap)")
     print(f"\n── {phi_label} ──")
     print(corr.to_string(float_format=lambda x: f"{x:.3f}"))
-
-    loadings = loadings_table(view.A, bench_names, data.bench_category)
-    save_df(loadings, results_dir / "mirt_loadings.csv")
-
-    scores = factor_scores_df(view.theta, model_names, is_human=data.is_human)
-    save_df(scores, results_dir / "mirt_factor_scores.csv")
 
     for k in range(min(args.K, 4)):
         sub = loadings[loadings["axis"] == f"axis{k + 1}"]
@@ -841,7 +906,8 @@ def run_exploration(args, parser) -> None:
                       and sizes.get("model") == data.n_models
                       and sizes.get("bench") == data.n_benchmarks
                       and json.loads(attrs.get("mirt_beta_binomial", "false"))
-                      == spec.beta_binomial)
+                      == spec.beta_binomial
+                      and attrs.get("mirt_data_fingerprint") == fingerprint)
             if cached:
                 print(f"\nReusing cached K=1 baseline → {baseline_path}", flush=True)
                 gof_path = results_dir / "mirt_gof_k1.json"
@@ -850,9 +916,9 @@ def run_exploration(args, parser) -> None:
                     print(f"  1D (K=1, cached): R²={m['bayesian_r2']:.3f}  "
                           f"RMSE={m['rmse']:.3f}  MAE={m['mae']:.3f}", flush=True)
             else:
-                print(f"\nCached K=1 dims or likelihood (model={sizes.get('model')}, "
-                      f"bench={sizes.get('bench')}) don't match current data "
-                      f"({data.n_models}, {data.n_benchmarks}) — refitting.", flush=True)
+                print(f"\nCached K=1 baseline was fit on other data or another likelihood "
+                      f"(data fingerprint {attrs.get('mirt_data_fingerprint')}, now "
+                      f"{fingerprint}) — refitting.", flush=True)
         if not cached:
             # The baseline is self-describing too: without the spec attr,
             # from_trace reads the folder tokens and gets floors wrong.
@@ -867,7 +933,8 @@ def run_exploration(args, parser) -> None:
                 spec_attrs={"mirt_spec": spec_json(spec.baseline_spec()),
                             "mirt_loading_prior": "normal",
                             "mirt_link": "linear",
-                            "mirt_beta_binomial": json.dumps(spec.beta_binomial)})
+                            "mirt_beta_binomial": json.dumps(spec.beta_binomial),
+                            "mirt_data_fingerprint": fingerprint})
             save_trace(thin_trace(idata_1d, args.save_thin), baseline_path)
             gof_report(idata_1d, "1D (K=1)", "k1")
 
@@ -912,10 +979,11 @@ def main():
                         help="[exploration] override config.SAMPLE_KW random_seed "
                              "(42). Nutpie is deterministic given seed+data+model, "
                              "so a multi-run recipe MUST vary this or the runs are "
-                             "duplicates. --preset canonical keeps config.SAMPLE_KW")
+                             "duplicates. Refused with --preset canonical, which keeps "
+                             "config.SAMPLE_KW")
     parser.add_argument("--target-accept", type=float, default=0.95,
                         help="[exploration] NUTS target acceptance (default 0.95). "
-                             "--preset canonical keeps config.SAMPLE_KW")
+                             "Refused with --preset canonical, which keeps config.SAMPLE_KW")
     parser.add_argument("--sampler", default="nutpie",
                         choices=["pymc", "nutpie", "numpyro"],
                         help="NUTS backend (default nutpie: Rust, ~2-3x faster on CPU)")
@@ -999,7 +1067,7 @@ def main():
                              "the thinned trace is saved; it needs about 8 GB of free disk "
                              "for the flagship shape while the run lasts. nutpie only")
     parser.add_argument("--no-stream-draws", dest="stream_draws", action="store_false",
-                        help="[exploration] keep every draw in RAM until the end instead "
+                        help="keep every draw in RAM until the end instead "
                              "(nutpie's arrow store)")
     parser.add_argument("--human-merge", action="store_true",
                         help="config.HUMAN_ORDER_MERGED (exploration, or --preset canonical → "
@@ -1135,6 +1203,16 @@ def main():
                         help="[exploration] render figures in-process via "
                              "4_diagnostics/3_plot_mirt.py")
     args = parser.parse_args()
+    # A flag of the other mode is refused, not ignored: --skip-sampling without the preset
+    # used to resample and write over the K-axis trace, and --seed or --merge-chains with it
+    # to resample the canonical index at seed 42. The mode is the help text's [tag].
+    other = "[exploration]" if args.preset == "canonical" else "[canonical]"
+    stray = [a.option_strings[0] for a in parser._actions
+             if (a.help or "").startswith(other) and getattr(args, a.dest) != a.default]
+    if stray:
+        parser.error(f"{', '.join(stray)}: {other[1:-1]} only, "
+                     + ("not with --preset canonical" if args.preset == "canonical"
+                        else "needs --preset canonical"))
 
     if args.preset == "canonical":
         run_canonical(args)

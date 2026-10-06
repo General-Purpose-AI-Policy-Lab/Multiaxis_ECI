@@ -420,11 +420,11 @@ FORECAST_BACKCAST_FLOOR: dict[str, str] = {}
 
 # Axis titles are never hard-coded: each fit folder carries an axis_names.json
 # written as a template by the fit and filled in by hand (analysis.axes).
-# Frontier releases pinned into every per-axis forest whatever their posterior SD:
-# a frontier model is the headline of the figure, so a wide interval is drawn
-# rather than the row dropped. Names of the published fit; a refit's newest
-# frontier releases are added here by hand.
-FOREST_PINNED_RELEASES = {"claude-mythos-preview-early", "claude-fable-5", "gpt-5.6-sol_max"}
+# Runs pinned into every per-axis forest by hand, on top of the rule that needs no upkeep:
+# the newest release of every lineage line with a model among the axis's top rows joins
+# the forest whatever its coverage (`analysis.forests.line_tips`, 2026-10-06; until then
+# this set named the frontier releases and went stale at each data update). Empty.
+FOREST_PINNED_RELEASES: set[str] = set()
 # Release dates of the "pretty" model names of Epoch's reference ECI table, which
 # --eci-data-only fits instead of the pipeline's view. The view itself carries a date
 # on every row the pipeline could date (release_dates.csv there); this map is only

@@ -980,6 +980,35 @@ class TestCLI:
         )
         assert r.returncode != 0
 
+    @pytest.mark.parametrize("argv, ok", [
+        (["--preset", "canonical", "--human-merge"], True),
+        (["--preset", "canonical", "--human-merge", "--access", "private",
+          "--anchors", "a,b", "--skip-sampling", "--no-stream-draws"], True),
+        (["--K", "4", "--human-merge", "--lineage-prior", "--lineage-bm", "--chains", "7",
+          "--seed", "43", "--merge-chains", "x.nc"], True),
+        (["--K", "4", "--skip-sampling"], False),
+        (["--access", "public"], False),
+        (["--preset", "canonical", "--seed", "43"], False),
+        (["--preset", "canonical", "--merge-chains", "x.nc"], False),
+        (["--preset", "canonical", "--K", "3"], False),
+    ])
+    def test_flags_of_the_other_mode_are_refused(self, argv, ok, monkeypatch):
+        """A flag tagged [canonical] or [exploration] in its help is refused in the other
+        mode instead of being ignored (--skip-sampling alone used to resample the K=4 fit)."""
+        from multiaxis_eci.scripts import load
+        fit = load("3_fit/fit.py")
+        ran = []
+        monkeypatch.setattr(fit, "run_canonical", lambda args: ran.append("canonical"))
+        monkeypatch.setattr(fit, "run_exploration", lambda args, parser: ran.append("exploration"))
+        monkeypatch.setattr(sys, "argv", ["fit.py", *argv])
+        if ok:
+            fit.main()
+            assert ran
+        else:
+            with pytest.raises(SystemExit):
+                fit.main()
+            assert not ran
+
 
 # ───────────────────────── MIRT (multidimensional) ─────────────────────────
 @pytest.fixture

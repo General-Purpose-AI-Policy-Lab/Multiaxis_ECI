@@ -548,9 +548,9 @@ def _load_human_baselines_as_models() -> pd.DataFrame:
     naturally estimates each group's capability with full posterior + HDI —
     replaces the ad-hoc post-hoc median-of-implied-C aggregation.
 
-    Boundary scores (exactly 0 or 1) are clamped into the open interval
-    (ECI_EPS, 1 - ECI_EPS) and kept — the same treatment AI boundary rows get
-    from the model builders (see the clamp note below).
+    Boundary scores (exactly 0 or 1) are kept as they are, like AI rows: each
+    model builder clips where its likelihood needs an open interval (the Beta
+    rows), and the Beta-binomial reads a 1 as k = N items solved.
     """
     src = HUMAN_FILE
     if not src.exists():
@@ -581,13 +581,9 @@ def _load_human_baselines_as_models() -> pd.DataFrame:
         "source":        "human_baselines.csv",
         "category":      "Human baseline",
     })
-    # Clamp into the open interval (ECI_EPS, 1 - ECI_EPS) rather than dropping.
-    # Beta has open support, so a boundary value cannot be evaluated — but AI rows
-    # at the boundary are CLIPPED and kept by the model builders, so dropping the
-    # human equivalent is the inconsistent treatment, not the consistent one.
-    # Two rows are affected (ARC-AGI-2 / Committee of Average Humans and VPCT /
-    # Average Human, both at exactly 0.999); both survive as clipped rows now.
-    out["score"] = out["score"].clip(ECI_EPS, 1.0 - ECI_EPS)
+    # No clamp here (until 2026-10-06 human rows were clamped to [ECI_EPS, 1 - ECI_EPS],
+    # which under the Beta-binomial turned a human 1.0 into k = 0.999 N while a machine
+    # 1.0 entered as k = N). Out-of-range rows are still dropped.
     return out[out["score"].between(0.0, 1.0)]
 
 

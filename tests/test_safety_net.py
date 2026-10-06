@@ -338,6 +338,9 @@ All goldens were re-pinned again the same day when five more human baselines joi
 (50 -> 55 rows: Furniture Assembly Average Human 0.63 and Top Performer 0.84, LMCA Domain Expert 0.87,
 DTBench Domain Expert 0.9867, FrontierMath Erdos Domain Expert 0.0), and once more when Cybench's
 Committee of Domain Experts row went from 1.0 to 0.75 (a top-25 competition team). Data only.
+The Beta-binomial golden moved once more when human scores stopped being clamped to
+[ECI_EPS, 1 - ECI_EPS] in data.py: a human 1.0 on an item-scored benchmark now enters as k = N,
+like a machine 1.0 (the Beta goldens clip in the builders, so they did not move).
 
 Three guards:
 - Golden initial-point log-probabilities per model configuration — any
@@ -441,7 +444,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         binomial_n=load_binomial_n(data))),
-            -58884.354767, rtol=self.RTOL)
+            -58884.674926, rtol=self.RTOL)
 
     def test_mirt_k1_pt1(self, data):
         np.testing.assert_allclose(

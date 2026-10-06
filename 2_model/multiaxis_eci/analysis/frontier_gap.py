@@ -69,8 +69,13 @@ from multiaxis_eci.analysis.regimes import (
     weighted_line_fit,
 )
 from multiaxis_eci.analysis.stats import post_stats
-from multiaxis_eci.data import (MODEL_OPENNESS_FILE, load_model_openness, model_country,
-                                model_organization, model_product)
+from multiaxis_eci.data import (
+    MODEL_OPENNESS_FILE,
+    load_model_openness,
+    model_country,
+    model_organization,
+    model_product,
+)
 
 # Smallest posterior SD (ECI-H points) a frontier point carries in the line fits.
 SD_FLOOR = 0.5

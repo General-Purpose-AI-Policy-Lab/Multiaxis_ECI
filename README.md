@@ -49,7 +49,7 @@ Python 3.11 or later, with the pinned scientific stack (`pyproject.toml`):
 uv venv --python 3.11 .venv && uv pip install -e . --group dev   # or: pip install -e .
 plotly_get_chrome -y                                             # once per env; figure export needs it
 python -m multiaxis_eci sync                                     # 0_input/ from ../benchmark-data-pipeline
-python -m pytest -m "not slow"                                   # under a minute, about 290 tests
+python -m pytest -m "not slow"                                   # under a minute, about 435 tests
 ruff check .
 ```
 
@@ -84,10 +84,11 @@ python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --chains 7 
 
 Traces on disk keep every fifth draw (`--save-thin`, `config.SAVE_THIN`): convergence and the tables are computed on the full run, and the 16,000 saved draws pin every median and interval the figures show. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default; `--no-stream-draws` restores the in-memory run), so the machine stays usable during a ten-hour fit; the store is deleted once the thinned trace is saved.
 
-Then find the posterior modes, render the fit's figures (on the chains the deliverables read and, separately, the remaining ones when there are several modes; French versions under `fr/`, their SVG twins under `fr/svg/`), and rebuild the dashboard. The deliverables read the best mode by log-density, or the `selected_chains` of the modes file when it names a subset (the flagship's: chains 2, 4, 5, picked on `4_diagnostics/integrated_loo.py`):
+Then find the posterior modes, render the fit's figures (on the chains the deliverables read and, separately, the remaining ones when there are several modes; French versions under `fr/`, their SVG twins under `fr/svg/`), and rebuild the dashboard. The deliverables read the best mode by log-density, or the `selected_chains` of the modes file when it names a subset (the flagship's: chains 2, 4, 5, picked on `4_diagnostics/integrated_loo.py`). `fit.py` writes the axis tables on every chain; `--write-tables` rewrites them on the chains the deliverables read, and `mirt_loadings.csv` among them is the frame every chain group's figures are put back on. A refit sets the old modes file aside, so a selection never outlives its chains:
 
 ```bash
 python 4_diagnostics/diagnose_chains.py --trace <trace> --write-modes
+python 4_diagnostics/diagnose_chains.py --trace <trace> --write-tables   # once selected_chains is final
 python 4_diagnostics/3_plot_mirt.py --forecast --trace <trace>
 python 4_diagnostics/4_build_dashboard.py --force-all
 ```

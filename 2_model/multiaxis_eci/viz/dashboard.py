@@ -21,7 +21,6 @@ from multiaxis_eci.viz.forecast import (
     crossover_panels_fig,
     frontier_trend_fig,
 )
-from multiaxis_eci.viz.style import READABLE
 from multiaxis_eci.viz.gof import (
     benchmark_icc_fig,
     benchmark_obs_vs_pred_fig,
@@ -38,6 +37,7 @@ from multiaxis_eci.viz.mirt import (
     loadings_grid_fig,
     loadings_heatmap_fig,
 )
+from multiaxis_eci.viz.style import READABLE
 
 # ── shared figure-SETS (Unit 3): one GoF quad + one per-fit set, all callers ──
 

@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from functools import lru_cache
+from functools import cache, lru_cache
 
 import arviz as az
 import numpy as np
@@ -66,7 +66,7 @@ _NOT = re.compile("|".join(NON_REASONING_PATTERNS), re.I)
 _HYBRID = re.compile("|".join(HYBRID_LINE_PATTERNS), re.I)
 
 
-@lru_cache(maxsize=None)
+@cache
 def run_mode(name: str) -> str:
     """The thinking mode a run states by itself: "off" (`config.NON_REASONING_PATTERNS`, a
     reasoning level of OFF_LEVELS, a variant of OFF_VARIANTS), "on" (any other reasoning level,

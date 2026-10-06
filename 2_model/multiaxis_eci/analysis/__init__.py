@@ -58,6 +58,12 @@ from multiaxis_eci.analysis.forecast import (
     mirt_frontier_forecast,
 )
 from multiaxis_eci.analysis.forests import forest_frames
+from multiaxis_eci.analysis.human_ident import (
+    human_axis_contraction,
+    human_scale_axes,
+    identified_tiers,
+    view_human_contraction,
+)
 from multiaxis_eci.analysis.regimes import (
     family_best,
     frontier_topk,
@@ -81,12 +87,6 @@ from multiaxis_eci.analysis.rotation import (
     geomin_rotate,
     permutation_matched_reproducibility,
     promax_rotate,
-)
-from multiaxis_eci.analysis.human_ident import (
-    human_axis_contraction,
-    human_scale_axes,
-    identified_tiers,
-    view_human_contraction,
 )
 from multiaxis_eci.analysis.scale import (
     ability_label,

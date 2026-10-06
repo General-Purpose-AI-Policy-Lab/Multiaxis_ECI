@@ -57,13 +57,13 @@ def load_trace(path: Path):
 def merge_chains(earlier, later):
     """`earlier`'s chains followed by `later`'s, as one trace: how chains are added to a fit.
 
-    Both must be the same fit (identical `mirt_spec`, same draws per chain and the same save
+    Both must be the same fit (identical `mirt_spec` and data fingerprint, same draws per chain and the same save
     thinning, every other dimension equal); `later`'s chains are renumbered after `earlier`'s.
     Only the groups both traces carry are kept, with `earlier`'s attributes. Raises ValueError
     when the two cannot be one fit.
     """
     pa, pb = earlier.posterior.attrs, later.posterior.attrs
-    for key in ("mirt_spec", "mirt_save_thin"):
+    for key in ("mirt_spec", "mirt_save_thin", "mirt_data_fingerprint"):
         if pa.get(key) != pb.get(key):
             raise ValueError(f"merge_chains: {key} differs ({pa.get(key)!r} vs {pb.get(key)!r})")
     if earlier.posterior.sizes["draw"] != later.posterior.sizes["draw"]:

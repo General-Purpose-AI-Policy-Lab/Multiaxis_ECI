@@ -97,6 +97,10 @@ trace      ├── trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
 figures    └── figures/k4/            (PNG; html/ beneath it)
 ```
 
+A K other than 4 adds `_k<K>` to the results folder (`--K 3` with the same flags writes to `mirt_humanmerge_lineageprior_lineagebm_k3/`), so its fixed-name tables, axis names and K=1 baseline never land on the K=4 fit's.
+
+A flag tagged `[canonical]` or `[exploration]` in `--help` is refused in the other mode rather than ignored (`--skip-sampling` without `--preset canonical` used to resample the K-axis fit).
+
 `FitSpec.from_trace` reads that identity back off a trace, so a trace path is
 the only thing a plotting or diagnostic caller has to name.
 

@@ -32,7 +32,7 @@ trace as a card, then build.
 
 | Script | Purpose |
 |---|---|
-| `diagnose_chains.py` | Are the chains one converged solution, or do some sit in a separate likelihood basin? No re-sampling. `--write-modes` writes the split the deliverables read, and keeps a `selected_chains` choice already in the file |
+| `diagnose_chains.py` | Are the chains one converged solution, or do some sit in a separate likelihood basin? No re-sampling. `--write-modes` writes the split the deliverables read, and keeps a `selected_chains` choice already in the file (a refit of the trace sets that file aside, as `mirt_modes_<stem>_<day>.json`, so a selection never outlives its chains) |
 | `theta_bimodality.py` | Which test-takers the chain split actually moves, per axis, before and after alignment |
 | `integrated_loo.py` | Leave-one-out per chain group (posterior mode) with each score's own latent block (its release level, or its model's theta) integrated out by a Laplace cavity, so PSIS weighs only the global parameters: on the K=4 flagship it takes the scores with Pareto k > 0.7 from about 740 to 290 per mode. Groups are compared at equal draws (chain averages). No re-sampling |
 | `robust_loo.py` | Silva-Zanella mixture leave-one-out per mode (plain, or balanced by a first estimate). Kept for the record: on the K=4 flagship its Monte Carlo spread between chains (800 to 1,200 elpd) was too wide to rank the modes; `integrated_loo.py` replaced it |

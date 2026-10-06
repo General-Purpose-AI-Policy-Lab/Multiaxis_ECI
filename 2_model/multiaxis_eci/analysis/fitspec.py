@@ -37,6 +37,12 @@ from multiaxis_eci.config import (
 _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
 
 
+# The K whose results folder carries no K token: every K-axis fit published so far is K=4.
+# Another K of the same flag set gets a `_k<K>` folder (2026-10-06; until then only the
+# figures were split by K, and a K=3 test run wrote over the K=4 fit's tables).
+UNTOKENED_K = 4
+
+
 @dataclass(frozen=True)
 class FitSpec:
     """The flag set of one compensatory MIRT fit.
@@ -143,14 +149,16 @@ class FitSpec:
     @property
     def results_dir(self) -> Path:
         """`5_outputs/<data generation>/mirt{tag}/`: the data generation is the
-        parent folder, so the tag carries only the flag set."""
-        return RESULTS_DIR / (f"mirt{self.tag}" if self.tag else "mirt")
+        parent folder, so the tag carries only the flag set. A K other than
+        `UNTOKENED_K` adds `_k<K>`, so a K=3 run of the flagship's flags never
+        writes its fixed-name tables (`mirt_loadings.csv`, the display frame every
+        K=4 figure is aligned on), axis names or live store over the K=4 fit's."""
+        name = f"mirt{self.tag}" if self.tag else "mirt"
+        return RESULTS_DIR / (name if self.K == UNTOKENED_K else f"{name}_k{self.K}")
 
     @property
     def figures_dir(self) -> Path:
-        """`<results_dir>/figures/k{K}/` (PNG) with `html/` beneath it. K is in the
-        name, unlike `results_dir`: two fits of one flag set differing only in K
-        share a results folder but must not overwrite each other's figures."""
+        """`<results_dir>/figures/k{K}/` (PNG) with `html/` beneath it."""
         return self.results_dir / FIGURES_DIRNAME / f"k{self.K}"
 
     @property
@@ -368,15 +376,14 @@ FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
 # `open_flagship` says so when it has not. `FLAGSHIP_TRACE.parent` is the fit's
 # results folder and holds its CSVs and caches.
 FLAGSHIP_TRACE = FLAGSHIP.trace_path
-# Which chains the flagship's summaries read: "best" is the best-log-density mode
-# of the modes file beside the trace (`diagnose_chains.py --write-modes`), every
-# chain when that file is missing or finds one mode. The 2026-10-01 flagship has
-# two (chains 0/5/7, 36 nats above 1/2/3/4/6); the user chose the best one
-# (2026-10-02), the rule `3_plot_mirt.chain_split` applies to the figures.
+# Which chains the flagship's summaries read: "best" is the modes file's `selected_chains`
+# when it names a subset, else the best-log-density mode (`best_mode_chains`), every chain
+# when that file is missing or finds one mode; the rule `3_plot_mirt.chain_split` applies
+# to the figures.
 FLAGSHIP_CHAINS = "best"
-# Every flagship summary is a median or an interval, which the thinned draws
-# pin as well as the full 120,000.
-FLAGSHIP_THIN = 10
+# No further thinning on read: traces are saved every config.SAVE_THIN-th draw already
+# (5), and at 2,000 draws a chain a further 10 left 120 draws on three selected chains.
+FLAGSHIP_THIN = 1
 
 
 def best_mode_chains(trace_path) -> list[int] | None:
@@ -493,7 +500,8 @@ def _folder_tag(trace_path: Path) -> str:
     # it named the folder, never the spec. A `_short<draws>x<chains>` suffix marks a
     # smaller run of the same flag set kept beside the full one (the 2000x8 K=4
     # test fit); it names the folder too.
-    return re.sub(r"(_data\d{8}|_short\d+x\d+)$", "", name[4:])
+    # A `_k<K>` suffix puts a K other than UNTOKENED_K in a folder of its own.
+    return re.sub(r"(_k\d+)?(_data\d{8}|_short\d+x\d+)?$", "", name[4:])
 
 
 def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
