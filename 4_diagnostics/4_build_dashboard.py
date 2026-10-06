@@ -266,10 +266,43 @@ def _modes_table_html(doc):
 # next build: unchanged trace → cached card, no trace load; trace DELETED →
 # cached card still served, labelled "trace retired" (delete the .nc freely,
 # the plots survive); trace present but fit on a different data generation →
-# cached card with a "data superseded" label instead of a crash. Bump
-# RENDER_REV (or use --force) when the figure set itself changes.
+# cached card with a "data superseded" label instead of a crash. The key also
+# hashes what a card is drawn from besides the trace (`_render_inputs`: the axis
+# names, the display frame, the synced data, the curated tables and the display
+# thresholds), so naming the axes or resyncing re-renders without --force.
+# Bump RENDER_REV (or use --force) when the figure set itself changes.
 RENDER_REV = 15  # posterior summaries are median + central interval
 CACHE_DIR = config.OUTPUTS_DIR / "dashboard_cache"
+
+
+# The display settings a card is drawn with, outside the trace and the files below.
+_RENDER_SETTINGS = ("MIN_AXIS_COVERAGE", "HUMAN_AXIS_SHARE_MIN", "HUMAN_AXIS_CONTRACTION_MIN",
+                    "FOREST_PINNED_RELEASES")
+
+
+def _render_inputs(trace_path) -> str:
+    """Hash of what a card is drawn from besides its trace: the fit folder's axis names and
+    display frame (`mirt_loadings.csv`, rewritten by `diagnose_chains --write-tables`), the
+    synced data (`provenance.json`, its sync time left out), the curated tables of
+    `1_curated/` and the display settings of `_RENDER_SETTINGS`. Until 2026-10-06 the key was
+    the trace and the mode split only, so a card named after its axes, or drawn before a
+    resync, kept being served until --force-all."""
+    import hashlib
+    h = hashlib.sha256()
+    files = [trace_path.parent / "axis_names.json", trace_path.parent / "mirt_loadings.csv",
+             *sorted(config.CURATED_DIR.glob("*.csv")), *sorted(config.CURATED_DIR.glob("*.txt"))]
+    for f in files:
+        h.update(f.name.encode())
+        h.update(f.read_bytes() if f.exists() else b"-")
+    prov = config.INPUT_DIR / config.PROVENANCE_FILE
+    if prov.exists():
+        doc = json.loads(prov.read_text())
+        doc.pop("synced_at", None)
+        h.update(json.dumps(doc, sort_keys=True).encode())
+    h.update(json.dumps({k: sorted(v) if isinstance(v, set) else v
+                         for k in _RENDER_SETTINGS for v in [getattr(config, k)]},
+                        sort_keys=True).encode())
+    return h.hexdigest()[:16]
 
 
 def _fingerprint(trace_path, modes_file=None):
@@ -281,7 +314,8 @@ def _fingerprint(trace_path, modes_file=None):
     contains — or, after a re-detection at a different threshold, a table whose
     chain groupings contradict its own figure titles."""
     st = trace_path.stat()
-    fp = {"size": st.st_size, "mtime": int(st.st_mtime), "rev": RENDER_REV}
+    fp = {"size": st.st_size, "mtime": int(st.st_mtime), "rev": RENDER_REV,
+          "inputs": _render_inputs(trace_path)}
     if modes_file is not None and modes_file.exists():
         import hashlib
         fp["modes"] = hashlib.sha256(modes_file.read_bytes()).hexdigest()[:16]
@@ -328,7 +362,8 @@ def _identified_ess_cached(fit, tp, fp, data, allow_load=True):
     Cached by trace identity + chain subset — the trace load dominates the cost
     and the table re-assembles on every build.
 
-    The key deliberately drops `rev` (and the mode split) from the fingerprint:
+    The key deliberately drops `rev`, the mode split and the render inputs from the
+    fingerprint:
     ESS depends on the posterior, not on which figures the dashboard draws, so a
     RENDER_REV bump must not force every trace to be re-read.
 
@@ -337,13 +372,13 @@ def _identified_ess_cached(fit, tp, fp, data, allow_load=True):
     would misalign and raise."""
     import json
     drop = sorted(fit.get("drop_chains", []))
-    trace_key = {k: v for k, v in fp.items() if k not in ("rev", "modes")}
+    trace_key = {k: v for k, v in fp.items() if k not in ("rev", "modes", "inputs")}
     cache = (json.loads(_MODE_EVAL_CACHE.read_text())
              if _MODE_EVAL_CACHE.exists() else {})
     hit = cache.get(fit["name"])
     if (hit and hit["drop_chains"] == drop
             and {k: v for k, v in hit["fingerprint"].items()
-                 if k not in ("rev", "modes")} == trace_key):
+                 if k not in ("rev", "modes", "inputs")} == trace_key):
         return hit
     if not allow_load:
         return None

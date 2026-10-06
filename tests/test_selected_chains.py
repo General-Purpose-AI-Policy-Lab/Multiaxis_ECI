@@ -110,3 +110,21 @@ def test_a_subset_is_put_on_the_display_frame_only_when_its_axes_match(tmp_path)
     other[:, 1] = rng.uniform(0, 1, B)
     with pytest.raises(SystemExit):
         align_to_reference_loadings(view(other), data, csv)
+
+
+def test_the_dashboard_cache_key_sees_the_axis_names_and_the_frame(tmp_path):
+    """A card is re-rendered when its axis names or display frame change, not only its trace;
+    the ESS cache, which depends on the posterior alone, ignores those inputs."""
+    bd = load("4_diagnostics/4_build_dashboard.py")
+    trace = tmp_path / "trace_mirt_k4_x.nc"
+    trace.write_bytes(b"trace")
+    names = tmp_path / "axis_names.json"
+    names.write_text('{"confirmed": false}')
+    before = bd._fingerprint(trace)
+    names.write_text('{"confirmed": true}')
+    after = bd._fingerprint(trace)
+    assert before != after and before["inputs"] != after["inputs"]
+    assert {k: v for k, v in before.items() if k != "inputs"} == \
+        {k: v for k, v in after.items() if k != "inputs"}
+    (tmp_path / "mirt_loadings.csv").write_text("benchmark,axis\n")
+    assert bd._fingerprint(trace)["inputs"] != after["inputs"]

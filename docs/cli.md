@@ -269,3 +269,10 @@ crossover figures.
 fails in the first second rather than mid-render. A card whose trace and render
 cache are both absent (every card, on a fresh clone) is warned about and
 skipped, not fatal; the build exits non-zero only when NO card can render.
+
+A rendered card is cached under `5_outputs/dashboard_cache/` and served again while nothing it is
+drawn from has changed: the trace (size and modification time), the mode split, the fit folder's
+`axis_names.json` and `mirt_loadings.csv`, the synced data (`0_input/provenance.json`), the
+`1_curated/` tables and the display settings (`_RENDER_SETTINGS`). Naming the axes or resyncing
+therefore re-renders the cards they touch on a plain build; `--force` / `--force-all` are for a
+change to the figure code itself (or bump `RENDER_REV`).
