@@ -348,16 +348,16 @@ ZeroSumNormal so the location stays pinned):
 order (each tier has a parent tier; roots have none):
 
 $$
-\theta_{\text{root},k} \sim \mathcal{N}(0,3^2),
+\theta_{\text{root},k} \sim \mathcal{N}(0,\sigma_{\text{root}}^2),
 \qquad
 \theta_{\text{child},k} = \theta_{\text{parent},k} + \delta_{e,k},
 \qquad
 \delta_{e,k} \sim \mathrm{HalfNormal}(\sigma_\delta).
 $$
 
-$\sigma_\delta$ is `config.PRIOR_DELTA_HUMAN`; each fit records the value it was sampled with in its spec (`FitSpec.human_delta_sd`, the trace's `mirt_spec`), and whatever reads a trace back (a rebuilt model, the human-tier display rule) takes that one.
+$\sigma_{\text{root}}$ and $\sigma_\delta$ are `config.PRIOR_HUMAN_ROOT` and `config.PRIOR_DELTA_HUMAN`; each fit records the values it was sampled with in its spec (`FitSpec.human_root_sd` and `human_delta_sd`, the trace's `mirt_spec`), and whatever reads a trace back (a rebuilt model, the human-tier display rule) takes those.
 
-The roots are private bases outside the models' ZeroSumNormal, with sd 3 (`config.PRIOR_HUMAN_ROOT`, 2026-10-05): humans are no draw of the model population, and inside it the unit prior held Average Human 4 to 5 sd from the models on its extreme axis of the 2026-10-03 flagship, about a third of the way back from where its scores put it. They stay on the models' scale and axes: their scores on the shared benchmarks place them.
+The roots are private bases outside the models' ZeroSumNormal (2026-10-05): humans are no draw of the model population, and inside it the unit prior held Average Human 4 to 5 sd from the models on its extreme axis of the 2026-10-03 flagship, about a third of the way back from where its scores put it. They stay on the models' scale and axes: their scores on the shared benchmarks place them.
 
 Because each increment $\delta_{e,k}\ge 0$, every child tier is **$\ge$ its
 parent on every axis** (hard monotone). Tiers on different branches share no

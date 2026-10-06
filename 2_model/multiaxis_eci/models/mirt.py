@@ -74,6 +74,7 @@ def _theta_t_cells(n_rows: int, K: int, nu: float = PRIOR_THETA_T_NU):
 
 def _assemble_theta(n_models: int, K: int, human_struct=None,
                     human_delta_sd: float = PRIOR_DELTA_HUMAN,
+                    human_root_sd: float = PRIOR_HUMAN_ROOT,
                     lin: LineageStructure | None = None,
                     lineage_bm: bool = False,
                     variant_offsets: bool = True,
@@ -102,7 +103,7 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     plain single-ZeroSumNormal path over every model.
 
     The human roots are not drawn from the model population: each is a private
-    Normal(0, config.PRIOR_HUMAN_ROOT = 3) base, outside the zero-sum (user,
+    Normal(0, human_root_sd) base (config.PRIOR_HUMAN_ROOT), outside the zero-sum (user,
     2026-10-05). Inside it, Average Human sat 4 to 5 sd from the models on its
     extreme axis of the 2026-10-03 flagship and the unit prior pulled it a third
     of the way back. Humans stay on the models' scale and axes all the same:
@@ -187,7 +188,7 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     theta_full = pt.set_subtensor(theta_full[rest, :], zsn[:rest.size])
     cut = rest.size
     if human_struct is not None:
-        base_h = pm.Normal("theta_h_base", 0.0, PRIOR_HUMAN_ROOT, shape=(n_roots, K))
+        base_h = pm.Normal("theta_h_base", 0.0, human_root_sd, shape=(n_roots, K))
         rows_h, theta_h = _human_block(human_struct, K, base_h, human_delta_sd)
         theta_full = pt.set_subtensor(theta_full[rows_h, :], theta_h)
     if lin is not None:
@@ -551,6 +552,7 @@ def build_mirt_model(data: ECIData, K: int,
                       loading_prior: str = "normal",
                       human_order: dict[str, str | None] | list[str] | None = None,
                       human_delta_sd: float = PRIOR_DELTA_HUMAN,
+                      human_root_sd: float = PRIOR_HUMAN_ROOT,
                       lineage: LineageStructure | None = None,
                       lineage_bm: bool = False,
                       lineage_links: bool = True,
@@ -648,9 +650,10 @@ def build_mirt_model(data: ECIData, K: int,
     them, theta = max(parents) + the increment; see _human_block for the kink
     that buys.
 
-    human_delta_sd: sigma of the HalfNormal increment between ordered tiers. The fit's
-    value travels in FitSpec.human_delta_sd (and so in the trace's mirt_spec); a caller
-    rebuilding a model from a trace passes the spec's, never the config's.
+    human_delta_sd, human_root_sd: sigma of the HalfNormal increment between ordered tiers
+    and sd of the roots' private Normal base. The fit's values travel in FitSpec (and so in
+    the trace's mirt_spec); a caller rebuilding a model from a trace passes the spec's,
+    never the config's.
     lineage: optional release-chain structure (see lineage.py). Chained models get
     psi[node] + variant offset, where psi follows founder + cumulative SOFT
     (Normal, can regress) increments along the chain. Disjoint from human_order.
@@ -1046,7 +1049,7 @@ def build_mirt_model(data: ECIData, K: int,
         theta = _assemble_theta(
             data.n_models, K,
             human_struct=_human_structure(human_order, coords["model"]),
-            human_delta_sd=human_delta_sd,
+            human_delta_sd=human_delta_sd, human_root_sd=human_root_sd,
             lin=lineage, lineage_bm=lineage_bm,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,

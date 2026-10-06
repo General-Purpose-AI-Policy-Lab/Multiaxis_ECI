@@ -159,6 +159,8 @@ PRIOR_DELTA_HUMAN = 2.0
 # the 2026-10-03 flagship kept Average Human at about 4.5 sd on its extreme axis with a posterior sd of
 # 0.55, so the unit prior pulled it about a third of the way back toward the models, and the human
 # crossing dates with it. 3 leaves the scores to place them; the tiers above follow through delta_h.
+# Set here only, like PRIOR_DELTA_HUMAN: a fit records it in its spec (FitSpec.human_root_sd), and
+# whatever reads a trace back uses the trace's value.
 PRIOR_HUMAN_ROOT = 3.0
 
 # Lineage prior (models/mirt.py, build_mirt_model(..., lineage=...)). Within a

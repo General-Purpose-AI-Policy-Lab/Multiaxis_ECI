@@ -1705,8 +1705,12 @@ class TestMIRT:
         # rest rows + one founder per chain, no human root
         assert m["theta_zsn_t"].type.shape[1] == n_rest + lin.n_chains
         from multiaxis_eci.config import PRIOR_HUMAN_ROOT
-        draws = pm.draw(m["theta_h_base"], draws=400, random_seed=1)
-        assert 2.5 < draws.std() < 3.5 and PRIOR_HUMAN_ROOT == 3.0
+        draws = pm.draw(m["theta_h_base"], draws=4000, random_seed=1)
+        assert abs(draws.std() / PRIOR_HUMAN_ROOT - 1) < 0.05
+        # The root sd is the builder's argument, not a module constant.
+        m2 = build_mirt_model(data, K=3, human_order=HUMAN_ORDER, lineage=lin,
+                              human_root_sd=0.5)
+        assert abs(pm.draw(m2["theta_h_base"], draws=4000, random_seed=1).std() - 0.5) < 0.03
 
     def test_time_prior_shifts_theta_by_beta_times_year(self, data):
         """The time prior adds beta[k]*t[m] to theta and nothing else. Evaluated
@@ -2556,29 +2560,39 @@ class TestFitSpec:
             drop_benchmarks=("FrontierMath v1", "AlgoTune"), private_bases=True,
             floors=True, ceiling_noise=True, known_se=True,
             pooled_noise=True, censor_bounds=True, keep_isolated=True,
-            human_delta_sd=1.5)
+            human_delta_sd=1.5, human_root_sd=2.5)
         idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(spec)})
         got = analysis.FitSpec.from_trace(idata, spec.trace_path)
         assert got == spec
 
-    def test_human_delta_sd_travels_with_the_trace(self):
-        # The config sets the tier increment sigma once; a fit records it in its spec, and a
-        # reader takes the trace's value: a spec saved before the field existed reads as 1.0,
-        # the spec-less canonical K=1 trace carries it as its own attr.
-        from multiaxis_eci.analysis.fitspec import LEGACY_HUMAN_DELTA_SD, trace_human_delta_sd
-        from multiaxis_eci.config import PRIOR_DELTA_HUMAN
+    def test_human_prior_travels_with_the_trace(self):
+        # The config sets the tier increment sigma and the root sd once; a fit records them in
+        # its spec, and a reader takes the trace's values: a spec saved before the fields
+        # existed reads as 1.0 and 3.0, the spec-less canonical K=1 trace carries them as attrs.
+        from multiaxis_eci.analysis.fitspec import (
+            LEGACY_HUMAN_DELTA_SD,
+            LEGACY_HUMAN_ROOT_SD,
+            trace_human_delta_sd,
+            trace_human_root_sd,
+        )
+        from multiaxis_eci.config import PRIOR_DELTA_HUMAN, PRIOR_HUMAN_ROOT
         assert analysis.FitSpec(K=3).human_delta_sd == PRIOR_DELTA_HUMAN
+        assert analysis.FitSpec(K=3).human_root_sd == PRIOR_HUMAN_ROOT
         spec = analysis.FitSpec(K=3, human_merge=True)
         old = json.loads(analysis.spec_json(spec))
         old.pop("human_delta_sd")
+        old.pop("human_root_sd")
         idata = self._idata(K=3, attrs={"mirt_spec": json.dumps(old)})
-        assert analysis.FitSpec.from_trace(idata, spec.trace_path).human_delta_sd == 1.0
+        got = analysis.FitSpec.from_trace(idata, spec.trace_path)
+        assert (got.human_delta_sd, got.human_root_sd) == (1.0, 3.0)
         assert trace_human_delta_sd(idata.posterior) == LEGACY_HUMAN_DELTA_SD == 1.0
+        assert trace_human_root_sd(idata.posterior) == LEGACY_HUMAN_ROOT_SD == 3.0
         idata = self._idata(K=3, attrs={"mirt_spec": analysis.spec_json(
             analysis.FitSpec(K=3, human_merge=True, human_delta_sd=2.5))})
         assert trace_human_delta_sd(idata.posterior) == 2.5
-        assert trace_human_delta_sd(self._idata(
-            K=1, attrs={"mirt_human_delta_sd": "0.75"}).posterior) == 0.75
+        canonical = self._idata(K=1, attrs={"mirt_human_delta_sd": "0.75",
+                                            "mirt_human_root_sd": "2.0"}).posterior
+        assert (trace_human_delta_sd(canonical), trace_human_root_sd(canonical)) == (0.75, 2.0)
         assert trace_human_delta_sd(self._idata(K=1).posterior) == 1.0
 
     def test_folder_tag_fallback(self):

@@ -141,7 +141,8 @@ TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-06-15", 61, "Claude 3.5 So
                          config.ANCHOR_HIGH[0]: ("2025-09-20", 72, "GPT-5 (medium)")}
 
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
-                human_delta_sd: float = config.PRIOR_DELTA_HUMAN, lineage=None,
+                human_delta_sd: float = config.PRIOR_DELTA_HUMAN,
+                human_root_sd: float = config.PRIOR_HUMAN_ROOT, lineage=None,
                 lineage_bm=False, lineage_links=True, variant_offsets=True,
                 effort_means=False, loading_prior="signed", floor_c=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
@@ -186,6 +187,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
           flush=True)
     model = build_mirt_model(data, K, loading_prior=loading_prior,
                              human_order=human_order, human_delta_sd=human_delta_sd,
+                             human_root_sd=human_root_sd,
                              lineage=lineage,
                              lineage_bm=lineage_bm, lineage_links=lineage_links,
                              variant_offsets=variant_offsets,
@@ -466,9 +468,10 @@ def run_canonical(args) -> None:
             trace.posterior.attrs["mirt_keep_isolated"] = json.dumps(True)
         if human_order:
             trace.posterior.attrs["mirt_human_order"] = json.dumps(human_order)
-            # This path writes no mirt_spec: the increment sigma travels as its own attr
-            # (fitspec.trace_human_delta_sd reads either).
+            # This path writes no mirt_spec: the human prior travels as its own attrs
+            # (fitspec.trace_human_delta_sd / trace_human_root_sd read either).
             trace.posterior.attrs["mirt_human_delta_sd"] = json.dumps(config.PRIOR_DELTA_HUMAN)
+            trace.posterior.attrs["mirt_human_root_sd"] = json.dumps(config.PRIOR_HUMAN_ROOT)
         save_trace(thin_trace(trace, args.save_thin), trace_path)
         print(f"   saved trace → {trace_path} (every {args.save_thin}th draw)")
         if stream:
@@ -802,7 +805,8 @@ def run_exploration(args, parser) -> None:
     # ── Fit the overcomplete MIRT ─────────────────────────────────────────
     idata_k, conv_k = sample_mirt(data, spec.K, sample_kw,
                                   human_order=human_order,
-                                  human_delta_sd=spec.human_delta_sd, lineage=lineage,
+                                  human_delta_sd=spec.human_delta_sd,
+                                  human_root_sd=spec.human_root_sd, lineage=lineage,
                                   lineage_bm=spec.lineage_bm,
                                   effort_means=spec.effort_means, time_t=time_t,
                                   loading_prior=spec.loading_prior, floor_c=floor_c,

@@ -29,6 +29,7 @@ from multiaxis_eci.config import (
     HUMAN_ORDER,
     HUMAN_ORDER_MERGED,
     PRIOR_DELTA_HUMAN,
+    PRIOR_HUMAN_ROOT,
     RESULTS_DIR,
     SG_MODEL_NAME,
 )
@@ -43,9 +44,12 @@ _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
 # figures were split by K, and a K=3 test run wrote over the K=4 fit's tables).
 UNTOKENED_K = 4
 
-# The tier increment sigma of every fit saved before FitSpec carried it (2026-10-06): the
-# config value until that day. A trace whose mirt_spec lacks the field was sampled with it.
+# The human prior of every fit saved before FitSpec carried it (2026-10-06), the config values
+# until that day: a trace whose mirt_spec lacks a field was sampled with these. The root sd holds
+# from 2026-10-05; a trace from before then (no `theta_h_base`) had its roots inside the models'
+# ZeroSumNormal, a model no current builder reproduces.
 LEGACY_HUMAN_DELTA_SD = 1.0
+LEGACY_HUMAN_ROOT_SD = 3.0
 
 
 @dataclass(frozen=True)
@@ -108,6 +112,9 @@ class FitSpec:
     # carries it into the trace (mirt_spec) so a rebuilt model or a figure reads the value the
     # trace was sampled with. A spec without it predates the field (LEGACY_HUMAN_DELTA_SD).
     human_delta_sd: float = PRIOR_DELTA_HUMAN
+    # sd of the human roots' private Normal base (models.mirt._assemble_theta), carried the same
+    # way; a spec without it predates the field (LEGACY_HUMAN_ROOT_SD).
+    human_root_sd: float = PRIOR_HUMAN_ROOT
 
     def __post_init__(self):
         # The cross-flag constraint the model cannot express on its own. Checked
@@ -257,6 +264,7 @@ class FitSpec:
             d.setdefault("beta_binomial", False)
             d.setdefault("effort_means", False)
             d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
+            d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
             spec = FitSpec(**d)
         else:
             attr = _attr_flags(post)
@@ -272,7 +280,8 @@ class FitSpec:
             # Without mirt_spec the trace predates the Beta-binomial: the Beta, unless an attr says so.
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
                                    "beta_binomial": False, "effort_means": False,
-                                   "human_delta_sd": LEGACY_HUMAN_DELTA_SD, **attr})
+                                   "human_delta_sd": LEGACY_HUMAN_DELTA_SD,
+                                   "human_root_sd": LEGACY_HUMAN_ROOT_SD, **attr})
             if is_baseline:
                 spec = _baseline_spec(spec)
         if not is_baseline:
@@ -660,18 +669,28 @@ def _check_dims(idata, data) -> None:
                 "indexed against it.")
 
 
-def trace_human_delta_sd(post) -> float:
-    """The tier increment sigma a posterior was sampled with: its mirt_spec's, else the
-    `mirt_human_delta_sd` attr the spec-less canonical K=1 fit writes, else
-    LEGACY_HUMAN_DELTA_SD for a trace saved before either existed. Reads attrs only, so it
-    serves a FitView or a bare posterior group as well as `FitSpec.from_trace`."""
+def _trace_human_prior(post, field: str, legacy: float) -> float:
+    """One human-prior value a posterior was sampled with: its mirt_spec's `field`, else the
+    `mirt_<field>` attr the spec-less canonical K=1 fit writes, else `legacy` for a trace saved
+    before either existed. Reads attrs only, so it serves a FitView or a bare posterior group
+    as well as `FitSpec.from_trace`."""
     a = post.attrs
     spec = json.loads(a["mirt_spec"]) if a.get("mirt_spec") else {}
-    if "human_delta_sd" in spec:
-        return float(spec["human_delta_sd"])
-    if a.get("mirt_human_delta_sd"):
-        return float(json.loads(a["mirt_human_delta_sd"]))
-    return LEGACY_HUMAN_DELTA_SD
+    if field in spec:
+        return float(spec[field])
+    if a.get(f"mirt_{field}"):
+        return float(json.loads(a[f"mirt_{field}"]))
+    return legacy
+
+
+def trace_human_delta_sd(post) -> float:
+    """The tier increment sigma a posterior was sampled with (`_trace_human_prior`)."""
+    return _trace_human_prior(post, "human_delta_sd", LEGACY_HUMAN_DELTA_SD)
+
+
+def trace_human_root_sd(post) -> float:
+    """The human roots' base sd a posterior was sampled with (`_trace_human_prior`)."""
+    return _trace_human_prior(post, "human_root_sd", LEGACY_HUMAN_ROOT_SD)
 
 
 def spec_json(spec: FitSpec) -> str:

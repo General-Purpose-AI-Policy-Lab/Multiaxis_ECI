@@ -15,8 +15,8 @@ The test here asks how much the scores on benchmarks that MOSTLY measure axis k 
     the loading components whose axis share passes the threshold and `w` is the Beta
     likelihood's information on the logit at the tier's fitted mean (a Beta-binomial score is
     read as Beta; the floor asymptote is ignored);
-  * the ordering prior is approximated by a Gaussian: a root Normal(0, PRIOR_HUMAN_ROOT^2), one
-    increment of variance (1 - 2/pi) PRIOR_DELTA_HUMAN^2 per tier (the HalfNormal's variance),
+  * the ordering prior is approximated by a Gaussian: a root Normal(0, root_sd^2), one
+    increment of variance (1 - 2/pi) delta_sd^2 per tier (the HalfNormal's variance),
     and a multi-parent tier read as the mean of its paths rather than their max. Information then
     flows up and down the order, damped by the increments;
   * the result is the contraction 1 - var_post / var_prior per tier and axis.
@@ -33,7 +33,8 @@ prior's sd. A step pinned by the tier's scores, or squeezed between a placed par
 descendant, contracts; a step that is the prior on top of a lower bound does not. A tier is drawn
 where both pass (`view_human_contraction` returns the smaller of the two). The draws carry the
 compensation the share test removes, which is why the step test does not replace it. Both read
-the increment sigma the trace was sampled with (FitView.human_delta_sd, from its mirt_spec).
+the human prior the trace was sampled with (FitView.human_delta_sd and human_root_sd, from its
+mirt_spec).
 """
 from __future__ import annotations
 
@@ -66,9 +67,10 @@ def _beta_logit_information(mu: np.ndarray, phi: np.ndarray) -> np.ndarray:
 
 
 def _prior_covariance(R: np.ndarray, P: np.ndarray, groups: list,
-                      delta_sd: float = PRIOR_DELTA_HUMAN) -> np.ndarray:
+                      delta_sd: float = PRIOR_DELTA_HUMAN,
+                      root_sd: float = PRIOR_HUMAN_ROOT) -> np.ndarray:
     """Gaussian stand-in for the ordering prior: (n_tiers, n_tiers), the same on every axis."""
-    paths = (R @ R.T) * PRIOR_HUMAN_ROOT ** 2 + (P @ P.T) * (1 - 2 / np.pi) * delta_sd ** 2
+    paths = (R @ R.T) * root_sd ** 2 + (P @ P.T) * (1 - 2 / np.pi) * delta_sd ** 2
     M = np.zeros((len(groups), R.shape[0]))
     for t, g in enumerate(groups):
         M[t, g] = 1.0 / len(g)
@@ -79,7 +81,8 @@ def human_axis_contraction(A_draws: np.ndarray, theta_draws: np.ndarray, data: E
                            human_order, D: np.ndarray | None = None,
                            phi: np.ndarray | None = None,
                            share_min: float = HUMAN_AXIS_SHARE_MIN,
-                           delta_sd: float = PRIOR_DELTA_HUMAN) -> pd.DataFrame | None:
+                           delta_sd: float = PRIOR_DELTA_HUMAN,
+                           root_sd: float = PRIOR_HUMAN_ROOT) -> pd.DataFrame | None:
     """Per tier (rows, the tier names) and axis (columns 0..K-1), the prior-to-posterior
     contraction of theta_k that the tier order and the human scores on benchmarks mostly
     measuring k give. None when the fit has no loadings, no order or fewer than two tiers.
@@ -114,7 +117,7 @@ def human_axis_contraction(A_draws: np.ndarray, theta_draws: np.ndarray, data: E
             w = float(_beta_logit_information(mu, phi[b]))
         info[t] += w * np.outer(A_kept[b], A_kept[b])
 
-    S0 = _prior_covariance(R, P, groups, delta_sd)
+    S0 = _prior_covariance(R, P, groups, delta_sd, root_sd)
     n = len(rows)
     prec = np.kron(np.linalg.inv(S0), np.eye(K))
     for t in range(n):
@@ -176,9 +179,10 @@ def view_human_contraction(view, data: ECIData, theta: np.ndarray | None = None,
     placed?), on a FitView (its own frame unless `theta` / `A` are given)."""
     theta = view.theta if theta is None else theta
     delta_sd = PRIOR_DELTA_HUMAN if view.human_delta_sd is None else view.human_delta_sd
+    root_sd = PRIOR_HUMAN_ROOT if view.human_root_sd is None else view.human_root_sd
     chain = human_axis_contraction(view.A if A is None else A, theta, data,
                                    view.human_order, D=view.D_med, phi=view.phi_med,
-                                   delta_sd=delta_sd)
+                                   delta_sd=delta_sd, root_sd=root_sd)
     if chain is None:
         return None
     step = increment_contraction(theta, data, view.human_order, delta_sd)
