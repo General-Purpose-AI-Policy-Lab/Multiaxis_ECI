@@ -1,93 +1,113 @@
 {
  "trace": "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc",
- "n_chains": 15,
+ "n_chains": 20,
  "K": 4,
  "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
  "chain_delta_logp": [
-  -10.4,
-  -6.9,
-  -2.5,
-  -84.2,
-  -14.8,
+  -47.3,
+  -41.1,
+  -47.3,
+  -112.1,
+  -44.7,
+  -103.6,
+  -38.7,
+  -33.6,
+  -25.5,
+  -33.7,
+  -1.1,
+  -3.8,
+  -101.0,
+  -42.7,
+  -52.9,
   0.0,
-  -84.9,
-  -41.6,
-  -42.5,
-  -45.9,
-  -83.3,
-  -89.6,
-  -62.7,
-  -93.5,
-  -71.5
+  -94.0,
+  -84.3,
+  -43.5,
+  -27.3
  ],
  "modes": [
   {
    "chains": [
-    0,
-    1,
-    2,
-    4,
-    5
+    10,
+    11,
+    15
    ],
-   "mean_logp": -21755.518847900184,
-   "min_matched_corr": 0.956,
+   "mean_logp": -21796.60709154523,
+   "min_matched_corr": 0.966,
    "label": "A",
    "delta_logp": 0.0,
    "matched_corr_to_best": null
   },
   {
    "chains": [
-    7,
-    8,
-    9
+    19
    ],
-   "mean_logp": -21791.933512929485,
-   "min_matched_corr": 0.994,
+   "mean_logp": -21822.289173148092,
+   "min_matched_corr": 1.0,
    "label": "B",
-   "delta_logp": -36.4,
-   "matched_corr_to_best": 0.738
+   "delta_logp": -25.7,
+   "matched_corr_to_best": 0.79
   },
   {
    "chains": [
-    12
+    0,
+    1,
+    2,
+    4,
+    6,
+    7,
+    8,
+    9,
+    13,
+    14
    ],
-   "mean_logp": -21811.32062805077,
-   "min_matched_corr": 1.0,
+   "mean_logp": -21835.715460437943,
+   "min_matched_corr": 0.935,
    "label": "C",
-   "delta_logp": -55.8,
-   "matched_corr_to_best": 0.404
+   "delta_logp": -39.1,
+   "matched_corr_to_best": 0.687
+  },
+  {
+   "chains": [
+    18
+   ],
+   "mean_logp": -21838.487960718907,
+   "min_matched_corr": 1.0,
+   "label": "D",
+   "delta_logp": -41.9,
+   "matched_corr_to_best": 0.848
+  },
+  {
+   "chains": [
+    17
+   ],
+   "mean_logp": -21879.273952167514,
+   "min_matched_corr": 1.0,
+   "label": "E",
+   "delta_logp": -82.7,
+   "matched_corr_to_best": 0.588
+  },
+  {
+   "chains": [
+    12,
+    16
+   ],
+   "mean_logp": -21892.488400084556,
+   "min_matched_corr": 0.997,
+   "label": "F",
+   "delta_logp": -95.9,
+   "matched_corr_to_best": 0.056
   },
   {
    "chains": [
     3,
-    10,
-    13,
-    14
+    5
    ],
-   "mean_logp": -21831.734349656574,
-   "min_matched_corr": 0.949,
-   "label": "D",
-   "delta_logp": -76.2,
-   "matched_corr_to_best": 0.02
-  },
-  {
-   "chains": [
-    6,
-    11
-   ],
-   "mean_logp": -21835.846823430707,
-   "min_matched_corr": 0.987,
-   "label": "E",
-   "delta_logp": -80.3,
-   "matched_corr_to_best": 0.147
+   "mean_logp": -21902.78729725085,
+   "min_matched_corr": 0.969,
+   "label": "G",
+   "delta_logp": -106.2,
+   "matched_corr_to_best": 0.059
   }
- ],
- "selected_chains": {
-  "chains": [
-   2,
-   4,
-   5
-  ],
-  "why": "User choice, 2026-10-06: the converged sub-group of the best mode A (chains 0, 1, 2, 4, 5). Within A, chains {2, 4, 5} agree (identified eta r-hat 1.03) while 0 and 1 drift on the chemistry and biology loadings (1.22 between them, 1.15 over the five). On integrated LOO (4_diagnostics/integrated_loo.py, chains compared at equal draws) {2, 4, 5} predict best: {0, 1} -7.1 (se 3.9), mode B -10.2 (8.2), C -15, D -22, E -29 on the 3,739 observations with k < 0.7 in every group."
- }
+ ]
 }
