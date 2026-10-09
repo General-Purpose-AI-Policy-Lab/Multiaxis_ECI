@@ -28,7 +28,7 @@ def test_selected_chains_override_the_best_mode(tmp_path):
     _modes(modes, trace, selected=[2, 0])
     assert best_mode_chains(trace) == [0, 2]
     split = load("4_diagnostics/3_plot_mirt.py").chain_split(trace, 6)
-    assert split["majority"] == [0, 2] and split["minority"] == [1, 3, 4, 5]
+    assert split["primary"] == [0, 2] and split["secondary"] == [1, 3, 4, 5]
 
 
 def test_rewriting_the_modes_keeps_the_selection(tmp_path, monkeypatch):

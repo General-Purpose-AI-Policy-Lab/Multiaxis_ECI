@@ -28,6 +28,7 @@ from multiaxis_eci.config import (
     FIGURES_DIRNAME,
     HUMAN_ORDER,
     HUMAN_ORDER_MERGED,
+    HUMAN_ORDER_MERGED_PRE_COMMITTEES,
     PRIOR_DELTA_HUMAN,
     PRIOR_HUMAN_ROOT,
     RESULTS_DIR,
@@ -43,6 +44,16 @@ _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
 # Another K of the same flag set gets a `_k<K>` folder (2026-10-06; until then only the
 # figures were split by K, and a K=3 test run wrote over the K=4 fit's tables).
 UNTOKENED_K = 4
+
+# Spec fields since removed, with the value that meant "off". A trace whose mirt_spec carries one
+# at that value reads as today's spec; at any other value it was fit with a model no builder
+# reproduces any more, and reading it raises. The "easy for humans" fifth axis
+# (`--target-axis`, `--target-root-sd`), tested and dropped on 2026-10-07 (docs/model_math.md).
+_RETIRED_FIELDS = {"target_axis": False, "target_root_sd": None}
+
+# The IRF links models/mirt.build_mirt_model knows, "linear" (the compensatory 2PL, untagged)
+# first; any other emits its name as a tag token.
+LINKS = ("linear", "loglog", "semicomp", "noncomp", "semicomp0")
 
 # The human prior of every fit saved before FitSpec carried it (2026-10-06), the config values
 # until that day: a trace whose mirt_spec lacks a field was sampled with these. The root sd holds
@@ -115,10 +126,19 @@ class FitSpec:
     # sd of the human roots' private Normal base (models.mirt._assemble_theta), carried the same
     # way; a spec without it predates the field (LEGACY_HUMAN_ROOT_SD).
     human_root_sd: float = PRIOR_HUMAN_ROOT
+    # The human baselines left out of the data (load_eci_data(fit_humans=False)): a pure
+    # model-vs-model scale, the humans placed afterwards on the frozen benchmark side.
+    # Emits `_nohumans`. Exploration, 2026-10-07.
+    no_humans: bool = False
 
     def __post_init__(self):
         # The cross-flag constraint the model cannot express on its own. Checked
         # here so every construction path pays it, not just the CLI.
+        if self.no_humans and (self.human_merge or self.human_prior):
+            raise ValueError("--no-humans and the ordered-human priors cannot compose: there "
+                             "are no human test-takers left to order.")
+        if self.link not in LINKS:
+            raise ValueError(f"unknown link {self.link!r} (one of {', '.join(LINKS)})")
         if self.lineage_bm and not self.lineage_prior:
             raise ValueError(
                 "--lineage-bm re-indexes the lineage increments by time; it "
@@ -137,7 +157,7 @@ class FitSpec:
         the historical `trace_mirt_k3_signed_...` convention); "normal" stays
         untagged so its folders reduce to the canonical mirt_humanprior etc."""
         tag = "" if self.loading_prior == "normal" else f"_{self.loading_prior}"
-        if self.link == "loglog": tag += "_loglog"
+        if self.link != "linear": tag += f"_{self.link}"
         if self.human_merge: tag += "_humanmerge"
         elif self.human_prior: tag += "_humanprior"
         if self.lineage_prior: tag += "_lineageprior"
@@ -161,6 +181,7 @@ class FitSpec:
         if not self.pooled_noise: tag += "_unpooled"
         if self.censor_bounds: tag += "_censor"
         elif not self.beta_binomial: tag += "_betalik"
+        if self.no_humans: tag += "_nohumans"
         return tag
 
     @property
@@ -226,7 +247,8 @@ class FitSpec:
                 ceiling_noise=args.ceiling_noise, known_se=args.known_se,
                 pooled_noise=args.pooled_noise,
                 censor_bounds=args.censor_bounds,
-                beta_binomial=args.beta_binomial)
+                beta_binomial=args.beta_binomial,
+                no_humans=getattr(args, "no_humans", False))
         except ValueError as e:
             if parser is None:
                 raise
@@ -265,6 +287,12 @@ class FitSpec:
             d.setdefault("effort_means", False)
             d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
             d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
+            for field, off in _RETIRED_FIELDS.items():
+                if field in d:
+                    if d[field] != off:
+                        raise ValueError(f"{trace_path.name} was fit with {field}={d[field]!r}, "
+                                         "an option since removed (see _RETIRED_FIELDS)")
+                    del d[field]
             spec = FitSpec(**d)
         else:
             attr = _attr_flags(post)
@@ -307,6 +335,7 @@ class FitSpec:
         )
         data = load_eci_data(
             include_all_benchmarks=not self.apply_exclusions,
+            fit_humans=not self.no_humans,
             drop_isolated_families=not self.keep_isolated,
             fit_simpleqa_original=self.simpleqa_original,
             drop_benchmarks=list(self.drop_benchmarks) or None)
@@ -378,23 +407,29 @@ class FitSpec:
 
 
 # ── the flagship fit ────────────────────────────────────────────────────────
-# K=4, positive loadings, merged human order + Brownian lineage prior, 3PL
-# floors, pooled noise, the exploration scope. THE forecasting base. The blog
-# post reports its 2026-08 run (10 chains x 12,000 draws on the pre-pipeline
-# snapshot: 4,923 obs / 829 test-takers / 96 benchmarks, R² 0.9643), archived
-# under 5_outputs/pre_pipeline/; FrontierMath v1 and AlgoTune were out of that
-# scope, and the pipeline excludes them today, so no drop flag names them.
-# `loading_prior` and `floors` are named explicitly although both hold the
-# default: the flagship is a statement of one fit, and a later default change
-# must not silently redefine it. The superseded 2026-07 fit (old tag grammar)
-# is archived under `archive/results_old/`.
-FLAGSHIP = FitSpec(K=4, loading_prior="normal", human_merge=True,
-                   lineage_prior=True, lineage_bm=True, floors=True)
+# K=4, positive loadings, Brownian lineage prior, 3PL floors, pooled noise, the exploration
+# scope, fitted on the MODELS ALONE (user, 2026-10-08): the human tiers are placed afterwards,
+# axis by axis, with the benchmark side frozen (analysis.human_placement,
+# 4_diagnostics/5_place_humans.py). Fitted with the human tiers (`human_merge`, the flagship
+# until that day, still fitted under `mirt_humanmerge_lineageprior_lineagebm/`), the
+# compensatory model put them about 5 sd below the models on one axis and 8 above on another.
+# The blog post reports the 2026-08 run of that joint fit (10 chains x 12,000 draws on the
+# pre-pipeline snapshot, archived under 5_outputs/pre_pipeline/). `loading_prior` and `floors`
+# are named explicitly although both hold the default: the flagship is a statement of one fit,
+# and a later default change must not silently redefine it.
+FLAGSHIP = FitSpec(K=4, loading_prior="normal", lineage_prior=True, lineage_bm=True,
+                   floors=True, no_humans=True)
+# The former flagship, the human tiers fitted inside under the merged order: kept as a secondary
+# fit in its own folder (`mirt_humanmerge_lineageprior_lineagebm/`), refitted on new data only on
+# request (`3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm`), out of the default
+# run and of the dashboard (user, 2026-10-08).
+JOINT_FIT = FitSpec(K=4, loading_prior="normal", human_merge=True, lineage_prior=True,
+                    lineage_bm=True, floors=True)
 # The one path every consumer reads, so the figures, the dashboard card and the
 # post cannot name different traces: the flagship fit of the CURRENT data
-# generation (`config.RESULTS_DIR`). It exists once `3_fit/fit.py --K 4
-# --human-merge --lineage-prior --lineage-bm` has run on that generation;
-# `open_flagship` says so when it has not. `FLAGSHIP_TRACE.parent` is the fit's
+# generation (`config.RESULTS_DIR`). It exists once `3_fit/fit.py --K 4 --lineage-prior
+# --lineage-bm --no-humans` has run on that generation (and 5_place_humans.py has placed the
+# tiers); `open_flagship` says so when it has not. `FLAGSHIP_TRACE.parent` is the fit's
 # results folder and holds its CSVs and caches.
 FLAGSHIP_TRACE = FLAGSHIP.trace_path
 # Which chains the flagship's summaries read: "best" is the modes file's `selected_chains`
@@ -431,6 +466,19 @@ def best_mode_chains(trace_path) -> list[int] | None:
     return sorted(best["chains"])
 
 
+def secondary_mode_chains(trace_path) -> list[int] | None:
+    """The chains of the secondary mode the figures render beside the primary one: the modes
+    file's `secondary_chains` (a mode the user kept for comparison, e.g. one integrated LOO
+    cannot tell from the primary), None when the file names none."""
+    p = Path(trace_path)
+    f = p.parent / f"mirt_modes_{p.stem}.json"
+    if not f.exists():
+        return None
+    doc = json.loads(f.read_text())
+    sec = doc.get("secondary_chains") if doc.get("trace") == p.name else None
+    return sorted(sec["chains"]) if sec else None
+
+
 def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
     """The flagship posterior, thinned. `chains=None` reads every chain, "best" the
     best-log-density mode (`best_mode_chains`), every chain when there is one mode.
@@ -441,7 +489,7 @@ def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
     if not FLAGSHIP_TRACE.exists():
         raise FileNotFoundError(
             f"{FLAGSHIP_TRACE}: the flagship K=4 fit does not exist for this data generation; "
-            "run `python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm` first "
+            "run `python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --no-humans` first "
             "(the published run sits under 5_outputs/pre_pipeline/).")
     if chains == "best":
         chains = best_mode_chains(FLAGSHIP_TRACE)
@@ -466,7 +514,8 @@ def _attr_flags(post) -> dict:
     if a.get("mirt_human_order"):
         # Tuple parents survive JSON as lists, so compare both sides round-tripped.
         order = json.loads(a["mirt_human_order"])
-        if order == json.loads(json.dumps(HUMAN_ORDER_MERGED)):
+        if any(order == json.loads(json.dumps(o))
+               for o in (HUMAN_ORDER_MERGED, HUMAN_ORDER_MERGED_PRE_COMMITTEES)):
             out["human_merge"] = True
         elif order == json.loads(json.dumps(HUMAN_ORDER)):
             out["human_prior"] = True
@@ -544,8 +593,10 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
             break
     else:
         out["loading_prior"] = "normal"
-    if take("_loglog"):
-        out["link"] = "loglog"
+    for lk in sorted(LINKS[1:], key=len, reverse=True):     # semicomp0 before semicomp
+        if take(f"_{lk}"):
+            out["link"] = lk
+            break
     if take("_humanmerge"):
         out["human_merge"] = True
     elif take("_humanprior"):
@@ -599,6 +650,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["censor_bounds"] = True
     if take("_betalik"):
         out["beta_binomial"] = False
+    if take("_nohumans"):
+        out["no_humans"] = True
     if rest:
         raise ValueError(f"unrecognized tag token {rest!r} in folder tag {tag!r} "
                          "— refusing to guess the fit's data scope")
@@ -691,6 +744,15 @@ def trace_human_delta_sd(post) -> float:
 def trace_human_root_sd(post) -> float:
     """The human roots' base sd a posterior was sampled with (`_trace_human_prior`)."""
     return _trace_human_prior(post, "human_root_sd", LEGACY_HUMAN_ROOT_SD)
+
+
+def sampled_human_order(post, spec: FitSpec):
+    """The tier order a posterior was sampled with: its `mirt_human_order` attr, else the
+    spec's (a trace saved before the attr existed). A rebuild of the model from a trace goes
+    through here, not through `spec.human_order`, which follows config and so moves when
+    config's order does (the committee chain, 2026-10-07)."""
+    raw = post.attrs.get("mirt_human_order")
+    return json.loads(raw) if raw else spec.human_order
 
 
 def spec_json(spec: FitSpec) -> str:

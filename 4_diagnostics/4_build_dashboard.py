@@ -41,6 +41,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
     _aligned_reproducibility,
     align_to_reference_loadings,
+    attach_placement,
     best_mode_chains,
     crosschain_axis_reproducibility,
     load_axis_titles,
@@ -112,7 +113,7 @@ def _flagship_drop_chains() -> list[int]:
 
 
 FITS = [
-    {"name": "k4_humanmerge_flagship",
+    {"name": "k4_flagship",
      "spec": FLAGSHIP,
      "trace_path": FLAGSHIP_TRACE,
      # The card renders the flagship fit of the CURRENT data generation
@@ -120,13 +121,13 @@ FITS = [
      # post's 2026-08 run (4,923 obs / 829 takers / 96 benchmarks, 10x12,000
      # draws, one basin, R² 0.9643) is under 5_outputs/pre_pipeline/ and on the
      # blogpost-frozen branch.
-     "label": "K=4 · full exploration scope · positive loadings · "
-              "raw rank-tracked axes (no rotation) · "
-              "human-merge+lineage(BM) priors · 3PL floors · pooled noise; "
+     "label": "K=4 · full exploration scope · fitted on the models alone · positive loadings · "
+              "raw rank-tracked axes (no rotation) · lineage(BM) prior · 3PL floors · "
+              "pooled noise; human tiers placed axis by axis afterwards (5_place_humans.py); "
               "THE forecasting base (the current flagship)",
-     "short": "K=4 · pooled · merge · flagship",
+     "short": "K=4 · no humans · flagship",
      "type": "exploratory",
-     "nav": "K=4 flagship · pooled noise + HS merge", "forecast": True,
+     "nav": "K=4 flagship · tiers placed after the fit", "forecast": True,
      # The card reads the chains every deliverable reads (analysis.best_mode_chains).
      "drop_chains": _flagship_drop_chains()},
 ]
@@ -459,7 +460,7 @@ def render_fit(fit, data, raw, bench, mod):
     idata = az.from_netcdf(_trace_path(fit))
     if fit.get("drop_chains"):
         # Mode-restricted card: drop outlier chain(s) before ANY summary, so the
-        # whole card (timeline, forecast, GoF, r̂) reads the majority island.
+        # whole card (timeline, forecast, GoF, r̂) reads the primary mode.
         keep = [c for c in idata.posterior.chain.values if c not in fit["drop_chains"]]
         idata = idata.sel(chain=keep)
         print(f"  drop_chains {fit['drop_chains']}: kept {len(keep)} chains", flush=True)
@@ -470,6 +471,8 @@ def render_fit(fit, data, raw, bench, mod):
         # A chain subset ranks its axes in its own order; put them back on the fit's display
         # frame, as 3_plot_mirt.py does, so axis k and its title match the fit's figures.
         view = align_to_reference_loadings(view, data, ref)
+    # A fit without humans draws the tiers placed on it afterwards (5_place_humans.py).
+    view = attach_placement(view, _trace_path(fit).parent)
     # Floored fits are scored with the same fixed-c 3PL link they were fit
     # with. A ceiling-noise fit carries its ESTIMATED `ceiling_d` in the
     # posterior; posterior_predictive_mirt picks that up on its own.

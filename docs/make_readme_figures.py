@@ -3,8 +3,8 @@
 The forecast panel of each axis (`frontier_trend_fig` in its standalone design, the one
 the per-fit folders carry) and the loadings grid (`loadings_grid_fig`, the top 20
 benchmarks per axis), in English. When `diagnose_chains.py --write-modes` found more than
-one posterior mode, they are drawn on the majority chains, the per-fit folders' `_majority`
-set, but without the chain-group note those renders carry in their title. Same builders,
+one posterior mode, they are drawn on the primary mode's chains, the per-fit folders'
+`_primary` set, but without the chain-group note those renders carry in their title. Same builders,
 same forecast rule (`viz.dashboard.forecast_figures`), so the README cannot drift from the
 outputs; only the trace and the destination are this script's.
 
@@ -24,6 +24,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FLAGSHIP,
     FLAGSHIP_TRACE,
     align_to_reference_loadings,
+    attach_placement,
     load_axis_titles,
     loadings_table,
     prepare_fit,
@@ -43,12 +44,13 @@ def main():
     data = FLAGSHIP.load_data(idata)[0]
     split = _plot.chain_split(trace, int(idata.posterior.sizes["chain"]))
     if split is not None:
-        idata = idata.sel(chain=split["majority"])
-        print(f"majority chains {split['majority']} / {split['n_chains']}")
+        idata = idata.sel(chain=split["primary"])
+        print(f"primary mode chains {split['primary']} / {split['n_chains']}")
     view = prepare_fit(idata, data)
     ref = trace.parent / "mirt_loadings.csv"
     if ref.exists():
         view = align_to_reference_loadings(view, data, ref)
+    view = attach_placement(view, trace.parent)       # a fit without humans: the 2b tiers
     titles = load_axis_titles(trace.parent, view, data)
     raw = pd.read_csv(PROCESSED_FILE)
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()

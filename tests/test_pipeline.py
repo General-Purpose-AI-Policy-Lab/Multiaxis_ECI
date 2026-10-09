@@ -2542,11 +2542,13 @@ class TestFitSpec:
         # The name every future flagship artefact is written under. Pooled noise
         # and the 3PL floors are defaults and carry no token; FrontierMath v1 and
         # AlgoTune are out of scope through the retirement list, so no `_drop`
-        # either. Non-negative loadings are the default too, so no prior token.
+        # either. Non-negative loadings are the default too, so no prior token. Fitted
+        # without the human baselines since 2026-10-08 (the tiers are placed afterwards).
         assert analysis.FLAGSHIP.tag == (
-            "_humanmerge_lineageprior_lineagebm")
+            "_lineageprior_lineagebm_nohumans")
         assert analysis.FLAGSHIP.trace_path.name == (
-            "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc")
+            "trace_mirt_k4_lineageprior_lineagebm_nohumans.nc")
+        assert analysis.FLAGSHIP.no_humans and not analysis.FLAGSHIP.human_merge
         assert analysis.FLAGSHIP.pooled_noise and analysis.FLAGSHIP.floors
         assert analysis.FLAGSHIP.loading_prior == "normal"
         assert not analysis.FLAGSHIP.drop_benchmarks
@@ -2670,6 +2672,9 @@ class TestFitSpec:
     ] + [
         pytest.param({"loading_prior": p}, id=f"prior_{p}")
         for p in ("normal", "signed", "signedhs", "pt1", "bifactor")
+    ] + [
+        pytest.param({"link": lk}, id=f"link_{lk}")
+        for lk in ("loglog", "semicomp", "noncomp", "semicomp0")
     ])
     def test_tag_round_trips_through_parse_tag(self, kwargs):
         from multiaxis_eci.analysis.fitspec import _parse_tag
@@ -2745,7 +2750,7 @@ class TestFitSpec:
         # whose tag carries tokens the current grammar does not write, so the
         # round-trip guard must accept that pairing.
         import dataclasses as dc
-        legacy = dc.replace(analysis.FLAGSHIP,
+        legacy = dc.replace(analysis.JOINT_FIT,
                             drop_benchmarks=("FrontierMath v1", "AlgoTune"))
         tag = ("_humanmerge_lineageprior_lineagebm_dropFrontierMathv1AlgoTune"
                "_floors_poolednoise")
@@ -2785,7 +2790,7 @@ class TestFitSpec:
 
     def test_effort_means_are_the_untagged_default(self):
         spec = analysis.FitSpec(K=4, human_merge=True, lineage_prior=True, lineage_bm=True)
-        assert spec.effort_means and spec == analysis.FLAGSHIP
+        assert spec.effort_means and spec == analysis.JOINT_FIT
         assert spec.tag == "_humanmerge_lineageprior_lineagebm"
         off = dataclasses.replace(spec, effort_means=False)
         assert off.tag == "_humanmerge_lineageprior_lineagebm_noeffortmeans"

@@ -4,20 +4,19 @@
 self-contained interactive page: a fit selector + a cross-fit Comparison view.
 Every figure renders lazily (only the visible fit is live in the DOM).
 
-Registered cards (2):
+Registered cards (1):
 
-- K=4 · full exploration scope · positive loadings · raw rank-tracked axes (no rotation) · human-merge+lineage(BM) priors · 3PL floors · pooled noise; THE forecasting base (the current flagship)  ·  *exploratory*
-- K=2 demo · positive loadings · 3PL floors (default) · 4x400 (red-team walkthrough)  ·  *exploratory*
+- K=4 · full exploration scope · fitted on the models alone · positive loadings · raw rank-tracked axes (no rotation) · lineage(BM) prior · 3PL floors · pooled noise; human tiers placed axis by axis afterwards (5_place_humans.py); THE forecasting base (the current flagship)  ·  *exploratory*
 
 Data scope scored on:
 
-- 859 test-takers / 98 benchmarks / 5161 observations
+- 850 test-takers / 98 benchmarks / 5113 observations
 
 ## Comparison table (`gof_table.csv`)
 
 | fit | type | K | free_loadings | R2 | RMSE | MAE | PIT_var | eta_rhat | divergences | max_phi |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| K=4 · pooled · merge · flagship | exploratory | 4 | 392 | 0.9624 | 0.0447 | 0.0301 | 0.0667 | 1.03 | 6 | 0.565 |
+| K=4 · no humans · flagship | exploratory | 4 | 392 | 0.9647 | 0.043 | 0.0291 | 0.0673 | 1.033 | 89 | 0.643 |
 
 Columns: `type`; `free_loadings` = free loading cells (complexity); `R2`/`RMSE`/
 `MAE` = fit; `PIT_var` = calibration (ideal 0.083, below = under-confident);
@@ -28,7 +27,7 @@ draws, ESS and divergences for every card whose trace is still on disk.
 
 ## Convergence
 
-`eta_rhat` is 1.03 on the one card, against a ≤ 1.01 target. High R² is not trust: read
+`eta_rhat` is 1.033 on the one card, against a ≤ 1.01 target. High R² is not trust: read
 `cmp_convergence` beside `cmp_gof`, and the ESS column of
 `mode_eval_table.csv`.
 

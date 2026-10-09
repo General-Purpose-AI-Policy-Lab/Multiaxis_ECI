@@ -784,9 +784,10 @@ def run_exploration(args, parser) -> None:
         with xr.open_dataset(args.merge_chains, group="posterior") as post:
             earlier, saved = dict(post.attrs), int(post.sizes["draw"])
         thin = int(earlier.get("mirt_save_thin", 1))
-        wrong = [f"{key} ({earlier.get(key)!r} there, {attrs[key]!r} here)"
-                 for key in ("mirt_spec", "mirt_data_fingerprint")
-                 if earlier.get(key) != attrs[key]]
+        # The tier order is config's, not the spec's: a change to it leaves mirt_spec equal.
+        wrong = [f"{key} ({earlier.get(key)!r} there, {attrs.get(key)!r} here)"
+                 for key in ("mirt_spec", "mirt_data_fingerprint", "mirt_human_order")
+                 if earlier.get(key) != attrs.get(key)]
         if thin != args.save_thin:
             wrong.append(f"save thinning ({thin} there, {args.save_thin} here)")
         if saved != -(-sample_kw["draws"] // args.save_thin):
@@ -1015,12 +1016,12 @@ def main():
                         help="[canonical] keep the curated-excluded benchmarks in the fit; "
                              "results go to canonical_allbenchmarks/")
     parser.add_argument("--no-humans", action="store_true",
-                        help="[canonical] leave the human baselines out of the fit, so the index "
+                        help="leave the human baselines out of the fit, so the index "
                              "is a pure model-vs-model scale (ECI-H's two anchors are models, so "
                              "it survives). Compose it with --include-all-benchmarks to put the "
                              "'intentionally easy for humans' exclusions back: they are excluded "
                              "for what they do to the human tiers, which are gone here. Results "
-                             "go to canonical_nohumans/")
+                             "go to canonical_nohumans/; an exploration fit emits `_nohumans`")
     parser.add_argument("--access", choices=list(ACCESS_SCOPES), default=None,
                         help="[canonical] fit one access class of benchmarks only "
                              "(the `access` column of 0_input/benchmarks.csv: public, "
@@ -1048,9 +1049,13 @@ def main():
                              "non-negative horseshoe specifics (axes 2..K), which "
                              "identifies g without assigning any benchmark to an "
                              "axis. Needs --K >= 2.")
-    parser.add_argument("--link", choices=["linear", "loglog"], default="linear",
-                        help="IRF link: linear 2PL (default) or the log-logistic "
-                             "mu = 1/(1+(theta.A)^-alpha)")
+    parser.add_argument("--link", choices=["linear", "loglog", "semicomp", "noncomp", "semicomp0"],
+                        default="linear",
+                        help="IRF link: linear 2PL (default), the log-logistic "
+                             "mu = 1/(1+(theta.A)^-alpha), or the softmin links: semicomp "
+                             "(learned beta), semicomp0 (the same without the per-axis offset) "
+                             "and noncomp (beta = config.NONCOMP_BETA), "
+                             "eta = s_b softmin_beta(theta + o; w_b) - D_b (exploration)")
     parser.add_argument("--human-prior", action="store_true",
                         help="order human tiers by the FLAT config.HUMAN_ORDER: the High School "
                              "branch stays incomparable with the adult spine (exploration, or "

@@ -1,4 +1,4 @@
-"""Side-by-side diagnostics of two chain groups of one fit (majority against minority).
+"""Side-by-side diagnostics of two chain groups of one fit (primary mode against the secondary group).
 
 A multimodal posterior splits its chains into groups that disagree on some part of the
 solution. These figures put the two groups on the same panels so the disagreement can be
@@ -21,6 +21,7 @@ from multiaxis_eci.viz.style import DASHBOARD, FigureStyle, apply_fonts
 # Okabe-Ito blue and vermillion: the two chain groups, on every figure of this module.
 GROUP_COLORS = ("#0072B2", "#D55E00")
 HUMAN_COLOR = "#e69f00"
+OTHER_COLOR = "#B0B0B0"
 
 
 def _grid(n: int, titles: list[str], ncols: int = 2, **kw):
@@ -37,12 +38,18 @@ def chain_logp_fig(modes_doc: dict, split: dict, *, style: FigureStyle = DASHBOA
     delta = modes_doc.get("chain_delta_logp") or []
     mode_of = {c: m["label"] for m in modes_doc.get("modes", []) for c in m["chains"]}
     chains = list(range(len(delta)))
-    colors = [GROUP_COLORS[0] if c in split["majority"] else GROUP_COLORS[1] for c in chains]
+    # Chains in neither group (the other modes, when the secondary group is one named mode) in
+    # gray.
+    colors = [GROUP_COLORS[0] if c in split["primary"] else
+              GROUP_COLORS[1] if c in split["secondary"] else OTHER_COLOR for c in chains]
     fig = go.Figure(go.Bar(
         x=[str(c) for c in chains], y=delta, marker_color=colors,
         text=[f"mode {mode_of.get(c, '?')}" for c in chains], textposition="outside",
         hovertemplate="chain %{x}<br>Δ logp %{y:.1f}<extra></extra>", showlegend=False))
-    for color, lab in zip(GROUP_COLORS, ("majority chains", "minority chains")):
+    legend = list(zip(GROUP_COLORS, ("primary mode chains", "secondary mode chains")))
+    if OTHER_COLOR in colors:
+        legend.append((OTHER_COLOR, "other chains"))
+    for color, lab in legend:
         fig.add_trace(go.Bar(x=[None], y=[None], marker_color=color, name=lab))
     fig.update_layout(
         title=dict(text="Chain mean log-density below the best mode", x=0.5),
@@ -53,7 +60,7 @@ def chain_logp_fig(modes_doc: dict, split: dict, *, style: FigureStyle = DASHBOA
 
 
 def loadings_compare_fig(A_a, A_b, bench: list[str], names: list[str], titles: dict | None = None,
-                         labels=("majority", "minority"), top_n: int = 15, *,
+                         labels=("primary", "secondary"), top_n: int = 15, *,
                          style: FigureStyle = DASHBOARD) -> go.Figure:
     """Per axis, the `top_n` benchmarks by axis share (mean of the two groups): the median
     loading with its 95% interval in each group, one row per benchmark, dumbbell style.
@@ -100,7 +107,7 @@ def loadings_compare_fig(A_a, A_b, bench: list[str], names: list[str], titles: d
 
 
 def abilities_compare_fig(theta_a, theta_b, data, names: list[str], titles: dict | None = None,
-                          labels=("majority", "minority"), *,
+                          labels=("primary", "secondary"), *,
                           style: FigureStyle = DASHBOARD) -> go.Figure:
     """Per axis, every test-taker's median ability in group A against group B, models as
     dots and human tiers as squares, with the identity line and the correlation. A cloud on
@@ -145,7 +152,7 @@ def abilities_compare_fig(theta_a, theta_b, data, names: list[str], titles: dict
 
 
 def human_tiers_compare_fig(theta_a, theta_b, data, names: list[str], titles: dict | None = None,
-                            labels=("majority", "minority"), prob: float = 0.95, *,
+                            labels=("primary", "secondary"), prob: float = 0.95, *,
                             style: FigureStyle = DASHBOARD) -> go.Figure:
     """Per axis, each human tier's ability in the two groups: median and central `prob`
     interval, the groups dodged on the row. The blog post's chain-mode figure, drawn for any
@@ -184,8 +191,52 @@ def human_tiers_compare_fig(theta_a, theta_b, data, names: list[str], titles: di
     return apply_fonts(fig, style)
 
 
+def placed_tiers_compare_fig(doc_a: dict, doc_b: dict, names: list[str],
+                             titles: dict | None = None, labels=("primary", "secondary"),
+                             prob: float = 0.95, *, style: FigureStyle = DASHBOARD) -> go.Figure:
+    """`human_tiers_compare_fig` for a fit without humans: per axis, each tier the 2b placement
+    (`analysis.human_placement`) draws in either group, placed on that group's chains. A tier
+    a group places nothing for on that axis is left out of its row."""
+    titles = titles or {}
+    q = [(1 - prob) / 2, 0.5, (1 + prob) / 2]
+    fig, nrows = _grid(len(names), [titles.get(n, n) for n in names], horizontal_spacing=0.3,
+                       vertical_spacing=0.12)
+    fig.update_annotations(font_size=style.font_axis)
+    for k in range(len(names)):
+        row, col = k // 2 + 1, k % 2 + 1
+        axes = (doc_a["axes"][k], doc_b["axes"][k])
+        drawn = set(axes[0]["drawn"]) | set(axes[1]["drawn"])
+        stats = []
+        for ax in axes:
+            order, draws = ax.get("order") or [], ax.get("draws")
+            stats.append({t: np.quantile(draws[:, order.index(t)], q) for t in drawn
+                          if t in order and draws is not None})
+        tiers = sorted(drawn, key=lambda t: stats[0].get(t, stats[1].get(t))[1])
+        for i, (st, lab, color, off) in enumerate(zip(stats, labels, GROUP_COLORS, (0.15, -0.15))):
+            ys = [j for j, t in enumerate(tiers) if t in st]
+            lo, med, hi = (np.array([st[tiers[j]][m] for j in ys]) for m in range(3))
+            fig.add_trace(go.Scatter(
+                x=med, y=np.array(ys) + off, mode="markers", name=lab, legendgroup=lab,
+                showlegend=(k == 0), text=[tiers[j] for j in ys],
+                marker=dict(color=color, size=style.marker + 2, symbol="circle" if i == 0
+                            else "diamond"),
+                error_x=dict(type="data", symmetric=False, array=hi - med, arrayminus=med - lo,
+                             color=color, thickness=style.errbar, width=0),
+                hovertemplate="<b>%{text}</b><br>" + lab + " %{x:.2f}<extra></extra>"),
+                row=row, col=col)
+        fig.update_yaxes(tickmode="array", tickvals=list(range(len(tiers))), ticktext=tiers,
+                         range=[-0.7, max(len(tiers), 1) - 0.3], row=row, col=col)
+        fig.update_xaxes(title_text=f"ability (median, {prob:.0%} interval)", row=row, col=col)
+    fig.update_layout(
+        title=dict(text="Human tiers placed on each chain group", x=0.5), template="plotly_white",
+        width=style.width, height=nrows * style.height_per_row + 140,
+        legend=dict(orientation="h", yanchor="top", y=-0.06, xanchor="center", x=0.5),
+        margin=dict(l=60, r=40, t=110, b=110))
+    return apply_fonts(fig, style)
+
+
 def crossover_compare_fig(cx_a: pd.DataFrame, cx_b: pd.DataFrame, axes: list[str],
-                          titles: dict | None = None, labels=("majority", "minority"), *,
+                          titles: dict | None = None, labels=("primary", "secondary"), *,
                           today=None, style: FigureStyle = DASHBOARD) -> go.Figure:
     """Per axis, each tier's median crossing date with its 50% interval in the two groups,
     dodged on the row, on the shared 2015 to 2035 window. `cx_a` / `cx_b` are
@@ -235,10 +286,12 @@ def crossover_compare_fig(cx_a: pd.DataFrame, cx_b: pd.DataFrame, axes: list[str
 
 
 def build_chain_group_figures(view_a, view_b, data, raw, titles: dict | None, modes_doc: dict,
-                              split: dict, labels=("majority", "minority")) -> dict:
+                              split: dict, labels=("primary", "secondary")) -> dict:
     """The comparison set for two aligned chain-group views: log-density per chain, loadings,
-    abilities, human tiers and (when the fit has human tiers) the projected crossings."""
+    abilities, human tiers and (when the fit has human tiers, fitted or placed by 2b on both
+    groups) the projected crossings."""
     from multiaxis_eci.analysis import axis_forecast_inputs, crossover_table
+    from multiaxis_eci.analysis.human_placement import placement_crossings
 
     names = list(view_a.names)
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
@@ -248,10 +301,16 @@ def build_chain_group_figures(view_a, view_b, data, raw, titles: dict | None, mo
                                                  names, titles, labels),
         "abilities_compare": abilities_compare_fig(view_a.theta, view_b.theta, data, names,
                                                    titles, labels),
-        "human_tiers_compare": human_tiers_compare_fig(view_a.theta, view_b.theta, data, names,
-                                                       titles, labels),
     }
-    if np.asarray(data.is_human, bool).any():
+    fitted = np.asarray(data.is_human, bool).any()
+    placed = all(getattr(v, "human_placement", None) for v in (view_a, view_b))
+    if fitted:
+        figs["human_tiers_compare"] = human_tiers_compare_fig(view_a.theta, view_b.theta, data,
+                                                              names, titles, labels)
+    elif placed:   # a fit without humans, its tiers placed on each group (2b)
+        figs["human_tiers_compare"] = placed_tiers_compare_fig(
+            view_a.human_placement, view_b.human_placement, names, titles, labels)
+    if fitted or placed:
         tables = []
         for view in (view_a, view_b):
             parts = []
@@ -260,7 +319,9 @@ def build_chain_group_figures(view_a, view_b, data, raw, titles: dict | None, mo
                     fc = axis_forecast_inputs(view.theta, k, data, raw, name, A_draws=view.A)["fc"]
                 except ValueError:
                     continue
-                parts.append(crossover_table(fc, view.theta, k, data, name, probs=(0.5,)))
+                parts.append(crossover_table(fc, view.theta, k, data, name, probs=(0.5,))
+                             if fitted else placement_crossings(view, k, fc, name, probs=(0.5,)))
+            parts = [p for p in parts if len(p)]   # an axis without a placed tier has no row
             tables.append(pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(
                 columns=["axis", "tier", "human_mean", "crossover_date_median",
                          "crossover_hdi_low", "crossover_hdi_high"]))

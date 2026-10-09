@@ -46,8 +46,10 @@ from diagnose_chains import modes_path  # noqa: E402
 from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
     align_to_reference_loadings,
+    attach_placement,
     axis_title_translations,
     best_mode_chains,
+    secondary_mode_chains,
     human_unit_affine,
     load_axis_titles,
     mirt_factors_from_trace,
@@ -59,6 +61,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     rescale_theta,
     trace_loading_prior,
 )
+from multiaxis_eci.analysis.human_placement import SECONDARY_DIR  # noqa: E402
 from multiaxis_eci.analysis.human_ident import (  # noqa: E402
     human_scale_axes,
     view_human_contraction,
@@ -86,8 +89,10 @@ from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 
 # Every posterior variable any figure or the PPC here reads. Names absent from a
 # given trace are skipped, so this one list covers the linear and log-logistic
-# links, the softplus-theta variant and the estimated ceiling.
-PLOT_VARS = ("A", "theta", "theta_pos", "tau_A", "D", "phi_b", "alpha", "ceiling_d")
+# links, the softplus-theta variant, the estimated ceiling and the softmin links' beta and
+# offset.
+PLOT_VARS = ("A", "theta", "theta_pos", "tau_A", "D", "phi_b", "alpha", "ceiling_d",
+             "comp_beta", "comp_offset")
 
 # The figures a write-up would embed, rendered in French too (`fr/`): the
 # per-axis timelines and forecasts, the forests, the loadings, the PIT. Each also gets
@@ -98,23 +103,24 @@ MAIN_FIGURES = {"forests_per_axis", "forests_per_family", "loadings_per_axis", "
 
 
 def chain_split(trace_path, n_chains: int) -> dict | None:
-    """Majority and minority chains of a multimodal trace, from the modes file
-    `diagnose_chains.py --write-modes` wrote beside it; None when the file is
-    missing or reports a single mode. The "majority" is the chain set every
-    deliverable reads (`best_mode_chains`): the modes file's `selected_chains`
-    when it carries one, else the mode with the best log-density (ties go to the
-    larger mode): on 2026-10-02 the user chose the best mode over the largest one
-    for the flagship (3 chains, 36 nats above the other 5), and on 2026-10-06 the
-    converged sub-group {2, 4, 5} of the best mode. The minority is every other
-    chain, so the two groups partition the trace. The names stay: they name the
-    figure folders."""
-    majority = best_mode_chains(trace_path)
-    if majority is None:
+    """Primary and secondary chains of a multimodal trace, from the modes file
+    `diagnose_chains.py --write-modes` wrote beside it; None when the file is missing or
+    reports a single mode. The primary group is the chain set every deliverable reads
+    (`best_mode_chains`: the modes file's `selected_chains` when it carries one, else the mode
+    with the best log-density). The secondary group is the mode the file names under
+    `secondary_chains` (user, 2026-10-08: a mode integrated LOO cannot tell from the primary),
+    else every other chain. Until that day the two were called majority and minority."""
+    primary = best_mode_chains(trace_path)
+    if primary is None:
         return None
-    minority = sorted(set(range(n_chains)) - set(majority))
-    if not minority:  # a selection of every chain: one group, nothing to split
+    secondary = secondary_mode_chains(trace_path)
+    is_mode = secondary is not None
+    if not is_mode:
+        secondary = sorted(set(range(n_chains)) - set(primary))
+    if not secondary:  # a selection of every chain: one group, nothing to split
         return None
-    return {"majority": majority, "minority": minority, "n_chains": n_chains}
+    return {"primary": primary, "secondary": secondary, "secondary_is_mode": is_mode,
+            "n_chains": n_chains}
 
 
 def _spec_of(trace_path) -> FitSpec:
@@ -299,15 +305,16 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
     split = chain_split(trace_path, int(idata.posterior.sizes["chain"]))
     if split is None:
+        view_all = attach_placement(view_all, Path(trace_path).parent)   # no humans: the 2b tiers
         render(idata, view_all, figures_dir, "", "", figures_dir / "fr")
         return figures_dir
-    # A multimodal posterior: the folder holds the majority chains' figures, the
-    # minority chains' under minority/. Both groups are put back on the fit's
-    # display frame (mirt_loadings.csv), so axis k is the same axis in both.
+    # A multimodal posterior: the folder holds the primary mode's figures, the secondary
+    # group's under secondary/. Both groups are put back on the fit's display frame
+    # (mirt_loadings.csv), so axis k is the same axis in both.
     ref = results_dir / "mirt_loadings.csv"
     views = {}
-    for chains, sub_dir, suffix in ((split["majority"], figures_dir, "_majority"),
-                                    (split["minority"], figures_dir / "minority", "_minority")):
+    for chains, sub_dir, suffix in ((split["primary"], figures_dir, "_primary"),
+                                    (split["secondary"], figures_dir / "secondary", "_secondary")):
         sub = idata.sel(chain=chains)
         view = prepare_fit(sub, data)
         if K >= 2 and view.A is not None:
@@ -315,27 +322,34 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                 try:
                     view = align_to_reference_loadings(view, data, ref)
                 except SystemExit as err:
-                    if suffix == "_majority":
+                    if suffix == "_primary":
                         raise
-                    # A minority carrying another solution has no place on the fit's display
-                    # frame: its figures would title the wrong axes. The majority's stand alone.
-                    print(f"  minority chains {chains}: not on the fit's axes ({str(err).splitlines()[0]}); "
-                          "minority figures and the chain-group comparison skipped")
+                    # A secondary group carrying another solution has no place on the fit's
+                    # display frame: its figures would title the wrong axes. The primary's stand
+                    # alone.
+                    print(f"  secondary chains {chains}: not on the fit's axes ({str(err).splitlines()[0]}); "
+                          "secondary figures and the chain-group comparison skipped")
                     return figures_dir
             else:
                 print(f"  WARNING: {ref} missing; chain groups rendered in their own axis "
                       "order, so axis k may differ between the two folders")
+        if suffix == "_primary":
+            view = attach_placement(view, Path(trace_path).parent)   # no humans: the 2b tiers
+        elif split["secondary_is_mode"]:   # its own placement (5_place_humans.py --secondary)
+            view = attach_placement(view, Path(trace_path).parent / SECONDARY_DIR)
         label = suffix[1:]
         views[label] = view
+        group = ("primary mode" if label == "primary" else
+                 "secondary mode" if split["secondary_is_mode"] else "other chains")
         render(sub, view, sub_dir, suffix,
-               f"{label} chains {','.join(map(str, chains))} / {split['n_chains']}",
+               f"{group}: chains {','.join(map(str, chains))} / {split['n_chains']}",
                figures_dir / "fr")
     # Side by side: where the two groups disagree (chain_groups/).
-    if K >= 2 and views["majority"].A is not None:
-        titles = load_axis_titles(results_dir, views["majority"], data)
+    if K >= 2 and views["primary"].A is not None:
+        titles = load_axis_titles(results_dir, views["primary"], data)
         modes_doc = json.loads(modes_path(trace_path).read_text())
         cmp_dir = figures_dir / "chain_groups"
-        for name, fig in build_chain_group_figures(views["majority"], views["minority"], data,
+        for name, fig in build_chain_group_figures(views["primary"], views["secondary"], data,
                                                    raw, titles, modes_doc, split).items():
             save_fig(fig, name, cmp_dir)
         print(f"chain-group comparison → {cmp_dir}")
@@ -414,7 +428,7 @@ def main():
                          "RAM. --folder picks it from the file size unless set")
     ap.add_argument("--forecast", action="store_true",
                     help="add the frontier-projection figures (K>1 fits with "
-                         "human tiers only); on by default under --folder")
+                         "human tiers, fitted or placed by 5_place_humans.py); on by default under --folder")
     ap.add_argument("--dry-run", action="store_true",
                     help="with --folder: print the per-trace decision, render "
                          "nothing")

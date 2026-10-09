@@ -39,6 +39,7 @@ sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci.analysis import (  # noqa: E402
     align_to_reference_loadings,
+    attach_placement,
     load_axis_titles,
     prepare_fit,
 )
@@ -49,7 +50,7 @@ CACHE_DIR, _cache_load = _bd.CACHE_DIR, _bd._cache_load
 _trace_path, all_fits = _bd._trace_path, _bd.all_fits
 from multiaxis_eci.viz.dashboard import forecast_figures  # noqa: E402
 
-DEFAULT_FIT = "k4_humanmerge_flagship"
+DEFAULT_FIT = "k4_flagship"
 # What prepare_fit and the human-tier placement read; the log-likelihood, the bulk of
 # the trace, is left on disk.
 VIEW_VARS = ("A", "theta", "tau_A", "D", "phi_b")
@@ -69,6 +70,7 @@ def card_view(fit, data):
     ref = trace.parent / "mirt_loadings.csv"
     if drop and view.A is not None and view.K >= 2 and ref.exists():
         view = align_to_reference_loadings(view, data, ref)
+    view = attach_placement(view, trace.parent)       # a fit without humans: the 2b tiers
     titles = (load_axis_titles(trace.parent, view, data)
               if view.A is not None and view.K >= 2 else None)
     return view, titles

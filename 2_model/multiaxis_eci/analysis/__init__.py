@@ -44,8 +44,10 @@ from multiaxis_eci.analysis.fitspec import (
     FLAGSHIP_CHAINS,
     FLAGSHIP_THIN,
     FLAGSHIP_TRACE,
+    JOINT_FIT,
     FitSpec,
     best_mode_chains,
+    secondary_mode_chains,
     open_flagship,
     spec_json,
 )
@@ -64,6 +66,11 @@ from multiaxis_eci.analysis.human_ident import (
     identified_tiers,
     increment_contraction,
     view_human_contraction,
+)
+from multiaxis_eci.analysis.human_placement import (
+    attach_placement,
+    load_placement,
+    run_placement,
 )
 from multiaxis_eci.analysis.regimes import (
     family_best,
@@ -148,10 +155,11 @@ __all__ = [
     "axis_forecast_inputs", "crossover_table", "forest_frames",
     "human_axis_contraction", "human_scale_axes", "identified_tiers", "increment_contraction",
     "view_human_contraction",
+    "attach_placement", "load_placement", "run_placement",
     "human_unit_affine", "rescale_frame", "rescale_forecast", "rescale_theta", "ability_label",
     "family_best", "frontier_topk", "is_reasoning", "one_per_org_day", "reasoning_mask", "regime_crossover_df",
     "two_regime_forecast", "weighted_line_fit",
     "FitView", "prepare_fit",
-    "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS",
-    "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship", "best_mode_chains",
+    "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS", "JOINT_FIT",
+    "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship", "best_mode_chains", "secondary_mode_chains",
 ]

@@ -45,7 +45,7 @@ def test_group_builders():
     titles = {"axis1": "Axis 1: Fluid", "axis2": "Axis 2"}
     doc = {"chain_delta_logp": [0.0, -3.0, -9.5, -1.0],
            "modes": [{"label": "A", "chains": [0, 3]}, {"label": "B", "chains": [1, 2]}]}
-    split = {"majority": [0, 3], "minority": [1, 2], "n_chains": 4}
+    split = {"primary": [0, 3], "secondary": [1, 2], "n_chains": 4}
     lp = chain_logp_fig(doc, split)
     assert list(lp.data[0].marker.color)[:2] == ["#0072B2", "#D55E00"]
 

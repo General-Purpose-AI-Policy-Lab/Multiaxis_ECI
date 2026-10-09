@@ -143,8 +143,13 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     for k in range(K):
         disp = titles.get(names[k], names[k])
         y_label = ability_label(affine, human=bool(human_axes[k]))
-        hstat = rescale_frame(drop_unidentified(mirt_human_axis_stats(theta, k, data), k,
-                                                contraction), k, affine)
+        if view.human_placement is not None:
+            # a fit without humans: the tiers placed axis by axis (analysis.human_placement)
+            from multiaxis_eci.analysis.human_placement import placement_frame
+            hstat = placement_frame(view, k, hdi_prob=0.5)
+        else:
+            hstat = rescale_frame(drop_unidentified(mirt_human_axis_stats(theta, k, data), k,
+                                                    contraction), k, affine)
         tl = rescale_frame(mirt_model_timeline_df(theta, k, data, raw, A_draws=A), k, affine)
         if not tl.empty:
             fig = capability_timeline_fig(tl, human_stats=hstat,
@@ -240,14 +245,25 @@ def forecast_figures(view, data, raw, names, th_fc,
                                           A_draws=view.A)
         except ValueError:
             continue
-        cx = drop_unidentified(
-            crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8)),
-            k, contraction, col="tier")
-        # Crossings are read on the fitted scale; the drawn panel is in human units.
-        inputs = {"fc": rescale_forecast(inputs["fc"], k, affine),
-                  "tl": rescale_frame(inputs["tl"], k, affine),
-                  "hs": rescale_frame(drop_unidentified(inputs["hs"], k, contraction),
-                                      k, affine)}
+        placed = view.human_placement is not None
+        if placed:
+            # A fit without humans: the tiers placed axis by axis on it, their crossings read on
+            # the same trend (analysis.human_placement); the scale stays the fitted one.
+            from multiaxis_eci.analysis.human_placement import (
+                placement_crossings,
+                placement_frame,
+            )
+            cx = placement_crossings(view, k, inputs["fc"], names[k])
+            inputs = {**inputs, "hs": placement_frame(view, k)}
+        else:
+            cx = drop_unidentified(
+                crossover_table(inputs["fc"], th_fc, k, data, names[k], probs=(0.5, 0.8)),
+                k, contraction, col="tier")
+            # Crossings are read on the fitted scale; the drawn panel is in human units.
+            inputs = {"fc": rescale_forecast(inputs["fc"], k, affine),
+                      "tl": rescale_frame(inputs["tl"], k, affine),
+                      "hs": rescale_frame(drop_unidentified(inputs["hs"], k, contraction),
+                                          k, affine)}
         slug = _slug(names[k])
         # Read without a caption, so the figure explains itself (`standalone`). The ability
         # caption names the axis (the SVG twin has no title) and leaves out the scale's
@@ -255,8 +271,19 @@ def forecast_figures(view, data, raw, names, th_fc,
         # axis without placed tiers says it is on the fitted scale and that no tier is drawn.
         kind = titles.get(names[k], "").partition(": ")[2]
         y_label = f"Ability: {kind}" if kind else "Ability"
-        if human_axes[k]:
+        if placed:
+            y_label += " (fitted scale)"
+            subtitle = ("Frontier forecast against the human tiers placed on this axis "
+                        "(placed after a fit on the models alone)" if len(inputs["hs"]) else
+                        "Frontier forecast; no human tier drawn: no human score on a benchmark "
+                        "this axis measures")
+        elif human_axes[k]:
             subtitle = "Frontier forecast against human tiers"
+        elif len(inputs["hs"]):
+            # Some tiers are placed, but not both anchors of the human-unit scale.
+            y_label += " (fitted scale)"
+            subtitle = ("Frontier forecast against the human tiers placed on this axis "
+                        "(fitted scale: the scale's anchor tiers are not placed)")
         else:
             y_label += " (fitted scale)"
             subtitle = ("Frontier forecast; no human tier drawn: "
@@ -356,8 +383,10 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
 
     # Frontier forecast (opt-in per fit): extrapolate the running-best model per
     # axis and project when it crosses each human tier. Same oblique frame as the
-    # timelines above; gated on humans being in the fit (nothing to cross otherwise).
-    if forecast and not view.is_nc and K > 1 and data.is_human.any():
+    # timelines above; gated on human tiers, in the fit or placed beside it (nothing to cross
+    # otherwise).
+    if forecast and not view.is_nc and K > 1 and (data.is_human.any()
+                                                  or view.human_placement is not None):
         th_fc = signed_frames["oblique"].theta if is_signed else view.theta
         figs.update(forecast_figures(view, data, raw, names, th_fc, axis_titles=titles,
                                      doc_variants=doc_variants))

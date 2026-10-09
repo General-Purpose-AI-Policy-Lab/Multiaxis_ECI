@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 
 from multiaxis_eci.data import ECIData
+from multiaxis_eci.models.mirt import softmin_eta, trace_softmin
 
 
 def convergence(idata) -> dict:
@@ -52,6 +53,17 @@ def _identified_eta(post, data: ECIData, n_obs_sample: int, seed: int):
     bi, mi = _rhat_subset_idx(data, n_obs_sample, seed)
     A_sel = post["A"].isel(bench=("obs", bi))
     th_sel = th.isel(model=("obs", mi))
+    soft = trace_softmin(post)
+    if soft is not None:
+        # Softmin links: the same numpy formula the model's pytensor graph uses.
+        beta, off = soft
+        beta = np.asarray(beta)[..., None] if np.ndim(beta) else beta
+        eta = softmin_eta(A_sel.transpose("chain", "draw", "obs", "latent").values,
+                          th_sel.transpose("chain", "draw", "obs", "latent").values
+                          + off[:, :, None, :],
+                          post["D"].isel(bench=("obs", bi)).transpose("chain", "draw", "obs").values,
+                          beta)
+        return xr.DataArray(eta, dims=("chain", "draw", "obs"))
     if "alpha" in post:
         return post["alpha"].isel(bench=("obs", bi)) * np.log(
             (A_sel * th_sel).sum("latent"))

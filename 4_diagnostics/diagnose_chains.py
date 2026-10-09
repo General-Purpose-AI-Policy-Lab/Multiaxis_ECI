@@ -267,13 +267,15 @@ def write_modes(idata, trace_path, match_thresh: float) -> tuple:
         "modes": modes,
     }
     out_path = modes_path(trace_path)
-    # A chain selection made by hand on this trace survives a rewrite of the split.
+    # A chain selection made by hand on this trace (the primary mode, and the secondary one
+    # the figures render beside it) survives a rewrite of the split.
     if out_path.exists():
         prev = json.loads(out_path.read_text())
-        sel = prev.get("selected_chains")
-        if prev.get("trace") == out["trace"] and sel \
-                and max(sel["chains"]) < out["n_chains"]:
-            out["selected_chains"] = sel
+        for key in ("selected_chains", "secondary_chains"):
+            sel = prev.get(key)
+            if prev.get("trace") == out["trace"] and sel \
+                    and max(sel["chains"]) < out["n_chains"]:
+                out[key] = sel
     out_path.write_text(json.dumps(out, indent=1))
     return out, out_path
 

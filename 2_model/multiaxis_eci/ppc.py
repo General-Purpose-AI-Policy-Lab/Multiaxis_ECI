@@ -152,14 +152,27 @@ def posterior_predictive_mirt(trace, data: ECIData,
         # theta_pos fit: the likelihood reads softplus(theta), not theta
         # (models/mirt.py). Raw theta stays the reported ability, but scoring the
         # predictive with it would evaluate a different link than the fit.
+        from multiaxis_eci.config import NONCOMP_BETA
+        from multiaxis_eci.models.mirt import softmin_eta
         th_name = "theta_pos" if "theta_pos" in post else "theta"
-        names = ["A", th_name, "D", "phi_b"] + ceil_names
+        link = post.attrs.get("mirt_link")
+        soft = ((["comp_offset"] if link != "semicomp0" else [])
+                + (["comp_beta"] if link in ("semicomp", "semicomp0") else [])
+                if link in ("semicomp", "noncomp", "semicomp0") else [])
+        names = ["A", th_name, "D", "phi_b"] + soft + ceil_names
         A, theta, D, phi, *rest = _pull_flat(post, names, max_draws)
         K = A.shape[-1]
 
-        eta = -D[:, data.bench_idx]                                  # (S, n_obs)
-        for k in range(K):
-            eta += A[:, data.bench_idx, k] * theta[:, data.model_idx, k]
+        if soft:
+            # Softmin links (models/mirt.py): the model's own formula, on the same draws.
+            off = rest.pop(0) if link != "semicomp0" else np.zeros((A.shape[0], K))
+            beta = rest.pop(0)[:, None] if link != "noncomp" else NONCOMP_BETA
+            eta = softmin_eta(A[:, data.bench_idx], theta[:, data.model_idx] + off[:, None, :],
+                              D[:, data.bench_idx], beta)
+        else:
+            eta = -D[:, data.bench_idx]                              # (S, n_obs)
+            for k in range(K):
+                eta += A[:, data.bench_idx, k] * theta[:, data.model_idx, k]
     mu = expit(eta)
     if soft_d:
         # ceiling_noise trace: apply the same mu = c + (d - c) * sigmoid link

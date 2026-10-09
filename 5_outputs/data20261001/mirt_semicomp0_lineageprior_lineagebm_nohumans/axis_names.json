@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GDPval",
+        "CyberGym",
+        "CyScenarioBench",
+        "Furniture Assembly",
+        "FrontierSWE v2",
+        "Cybench",
+        "GBAEval",
+        "AISI Cyber Ranges - Cooling Tower"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "AudioMultiChallenge",
+        "DeepResearch Bench",
+        "CadEval",
+        "LAB-Bench SeqQA",
+        "AISI CTF Suites - Apprentice",
+        "GSO-Bench"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OpenBookQA",
+        "MATH Level 5",
+        "VPCT",
+        "CL-bench Life",
+        "TutorBench",
+        "OTIS Mock AIME 2024-2025",
+        "CritPt",
+        "VisualToolBench"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "Balrog",
+        "SimpleBench",
+        "Mystery Game Puzzles",
+        "MultiNRC",
+        "TriviaQA",
+        "HLE Diamond",
+        "MMLU"
+      ]
+    }
+  }
+}

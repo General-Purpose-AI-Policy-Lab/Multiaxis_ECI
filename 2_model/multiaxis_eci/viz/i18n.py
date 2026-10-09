@@ -139,8 +139,9 @@ FR_TABLE: list[tuple[str, str]] = [
     ("95% interval", "intervalle 95 %"),
     ("50% interval", "intervalle 50 %"),
     # Chain-mode figures
-    ("majority chains", "chaînes majoritaires"),
-    ("minority chains", "chaînes minoritaires"),
+    ("primary mode chains", "chaînes du mode principal"),
+    ("secondary mode chains", "chaînes du mode secondaire"),
+    ("other chains", "autres chaînes"),
     # PIT
     ("calibrated (uniform)", "calibré (uniforme)"),
     ("density", "densité"),

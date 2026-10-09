@@ -4,6 +4,7 @@ Represents the flagship fit: K=4, non-negative loadings, fixed guessing
 floors, pooled per-benchmark noise, merged human order,
 Brownian-motion lineage steps over release gaps.
 """
+import sys
 from pathlib import Path
 
 import matplotlib
@@ -13,6 +14,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Rectangle
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "2_model"))
+from multiaxis_eci.config import PRIOR_DELTA_HUMAN, PRIOR_HUMAN_ROOT  # noqa: E402
 
 INK = "#26324B"
 MUT = "#5a6478"
@@ -352,11 +356,12 @@ with PdfPages(out) as pdf:
 
     # generative rule as a graph
     plate(ax, 0.5, 8.3, 11.3, 11.5, "axes  k = 1…K")
-    zsn_node(ax, 1.7, 10.15)
+    # The roots are private bases outside the models' ZeroSumNormal (2026-10-05).
     plate(ax, 3.15, 8.7, 5.45, 11.05, "root tiers  r", fill="white")
-    det(ax, 4.3, 10.15, r"$\theta_{rk}$", color=HUM)
+    stoch(ax, 4.3, 9.7, r"$\theta_{rk}$",
+          rf"$\mathcal{{N}}(0,\;{PRIOR_HUMAN_ROOT:g}^2)$", below=True)
     plate(ax, 5.95, 8.7, 8.25, 11.05, "tier increments  t", fill="white")
-    stoch(ax, 7.1, 9.7, r"$\delta_{tk}$", r"$\mathrm{HalfNormal}(1)$",
+    stoch(ax, 7.1, 9.7, r"$\delta_{tk}$", rf"$\mathrm{{HalfNormal}}({PRIOR_DELTA_HUMAN:g})$",
           below=True)
     det(ax, 10.0, 10.0, r"$\theta_{tk}$", color=HUM)
     ax.text(10.0, 10.55, "non-root tiers  t", ha="center", va="bottom",
@@ -364,8 +369,7 @@ with PdfPages(out) as pdf:
     ax.text(10.0, 9.3,
             r"$\theta_{tk}=\max_{p\,\in\,\mathrm{par}(t)}\theta_{pk}+\delta_{tk}$",
             ha="center", va="center", fontsize=10.5)
-    edge(ax, (1.7, 10.15), (4.3, 10.15))
-    edge(ax, (4.3, 10.15), (10.0, 10.0), rad=-0.08)  # bows over delta_ek
+    edge(ax, (4.3, 9.7), (10.0, 10.0), rad=-0.12)  # bows over delta_ek
     edge(ax, (7.1, 9.7), (10.0, 10.0))
 
     # the tier forest (instantiation)
@@ -401,15 +405,17 @@ with PdfPages(out) as pdf:
     for a, b in forest:
         fedge(ax, tpt(a, "t"), tpt(b, "b"), HUM, label=r"$+\delta$")
 
-    # HUMAN_ORDER_MERGED: the two merge points where the High School branch
-    # joins the adult spine. The child dominates ALL its parents:
+    # HUMAN_ORDER_MERGED: the second parents — the High School branch joining
+    # the adult spine, and the committee chain. The child dominates ALL its parents:
     # theta = max(parents) + delta, so these carry no second delta.
     def rpt(name):
         x, y, w, h = T[name]
         return (x + w / 2, y)
 
     merges = [("High School Qualifier", "Domain Expert"),
-              ("High School Top Performer", "Top Performer")]
+              ("High School Top Performer", "Top Performer"),
+              ("Committee of Average Humans", "Committee of Skilled Generalists"),
+              ("Committee of Skilled Generalists", "Committee of Domain Experts")]
     for a, b in merges:
         edge(ax, rpt(a), tpt(b, "b"), color=HUM, rA=0.0, rB=0.06,
              ls=(0, (3, 2)), lw=1.1)

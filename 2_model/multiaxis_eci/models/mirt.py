@@ -15,6 +15,9 @@ import pytensor.tensor as pt
 from multiaxis_eci.config import (
     CONTINUOUS_EPS,
     ECI_EPS,
+    NONCOMP_BETA,
+    PRIOR_COMP_BETA,
+    PRIOR_COMP_OFFSET_SD,
     EFFORT_TOKEN_LEVEL,
     PRIOR_ALPHA,
     PRIOR_DELTA_HUMAN,
@@ -283,8 +286,8 @@ def _human_block(struct, K, base, delta_sd: float = PRIOR_DELTA_HUMAN):
     >= parent on every axis). Where a tier has SEVERAL parents its theta is the
     MAX over its paths, so it dominates all of them. Tiers on different
     branches share no path, so the prior says nothing about their relative
-    strength. `base` is the per-root level, sliced out of the shared
-    ZeroSumNormal. Returns (row_idx, theta).
+    strength. `base` is the per-root level, a Normal(0, human_root_sd) of its
+    own outside the models' ZeroSumNormal. Returns (row_idx, theta).
 
     The max costs smoothness: the log-posterior stays continuous but its
     gradient jumps across the surface where two parents of a merged tier are
@@ -547,6 +550,34 @@ def _beta_binomial_logp(value, a, b, n_items, k):
     return pt.switch(is_b, log_choose + log_beta_ratio, pm.logp(pm.Beta.dist(alpha=a, beta=b), value))
 
 
+def softmin_eta(A, theta, D, beta, lse=None, log=None):
+    """eta of the softmin links over the last axis: s * softmin_beta(theta; A / s) - D with
+    s = sum_k A_k (config.PRIOR_COMP_BETA). Broadcasts; numpy by default, pytensor when
+    `lse`/`log` are pytensor's (the model), so the fit and every post-fit reader share one
+    formula. A cell at exactly 0 weighs nothing (the 1e-12 keeps its log finite). `beta` is a
+    scalar or broadcasts against eta (e.g. (S, 1) per draw), not against theta."""
+    if lse is None:
+        from scipy.special import logsumexp as lse
+        log = np.log
+    s = A.sum(axis=-1)
+    logw = log(A + 1e-12) - log(s)[..., None]
+    b_k = beta[..., None] if getattr(beta, "ndim", 0) else beta
+    return -s * lse(logw - b_k * theta, axis=-1) / beta - D
+
+
+def trace_softmin(post):
+    """(beta, offset) of a softmin-link posterior as numpy, or None for any other link.
+    beta is (chain, draw) for "semicomp" and the config constant for "noncomp" (not sampled);
+    offset is (chain, draw, K). The link is read off the trace's `mirt_link` attr."""
+    link = post.attrs.get("mirt_link")
+    if link not in ("semicomp", "noncomp", "semicomp0"):
+        return None
+    beta = NONCOMP_BETA if link == "noncomp" else post["comp_beta"].values
+    if link == "semicomp0":                     # no offset: zeros of the (chain, draw, K) shape
+        return beta, np.zeros(post["A"].shape[:2] + post["A"].shape[-1:])
+    return beta, post["comp_offset"].values
+
+
 def build_mirt_model(data: ECIData, K: int,
                       anchors: dict | None = None,
                       loading_prior: str = "normal",
@@ -732,6 +763,14 @@ def build_mirt_model(data: ECIData, K: int,
         loading_prior="normal"; rejects theta_pos, anchors, plt_founders,
         pin_benchmark. Floors, known_se and pooled_noise compose
         unchanged (they act on mu and phi after the link).
+        "semicomp" / "noncomp" are the softmin links (config.PRIOR_COMP_BETA,
+        `softmin_eta`): eta = s_b * softmin_beta(theta + o; w_b) - D_b with
+        A_b = s_b w_b, compensatory at beta -> 0 and conjunctive (the weakest
+        loaded axis caps the score) as beta grows; beta is learned
+        ("comp_beta") or fixed at config.NONCOMP_BETA, and o ("comp_offset")
+        frees the axes' relative origin ("semicomp0": learned beta, no offset).
+        Requires loading_prior="normal"
+        (A >= 0, so w_b is a weight).
 
     shared_base_zsn: whether those bases join that ZeroSumNormal (default) or
     each get a private Normal(0, 1) with the sum-to-zero spanning only the
@@ -939,8 +978,12 @@ def build_mirt_model(data: ECIData, K: int,
             "permutation matching; interpret aligned axes with that caveat.",
             UserWarning)
 
-    if link not in ("linear", "loglog"):
-        raise ValueError(f"unknown link: {link!r} (use 'linear' or 'loglog')")
+    if link not in ("linear", "loglog", "semicomp", "noncomp", "semicomp0"):
+        raise ValueError(f"unknown link: {link!r} (use 'linear', 'loglog', 'semicomp', "
+                         "'noncomp' or 'semicomp0')")
+    if link in ("semicomp", "noncomp", "semicomp0") and loading_prior != "normal":
+        raise ValueError(f"link={link!r} reads each loading row as weights: it needs the "
+                         "non-negative loading_prior='normal'")
     if link == "loglog":
         # The loglog A block replaces the loading prior (log needs A > 0 and
         # structure-free cells); positivity is built in (exp of theta); D is
@@ -1188,6 +1231,13 @@ def build_mirt_model(data: ECIData, K: int,
             # best-loaded axis), so the family is disjunctive.
             eta = alpha[data.bench_idx] * pt.logsumexp(
                 theta[data.model_idx] + logA[data.bench_idx], axis=-1)
+        elif link in ("semicomp", "noncomp", "semicomp0"):
+            beta_c = (NONCOMP_BETA if link == "noncomp"
+                      else pm.LogNormal("comp_beta", **PRIOR_COMP_BETA))
+            offset = (0.0 if link == "semicomp0" else
+                      pm.ZeroSumNormal("comp_offset", sigma=PRIOR_COMP_OFFSET_SD, dims="latent"))
+            eta = softmin_eta(A[data.bench_idx], theta_lik[data.model_idx] + offset,
+                              D[data.bench_idx], beta_c, lse=pt.logsumexp, log=pt.log)
         else:
             A_obs     = A[data.bench_idx]          # (n_obs, K)
             theta_obs = theta_lik[data.model_idx]  # (n_obs, K)

@@ -96,7 +96,7 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
     """The fit's PyMC model, rebuilt from the trace's spec as 3_fit/fit.py builds it, on every
     observation or on those where `keep` is True. Returns (model, data, post): `data` is the
     FULL data scope either way, `post` the trace's posterior."""
-    from multiaxis_eci.analysis.fitspec import FitSpec
+    from multiaxis_eci.analysis.fitspec import FitSpec, sampled_human_order
     from multiaxis_eci.data import load_boundary_eps, release_time_covariate
     from multiaxis_eci.lineage import build_lineage_structure
     from multiaxis_eci.models.mirt import build_mirt_model
@@ -115,7 +115,7 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
         binomial_n = None if binomial_n is None else np.asarray(binomial_n)[keep]
         censor_eps = None if censor_eps is None else np.asarray(censor_eps)[keep]
     model = build_mirt_model(
-        fit_data, spec.K, loading_prior=spec.loading_prior, human_order=spec.human_order,
+        fit_data, spec.K, loading_prior=spec.loading_prior, human_order=sampled_human_order(post, spec),
         human_delta_sd=spec.human_delta_sd, human_root_sd=spec.human_root_sd,
         lineage=lineage, lineage_bm=spec.lineage_bm, effort_means=spec.effort_means,
         floor_c=floor_c, ceiling_noise=spec.ceiling_noise, known_se=spec.known_se,
@@ -249,11 +249,14 @@ def compare(out_dir: Path, labels: list[str]) -> None:
         print(f"  {lab} better on", g.tail(6)[::-1].round(1).to_dict())
 
 
+def _flagship_trace() -> Path:
+    from multiaxis_eci.analysis.fitspec import FLAGSHIP_TRACE
+    return FLAGSHIP_TRACE
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--trace", type=Path, default=config.RESULTS_DIR
-                    / "mirt_humanmerge_lineageprior_lineagebm"
-                    / "trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc")
+    ap.add_argument("--trace", type=Path, default=_flagship_trace())
     ap.add_argument("--mode", action="append", default=[], metavar="LABEL:CHAIN",
                     help="a mode to score, started from the last draw of CHAIN")
     ap.add_argument("--compare", nargs="+", metavar="LABEL",

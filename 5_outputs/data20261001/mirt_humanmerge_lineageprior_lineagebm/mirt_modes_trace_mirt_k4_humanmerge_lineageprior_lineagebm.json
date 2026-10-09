@@ -109,5 +109,13 @@
    "delta_logp": -106.2,
    "matched_corr_to_best": 0.059
   }
- ]
+ ],
+ "selected_chains": {
+  "chains": [
+   10,
+   11,
+   15
+  ],
+  "why": "User choice, 2026-10-07: the whole of the best mode A (chains 10, 11, 15) of the 20-chain refit (10 seed 42 + 10 seed 43; A was reached by the second seed only). Within A, identified eta r-hat max 1.08 over the three chains (10/15 1.05, chain 11 at 1.10-1.12 against each). On integrated LOO (4_diagnostics/integrated_loo.py, chains compared at equal draws), on the 3,657 observations with k < 0.7 in every group: mode C -9.3 (se 7.8), E -22.8 (13.7), B -26.0 (4.7), D -27.5 (4.9), F -29.3 (12.6), G -42.9 (13.9); C ties A on every observation (+3.7, se 14.3) but sits 39 nats lower in log-density."
+ }
 }

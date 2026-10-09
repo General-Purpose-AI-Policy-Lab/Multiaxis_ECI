@@ -135,7 +135,7 @@ def align_to_reference_loadings(view, data, loadings_csv: Path):
     everywhere else (the axis names file included). The columns are paired by the assignment
     that maximises the summed correlation, and SystemExit is raised when a pair falls below
     `AXIS_MATCH_MIN`: the subset then carries another solution, and no relabelling would make
-    its figures comparable (3_plot_mirt leaves such a minority out; for the chains the
+    its figures comparable (3_plot_mirt leaves such a secondary group out; for the chains the
     deliverables read, `diagnose_chains.py --write-tables` puts the frame on those chains).
     """
     from scipy.optimize import linear_sum_assignment

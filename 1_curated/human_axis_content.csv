@@ -1,0 +1,69 @@
+axis_title,benchmark,keep,decided,reason
+Fluid Intelligence & Formal Sciences,ARC-AGI,yes,2026-10-07 user,abstract visual reasoning puzzles
+Fluid Intelligence & Formal Sciences,ARC-AGI-2,yes,2026-10-07 user,abstract visual reasoning puzzles
+Fluid Intelligence & Formal Sciences,FrontierMath Tiers 1-3 v2,yes,2026-10-07 user,research mathematics
+Fluid Intelligence & Formal Sciences,MATH Level 5,yes,2026-10-07 user,competition mathematics
+Fluid Intelligence & Formal Sciences,OTIS Mock AIME 2024-2025,yes,2026-10-07 user,competition mathematics
+Fluid Intelligence & Formal Sciences,VPCT,yes,2026-10-07 user,predicting a physical trajectory from a picture
+Fluid Intelligence & Formal Sciences,BioLP-bench,no,2026-10-07 user,troubleshooting biology lab protocols
+Fluid Intelligence & Formal Sciences,GPQA Diamond,no,2026-10-07 user,graduate science knowledge
+Fluid Intelligence & Formal Sciences,GPQA Diamond Chemistry,no,2026-10-07 user,graduate chemistry knowledge
+Fluid Intelligence & Formal Sciences,GPQA Main Chemistry,no,2026-10-08 claude (validated by the user),graduate chemistry knowledge
+Fluid Intelligence & Formal Sciences,MMLU Chemistry,no,2026-10-08 claude (validated by the user),chemistry knowledge
+Fluid Intelligence & Formal Sciences,LAB-Bench SeqQA,no,2026-10-08 claude (validated by the user),biology sequence questions
+Fluid Intelligence & Formal Sciences,DTBench,yes,2026-10-08 claude (validated by the user),decision-theory (Newcomb-like) questions
+Fluid Intelligence & Formal Sciences,METR Time Horizons,yes,2026-10-08 user,"a plausible link; kept unless its score is far off (observed 0.83, predicted 0.87 on the reference)"
+Scientific Knowledge & Reasoning,GPQA Diamond Biology,yes,2026-10-07 user,graduate biology knowledge
+Scientific Knowledge & Reasoning,GPQA Diamond Chemistry,yes,2026-10-07 user,graduate chemistry knowledge
+Scientific Knowledge & Reasoning,GPQA Main Biology,yes,2026-10-07 user,graduate biology knowledge
+Scientific Knowledge & Reasoning,GPQA Main Chemistry,yes,2026-10-07 user,graduate chemistry knowledge
+Scientific Knowledge & Reasoning,GSM8K,yes,2026-10-07 user,grade-school mathematics word problems
+Scientific Knowledge & Reasoning,InterCode-CTF,yes,2026-10-07 user,a plausible link (security knowledge)
+Scientific Knowledge & Reasoning,LAB-Bench Cloning,yes,2026-10-07 user,biology lab knowledge
+Scientific Knowledge & Reasoning,LAB-Bench LitQA2,yes,2026-10-07 user,biology literature questions
+Scientific Knowledge & Reasoning,LAB-Bench Protocol,yes,2026-10-07 user,biology lab protocols
+Scientific Knowledge & Reasoning,MMLU,yes,2026-10-07 user,academic knowledge
+Scientific Knowledge & Reasoning,MMLU Biology,yes,2026-10-07 user,biology knowledge
+Scientific Knowledge & Reasoning,MMLU Chemistry,yes,2026-10-07 user,chemistry knowledge
+Scientific Knowledge & Reasoning,OpenBookQA,yes,2026-10-07 user,elementary science questions
+Scientific Knowledge & Reasoning,WMDP Biology,yes,2026-10-07 user,hazardous biology knowledge
+Scientific Knowledge & Reasoning,WMDP Chemistry,yes,2026-10-07 user,hazardous chemistry knowledge
+Scientific Knowledge & Reasoning,GeoBench,no,2026-10-07 user,geolocating photos
+Scientific Knowledge & Reasoning,Visual Task Assessment (VISTA),no,2026-10-07 user,visual tasks
+Scientific Knowledge & Reasoning,SimpleBench,no,2026-10-07 claude (validated with the batch),commonsense trick questions
+Scientific Knowledge & Reasoning,SimpleQA Verified,no,2026-10-07 user,trivia facts
+Scientific Knowledge & Reasoning,FrontierMath Erdos,yes,2026-10-08 user,"scientific reasoning: open mathematics problems"
+Scientific Knowledge & Reasoning,PIQA,no,2026-10-08 claude (validated by the user),"physical commonsense (dominant on this axis in the secondary mode only)"
+Scientific Knowledge & Reasoning,WinoGrande,no,2026-10-08 claude (validated by the user),"commonsense pronoun resolution (dominant on this axis in the secondary mode only)"
+Cyber Capabilities,Cybench,yes,2026-10-07 user,capture-the-flag tasks
+Cyber Capabilities,OSWorld,yes,2026-10-07 user,a plausible link (computer use)
+Cyber Capabilities,Furniture Assembly,no,2026-10-07 user,visual and spatial reasoning
+Cyber Capabilities,EBR-bench,no,2026-10-07 claude (validated with the batch),game play
+Cyber Capabilities,TriviaQA,no,2026-10-07 claude (validated with the batch),trivia
+Cyber Capabilities,HellaSwag,no,2026-10-08 claude (validated by the user),commonsense completion
+Cyber Capabilities,MMLU Biology,no,2026-10-08 claude (validated by the user),biology knowledge
+Cyber Capabilities,PIQA,no,2026-10-08 claude (validated by the user),physical commonsense
+Cyber Capabilities,WMDP Biology,no,2026-10-08 claude (validated by the user),hazardous biology knowledge
+Cyber Capabilities,WMDP Chemistry,no,2026-10-08 claude (validated by the user),hazardous chemistry knowledge
+Cyber Capabilities,WinoGrande,no,2026-10-08 claude (validated by the user),commonsense pronoun resolution
+Cyber Capabilities,OpenBookQA,no,2026-10-08 claude (validated by the user),elementary science questions
+Agentic Capabilities & Programming,EBR-bench,yes,2026-10-07 user,a plausible link (long-horizon agentic game play)
+Agentic Capabilities & Programming,OSWorld,yes,2026-10-07 claude (validated with the batch),computer use
+Agentic Capabilities & Programming,The Agent Company,yes,2026-10-07 user,workplace agentic tasks
+Agentic Capabilities & Programming,BlueprintBench 2,no,2026-10-07 user,floor plans from photos (spatial reasoning)
+Agentic Capabilities & Programming,OpenBookQA,no,2026-10-07 claude (validated with the batch),elementary science questions
+Agentic Capabilities & Programming,TriviaQA,no,2026-10-08 claude (validated by the user),trivia
+Agentic Capabilities & Programming,LMCA,no,2026-10-08 claude (validated by the user),grading arguments against expert ratings
+Cyber Capabilities & Reasoning,FrontierMath Tiers 1-3 v2,yes,2026-10-08 claude (validated by the user),"research mathematics: the reasoning in the title (semicomp0 mode A only)"
+Cyber Capabilities & Reasoning,GPQA Diamond Biology,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)"
+Cyber Capabilities & Reasoning,GPQA Diamond Chemistry,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)"
+Cyber Capabilities & Reasoning,GPQA Main Biology,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)"
+Cyber Capabilities & Reasoning,LAB-Bench LitQA2,no,2026-10-08 claude (validated by the user),"biology literature questions (semicomp0 mode A only)"
+Cyber Capabilities & Reasoning,LAB-Bench SeqQA,no,2026-10-08 claude (validated by the user),"biology sequence questions (semicomp0 mode A only)"
+Fluid Intelligence & Mathematics,HellaSwag,no,2026-10-08 claude (validated by the user),"commonsense completion (semicomp0 mode A only)"
+Fluid Intelligence & Mathematics,OpenBookQA,no,2026-10-08 claude (validated by the user),"elementary science questions (semicomp0 mode A only)"
+Fluid Intelligence & Mathematics,PIQA,no,2026-10-08 claude (validated by the user),"physical commonsense (semicomp0 mode A only)"
+Fluid Intelligence & Mathematics,WinoGrande,no,2026-10-08 claude (validated by the user),"commonsense pronoun resolution (semicomp0 mode A only)"
+Fluid Intelligence & Mathematics,Visual Task Assessment (VISTA),yes,2026-10-08 claude (validated by the user),"visual reasoning, a plausible link like VPCT (semicomp0 mode A only)"
+Agentic Capabilities & Programming,LAB-Bench Cloning,no,2026-10-08 claude (validated by the user),"biology lab knowledge (semicomp0 mode A only)"
+Agentic Capabilities & Programming,METR Time Horizons,yes,2026-10-08 claude (validated by the user),"long autonomous software tasks (semicomp0 mode A only)"

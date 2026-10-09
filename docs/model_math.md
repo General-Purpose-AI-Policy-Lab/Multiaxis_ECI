@@ -364,9 +364,13 @@ parent on every axis** (hard monotone). Tiers on different branches share no
 path, so the prior says nothing about their relative strength.
 
 *`--human-merge` — the flagship's order.* The merged order
-(`config.HUMAN_ORDER_MERGED`) lets a tier carry **several parents** (the High
-School branch merges into the adult spine); its ability is a max over its
-root-to-tier paths, each path priced with one HalfNormal increment per edge:
+(`config.HUMAN_ORDER_MERGED`) lets a tier carry **several parents**: the High
+School branch merges into the adult spine, and the committees are chained,
+Committee of Average Humans < Committee of Skilled Generalists < Committee of
+Domain Experts, each still above its own base tier (2026-10-07; fits saved
+before keep the order recorded in their `mirt_human_order` attr). Its ability is
+a max over its root-to-tier paths, each path priced with one HalfNormal
+increment per edge:
 
 $$
 \theta_{\text{child},k} = \max_{p \in \text{parents}} \theta_{p,k} + \delta_{e,k}.
@@ -376,6 +380,34 @@ The path-unrolled implementation is algebraically exact
 ($\max(a,b)+\delta = \max(a+\delta,\,b+\delta)$), so a merged tier dominates
 **every** parent on every axis while adding paths, not parameters. The gaps
 stay free, and unrelated branches stay incomparable, as in the tree order.
+
+*Tested and dropped (2026-10-07): a fifth axis for the humans.* On the K=4
+fit, the human tiers sit far outside the models' cloud on two axes (about
+−5 on the cyber axis, +8 on the agentic one), one error compensating the
+other. A K=5 fit whose last loading column was anchored a priori on the
+curated "easy for humans" list (full HalfNormal scale there, 0.1 elsewhere;
+models move on that axis too) was meant to give the humans' own advantage
+a place to go. With the humans' roots at sd 3 (10 chains) it split into 7
+modes, the best a single chain, and the compensation stayed (tiers at −6 to
+−3 and +8); the fifth axis took HellaSwag, PIQA, TriviaQA and WinoGrande but
+placed no tier. With the roots at sd 1 on the four capability axes and 3 on
+the anchored one (5 chains) the tiers came back inside the cloud on axes
+1–4, but only because the prior put them there, the whole human gap moved
+to the fifth axis (+16 to +23), axes 3 to 5 lost their meaning, and every
+chain found its own mode. The code was removed; the human tiers are placed
+instead on a fit without them, axis by axis, with the benchmark side frozen
+(the "2b" placement).
+
+*Tested and dropped (2026-10-07): the non-compensatory link.* `--link noncomp`
+fixes the softmin link at beta = 5 (`config.NONCOMP_BETA`), close to the
+minimum over the axes: a weak axis caps every benchmark it loads. On the K=4
+fit with the humans (5 chains) it found four modes, the best a single chain,
+and predicted the models' scores worse than the compensatory link: −62 nats
+(se 27) on the 4,231 model scores with Pareto k < 0.7 in both fits, −123 on
+plain PSIS. The humans stayed far from the models (above the frontier on
+three axes, below it on an academic-knowledge axis no recent model is limited
+by). The semi-compensatory link (beta learned, about 0.9) ties the
+compensatory one on the models' scores.
 
 *Lineage — soft release chains.* For a vendor's release chain (founder →
 successors), improvement is the *mean* step but a node may regress:
@@ -542,3 +574,51 @@ with the same $y_n\sim\mathrm{Beta}(\mu_n\phi_{b_n},(1-\mu_n)\phi_{b_n})$,
 $\phi_b = \tfrac{1}{4\sigma_b^2}-1$, boundary clipping at $\varepsilon=10^{-3}$ (or the Beta-binomial of §2.3 on item-scored benchmarks, the default),
 and the priors of Section 5 throughout. 1D is KD at $K=1$; KD is KD 3PL at
 $c\equiv 0$.
+
+---
+
+## 8. Placing the human tiers on the flagship (fitted without them)
+
+Since 2026-10-08 the K=4 flagship is fitted on the models alone (`--no-humans`) and the human
+tiers are placed on it afterwards, one axis at a time (`analysis.human_placement`,
+`4_diagnostics/5_place_humans.py`). With the benchmark side frozen at the selected chains'
+medians ($\hat A$, $\hat D$, $\hat\phi$), on axis $k$:
+
+- **Benchmarks.** $\mathcal B_k = \{\,b : k = \arg\max_j \hat A_{b,j}^2\,\}$, the benchmarks
+  whose largest share of loading variance is on $k$, minus the pairs judged off-topic for the
+  axis's name in `1_curated/human_axis_content.csv`.
+- **Other axes.** A tier's abilities off $k$ are those of a typical model at the same ability on
+  $k$: a least-squares line over the models' posterior medians,
+  $\theta_{j} \approx \alpha_j + \gamma_j\,\theta_k$ for $j\neq k$. Benchmark $b$ then sees the
+  tier through
+  $$\eta_b(\theta_k) = \Big(\hat A_{b,k} + \sum_{j\ne k}\hat A_{b,j}\gamma_j\Big)\,\theta_k
+  + \sum_{j\ne k}\hat A_{b,j}\alpha_j - \hat D_b ,$$
+  and its score follows the fit's own likelihood (fixed-c floor, Beta-binomial or Beta).
+- **Tiers.** The nine tiers keep the ordered prior of §5.4 on this one axis
+  (`config.HUMAN_ORDER_MERGED`, roots $\mathcal N(0, 3^2)$, increments
+  $\mathrm{HalfNormal}(2)$), sampled with NUTS.
+- **Display.** A tier is drawn where it has a score below the ceiling on $\mathcal B_k$, or
+  sits between two such tiers in the order; a score at the ceiling bounds the tier from below
+  and places nothing alone.
+
+The placement is checked score by score (observed against predicted at the tier's draws) and
+against the first model that reached each score on the benchmark itself, in
+`human_placement.json`.
+
+Why not fit them inside: with the 56 human scores spread over four axes, the compensatory sum
+of §4.2 let the tiers trade one axis against another (about −5 on one, +8 on another, every
+model in between), whatever the prior on the tiers (§5.4), an extra axis anchored on the
+benchmarks easy for humans, or a softer link (the softmin links below).
+
+**Softmin links (exploration, `--link semicomp` / `semicomp0` / `noncomp`).** With
+$s_b=\sum_k A_{b,k}$ and $w_{b,k}=A_{b,k}/s_b$,
+$$\eta_b = \sum_k A_{b,k}\theta_k - D_b - \frac{s_b}{\beta}\log\sum_k w_{b,k}\,
+e^{-\beta(\theta_k-\bar\theta_b)},\qquad \bar\theta_b=\sum_k w_{b,k}\theta_k ,$$
+the compensatory predictor minus a non-negative imbalance penalty, which vanishes as
+$\beta\to0$ and makes the weakest loaded axis cap the score as $\beta$ grows; to second order it
+is $\frac{\beta}{2 s_b}\sum_{j<k}A_{b,j}A_{b,k}(\theta_j-\theta_k)^2$. `semicomp` learns
+$\beta$ ($\mathrm{LogNormal}(0,1)$) with a per-axis offset added to $\theta$, `semicomp0` the
+same without the offset, `noncomp` fixes $\beta=5$. On the 2026-10-01 data, `semicomp`
+learns $\beta\approx0.8$ and ties the compensatory fit on held-out model scores; without the
+offset's freedom one axis no longer becomes the binding one on almost every benchmark, which
+it did with it (95 of 98 benchmarks on the fit without humans).

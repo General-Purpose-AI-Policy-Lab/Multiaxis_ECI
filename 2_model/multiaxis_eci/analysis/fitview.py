@@ -67,6 +67,9 @@ class FitView:
     human_order: dict | list | None = None
     human_delta_sd: float | None = None
     human_root_sd: float | None = None
+    # The tiers placed axis by axis on a fit without human baselines (analysis.human_placement,
+    # `attach_placement`), which the figures draw in place of fitted tiers. None otherwise.
+    human_placement: dict | None = None
 
     def require_A(self) -> np.ndarray:
         if self.A is None:

@@ -90,14 +90,16 @@ Inside a generation, one folder per fit holds its tables, its trace and its figu
 A fit's flags become one tag, and the tag names the results folder and the trace, so the two cannot drift apart. A default contributes no token, so the K=4 command above reduces to:
 
 ```
-flags    --K 4 --human-merge --lineage-prior --lineage-bm
-tag      _humanmerge_lineageprior_lineagebm
-results  5_outputs/data20261001/mirt_humanmerge_lineageprior_lineagebm/
-trace      ├── trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+flags    --K 4 --lineage-prior --lineage-bm --no-humans
+tag      _lineageprior_lineagebm_nohumans
+results  5_outputs/data20261001/mirt_lineageprior_lineagebm_nohumans/
+trace      ├── trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
+placement  ├── human_placement.json, human_placement_draws.npz   (4_diagnostics/5_place_humans.py)
+           ├── secondary_mode/human_placement.json, …_draws.npz (5_place_humans.py --secondary)
 figures    └── figures/k4/            (PNG; html/ beneath it)
 ```
 
-A K other than 4 adds `_k<K>` to the results folder (`--K 3` with the same flags writes to `mirt_humanmerge_lineageprior_lineagebm_k3/`), so its fixed-name tables, axis names and K=1 baseline never land on the K=4 fit's.
+A K other than 4 adds `_k<K>` to the results folder (`--K 3` with the same flags writes to `mirt_lineageprior_lineagebm_nohumans_k3/`), so its fixed-name tables, axis names and K=1 baseline never land on the K=4 fit's.
 
 A flag tagged `[canonical]` or `[exploration]` in `--help` is refused in the other mode rather than ignored (`--skip-sampling` without `--preset canonical` used to resample the K-axis fit).
 
@@ -154,7 +156,7 @@ and copies the deliverables, French included, into that folder (`GROUP=country` 
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --trace \
-  5_outputs/data20261001/mirt_humanmerge_lineageprior_lineagebm/trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc
+  5_outputs/data20261001/mirt_lineageprior_lineagebm_nohumans/trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
 ```
 
 Figures land in the fit's own `figures/k{K}/`, one PNG each with the HTML twin

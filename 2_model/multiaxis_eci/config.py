@@ -126,10 +126,25 @@ HUMAN_ORDER = {
 # EVERY one of them: theta = max(parents) + a positive increment, so a Domain
 # Expert beats both a Skilled Generalist and a High School Qualifier, and a Top
 # Performer beats both a Domain Expert and a High School Top Performer. The
-# reverse pairings stay unstated: nothing here ranks a High School Qualifier
-# against a Skilled Generalist. The max is the price of the extra edge — the
+# committees are chained the same way (decision 2026-10-07): a Committee of
+# Skilled Generalists beats a Committee of Average Humans, and a Committee of
+# Domain Experts beats a Committee of Skilled Generalists, each on top of its
+# own base tier. The reverse pairings stay unstated: nothing here ranks a High
+# School Qualifier against a Skilled Generalist, or a committee against the
+# next individual tier up. The max is the price of the extra edge — the
 # gradient jumps where two parents cross, which the flat partial order avoids.
 HUMAN_ORDER_MERGED = {
+    **HUMAN_ORDER,
+    "Domain Expert": ("Skilled Generalist", "High School Qualifier"),
+    "Top Performer": ("Domain Expert", "High School Top Performer"),
+    "Committee of Skilled Generalists": ("Skilled Generalist", "Committee of Average Humans"),
+    "Committee of Domain Experts": ("Domain Expert", "Committee of Skilled Generalists"),
+}
+# The merged order before the committee chain (fits saved up to 2026-10-07).
+# Kept so a trace sampled with it is still recognised as a --human-merge fit;
+# every analysis reads the order a trace was sampled with from its
+# `mirt_human_order` attr, never from here.
+HUMAN_ORDER_MERGED_PRE_COMMITTEES = {
     **HUMAN_ORDER,
     "Domain Expert": ("Skilled Generalist", "High School Qualifier"),
     "Top Performer": ("Domain Expert", "High School Top Performer"),
@@ -162,6 +177,25 @@ PRIOR_DELTA_HUMAN = 2.0
 # Set here only, like PRIOR_DELTA_HUMAN: a fit records it in its spec (FitSpec.human_root_sd), and
 # whatever reads a trace back uses the trace's value.
 PRIOR_HUMAN_ROOT = 3.0
+
+# Softmin links (models/mirt.py, build_mirt_model(..., link="semicomp"/"noncomp"); exploration,
+# 2026-10-07). With A_b = s_b w_b (s_b = sum_k A_bk, w_b on the simplex),
+#   eta_b = s_b * softmin_beta(theta + o; w_b) - D_b,
+#   softmin_beta(x; w) = -(1/beta) log sum_k w_k exp(-beta x_k),
+# the weighted mean of the axes at beta -> 0 (exactly the compensatory A.theta - D) and their
+# weighted minimum as beta grows: a weak axis then caps every benchmark it loads, however strong
+# the others. "semicomp" learns beta (LogNormal(0, 1): median 1, 90% in [0.19, 5.2], in units of
+# the models' ability spread); "noncomp" fixes it at NONCOMP_BETA, where an axis 1 unit below
+# the others outweighs them unless its weight is under exp(-5) ~ 0.007. The per-axis offset o
+# (ZeroSumNormal over the axes) frees the axes' relative origin, which the minimum compares and
+# the models' sum-to-zero pin would otherwise fix by convention.
+# "semicomp0" is "semicomp" without the offset (o = 0): on the 5-chain fit without humans
+# (2026-10-07) the offset made one unnamed axis the binding one on 95 of 98 benchmarks
+# (o = -2.6 there), so the named axes limited almost no score; without it the models' sum-to-
+# zero pin sets every axis's origin at the average model, and each axis can bind.
+PRIOR_COMP_BETA = dict(mu=0.0, sigma=1.0)
+NONCOMP_BETA = 5.0
+PRIOR_COMP_OFFSET_SD = 1.0
 
 # Lineage prior (models/mirt.py, build_mirt_model(..., lineage=...)). Within a
 # vendor-tier release chain, a release's per-axis ability is
