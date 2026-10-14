@@ -1,0 +1,361 @@
+question,benchmark_rank,benchmark,model,openness,released,utility,p_A,p_B,p_C,p_D,p_E
+all,1,GPQA Main Chemistry,gpt-6-luna_none,closed,2026-09,1.2,0.369,0.411,0.679,0.872,0.377
+all,1,GPQA Main Chemistry,gpt-5.6-luna_none,closed,2026-07,1.18,0.355,0.394,0.64,0.842,0.363
+all,1,GPQA Main Chemistry,gpt-5.6-terra_none,closed,2026-07,1.17,0.408,0.454,0.691,0.887,0.408
+all,1,GPQA Main Chemistry,claude-sonnet-5_none,closed,2026-06,1.16,0.399,0.434,0.668,0.858,0.404
+all,1,GPQA Main Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,1.15,0.352,0.393,0.606,0.772,0.337
+all,2,OTIS Mock AIME 2024-2025,inkling-small_none,open,2026-07,1.06,0.244,0.242,0.35,0.247,0.62
+all,2,OTIS Mock AIME 2024-2025,gpt-6-astra_none,closed,2026-09,0.9,0.976,0.975,0.955,0.975,0.867
+all,2,OTIS Mock AIME 2024-2025,o3-pro-2025-06-10_medium,closed,2025-06,0.85,0.855,0.859,0.809,0.858,0.672
+all,2,OTIS Mock AIME 2024-2025,o3-pro-2025-06-10_high,closed,2025-06,0.85,0.884,0.886,0.844,0.887,0.719
+all,2,OTIS Mock AIME 2024-2025,inkling-small_minimal,open,2026-07,0.83,0.554,0.555,0.64,0.562,0.841
+all,3,VPCT,gemini-3.6-flash_minimal,closed,2026-07,1.04,0.496,0.503,0.5,0.494,0.771
+all,3,VPCT,glm-5.2,open,2026-06,1.03,0.499,0.515,0.543,0.501,0.789
+all,3,VPCT,grok-4.5,closed,2026-07,1.02,0.591,0.606,0.681,0.609,0.897
+all,3,VPCT,grok-4.6_low,closed,2026-08,1.01,0.568,0.588,0.648,0.572,0.891
+all,3,VPCT,Inkling,open,2026-07,1.01,0.396,0.411,0.522,0.431,0.766
+all,4,MCP Atlas,gpt-5.4-nano-2026-03-17_high,closed,2026-03,0.99,0.218,0.216,0.342,0.235,0.602
+all,4,MCP Atlas,gpt-5.4-nano-2026-03-17_medium,closed,2026-03,0.97,0.219,0.222,0.335,0.231,0.582
+all,4,MCP Atlas,gpt-5.4-nano-2026-03-17_xhigh,closed,2026-03,0.96,0.263,0.256,0.38,0.274,0.629
+all,4,MCP Atlas,gpt-5-nano-2025-08-07_high,closed,2025-08,0.96,0.092,0.099,0.212,0.104,0.417
+all,4,MCP Atlas,gpt-5.4-nano-2026-03-17_low,closed,2026-03,0.95,0.215,0.212,0.316,0.225,0.544
+all,5,GPQA Main Biology,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.95,0.562,0.606,0.77,0.889,0.605
+all,5,GPQA Main Biology,gemma-3-27b-it,open,2025-03,0.95,0.52,0.579,0.715,0.833,0.492
+all,5,GPQA Main Biology,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.94,0.52,0.559,0.714,0.808,0.53
+all,5,GPQA Main Biology,gpt-5.4-mini-2026-03-17_none,closed,2026-03,0.94,0.599,0.624,0.794,0.883,0.663
+all,5,GPQA Main Biology,gpt-5.6-luna_none,closed,2026-07,0.94,0.6,0.629,0.821,0.932,0.671
+all,6,APEX-Agents,gpt-5.4-nano-2026-03-17_high,closed,2026-03,0.94,0.104,0.1,0.157,0.102,0.309
+all,6,APEX-Agents,gpt-5.4-nano-2026-03-17_medium,closed,2026-03,0.93,0.102,0.102,0.154,0.1,0.303
+all,6,APEX-Agents,gpt-5.4-nano-2026-03-17_low,closed,2026-03,0.91,0.099,0.097,0.149,0.097,0.292
+all,6,APEX-Agents,gpt-5.4-nano-2026-03-17_xhigh,closed,2026-03,0.9,0.126,0.12,0.178,0.121,0.324
+all,6,APEX-Agents,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.85,0.082,0.08,0.128,0.082,0.267
+all,7,GSO-Bench,grok-4.6_xhigh,closed,2026-08,0.92,0.467,0.463,0.381,0.464,0.235
+all,7,GSO-Bench,grok-4.6_high,closed,2026-08,0.88,0.472,0.47,0.382,0.464,0.235
+all,7,GSO-Bench,grok-4.5_high,closed,2026-07,0.86,0.376,0.372,0.305,0.373,0.179
+all,7,GSO-Bench,grok-4.6_medium,closed,2026-08,0.85,0.487,0.488,0.403,0.48,0.246
+all,7,GSO-Bench,muse-spark-1.1,closed,2026-07,0.84,0.407,0.393,0.329,0.398,0.177
+all,8,WMDP Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.92,0.615,0.645,0.744,0.812,0.556
+all,8,WMDP Chemistry,gpt-5.6-luna_none,closed,2026-07,0.92,0.62,0.644,0.762,0.845,0.603
+all,8,WMDP Chemistry,gpt-6-luna_none,closed,2026-09,0.91,0.64,0.666,0.791,0.864,0.612
+all,8,WMDP Chemistry,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.9,0.573,0.603,0.696,0.744,0.515
+all,8,WMDP Chemistry,gpt-6-sol_none,closed,2026-09,0.87,0.794,0.807,0.868,0.927,0.696
+all,9,GPQA Diamond Chemistry,gpt-6-luna_none,closed,2026-09,0.91,0.474,0.531,0.715,0.841,0.526
+all,9,GPQA Diamond Chemistry,gpt-5.6-luna_none,closed,2026-07,0.89,0.467,0.52,0.69,0.823,0.506
+all,9,GPQA Diamond Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.85,0.402,0.452,0.582,0.704,0.429
+all,9,GPQA Diamond Chemistry,gpt-5.6-terra_none,closed,2026-07,0.85,0.552,0.6,0.761,0.873,0.59
+all,9,GPQA Diamond Chemistry,gpt-5.4-mini-2026-03-17_none,closed,2026-03,0.83,0.432,0.469,0.6,0.713,0.473
+all,10,MMLU Pro Chemistry,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.91,0.616,0.658,0.784,0.83,0.534
+all,10,MMLU Pro Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.87,0.707,0.74,0.849,0.908,0.623
+all,10,MMLU Pro Chemistry,gpt-4.1-nano-2025-04-14,closed,2025-04,0.86,0.56,0.606,0.713,0.779,0.479
+all,10,MMLU Pro Chemistry,gpt-5.6-luna_none,closed,2026-07,0.81,0.765,0.777,0.891,0.943,0.737
+all,10,MMLU Pro Chemistry,gemma-3-27b-it,open,2025-03,0.8,0.647,0.723,0.802,0.875,0.606
+all,11,Aider Polyglot,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.89,0.288,0.284,0.249,0.265,0.51
+all,11,Aider Polyglot,gpt-5.4-nano-2026-03-17_low,closed,2026-03,0.75,0.442,0.438,0.411,0.418,0.636
+all,11,Aider Polyglot,gpt-5.4-nano-2026-03-17_high,closed,2026-03,0.7,0.524,0.523,0.494,0.51,0.701
+all,11,Aider Polyglot,gpt-5.4-nano-2026-03-17_medium,closed,2026-03,0.69,0.496,0.497,0.466,0.48,0.677
+all,11,Aider Polyglot,gpt-5.1-2025-11-13_none,closed,2025-11,0.61,0.585,0.587,0.572,0.566,0.71
+all,12,VisualToolBench,gpt-6-astra_max,closed,2026-09,0.89,0.885,0.874,0.792,0.834,0.573
+all,12,VisualToolBench,gpt-6-astra_xhigh,closed,2026-09,0.88,0.882,0.872,0.778,0.831,0.557
+all,12,VisualToolBench,gpt-6-astra_high,closed,2026-09,0.86,0.864,0.854,0.756,0.805,0.535
+all,12,VisualToolBench,gpt-6-astra_medium,closed,2026-09,0.83,0.871,0.859,0.771,0.812,0.559
+all,12,VisualToolBench,grok-4.5,closed,2026-07,0.82,0.227,0.237,0.273,0.231,0.416
+AD,1,GPQA Main Chemistry,gpt-6-luna_none,closed,2026-09,0.503,0.369,0.411,0.679,0.872,0.377
+AD,1,GPQA Main Chemistry,gpt-5.6-luna_none,closed,2026-07,0.487,0.355,0.394,0.64,0.842,0.363
+AD,1,GPQA Main Chemistry,gpt-5.6-terra_none,closed,2026-07,0.479,0.408,0.454,0.691,0.887,0.408
+AD,1,GPQA Main Chemistry,gpt-6-luna_low,closed,2026-09,0.467,0.43,0.477,0.714,0.897,0.458
+AD,1,GPQA Main Chemistry,claude-sonnet-5_none,closed,2026-06,0.459,0.399,0.434,0.668,0.858,0.404
+AD,2,GPQA Diamond Chemistry,gpt-6-luna_none,closed,2026-09,0.367,0.474,0.531,0.715,0.841,0.526
+AD,2,GPQA Diamond Chemistry,gpt-5.6-luna_none,closed,2026-07,0.356,0.467,0.52,0.69,0.823,0.506
+AD,2,GPQA Diamond Chemistry,gpt-5.6-terra_none,closed,2026-07,0.321,0.552,0.6,0.761,0.873,0.59
+AD,2,GPQA Diamond Chemistry,claude-sonnet-5_none,closed,2026-06,0.317,0.53,0.57,0.728,0.847,0.575
+AD,2,GPQA Diamond Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.302,0.402,0.452,0.582,0.704,0.429
+AD,3,GPQA Main Biology,gpt-5.6-luna_none,closed,2026-07,0.332,0.6,0.629,0.821,0.932,0.671
+AD,3,GPQA Main Biology,gpt-6-luna_none,closed,2026-09,0.331,0.61,0.643,0.834,0.941,0.684
+AD,3,GPQA Main Biology,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.327,0.562,0.606,0.77,0.889,0.605
+AD,3,GPQA Main Biology,gemma-3-27b-it,open,2025-03,0.313,0.52,0.579,0.715,0.833,0.492
+AD,3,GPQA Main Biology,gpt-5.6-terra_none,closed,2026-07,0.291,0.655,0.682,0.849,0.946,0.711
+AD,4,Lech Mazur Writing,Mistral-7B-Instruct-v0.2,open,2023-12,0.3,0.67,0.655,0.561,0.37,0.644
+AD,4,Lech Mazur Writing,open-mistral-7b,open,2023-09,0.292,0.609,0.588,0.508,0.317,0.595
+AD,4,Lech Mazur Writing,Mistral-7B-Instruct-v0.1,open,2023-09,0.292,0.609,0.588,0.508,0.317,0.595
+AD,4,Lech Mazur Writing,Mistral-7B-Instruct-v0.3,open,2024-05,0.28,0.71,0.697,0.609,0.43,0.657
+AD,4,Lech Mazur Writing,Mistral-7B-v0.1,open,2023-09,0.276,0.632,0.615,0.545,0.356,0.624
+AD,5,Cybench,DeepSeek-Coder-V2-Base,open,2024-06,0.291,0.235,0.347,0.508,0.526,0.196
+AD,5,Cybench,Qwen2.5-Coder-32B,open,2024-11,0.261,0.158,0.208,0.413,0.419,0.131
+AD,5,Cybench,Qwen2.5-Coder-14B,open,2024-11,0.252,0.102,0.144,0.318,0.354,0.094
+AD,5,Cybench,Baichuan-2-13B-Base,open,2023-09,0.222,0.083,0.134,0.254,0.305,0.075
+AD,5,Cybench,Yi-9B,open,2024-03,0.201,0.09,0.128,0.248,0.291,0.067
+AD,6,MMLU Pro Chemistry,DeepSeek-R1-Distill-Qwen-14B,open,2025-01,0.237,0.378,0.406,0.526,0.615,0.363
+AD,6,MMLU Pro Chemistry,gemma-3-27b-it,open,2025-03,0.228,0.647,0.723,0.802,0.875,0.606
+AD,6,MMLU Pro Chemistry,glm-4.7-flash_none,open,2026-01,0.223,0.403,0.402,0.579,0.626,0.469
+AD,6,MMLU Pro Chemistry,gpt-4.1-nano-2025-04-14,closed,2025-04,0.219,0.56,0.606,0.713,0.779,0.479
+AD,6,MMLU Pro Chemistry,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.214,0.616,0.658,0.784,0.83,0.534
+AD,7,CyberGym,DeepSeek-Coder-V2-Base,open,2024-06,0.226,0.18,0.316,0.481,0.406,0.183
+AD,7,CyberGym,gpt-4-0314,closed,2023-03,0.218,0.289,0.309,0.138,0.071,0.186
+AD,7,CyberGym,Qwen2.5-Coder-32B,open,2024-11,0.207,0.124,0.205,0.397,0.331,0.143
+AD,7,CyberGym,Qwen2.5-Coder-14B,open,2024-11,0.198,0.087,0.162,0.322,0.285,0.121
+AD,7,CyberGym,Baichuan-2-13B-Base,open,2023-09,0.183,0.067,0.144,0.3,0.25,0.101
+AD,8,WMDP Chemistry,gpt-5.6-luna_none,closed,2026-07,0.225,0.62,0.644,0.762,0.845,0.603
+AD,8,WMDP Chemistry,gpt-6-luna_none,closed,2026-09,0.224,0.64,0.666,0.791,0.864,0.612
+AD,8,WMDP Chemistry,gpt-5.6-terra_none,closed,2026-07,0.205,0.659,0.685,0.785,0.864,0.634
+AD,8,WMDP Chemistry,gpt-6-luna_low,closed,2026-09,0.204,0.659,0.689,0.787,0.863,0.655
+AD,8,WMDP Chemistry,gpt-6-luna,closed,2026-09,0.198,0.674,0.703,0.801,0.872,0.682
+AD,9,OpenBookQA,Inkling_high,open,2026-07,0.22,0.611,0.9,0.926,0.831,0.789
+AD,9,OpenBookQA,Inkling_xhigh,open,2026-07,0.218,0.625,0.91,0.932,0.843,0.8
+AD,9,OpenBookQA,Inkling,open,2026-07,0.215,0.626,0.907,0.929,0.841,0.804
+AD,9,OpenBookQA,Inkling_thinking,open,2026-07,0.209,0.633,0.91,0.929,0.842,0.804
+AD,9,OpenBookQA,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.154,0.92,0.672,0.703,0.766,0.747
+AD,10,WMDP Biology,deepseek-r1-0528-qwen3-8b,open,2025-05,0.216,0.433,0.453,0.551,0.649,0.423
+AD,10,WMDP Biology,mpt-7b,open,2023-05,0.197,0.436,0.457,0.519,0.633,0.438
+AD,10,WMDP Biology,opt-66b,open,2022-05,0.191,0.433,0.441,0.493,0.624,0.439
+AD,10,WMDP Biology,text-curie-001,closed,2022-01,0.19,0.403,0.407,0.478,0.593,0.407
+AD,10,WMDP Biology,curie,closed,2020-06,0.185,0.428,0.429,0.497,0.613,0.437
+AD,11,MATH Level 5,text-davinci-002,closed,2022-03,0.215,0.674,0.48,0.612,0.459,0.575
+AD,11,MATH Level 5,text-davinci-001,closed,2022-01,0.193,0.497,0.442,0.416,0.304,0.563
+AD,11,MATH Level 5,gemma-2b,open,2024-02,0.192,0.489,0.44,0.473,0.297,0.533
+AD,11,MATH Level 5,Qwen2.5-Coder-3B,open,2024-11,0.178,0.376,0.524,0.478,0.554,0.458
+AD,11,MATH Level 5,Qwen2.5-Coder-1.5B,open,2024-09,0.174,0.297,0.432,0.359,0.471,0.383
+AD,12,MCP Atlas,Qwen2.5-Coder-32B,open,2024-11,0.211,0.505,0.186,0.235,0.294,0.354
+AD,12,MCP Atlas,Baichuan-2-13B-Base,open,2023-09,0.189,0.359,0.112,0.137,0.17,0.27
+AD,12,MCP Atlas,Qwen2.5-Coder-14B,open,2024-11,0.18,0.41,0.16,0.185,0.23,0.313
+AD,12,MCP Atlas,DeepSeek-Coder-V2-Base,open,2024-06,0.157,0.565,0.204,0.297,0.408,0.381
+AD,12,MCP Atlas,Qwen2.5-Coder-3B,open,2024-11,0.14,0.248,0.104,0.101,0.108,0.221
+AE,1,MCP Atlas,gpt-5.4-nano-2026-03-17_high,closed,2026-03,0.384,0.218,0.216,0.342,0.235,0.602
+AE,1,MCP Atlas,gpt-5.4-nano-2026-03-17_xhigh,closed,2026-03,0.366,0.263,0.256,0.38,0.274,0.629
+AE,1,MCP Atlas,gpt-5.4-nano-2026-03-17_medium,closed,2026-03,0.363,0.219,0.222,0.335,0.231,0.582
+AE,1,MCP Atlas,gpt-5.4-nano-2026-03-17_low,closed,2026-03,0.329,0.215,0.212,0.316,0.225,0.544
+AE,1,MCP Atlas,gpt-5-nano-2025-08-07_high,closed,2025-08,0.325,0.092,0.099,0.212,0.104,0.417
+AE,2,OTIS Mock AIME 2024-2025,inkling-small_none,open,2026-07,0.376,0.244,0.242,0.35,0.247,0.62
+AE,2,OTIS Mock AIME 2024-2025,inkling-small_minimal,open,2026-07,0.287,0.554,0.555,0.64,0.562,0.841
+AE,2,OTIS Mock AIME 2024-2025,nemotron-3-ultra_thinking,open,2026-06,0.281,0.397,0.437,0.452,0.412,0.678
+AE,2,OTIS Mock AIME 2024-2025,inkling-small_low,open,2026-07,0.245,0.636,0.635,0.711,0.638,0.881
+AE,2,OTIS Mock AIME 2024-2025,o3-pro-2025-06-10_low,closed,2025-06,0.209,0.797,0.804,0.746,0.799,0.588
+AE,3,VPCT,Inkling,open,2026-07,0.37,0.396,0.411,0.522,0.431,0.766
+AE,3,VPCT,Inkling_thinking,open,2026-07,0.339,0.421,0.439,0.545,0.463,0.76
+AE,3,VPCT,Inkling_high,open,2026-07,0.33,0.447,0.465,0.582,0.496,0.777
+AE,3,VPCT,inkling-small_xhigh,open,2026-07,0.328,0.425,0.428,0.524,0.445,0.753
+AE,3,VPCT,inkling-small_high,open,2026-07,0.325,0.419,0.419,0.497,0.429,0.744
+AE,4,GPQA Main Chemistry,Inkling,open,2026-07,0.37,0.509,0.513,0.501,0.389,0.879
+AE,4,GPQA Main Chemistry,Inkling_thinking,open,2026-07,0.334,0.547,0.54,0.506,0.4,0.881
+AE,4,GPQA Main Chemistry,Inkling_high,open,2026-07,0.327,0.564,0.554,0.497,0.395,0.891
+AE,4,GPQA Main Chemistry,inkling-small_xhigh,open,2026-07,0.304,0.441,0.452,0.607,0.643,0.745
+AE,4,GPQA Main Chemistry,Inkling_xhigh,open,2026-07,0.3,0.606,0.595,0.519,0.408,0.906
+AE,5,GeoBench,Inkling_high,open,2026-07,0.363,0.379,0.399,0.511,0.409,0.742
+AE,5,GeoBench,Inkling,open,2026-07,0.357,0.386,0.414,0.53,0.425,0.743
+AE,5,GeoBench,Inkling_xhigh,open,2026-07,0.351,0.4,0.422,0.522,0.43,0.751
+AE,5,GeoBench,Inkling_thinking,open,2026-07,0.345,0.398,0.423,0.525,0.43,0.743
+AE,5,GeoBench,Baichuan-2-13B-Base,open,2023-09,0.273,0.158,0.282,0.275,0.207,0.431
+AE,6,ARC-AGI-2,glm-5.3-flash_max,open,2026-08,0.338,0.636,0.662,0.6,0.653,0.298
+AE,6,ARC-AGI-2,kimi-k2.7-code,open,2026-06,0.17,0.493,0.515,0.431,0.505,0.323
+AE,6,ARC-AGI-2,qwen3.7-plus,closed,2026-06,0.163,0.242,0.208,0.268,0.201,0.405
+AE,6,ARC-AGI-2,qwen3.7-plus_thinking,closed,2026-06,0.163,0.32,0.281,0.366,0.29,0.483
+AE,6,ARC-AGI-2,deepseek-v4-pro_high,open,2026-04,0.15,0.47,0.462,0.437,0.474,0.32
+AE,7,ARC-AGI,glm-4.7-flash_thinking,open,2026-01,0.332,0.447,0.445,0.399,0.461,0.115
+AE,7,ARC-AGI,gemma-4-26b-a4b_minimal,open,2026-04,0.272,0.569,0.555,0.512,0.559,0.297
+AE,7,ARC-AGI,gpt-oss-120b_high,open,2025-08,0.202,0.411,0.412,0.419,0.403,0.613
+AE,7,ARC-AGI,glm-5.3-flash_max,open,2026-08,0.199,0.889,0.899,0.871,0.898,0.69
+AE,7,ARC-AGI,gpt-oss-120b_medium,open,2025-08,0.178,0.305,0.322,0.316,0.304,0.483
+AE,8,VisualToolBench,gpt-6-astra_high,closed,2026-09,0.329,0.864,0.854,0.756,0.805,0.535
+AE,8,VisualToolBench,gpt-6-astra_xhigh,closed,2026-09,0.325,0.882,0.872,0.778,0.831,0.557
+AE,8,VisualToolBench,gpt-6-astra_max,closed,2026-09,0.312,0.885,0.874,0.792,0.834,0.573
+AE,8,VisualToolBench,gpt-6-astra_medium,closed,2026-09,0.312,0.871,0.859,0.771,0.812,0.559
+AE,8,VisualToolBench,gpt-6-astra_low,closed,2026-09,0.306,0.852,0.842,0.754,0.787,0.546
+AE,9,GSO-Bench,gpt-6-astra_none,closed,2026-09,0.289,0.54,0.553,0.623,0.54,0.829
+AE,9,GSO-Bench,gpt-6-astra,closed,2026-09,0.282,0.556,0.564,0.634,0.553,0.838
+AE,9,GSO-Bench,gpt-6-astra_xhigh,closed,2026-09,0.281,0.565,0.57,0.639,0.567,0.846
+AE,9,GSO-Bench,gpt-6-astra_low,closed,2026-09,0.28,0.552,0.555,0.625,0.547,0.832
+AE,9,GSO-Bench,gpt-6-astra_high,closed,2026-09,0.28,0.549,0.556,0.625,0.549,0.829
+AE,10,InterCode-CTF,glm-4.7-flash_none,open,2026-01,0.268,0.615,0.541,0.616,0.647,0.347
+AE,10,InterCode-CTF,glm-4.7-flash_thinking,open,2026-01,0.248,0.697,0.628,0.653,0.72,0.449
+AE,10,InterCode-CTF,Baichuan-2-13B-Base,open,2023-09,0.238,0.442,0.25,0.392,0.413,0.204
+AE,10,InterCode-CTF,DeepSeek-Coder-V2-Base,open,2024-06,0.221,0.765,0.603,0.711,0.765,0.544
+AE,10,InterCode-CTF,Qwen2.5-Coder-32B,open,2024-11,0.217,0.743,0.573,0.708,0.738,0.526
+AE,11,Cybench,gpt-oss-120b_high,open,2025-08,0.247,0.448,0.44,0.441,0.45,0.201
+AE,11,Cybench,gpt-oss-120b_medium,open,2025-08,0.243,0.437,0.439,0.442,0.447,0.194
+AE,11,Cybench,QwQ-32B_16K,open,2025-03,0.231,0.398,0.424,0.431,0.47,0.167
+AE,11,Cybench,QwQ-32B,open,2025-03,0.223,0.383,0.408,0.418,0.46,0.16
+AE,11,Cybench,gemma-3-27b-it,open,2025-03,0.222,0.287,0.317,0.346,0.367,0.065
+AE,12,Fiction.LiveBench,Inkling,open,2026-07,0.246,0.614,0.638,0.681,0.617,0.86
+AE,12,Fiction.LiveBench,Inkling_thinking,open,2026-07,0.203,0.656,0.674,0.699,0.654,0.859
+AE,12,Fiction.LiveBench,Inkling_high,open,2026-07,0.194,0.676,0.69,0.713,0.675,0.87
+AE,12,Fiction.LiveBench,inkling-small_low,open,2026-07,0.183,0.504,0.507,0.506,0.499,0.687
+AE,12,Fiction.LiveBench,inkling-small_none,open,2026-07,0.177,0.313,0.314,0.348,0.305,0.49
+AB,1,MCP Atlas,DeepSeek-Coder-V2-Base,open,2024-06,0.361,0.565,0.204,0.297,0.408,0.381
+AB,1,MCP Atlas,Qwen2.5-Coder-32B,open,2024-11,0.319,0.505,0.186,0.235,0.294,0.354
+AB,1,MCP Atlas,Qwen2.5-Coder-14B,open,2024-11,0.25,0.41,0.16,0.185,0.23,0.313
+AB,1,MCP Atlas,Baichuan-2-13B-Base,open,2023-09,0.247,0.359,0.112,0.137,0.17,0.27
+AB,1,MCP Atlas,falcon-180B,open,2023-09,0.217,0.44,0.223,0.406,0.509,0.338
+AB,2,OpenBookQA,Inkling_high,open,2026-07,0.289,0.611,0.9,0.926,0.831,0.789
+AB,2,OpenBookQA,Inkling_xhigh,open,2026-07,0.285,0.625,0.91,0.932,0.843,0.8
+AB,2,OpenBookQA,Inkling,open,2026-07,0.281,0.626,0.907,0.929,0.841,0.804
+AB,2,OpenBookQA,Inkling_thinking,open,2026-07,0.277,0.633,0.91,0.929,0.842,0.804
+AB,2,OpenBookQA,gpt-4.1-nano-2025-04-14,closed,2025-04,0.273,0.907,0.634,0.677,0.756,0.682
+AB,3,AISI CTF Suites - Technical Non-Expert,Baichuan-2-13B-Base,open,2023-09,0.228,0.538,0.31,0.348,0.502,0.332
+AB,3,AISI CTF Suites - Technical Non-Expert,DeepSeek-Coder-V2-Base,open,2024-06,0.218,0.742,0.524,0.587,0.736,0.53
+AB,3,AISI CTF Suites - Technical Non-Expert,Gopher (280B),closed,2021-12,0.216,0.209,0.425,0.357,0.269,0.353
+AB,3,AISI CTF Suites - Technical Non-Expert,Qwen2.5-Coder-32B,open,2024-11,0.212,0.695,0.483,0.532,0.665,0.506
+AB,3,AISI CTF Suites - Technical Non-Expert,Baichuan-2-7B-Base,open,2023-09,0.197,0.487,0.29,0.324,0.477,0.312
+AB,4,Aider Polyglot,DeepSeek-Coder-V2-Base,open,2024-06,0.226,0.494,0.268,0.234,0.398,0.324
+AB,4,Aider Polyglot,Qwen2.5-Coder-32B,open,2024-11,0.206,0.444,0.238,0.182,0.32,0.29
+AB,4,Aider Polyglot,Qwen2.5-Coder-14B,open,2024-11,0.168,0.34,0.172,0.116,0.246,0.226
+AB,4,Aider Polyglot,falcon-180B,open,2023-09,0.132,0.368,0.236,0.297,0.364,0.306
+AB,4,Aider Polyglot,Baichuan-2-13B-Base,open,2023-09,0.129,0.221,0.092,0.055,0.133,0.124
+AB,5,ARC AI2,gpt-4.1-nano-2025-04-14,closed,2025-04,0.215,0.919,0.704,0.744,0.808,0.713
+AB,5,ARC AI2,Inkling_high,open,2026-07,0.215,0.704,0.919,0.945,0.865,0.866
+AB,5,ARC AI2,Inkling,open,2026-07,0.208,0.719,0.927,0.947,0.876,0.876
+AB,5,ARC AI2,Inkling_xhigh,open,2026-07,0.206,0.723,0.929,0.949,0.878,0.876
+AB,5,ARC AI2,Inkling_thinking,open,2026-07,0.202,0.728,0.93,0.948,0.877,0.876
+AB,6,GeoBench,DeepSeek-Coder-V2-Base,open,2024-06,0.207,0.323,0.53,0.489,0.379,0.545
+AB,6,GeoBench,Qwen2.5-Coder-32B,open,2024-11,0.157,0.351,0.508,0.516,0.411,0.569
+AB,6,GeoBench,Phi-3-small-8k-instruct,open,2024-05,0.143,0.49,0.347,0.441,0.52,0.56
+AB,6,GeoBench,Qwen2.5-Coder-14B,open,2024-11,0.137,0.311,0.448,0.458,0.372,0.547
+AB,6,GeoBench,Baichuan-2-13B-Base,open,2023-09,0.124,0.158,0.282,0.275,0.207,0.431
+AB,7,MATH Level 5,text-davinci-002,closed,2022-03,0.194,0.674,0.48,0.612,0.459,0.575
+AB,7,MATH Level 5,Qwen2.5-Coder-7B,open,2024-09,0.154,0.425,0.579,0.493,0.572,0.437
+AB,7,MATH Level 5,Baichuan-2-7B-Base,open,2023-09,0.153,0.445,0.598,0.482,0.489,0.595
+AB,7,MATH Level 5,Qwen2.5-Coder-3B,open,2024-11,0.148,0.376,0.524,0.478,0.554,0.458
+AB,7,MATH Level 5,DeepSeek-Coder-V2-Base,open,2024-06,0.144,0.629,0.773,0.677,0.689,0.741
+AB,8,InterCode-CTF,Baichuan-2-13B-Base,open,2023-09,0.192,0.442,0.25,0.392,0.413,0.204
+AB,8,InterCode-CTF,Qwen2.5-Coder-32B,open,2024-11,0.17,0.743,0.573,0.708,0.738,0.526
+AB,8,InterCode-CTF,falcon-180B,open,2023-09,0.167,0.665,0.498,0.638,0.657,0.474
+AB,8,InterCode-CTF,DeepSeek-Coder-V2-Base,open,2024-06,0.162,0.765,0.603,0.711,0.765,0.544
+AB,8,InterCode-CTF,Qwen2.5-Coder-14B,open,2024-11,0.158,0.638,0.48,0.605,0.653,0.424
+AB,9,NL2Bash,gpt-4.1-nano-2025-04-14,closed,2025-04,0.165,0.634,0.469,0.425,0.487,0.446
+AB,9,NL2Bash,gemma-3-12b-it,open,2025-03,0.145,0.434,0.289,0.334,0.324,0.327
+AB,9,NL2Bash,gpt-5-nano-2025-08-07_high,closed,2025-08,0.145,0.749,0.604,0.583,0.62,0.624
+AB,9,NL2Bash,gpt-5-nano-2025-08-07_low,closed,2025-08,0.143,0.727,0.584,0.535,0.589,0.575
+AB,9,NL2Bash,gpt-5-nano-2025-08-07_medium,closed,2025-08,0.138,0.763,0.625,0.595,0.63,0.632
+AB,10,OTIS Mock AIME 2024-2025,text-davinci-002,closed,2022-03,0.155,0.34,0.185,0.279,0.224,0.232
+AB,10,OTIS Mock AIME 2024-2025,DeepSeek-Coder-V2-Base,open,2024-06,0.124,0.334,0.458,0.347,0.414,0.451
+AB,10,OTIS Mock AIME 2024-2025,Phi-3-small-8k-instruct,open,2024-05,0.122,0.376,0.254,0.313,0.259,0.302
+AB,10,OTIS Mock AIME 2024-2025,Baichuan-2-13B-Base,open,2023-09,0.114,0.208,0.322,0.19,0.303,0.33
+AB,10,OTIS Mock AIME 2024-2025,Qwen2.5-Coder-32B,open,2024-11,0.112,0.286,0.398,0.304,0.402,0.379
+AB,11,APEX-Agents,DeepSeek-Coder-V2-Base,open,2024-06,0.137,0.241,0.104,0.15,0.202,0.167
+AB,11,APEX-Agents,Qwen2.5-Coder-32B,open,2024-11,0.102,0.181,0.079,0.108,0.121,0.141
+AB,11,APEX-Agents,falcon-180B,open,2023-09,0.097,0.215,0.118,0.191,0.256,0.168
+AB,11,APEX-Agents,Baichuan-2-13B-Base,open,2023-09,0.076,0.126,0.05,0.062,0.075,0.1
+AB,11,APEX-Agents,Qwen2.5-Coder-14B,open,2024-11,0.073,0.137,0.064,0.084,0.091,0.128
+AB,12,CyberGym,DeepSeek-Coder-V2-Base,open,2024-06,0.136,0.18,0.316,0.481,0.406,0.183
+AB,12,CyberGym,Llama-2-34b,closed,2023-07,0.135,0.158,0.293,0.241,0.219,0.204
+AB,12,CyberGym,tiny-recursion-model,open,2025-10,0.101,0.304,0.405,0.381,0.391,0.379
+AB,12,CyberGym,falcon-180B,open,2023-09,0.099,0.329,0.428,0.385,0.357,0.29
+AB,12,CyberGym,Nemotron-4 15B,closed,2024-02,0.098,0.139,0.237,0.278,0.209,0.152
+AC,1,OpenBookQA,Inkling_high,open,2026-07,0.315,0.611,0.9,0.926,0.831,0.789
+AC,1,OpenBookQA,Inkling_xhigh,open,2026-07,0.307,0.625,0.91,0.932,0.843,0.8
+AC,1,OpenBookQA,Inkling,open,2026-07,0.303,0.626,0.907,0.929,0.841,0.804
+AC,1,OpenBookQA,Inkling_thinking,open,2026-07,0.296,0.633,0.91,0.929,0.842,0.804
+AC,1,OpenBookQA,gpt-4.1-nano-2025-04-14,closed,2025-04,0.23,0.907,0.634,0.677,0.756,0.682
+AC,2,GPQA Main Chemistry,gpt-6-luna_none,closed,2026-09,0.31,0.369,0.411,0.679,0.872,0.377
+AC,2,GPQA Main Chemistry,gpt-5.6-luna_none,closed,2026-07,0.285,0.355,0.394,0.64,0.842,0.363
+AC,2,GPQA Main Chemistry,gpt-6-luna_low,closed,2026-09,0.284,0.43,0.477,0.714,0.897,0.458
+AC,2,GPQA Main Chemistry,gpt-5.6-terra_none,closed,2026-07,0.283,0.408,0.454,0.691,0.887,0.408
+AC,2,GPQA Main Chemistry,gpt-6-luna,closed,2026-09,0.275,0.461,0.507,0.736,0.913,0.518
+AC,3,CyberGym,DeepSeek-Coder-V2-Base,open,2024-06,0.301,0.18,0.316,0.481,0.406,0.183
+AC,3,CyberGym,Qwen2.5-Coder-32B,open,2024-11,0.273,0.124,0.205,0.397,0.331,0.143
+AC,3,CyberGym,Qwen2.5-Coder-14B,open,2024-11,0.235,0.087,0.162,0.322,0.285,0.121
+AC,3,CyberGym,Baichuan-2-13B-Base,open,2023-09,0.233,0.067,0.144,0.3,0.25,0.101
+AC,3,CyberGym,Qwen2.5-Coder-7B,open,2024-09,0.187,0.058,0.113,0.245,0.211,0.079
+AC,4,Cybench,DeepSeek-Coder-V2-Base,open,2024-06,0.273,0.235,0.347,0.508,0.526,0.196
+AC,4,Cybench,Qwen2.5-Coder-32B,open,2024-11,0.255,0.158,0.208,0.413,0.419,0.131
+AC,4,Cybench,Qwen2.5-Coder-14B,open,2024-11,0.216,0.102,0.144,0.318,0.354,0.094
+AC,4,Cybench,Qwen2.5-Coder-7B,open,2024-09,0.184,0.059,0.084,0.243,0.241,0.051
+AC,4,Cybench,Baichuan-2-13B-Base,open,2023-09,0.171,0.083,0.134,0.254,0.305,0.075
+AC,5,MCP Atlas,Qwen2.5-Coder-32B,open,2024-11,0.27,0.505,0.186,0.235,0.294,0.354
+AC,5,MCP Atlas,DeepSeek-Coder-V2-Base,open,2024-06,0.268,0.565,0.204,0.297,0.408,0.381
+AC,5,MCP Atlas,Qwen2.5-Coder-14B,open,2024-11,0.225,0.41,0.16,0.185,0.23,0.313
+AC,5,MCP Atlas,Baichuan-2-13B-Base,open,2023-09,0.222,0.359,0.112,0.137,0.17,0.27
+AC,5,MCP Atlas,text-davinci-002,closed,2022-03,0.172,0.086,0.263,0.258,0.149,0.224
+AC,6,Aider Polyglot,Qwen2.5-Coder-32B,open,2024-11,0.262,0.444,0.238,0.182,0.32,0.29
+AC,6,Aider Polyglot,DeepSeek-Coder-V2-Base,open,2024-06,0.26,0.494,0.268,0.234,0.398,0.324
+AC,6,Aider Polyglot,Qwen2.5-Coder-14B,open,2024-11,0.224,0.34,0.172,0.116,0.246,0.226
+AC,6,Aider Polyglot,Baichuan-2-13B-Base,open,2023-09,0.166,0.221,0.092,0.055,0.133,0.124
+AC,6,Aider Polyglot,Yi-9B,open,2024-03,0.16,0.236,0.126,0.076,0.163,0.145
+AC,7,ARC AI2,Inkling_high,open,2026-07,0.241,0.704,0.919,0.945,0.865,0.866
+AC,7,ARC AI2,Inkling,open,2026-07,0.228,0.719,0.927,0.947,0.876,0.876
+AC,7,ARC AI2,Inkling_xhigh,open,2026-07,0.226,0.723,0.929,0.949,0.878,0.876
+AC,7,ARC AI2,Inkling_thinking,open,2026-07,0.22,0.728,0.93,0.948,0.877,0.876
+AC,7,ARC AI2,gpt-4.1-nano-2025-04-14,closed,2025-04,0.175,0.919,0.704,0.744,0.808,0.713
+AC,8,GPQA Diamond Chemistry,gpt-6-luna_none,closed,2026-09,0.241,0.474,0.531,0.715,0.841,0.526
+AC,8,GPQA Diamond Chemistry,gpt-5.6-luna_none,closed,2026-07,0.223,0.467,0.52,0.69,0.823,0.506
+AC,8,GPQA Diamond Chemistry,gpt-5.6-terra_none,closed,2026-07,0.209,0.552,0.6,0.761,0.873,0.59
+AC,8,GPQA Diamond Chemistry,gpt-6-luna_low,closed,2026-09,0.201,0.589,0.634,0.79,0.89,0.644
+AC,8,GPQA Diamond Chemistry,claude-sonnet-5_none,closed,2026-06,0.198,0.53,0.57,0.728,0.847,0.575
+AC,9,InterCode-CTF,gemma-3-27b-it,open,2025-03,0.236,0.421,0.534,0.657,0.614,0.452
+AC,9,InterCode-CTF,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.232,0.373,0.469,0.605,0.543,0.352
+AC,9,InterCode-CTF,gpt-4.1-nano-2025-04-14,closed,2025-04,0.203,0.257,0.343,0.46,0.415,0.231
+AC,9,InterCode-CTF,gpt-5-nano-2025-08-07_low,closed,2025-08,0.2,0.408,0.497,0.608,0.571,0.394
+AC,9,InterCode-CTF,Chinchilla (70B),closed,2022-03,0.181,0.213,0.291,0.394,0.304,0.236
+AC,10,NL2Bash,gemma-3-27b-it,open,2025-03,0.236,0.773,0.646,0.537,0.631,0.595
+AC,10,NL2Bash,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.216,0.724,0.586,0.508,0.577,0.56
+AC,10,NL2Bash,gpt-4.1-nano-2025-04-14,closed,2025-04,0.209,0.634,0.469,0.425,0.487,0.446
+AC,10,NL2Bash,gemma-2-27b-it,open,2024-06,0.2,0.541,0.415,0.341,0.418,0.425
+AC,10,NL2Bash,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.2,0.861,0.789,0.661,0.743,0.736
+AC,11,GPQA Main Biology,gpt-6-luna_none,closed,2026-09,0.224,0.61,0.643,0.834,0.941,0.684
+AC,11,GPQA Main Biology,gpt-5.6-luna_none,closed,2026-07,0.221,0.6,0.629,0.821,0.932,0.671
+AC,11,GPQA Main Biology,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.208,0.562,0.606,0.77,0.889,0.605
+AC,11,GPQA Main Biology,gpt-5.4-mini-2026-03-17_none,closed,2026-03,0.195,0.599,0.624,0.794,0.883,0.663
+AC,11,GPQA Main Biology,gemma-3-27b-it,open,2025-03,0.195,0.52,0.579,0.715,0.833,0.492
+AC,12,AISI CTF Suites - Technical Non-Expert,Baichuan-2-13B-Base,open,2023-09,0.19,0.538,0.31,0.348,0.502,0.332
+AC,12,AISI CTF Suites - Technical Non-Expert,Baichuan-2-7B-Base,open,2023-09,0.163,0.487,0.29,0.324,0.477,0.312
+AC,12,AISI CTF Suites - Technical Non-Expert,Qwen2.5-Coder-32B,open,2024-11,0.163,0.695,0.483,0.532,0.665,0.506
+AC,12,AISI CTF Suites - Technical Non-Expert,DeepSeek-Coder-V2-Base,open,2024-06,0.155,0.742,0.524,0.587,0.736,0.53
+AC,12,AISI CTF Suites - Technical Non-Expert,Qwen2.5-Coder-14B,open,2024-11,0.154,0.606,0.416,0.452,0.597,0.439
+DE,1,GPQA Main Chemistry,Inkling_xhigh,open,2026-07,0.498,0.606,0.595,0.519,0.408,0.906
+DE,1,GPQA Main Chemistry,Inkling_high,open,2026-07,0.496,0.564,0.554,0.497,0.395,0.891
+DE,1,GPQA Main Chemistry,gpt-6-luna_none,closed,2026-09,0.495,0.369,0.411,0.679,0.872,0.377
+DE,1,GPQA Main Chemistry,Inkling,open,2026-07,0.49,0.509,0.513,0.501,0.389,0.879
+DE,1,GPQA Main Chemistry,Inkling_thinking,open,2026-07,0.481,0.547,0.54,0.506,0.4,0.881
+DE,2,OTIS Mock AIME 2024-2025,inkling-small_none,open,2026-07,0.373,0.244,0.242,0.35,0.247,0.62
+DE,2,OTIS Mock AIME 2024-2025,inkling-small_minimal,open,2026-07,0.279,0.554,0.555,0.64,0.562,0.841
+DE,2,OTIS Mock AIME 2024-2025,nemotron-3-ultra_thinking,open,2026-06,0.266,0.397,0.437,0.452,0.412,0.678
+DE,2,OTIS Mock AIME 2024-2025,inkling-small_low,open,2026-07,0.243,0.636,0.635,0.711,0.638,0.881
+DE,2,OTIS Mock AIME 2024-2025,o3-pro-2025-06-10_low,closed,2025-06,0.211,0.797,0.804,0.746,0.799,0.588
+DE,3,MCP Atlas,gpt-5.4-nano-2026-03-17_high,closed,2026-03,0.367,0.218,0.216,0.342,0.235,0.602
+DE,3,MCP Atlas,gpt-5.4-nano-2026-03-17_xhigh,closed,2026-03,0.355,0.263,0.256,0.38,0.274,0.629
+DE,3,MCP Atlas,gpt-5.4-nano-2026-03-17_medium,closed,2026-03,0.351,0.219,0.222,0.335,0.231,0.582
+DE,3,MCP Atlas,gpt-5.4-nano-2026-03-17_low,closed,2026-03,0.319,0.215,0.212,0.316,0.225,0.544
+DE,3,MCP Atlas,gpt-5-nano-2025-08-07_high,closed,2025-08,0.313,0.092,0.099,0.212,0.104,0.417
+DE,4,ARC-AGI-2,glm-5.3-flash_max,open,2026-08,0.355,0.636,0.662,0.6,0.653,0.298
+DE,4,ARC-AGI-2,qwen3.7-plus,closed,2026-06,0.204,0.242,0.208,0.268,0.201,0.405
+DE,4,ARC-AGI-2,qwen3.7-plus_thinking,closed,2026-06,0.193,0.32,0.281,0.366,0.29,0.483
+DE,4,ARC-AGI-2,kimi-k2.7-code,open,2026-06,0.182,0.493,0.515,0.431,0.505,0.323
+DE,4,ARC-AGI-2,qwen3.6-plus,closed,2026-03,0.161,0.152,0.117,0.17,0.132,0.293
+DE,5,ARC-AGI,glm-4.7-flash_thinking,open,2026-01,0.346,0.447,0.445,0.399,0.461,0.115
+DE,5,ARC-AGI,gemma-4-26b-a4b_minimal,open,2026-04,0.262,0.569,0.555,0.512,0.559,0.297
+DE,5,ARC-AGI,gpt-oss-120b_high,open,2025-08,0.21,0.411,0.412,0.419,0.403,0.613
+DE,5,ARC-AGI,glm-5.3-flash_max,open,2026-08,0.208,0.889,0.899,0.871,0.898,0.69
+DE,5,ARC-AGI,qwen3.6-35b-a3b,open,2026-04,0.202,0.446,0.412,0.401,0.399,0.601
+DE,6,GPQA Main Biology,gemma-3-27b-it,open,2025-03,0.341,0.52,0.579,0.715,0.833,0.492
+DE,6,GPQA Main Biology,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.284,0.562,0.606,0.77,0.889,0.605
+DE,6,GPQA Main Biology,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.278,0.52,0.559,0.714,0.808,0.53
+DE,6,GPQA Main Biology,QwQ-32B_16K,open,2025-03,0.27,0.575,0.618,0.72,0.837,0.567
+DE,6,GPQA Main Biology,gpt-4.1-nano-2025-04-14,closed,2025-04,0.269,0.489,0.529,0.653,0.754,0.485
+DE,7,VPCT,Inkling,open,2026-07,0.335,0.396,0.411,0.522,0.431,0.766
+DE,7,VPCT,grok-4.6_low,closed,2026-08,0.319,0.568,0.588,0.648,0.572,0.891
+DE,7,VPCT,inkling-small_high,open,2026-07,0.315,0.419,0.419,0.497,0.429,0.744
+DE,7,VPCT,inkling-small,open,2026-07,0.309,0.392,0.394,0.453,0.397,0.706
+DE,7,VPCT,inkling-small_xhigh,open,2026-07,0.308,0.425,0.428,0.524,0.445,0.753
+DE,8,GeoBench,Inkling_high,open,2026-07,0.333,0.379,0.399,0.511,0.409,0.742
+DE,8,GeoBench,Inkling_xhigh,open,2026-07,0.321,0.4,0.422,0.522,0.43,0.751
+DE,8,GeoBench,Inkling,open,2026-07,0.318,0.386,0.414,0.53,0.425,0.743
+DE,8,GeoBench,Inkling_thinking,open,2026-07,0.313,0.398,0.423,0.525,0.43,0.743
+DE,8,GeoBench,glm-5.3-flash_max,open,2026-08,0.26,0.418,0.4,0.486,0.382,0.642
+DE,9,Cybench,DeepSeek-Coder-V2-Base,open,2024-06,0.33,0.235,0.347,0.508,0.526,0.196
+DE,9,Cybench,QwQ-32B_16K,open,2025-03,0.303,0.398,0.424,0.431,0.47,0.167
+DE,9,Cybench,gemma-3-27b-it,open,2025-03,0.302,0.287,0.317,0.346,0.367,0.065
+DE,9,Cybench,QwQ-32B,open,2025-03,0.3,0.383,0.408,0.418,0.46,0.16
+DE,9,Cybench,Qwen2.5-Coder-32B,open,2024-11,0.288,0.158,0.208,0.413,0.419,0.131
+DE,10,GPQA Diamond Chemistry,gpt-5.6-luna_none,closed,2026-07,0.317,0.467,0.52,0.69,0.823,0.506
+DE,10,GPQA Diamond Chemistry,gpt-6-luna_none,closed,2026-09,0.315,0.474,0.531,0.715,0.841,0.526
+DE,10,GPQA Diamond Chemistry,gpt-5.6-terra_none,closed,2026-07,0.283,0.552,0.6,0.761,0.873,0.59
+DE,10,GPQA Diamond Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.275,0.402,0.452,0.582,0.704,0.429
+DE,10,GPQA Diamond Chemistry,claude-sonnet-5_none,closed,2026-06,0.272,0.53,0.57,0.728,0.847,0.575
+DE,11,InterCode-CTF,glm-4.7-flash_none,open,2026-01,0.3,0.615,0.541,0.616,0.647,0.347
+DE,11,InterCode-CTF,glm-4.7-flash_thinking,open,2026-01,0.271,0.697,0.628,0.653,0.72,0.449
+DE,11,InterCode-CTF,Qwen2.5-Coder-14B,open,2024-11,0.229,0.638,0.48,0.605,0.653,0.424
+DE,11,InterCode-CTF,DeepSeek-Coder-V2-Base,open,2024-06,0.221,0.765,0.603,0.711,0.765,0.544
+DE,11,InterCode-CTF,Qwen2.5-Coder-7B,open,2024-09,0.22,0.486,0.359,0.493,0.501,0.281
+DE,12,MMLU Pro Chemistry,gpt-4.1-nano-2025-04-14,closed,2025-04,0.3,0.56,0.606,0.713,0.779,0.479
+DE,12,MMLU Pro Chemistry,gpt-5-nano-2025-08-07_minimal,closed,2025-08,0.296,0.616,0.658,0.784,0.83,0.534
+DE,12,MMLU Pro Chemistry,gpt-5.4-nano-2026-03-17_none,closed,2026-03,0.285,0.707,0.74,0.849,0.908,0.623
+DE,12,MMLU Pro Chemistry,gemma-3-27b-it,open,2025-03,0.269,0.647,0.723,0.802,0.875,0.606
+DE,12,MMLU Pro Chemistry,DeepSeek-R1-Distill-Qwen-14B,open,2025-01,0.252,0.378,0.406,0.526,0.615,0.363
