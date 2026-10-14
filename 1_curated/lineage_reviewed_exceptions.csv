@@ -1,7 +1,9 @@
 check,chain,node,variant,raw_strings,reason
 pool,gemini-flash,flash 1.5,bare,gemini-1.5-flash-001|gemini-1.5-flash-0514,announced 2024-05-14 and shipped as -001 on 2024-05-23: one release
 pool,gemini-flash,flash 2.5,bare,gemini-2.5-flash-2025-04|gemini-2.5-flash-preview-04-17,the pipeline's 2025-04 snapshot of the 04-17 preview
-pool,gemini-flash,flash 2.5 2025-05-20,bare,gemini-2.5-flash-2025-05|gemini-2.5-flash-preview-05-20,the pipeline's 2025-05 snapshot of the 05-20 preview
+pool,gemini-flash,flash 2.5 2025-05-20,bare,gemini-2.5-flash|gemini-2.5-flash-2025-05|gemini-2.5-flash-preview-05-20,the pipeline's 2025-05 snapshot of the 05-20 preview; the 05-20 preview became GA unchanged on 06-17
+pool,gemini-flash,flash 2.5 2025-05-20,effort:none,gemini-2.5-flash-preview-05-20_none|gemini-2.5-flash_none,the 05-20 preview became GA unchanged on 06-17
+pool,gemini-flash,flash 2.5 2025-05-20,thinking,gemini-2.5-flash-preview-05-20_thinking|gemini-2.5-flash_thinking,the 05-20 preview became GA unchanged on 06-17
 pool,gemini-pro,pro 2.5 2025-06-05,bare,gemini-2.5-pro|gemini-2.5-pro-preview-06-05,the 06-05 preview became GA unchanged on 06-17
 pool,gemini-pro,pro 2.5 2025-06-05,token:32k,gemini-2.5-pro-preview-06-05_32K|gemini-2.5-pro_32K,the 06-05 preview became GA unchanged on 06-17
 pool,gemini-pro,pro 2.5 2025-06-05,thinking,gemini-2.5-pro-preview-06-05_thinking|gemini-2.5-pro_thinking,the 06-05 preview became GA unchanged on 06-17 (both thinking runs moved off the bare name by the 2026-10-05 effort review)
