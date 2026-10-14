@@ -183,6 +183,13 @@ Whether the chains agree on those axes is a different question, with its own num
 - Epoch on benchmark scores carrying more than one dimension: [Benchmark Scores = General Capability + Claudiness](https://epoch.ai/gradient-updates/benchmark-scores-general-capability-claudiness)
 - Epoch on the jump that came with reasoning models: [Have AI Capabilities Accelerated?](https://epoch.ai/publications/have-ai-capabilities-accelerated) (Denain and Barry, 2026)
 
+## Authors
+
+This project is co-authored by:
+
+- [Yassine Essifi](https://github.com/linkofrivia), former Research Resident, GPAI Policy Lab
+- [Jérémy Andréoletti](https://github.com/Jeremy-Andreoletti), Head of Research, GPAI Policy Lab
+
 ## License
 
 CC-BY-4.0 ([LICENSE](LICENSE)) over the code, the analysis layer, `1_curated/` and `5_outputs/`.
