@@ -76,7 +76,9 @@ is $4\sigma_b^2\,\mu(1-\mu)$.
 | $\sigma_b > 0$ | per-benchmark noise SD (the SD of scores at $\mu=\tfrac12$). |
 
 **Validity constraint:** $\phi_b>0$ requires $\sigma_b < \tfrac12$; the prior
-(Section 5) keeps $\sigma_b$ well below that.
+(Section 5) keeps $\sigma_b$ well below that, and the model enforces it (a `noise_domain`
+term at $-\infty$ outside it, 2026-10-09). **Floor:** every fit since 2026-10-13 adds
+$\sigma_{\min} = 0.005$ to $\sigma_b$ (§5.2), so $\phi_b \le 9999$.
 
 ### 2.2 Boundary clipping (Beta-scored observations)
 
@@ -242,7 +244,7 @@ thin benchmark's $\sigma_b$ shrinks toward the shared median instead of
 keeping a free scale the panel cannot pin:
 
 $$
-\sigma_b = \exp(\mu_s + \tau_s\, z_b),
+\sigma_b = \sigma_{\min} + \exp(\mu_s + \tau_s\, z_b),
 \qquad
 \mu_s \sim \mathcal{N}(\log 0.05,\;0.5),\quad
 \tau_s \sim \mathrm{HalfNormal}(0.5),\quad
@@ -250,7 +252,17 @@ z_b \sim \mathcal{N}(0,1),
 $$
 
 (non-centered; constants `PRIOR_SIGMA_B_POOLED`). `--no-pooled-noise` opts back
-into the independent LogNormal above as the sensitivity run.
+into the independent LogNormal above as the sensitivity run (with the same floor added).
+
+**Floor $\sigma_{\min} = 0.005$** (`config.SIGMA_B_FLOOR`, carried in each trace's spec as
+`sigma_b_floor`; traces fitted before 2026-10-13 carry none and are rebuilt without it). Without
+it the whole population can slide down together: $\mu_s \approx -5$, $\tau_s \approx 3$ cost
+about 26 nats of prior, while the Beta rows' density grows without bound as $\phi_b\to\infty$.
+Multi-start MAP optimisation of the flagship (sampler study, 2026-10-12) found such
+noise-collapse spikes, $\sigma_b \le 10^{-3}$ on many benchmarks, 3,000 to 5,000 nats of log
+posterior above the modes NUTS samples; NUTS from jittered starts never reaches them, NUTS
+started from those optima stays in them. The floor sits below mode A's smallest $\sigma_b$
+(about 0.013) and caps $\phi_b$ at 9999.
 
 ### 5.3 Loadings $A_{b,k}$
 

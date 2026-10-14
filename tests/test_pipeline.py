@@ -1177,6 +1177,25 @@ class TestMIRT:
         np.testing.assert_allclose(sigma_b, np.full(data.n_benchmarks, 0.05),
                                    rtol=1e-12)
 
+    def test_sigma_b_floor(self, data):
+        """sigma_b = floor + exp(mu + tau z): the floor adds to the pooled scale (and to the free
+        LogNormal one), new specs carry config.SIGMA_B_FLOOR, a spec without the field was
+        sampled with none (2026-10-13)."""
+        from multiaxis_eci.analysis.fitspec import FitSpec
+        from multiaxis_eci.config import SIGMA_B_FLOOR
+        assert SIGMA_B_FLOOR == 0.005 and FitSpec(K=4).sigma_b_floor == SIGMA_B_FLOOR
+        def sigma_b_at_start(m):
+            v = m["sigma_b"]
+            [graph] = m.replace_rvs_by_values([v])
+            fn = pytensor.function(m.value_vars, graph, on_unused_input="ignore")
+            point = m.initial_point()
+            return fn(*[point[v.name] for v in m.value_vars])
+        for pooled in (True, False):
+            kw = dict(K=3, loading_prior="normal", pooled_noise=pooled)
+            with_floor = sigma_b_at_start(build_mirt_model(data, sigma_b_floor=SIGMA_B_FLOOR, **kw))
+            without = sigma_b_at_start(build_mirt_model(data, **kw))
+            np.testing.assert_allclose(with_floor, without + SIGMA_B_FLOOR, rtol=1e-12)
+
     def test_align_factor_signs_fixes_flips_and_preserves_eta(self):
         """Random per-draw ± flips of (A, theta) columns are resolved to one
         consistent orientation, and eta = A·theta^T is unchanged draw-by-draw."""

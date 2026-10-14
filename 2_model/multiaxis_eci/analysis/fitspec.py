@@ -33,6 +33,7 @@ from multiaxis_eci.config import (
     PRIOR_HUMAN_ROOT,
     RESULTS_DIR,
     SG_MODEL_NAME,
+    SIGMA_B_FLOOR,
 )
 
 # Loading priors, longest first: "_signed" is a prefix of "_signedhs".
@@ -126,6 +127,9 @@ class FitSpec:
     # sd of the human roots' private Normal base (models.mirt._assemble_theta), carried the same
     # way; a spec without it predates the field (LEGACY_HUMAN_ROOT_SD).
     human_root_sd: float = PRIOR_HUMAN_ROOT
+    # floor added to every benchmark's noise scale (config.SIGMA_B_FLOOR), carried like the human
+    # prior; a spec without it was sampled with none (0.0).
+    sigma_b_floor: float = SIGMA_B_FLOOR
     # The human baselines left out of the data (load_eci_data(fit_humans=False)): a pure
     # model-vs-model scale, the humans placed afterwards on the frozen benchmark side.
     # Emits `_nohumans`. Exploration, 2026-10-07.
@@ -287,6 +291,7 @@ class FitSpec:
             d.setdefault("effort_means", False)
             d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
             d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
+            d.setdefault("sigma_b_floor", 0.0)
             for field, off in _RETIRED_FIELDS.items():
                 if field in d:
                     if d[field] != off:
@@ -309,7 +314,8 @@ class FitSpec:
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
                                    "beta_binomial": False, "effort_means": False,
                                    "human_delta_sd": LEGACY_HUMAN_DELTA_SD,
-                                   "human_root_sd": LEGACY_HUMAN_ROOT_SD, **attr})
+                                   "human_root_sd": LEGACY_HUMAN_ROOT_SD, "sigma_b_floor": 0.0,
+                                   **attr})
             if is_baseline:
                 spec = _baseline_spec(spec)
         if not is_baseline:

@@ -547,7 +547,13 @@ def _beta_binomial_logp(value, a, b, n_items, k):
     lgam = pt.gammaln
     log_choose = lgam(n + 1.0) - lgam(kk + 1.0) - lgam(n - kk + 1.0)
     log_beta_ratio = (lgam(kk + a) + lgam(n - kk + b) - lgam(n + a + b)) - (lgam(a) + lgam(b) - lgam(a + b))
-    return pt.switch(is_b, log_choose + log_beta_ratio, pm.logp(pm.Beta.dist(alpha=a, beta=b), value))
+    # a, b <= 0 (phi_b = 1/(4 sigma_b^2) - 1 < 0 once sigma_b > 0.5) is outside the model, as
+    # pm.Beta's own check says; gammaln of a negative argument stays finite, so without this
+    # the item rows score about +37 each there, a spike tempered samplers fell into
+    # (2026-10-09). Inside the domain nothing changes.
+    valid = pt.and_(pt.gt(a, 0.0), pt.gt(b, 0.0))
+    logp = pt.switch(is_b, log_choose + log_beta_ratio, pm.logp(pm.Beta.dist(alpha=a, beta=b), value))
+    return pt.switch(valid, logp, -np.inf)
 
 
 def softmin_eta(A, theta, D, beta, lse=None, log=None):
@@ -597,6 +603,7 @@ def build_mirt_model(data: ECIData, K: int,
                       censor_eps: np.ndarray | None = None,
                       binomial_n: np.ndarray | None = None,
                       pooled_noise: bool = False,
+                      sigma_b_floor: float = 0.0,
                       shared_base_zsn: bool = True,
                       time_t: np.ndarray | None = None,
                       theta_t_cells: bool = False,
@@ -1019,8 +1026,11 @@ def build_mirt_model(data: ECIData, K: int,
                              PRIOR_SIGMA_B_POOLED["mu_sd"])
             tau_s = pm.HalfNormal("sigma_b_tau", PRIOR_SIGMA_B_POOLED["tau_sd"])
             z_s = pm.Normal("sigma_b_z", 0.0, 1.0, dims="bench")
-            sigma_b = pm.Deterministic("sigma_b", pt.exp(mu_s + tau_s * z_s),
+            sigma_b = pm.Deterministic("sigma_b", sigma_b_floor + pt.exp(mu_s + tau_s * z_s),
                                        dims="bench")
+        elif sigma_b_floor:
+            sigma_b = pm.Deterministic("sigma_b", sigma_b_floor + pm.LogNormal(
+                "sigma_b_free", dims="bench", **PRIOR_SIGMA_B), dims="bench")
         else:
             sigma_b = pm.LogNormal("sigma_b", dims="bench", **PRIOR_SIGMA_B)
         tau_CD = pm.LogNormal("tau_CD", **PRIOR_TAU_CD)
@@ -1295,6 +1305,11 @@ def build_mirt_model(data: ECIData, K: int,
 
         a = mu_n * phi_n
         b = (1.0 - mu_n) * phi_n
+        # The precision must stay positive (sigma_b < 0.5; with n_eff, 1/n_eff + 4 sigma_b^2 < 1).
+        # pm.Beta's own parameter check is dropped by PyMC's JAX backend (and by the hand-written
+        # Beta-binomial), so outside that domain the density is garbage, and tempered samplers
+        # were drawn to it (2026-10-09). 0 inside the domain: no fit within it changes.
+        pm.Potential("noise_domain", pt.switch(pt.all(pt.gt(phi_n, 0.0)), 0.0, -np.inf))
 
         if binomial_n is not None:
             # Beta-binomial on the benchmarks whose score is a share of N items: the score is

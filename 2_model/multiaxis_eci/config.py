@@ -98,6 +98,12 @@ PRIOR_ALPHA = dict(mu=0.0, sigma=0.5)   # loglog link: per-bench discrimination 
 # ([0.022, 0.114]) the fixed LogNormal(log 0.05, 0.5) implied, so the pooled
 # model nests the fixed one instead of tightening it.
 PRIOR_SIGMA_B_POOLED = dict(mu_loc=math.log(0.05), mu_sd=0.5, tau_sd=0.5)
+# Floor on every benchmark's noise scale: sigma_b = SIGMA_B_FLOOR + exp(mu + tau z_b) (phi_b <= 9999).
+# Without it the pooled population can slide down as a block (mu ~ -5, tau ~ 3 cost ~26 nats of
+# prior) while the Beta rows' density grows without bound as phi -> inf: noise-collapse spikes
+# thousands of nats above the modes NUTS samples, found by MAP optimisation (2026-10-13, user:
+# floor at 0.005; mode A's smallest sigma_b are ~0.013).
+SIGMA_B_FLOOR = 0.005
 
 # Ordered human prior (models/mirt.py, build_mirt_model(..., human_order=...)).
 # Human baseline tiers enter the MIRT as test-takers but their per-axis ability
