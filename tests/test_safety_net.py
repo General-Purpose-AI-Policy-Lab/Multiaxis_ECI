@@ -620,16 +620,20 @@ class TestGoldenLogp:
 
     def test_mirt_k4_bifactor_full_options(self, data_all):
         # The live exploratory base, bifactor loadings: both theta priors,
-        # Brownian lineage, 3PL floors, estimated noise ceiling.
-        from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
+        # Brownian lineage, 3PL floors, estimated noise ceiling (absolute gap with
+        # benchmark-forecasting's population prior and the pipeline's known ceilings
+        # since 2026-10-15; the relative Beta(1, 20) gap gave -195869.637522).
+        from multiaxis_eci.data import (clip_scores_to_floors, load_benchmark_ceilings,
+                                        load_benchmark_floors)
         floors = load_benchmark_floors(data_all)
         clipped = clip_scores_to_floors(data_all, floors)
         model = build_mirt_model(
             clipped, K=4, loading_prior="bifactor", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(clipped.mlookup), lineage_bm=True,
-            floor_c=floors, ceiling_noise=True)
+            floor_c=floors, ceiling_noise=True,
+            known_ceiling=load_benchmark_ceilings(clipped))
         np.testing.assert_allclose(
-            total_logp(model), -195869.637522, rtol=self.RTOL)
+            total_logp(model), -197280.846632, rtol=self.RTOL)
 
     def test_mirt_k3_anchored(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial

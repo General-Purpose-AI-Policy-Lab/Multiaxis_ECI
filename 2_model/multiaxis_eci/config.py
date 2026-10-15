@@ -104,6 +104,16 @@ PRIOR_SIGMA_B_POOLED = dict(mu_loc=math.log(0.05), mu_sd=0.5, tau_sd=0.5)
 # thousands of nats above the modes NUTS samples, found by MAP optimisation (2026-10-13, user:
 # floor at 0.005; mode A's smallest sigma_b are ~0.013).
 SIGMA_B_FLOOR = 0.005
+# --ceiling-noise (exploration): each benchmark's ceiling d_b = 1 - e_b, e_b the share of items a
+# perfect model still fails (wrong keys, two defensible answers, judge disagreement). With a share
+# e of wrong keys, mu = c + (1 - c - e) * sigmoid(eta): the gap below 1 is e whatever the chance
+# floor c, so it is drawn on the absolute scale. Prior: benchmark-forecasting's posterior
+# population of 1 - L (harvey joint skew Lobs Lceil Lb1, cutoff 20261001, posterior medians of
+# L_raw_mu 0.765 and L_raw_sigma 0.159): e = 0.25 * Beta(1.43, 4.67), mean 0.059, median 0.051,
+# P(e > 0.10) = 0.16; a benchmark whose ceiling the pipeline records (its `ceiling` column, 1 for
+# verified answers) keeps it, as benchmark-forecasting pins L there (user, 2026-10-15). The cap
+# 0.25 keeps d_b >= 0.75 above every chance floor (0.5 at most today).
+PRIOR_CEILING_GAP = dict(alpha=1.43, beta=4.67, scale=0.25)
 
 # Ordered human prior (models/mirt.py, build_mirt_model(..., human_order=...)).
 # Human baseline tiers enter the MIRT as test-takers but their per-axis ability

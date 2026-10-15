@@ -20,6 +20,7 @@ from multiaxis_eci.config import (
     PRIOR_COMP_OFFSET_SD,
     EFFORT_TOKEN_LEVEL,
     PRIOR_ALPHA,
+    PRIOR_CEILING_GAP,
     PRIOR_DELTA_HUMAN,
     PRIOR_EFFORT_MEAN,
     PRIOR_EFFORT_TOKEN_SLOPE,
@@ -599,6 +600,7 @@ def build_mirt_model(data: ECIData, K: int,
                       plt_founders: list[str] | None = None,
                       floor_c: np.ndarray | None = None,
                       ceiling_noise: bool = False,
+                      known_ceiling: np.ndarray | None = None,
                       known_se: bool = False,
                       censor_eps: np.ndarray | None = None,
                       binomial_n: np.ndarray | None = None,
@@ -821,20 +823,21 @@ def build_mirt_model(data: ECIData, K: int,
     deliberately keeps no floor (below-chance is signal there), and the
     nc/sparse product links have no single eta to floor.
 
-    ceiling_noise: estimate a per-benchmark upper asymptote confined to a
-    noise-sized gap (label errors, judge disagreement). The mean becomes
-    mu = c_b + (d_b - c_b) * sigmoid(eta) with d_b = 1 - delta_b * (1 - c_b)
-    and delta_b ~ Beta(1, 20) (mean 0.048, mode 0, P(gap > 0.10) = 0.122):
-    "no ceiling unless the data insists". This is the smooth relaxation of a
-    spike-slab at d = 1 — a point-mass mixture would give NUTS a two-story
-    posterior per benchmark (the islands failure mode), the Beta dial does not.
-    d_b is identified only where observations press the ceiling; elsewhere the
-    posterior returns the prior, the honest "not measurable yet" answer.
-    Diagnostic use: read `ceiling_d` off the trace to see which benchmarks
-    demand d < 1. This is the only ceiling the model carries — a FIXED wall
-    read from a curated file was the retired --ceilings flag, and a freely
-    estimated one (the retired soft_ceiling flag) was weakly identified /
-    multimodal on this data, which is why the gap is confined to noise size.
+    ceiling_noise: estimate a per-benchmark upper asymptote d_b = 1 - e_b, the
+    gap e_b being the share of items a perfect model still fails (wrong keys,
+    ambiguous items, judge disagreement). With a share e of wrong keys the mean
+    is c + (1 - c - e) * sigmoid(eta), so the gap is absolute, independent of
+    the chance floor: e_b = 0.25 * Beta(1.43, 4.67) (config.PRIOR_CEILING_GAP,
+    benchmark-forecasting's posterior population of 1 - L). d_b is identified
+    only where observations press the ceiling; elsewhere the posterior returns
+    the prior. Diagnostic use: read `ceiling_d` off the trace. A FIXED wall read
+    from a curated file was the retired --ceilings flag, and a freely estimated
+    one (the retired soft_ceiling flag) was weakly identified / multimodal on
+    this data, which is why the gap is confined to a noise-sized prior.
+
+    known_ceiling: per-benchmark ceiling the pipeline records (NaN elsewhere,
+    data.load_benchmark_ceilings); under ceiling_noise those benchmarks keep it
+    instead of estimating one. Ignored without ceiling_noise.
 
     binomial_n: per-observation item count N of the benchmark (NaN for a benchmark whose
     score is not a share of items): the score enters as k = score * N successes of a
@@ -1254,19 +1257,15 @@ def build_mirt_model(data: ECIData, K: int,
             eta = (A_obs * theta_obs).sum(axis=-1) - D[data.bench_idx]
         mu_n = pm.math.sigmoid(eta)
         if ceiling_noise:
-            # Estimated 4PL: the mean saturates at d_b instead of 1. delta is
-            # the FRACTION of the (c_b, 1] range left unreachable, so
-            # d_b > c_b holds by construction — a free absolute gap could dip
-            # below the floor and flip the Beta mean negative.
-            #
-            # Beta(1, 20): mean 0.048, P(delta > 0.10) = 0.122. Beta(1, beta)
-            # is an Exponential folded onto [0, 1]: mode at 0 and log-density
-            # near-linear in delta over the small-gap region, so every further
-            # point of ceiling costs the same. Constant marginal cost shrinks
-            # the many no-ceiling benchmarks toward 0 without fighting the few
-            # that genuinely saturate; a quadratic penalty (HalfNormal) does
-            # the opposite. Smooth in delta, so no discrete ceiling/no-ceiling
-            # mode split.
+            # Estimated 4PL: the mean saturates at d_b = 1 - e_b instead of 1.
+            # e_b is an ABSOLUTE gap, the share of items a perfect model still
+            # fails: with a share e of wrong keys a random guesser still lands
+            # at c, a perfect model at 1 - e, and mu = c + (1 - c - e) sigmoid.
+            # A gap relative to (1 - c) would ask a 4-choice benchmark for a
+            # larger gap than a free-answer one for the same error rate.
+            # Prior: benchmark-forecasting's posterior population of 1 - L
+            # (config.PRIOR_CEILING_GAP); its 0.25 cap keeps d_b above every
+            # floor. Benchmarks with a known ceiling keep it.
             #
             # The scale decides identifiability. d reaches the likelihood
             # through log(d_b - c_b), a constant shift of eta that D_b absorbs
@@ -1276,12 +1275,19 @@ def build_mirt_model(data: ECIData, K: int,
             # the 2PL cannot fit because it forces
             # Var = 4 sigma_b^2 mu(1-mu) -> 0 as mu -> 1. The gap is kept
             # small so the mid-scale data still pin A and D as in the 2PL.
-            # (The retired soft_ceiling flag was the same asymptote at
-            # Beta(1, 19).)
-            delta = pm.Beta("ceiling_gap", alpha=1.0, beta=20.0, dims="bench")
             c_full = floor_c if floor_c is not None else np.zeros(data.n_benchmarks)
-            d_b = pm.Deterministic("ceiling_d", 1.0 - delta * (1.0 - c_full),
-                                   dims="bench")
+            if np.any(c_full >= 1.0 - PRIOR_CEILING_GAP["scale"]):
+                raise ValueError("a chance floor reaches the lowest possible ceiling "
+                                 f"(1 - {PRIOR_CEILING_GAP['scale']})")
+            gap_raw = pm.Beta("ceiling_gap_raw", alpha=PRIOR_CEILING_GAP["alpha"],
+                              beta=PRIOR_CEILING_GAP["beta"], dims="bench")
+            gap = PRIOR_CEILING_GAP["scale"] * gap_raw
+            if known_ceiling is not None:
+                known = np.asarray(known_ceiling, dtype=np.float64)
+                pinned = np.isfinite(known)
+                gap = pt.switch(pinned, 1.0 - np.where(pinned, known, 1.0), gap)
+            gap = pm.Deterministic("ceiling_gap", gap, dims="bench")
+            d_b = pm.Deterministic("ceiling_d", 1.0 - gap, dims="bench")
             c_obs = c_full[data.bench_idx]
             mu_n = c_obs + (d_b[data.bench_idx] - c_obs) * mu_n
         elif floor_c is not None:

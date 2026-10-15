@@ -1078,24 +1078,42 @@ class TestMIRT:
         carries neither (off = the plain 2PL, guarded by the golden logp)."""
         m = build_mirt_model(data, K=1, ceiling_noise=True)
         names = ({v.name for v in m.free_RVs} | {d.name for d in m.deterministics})
-        assert {"ceiling_gap", "ceiling_d"} <= names
+        assert {"ceiling_gap_raw", "ceiling_gap", "ceiling_d"} <= names
         d_draws = pm.draw(m["ceiling_d"], draws=4, random_seed=0)
         assert d_draws.shape == (4, data.n_benchmarks)
         assert np.all((d_draws > 0) & (d_draws <= 1))
         m0 = build_mirt_model(data, K=1)
         names0 = ({v.name for v in m0.free_RVs} | {d.name for d in m0.deterministics})
-        assert not ({"ceiling_gap", "ceiling_d"} & names0)
+        assert not ({"ceiling_gap_raw", "ceiling_gap", "ceiling_d"} & names0)
 
     def test_ceiling_noise_gap_is_noise_sized(self, data_all):
-        """the estimated ceiling stays a noise-sized gap under 1, never a wall."""
+        """the estimated ceiling stays a noise-sized gap under 1, never a wall:
+        e = 0.25 * Beta(1.43, 4.67), benchmark-forecasting's population of 1 - L
+        (median 0.051, P(e > 0.10) = 0.16), capped at 0.25."""
         m = build_mirt_model(data_all, K=1, ceiling_noise=True)
         d = pm.draw(m["ceiling_d"], draws=400, random_seed=0)
         assert d.shape == (400, data_all.n_benchmarks)
-        assert np.all(d <= 1.0 + 1e-12)
-        # noise-sized: the median gap is ~0.034 (Beta(1,20): P(gap > 0.10) = 0.122)
         gap = 1.0 - d
-        assert 0.02 < np.median(gap) < 0.05
-        assert (gap > 0.10).mean() < 0.15
+        assert np.all((gap >= 0.0) & (gap <= 0.25 + 1e-12))
+        assert 0.035 < np.median(gap) < 0.065
+        assert 0.10 < (gap > 0.10).mean() < 0.22
+
+    def test_ceiling_noise_gap_is_absolute_and_known_ceilings_kept(self, data_all):
+        """the gap does not scale with the chance floor (a share of wrong keys
+        costs the same points on a 4-choice benchmark as on a free-answer one),
+        and a benchmark with a recorded ceiling keeps it (2026-10-15)."""
+        from multiaxis_eci.data import load_benchmark_ceilings, load_benchmark_floors
+        floors = load_benchmark_floors(data_all)
+        known = load_benchmark_ceilings(data_all)
+        assert np.isfinite(known).any(), "the pipeline records ceilings (ARC-AGI, Cybench, ...)"
+        m0 = build_mirt_model(data_all, K=1, ceiling_noise=True)
+        m1 = build_mirt_model(data_all, K=1, ceiling_noise=True, floor_c=floors,
+                              known_ceiling=known)
+        g0 = pm.draw(m0["ceiling_gap"], draws=50, random_seed=1)
+        g1 = pm.draw(m1["ceiling_gap"], draws=50, random_seed=1)
+        free = ~np.isfinite(known)
+        np.testing.assert_allclose(g1[:, free], g0[:, free])   # floors leave the gap alone
+        np.testing.assert_allclose(g1[:, ~free], 1.0 - known[~free][None, :].repeat(50, 0))
 
     def test_invalid_loading_prior_raises(self, data):
         with pytest.raises(ValueError):

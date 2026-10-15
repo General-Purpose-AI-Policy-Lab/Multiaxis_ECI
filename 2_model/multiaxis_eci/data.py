@@ -192,6 +192,23 @@ def load_benchmark_floors(data: ECIData) -> np.ndarray:
     return floors
 
 
+def load_benchmark_ceilings(data: ECIData) -> np.ndarray:
+    """Per-benchmark known ceiling in blookup order, NaN where the pipeline records none.
+
+    Reads the `ceiling` column of the pipeline's benchmarks table (1.0 where answers are verified
+    or a human reaches the top of the scale): those benchmarks keep their ceiling under
+    `--ceiling-noise` instead of estimating one.
+    """
+    benchmarks = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+    table = pd.read_csv(BENCHMARKS_FILE)
+    ceiling_by_bench = dict(zip(table["name"], pd.to_numeric(table["ceiling"], errors="coerce")))
+    ceilings = np.array([ceiling_by_bench.get(b, np.nan) for b in benchmarks], dtype=np.float64)
+    known = np.isfinite(ceilings)
+    if not np.all((ceilings[known] > 0.0) & (ceilings[known] <= 1.0)):
+        raise ValueError(f"benchmark ceilings must be in (0, 1]: {ceilings[known]}")
+    return ceilings
+
+
 BENCHMARK_CLIPS_FILE = CURATED_DIR / "benchmark_score_clips.csv"
 N_ITEMS_FILE = CURATED_DIR / "benchmark_n_items.csv"
 MODEL_OPENNESS_FILE = CURATED_DIR / "model_openness.csv"
