@@ -916,6 +916,45 @@ class TestThetaTCells:
             data.n_models - len(rows_h) - len(lin.row_idx) + lin.n_chains)
 
 
+class TestThetaSkew:
+    """--theta-skew: the exchangeable theta block is independent skew-normal per axis,
+    standardised, with a learned shape per axis (sampler study 2026-10-13/16)."""
+
+    def test_block_replaces_the_zero_sum_block_and_covers_the_same_rows(self, data):
+        # same rows as the t block: the unstructured models plus one base per chain founder
+        lin = build_lineage_structure(data.mlookup)
+        model = build_mirt_model(data, K=3, loading_prior="normal", lineage=lin, theta_skew=True)
+        names = {rv.name for rv in model.free_RVs}
+        assert {"theta_skew", "theta_skew_alpha"} <= names and "theta_zsn_t" not in names
+        assert model["theta_skew"].type.shape == (data.n_models - len(lin.row_idx) + lin.n_chains, 3)
+        assert model["theta_skew_alpha"].type.shape == (3,)
+        assert np.isfinite(perturbed_logp(model))
+
+    def test_columns_are_standardised_whatever_the_shape(self, data):
+        # mean 0 and sd 1 per column for any alpha: only the asymmetry moves, so the location
+        # (absorbed by D) and the scale (absorbed by the loadings) stay the Gaussian block's
+        model = build_mirt_model(data, K=3, loading_prior="normal", theta_skew=True)
+        th, al = pm.draw([model["theta_skew"], model["theta_skew_alpha"]], draws=30, random_seed=0)
+        assert np.abs(th.mean(axis=1)).max() < 0.2
+        assert np.abs(th.std(axis=1) - 1).max() < 0.2
+        # and the asymmetry follows the sign of each column's alpha where it is clear
+        from scipy.stats import skew
+        sk = skew(th, axis=1)
+        strong = np.abs(al) > 3
+        assert np.all(np.sign(sk[strong]) == np.sign(al[strong]))
+
+    def test_exclusive_with_theta_t_cells(self, data):
+        with pytest.raises(ValueError, match="pick one"):
+            build_mirt_model(data, K=3, loading_prior="normal", theta_t_cells=True, theta_skew=True)
+
+    def test_spec_reads_the_flag_back_from_the_trace_attrs(self):
+        from types import SimpleNamespace
+        from multiaxis_eci.analysis.fitspec import FitSpec, _attr_flags
+        assert FitSpec(K=4).theta_skew is False
+        assert _attr_flags(SimpleNamespace(attrs={"mirt_theta_skew": "true"})).get("theta_skew") is True
+        assert "theta_skew" not in _attr_flags(SimpleNamespace(attrs={}))
+
+
 class TestThetaPos:
     """--theta-pos: the likelihood reads softplus(theta), raw theta stays the
     reported ability. The golden locks the eta arithmetic; what it cannot see

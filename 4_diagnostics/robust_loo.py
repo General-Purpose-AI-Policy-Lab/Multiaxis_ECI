@@ -124,6 +124,7 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
         censor_eps=censor_eps, binomial_n=binomial_n, pooled_noise=spec.pooled_noise,
         sigma_b_floor=spec.sigma_b_floor,
         shared_base_zsn=not spec.private_bases, time_t=time_t, theta_t_cells=spec.theta_t,
+        theta_skew=spec.theta_skew,
         theta_pos=spec.theta_pos, link=spec.link)
     # The builder's initial values only steer a cold start, and PyMC cannot compute a
     # log-likelihood on a model that carries them (as in fit.py); the runs here start from a

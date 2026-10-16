@@ -85,6 +85,7 @@ class FitSpec:
     effort_means: bool = True
     time_prior: bool = False
     theta_t: bool = False
+    theta_skew: bool = False
     theta_pos: bool = False
     no_sg: bool = False
     apply_exclusions: bool = False
@@ -169,6 +170,7 @@ class FitSpec:
         if self.lineage_prior and not self.effort_means: tag += "_noeffortmeans"
         if self.time_prior: tag += "_timeprior"
         if self.theta_t: tag += "_thetat"
+        if self.theta_skew: tag += "_thetaskew"
         if self.theta_pos: tag += "_thetapos"
         if self.no_sg: tag += "_noSG"
         if self.apply_exclusions: tag += "_excluded"
@@ -240,6 +242,7 @@ class FitSpec:
                 lineage_prior=args.lineage_prior, lineage_bm=args.lineage_bm,
                 effort_means=args.effort_means,
                 time_prior=args.time_prior, theta_t=args.theta_t,
+                theta_skew=getattr(args, "theta_skew", False),
                 theta_pos=args.theta_pos,
                 no_sg=args.no_sg,
                 apply_exclusions=args.apply_exclusions,
@@ -537,6 +540,8 @@ def _attr_flags(post) -> dict:
         out["time_prior"] = True
     if a.get("mirt_theta_t_cells"):
         out["theta_t"] = True
+    if a.get("mirt_theta_skew"):
+        out["theta_skew"] = True
     if a.get("mirt_theta_pos"):
         out["theta_pos"] = True
     if "mirt_shared_base_zsn" in a and not json.loads(a["mirt_shared_base_zsn"]):
@@ -613,7 +618,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
     if take("_noeffortmeans"):
         out["effort_means"] = False
     for tok, fl in (("_timeprior", "time_prior"),
-                    ("_thetat", "theta_t"), ("_thetapos", "theta_pos")):
+                    ("_thetat", "theta_t"), ("_thetaskew", "theta_skew"),
+                    ("_thetapos", "theta_pos")):
         if take(tok):
             out[fl] = True
     for tok, fl in (("_noSG", "no_sg"), ("_excluded", "apply_exclusions"),
@@ -672,7 +678,7 @@ _BASELINE_OFF = dict(loading_prior="normal", link="linear",
                      human_prior=False, human_merge=False,
                      lineage_prior=False, lineage_bm=False, effort_means=False,
                      time_prior=False,
-                     theta_t=False, theta_pos=False, private_bases=False,
+                     theta_t=False, theta_skew=False, theta_pos=False, private_bases=False,
                      pooled_noise=False)
 
 

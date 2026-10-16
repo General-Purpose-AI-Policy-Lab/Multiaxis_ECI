@@ -40,6 +40,7 @@ unmarked to both.
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
 | `--time-prior` | `[expl]` add a learned per-axis linear trend in release year to the theta prior MEAN, so a thinly-evaluated model is shrunk toward its era's level rather than the whole population's. The slope is signed and centered at zero, so a flat population reduces to the plain prior |
 | `--theta-t` | `[expl]` cell-wise leptokurtic theta: each (model, axis) cell of the exchangeable block gets a Student-t(4) marginal (direct closed-form density, no extra latents) instead of a Gaussian one |
+| `--theta-skew` | `[expl]` skew-normal theta: the exchangeable block (unstructured models and chain founders) independent skew-normal per axis, standardised, with a learned shape per axis (`config.PRIOR_THETA_SKEW_ALPHA`). Matches the abilities' left tail and identifies the axes' orientation; exclusive with `--theta-t`; emits `_thetaskew` |
 | `--private-bases` | `[expl]` give each chain founder a private Normal(0,1) base and let the ZeroSumNormal span only the unstructured rows (human roots always have their own Normal(0, `PRIOR_HUMAN_ROOT` = 3) base). Same marginal scale; changes how much of the population the location pin carries |
 
 **Data scope**

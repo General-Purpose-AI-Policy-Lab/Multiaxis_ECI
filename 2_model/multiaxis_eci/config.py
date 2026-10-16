@@ -298,6 +298,16 @@ PRIOR_TIME_BETA = 0.5
 # unit scale the rest of the theta priors assume.
 PRIOR_THETA_T_NU = 4.0
 
+# Skew-normal theta block (models/mirt.py, build_mirt_model(..., theta_skew=True)). Each axis's
+# column is skew-normal, standardised to mean 0 and sd 1, with its own shape alpha_k ~
+# Normal(0, PRIOR_THETA_SKEW_ALPHA), learned. The abilities have a left tail (old and weak models far
+# below the frontier, a ceiling on the right), and independent skewed columns identify the rotation
+# the Gaussian block leaves flat (ICA). Learned, unlike the t block's nu: the sign and strength of
+# each axis's asymmetry are not known a priori, and from this symmetric prior the sampler study fits
+# (2026-10-13/16, 5_outputs/sampler_study/GEOMETRY_REPORT.md) came out at alpha -8 to -10 on three
+# axes and ~0 on one, every chain.
+PRIOR_THETA_SKEW_ALPHA = 4.0
+
 # Regularized-horseshoe scales, used by the "bifactor" loading prior
 # (models/mirt.py) and the sparse-gate model's gate horseshoe (models/mirt_sparse.py).
 RH_TAU_SCALE  = 0.5   # global-scale prior width

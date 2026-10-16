@@ -149,7 +149,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
                 binomial_n=None, pooled_noise=False, sigma_b_floor=0.0, shared_base_zsn=True,
                 time_t=None,
-                theta_t_cells=False, theta_pos=False, link="linear",
+                theta_t_cells=False, theta_skew=False, theta_pos=False, link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None,
                 save_thin: int = config.SAVE_THIN):
     """Build + sample one compensatory MIRT; print identified convergence."""
@@ -179,6 +179,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
         tag += ", private structured bases"
     if theta_t_cells:
         tag += ", cell-wise t theta"
+    if theta_skew:
+        tag += ", skew-normal theta"
     if theta_pos:
         tag += ", positive theta (softplus link)"
     if link != "linear":
@@ -201,7 +203,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                              censor_eps=censor_eps, binomial_n=binomial_n,
                              pooled_noise=pooled_noise, sigma_b_floor=sigma_b_floor,
                              shared_base_zsn=shared_base_zsn,
-                             time_t=time_t, theta_t_cells=theta_t_cells,
+                             time_t=time_t, theta_t_cells=theta_t_cells, theta_skew=theta_skew,
                              theta_pos=theta_pos, link=link)
     # PyMC sampler uses the heartbeat callback below (so its bar stays off);
     # nutpie/numpyro have no heartbeat, so let their own live progress bar show.
@@ -765,6 +767,8 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_shared_base_zsn"] = json.dumps(False)
     if args.theta_t:
         attrs["mirt_theta_t_cells"] = json.dumps(True)
+    if args.theta_skew:
+        attrs["mirt_theta_skew"] = json.dumps(True)
     if args.theta_pos:
         attrs["mirt_theta_pos"] = json.dumps(True)
     if floor_c is not None:
@@ -822,6 +826,7 @@ def run_exploration(args, parser) -> None:
                                   sigma_b_floor=spec.sigma_b_floor,
                                   shared_base_zsn=not spec.private_bases,
                                   theta_t_cells=spec.theta_t,
+                                  theta_skew=spec.theta_skew,
                                   theta_pos=spec.theta_pos,
                                   link=spec.link,
                                   checkpoint_path=spec.trace_path,
@@ -1130,6 +1135,14 @@ def main():
                              "are the ICA identification channel, so the likelihood "
                              "can prefer one orientation. Widens the abilities of "
                              "thinly-measured models")
+    parser.add_argument("--theta-skew", action="store_true",
+                        help="[exploration] skew-normal theta: the exchangeable block "
+                             "(unstructured models and chain founders) independent "
+                             "skew-normal per axis, standardised, with a learned shape "
+                             "per axis (config.PRIOR_THETA_SKEW_ALPHA). Matches the "
+                             "abilities' left tail and identifies the axes' orientation "
+                             "(ICA); see 5_outputs/sampler_study/GEOMETRY_REPORT.md. "
+                             "Exclusive with --theta-t")
     parser.add_argument("--theta-pos", action="store_true",
                         help="[exploration] positive likelihood-side ability, the "
                              "semi-compensatory convention: eta reads "

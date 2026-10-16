@@ -35,6 +35,7 @@ from multiaxis_eci.config import (
     PRIOR_SIGMA_B_POOLED,
     PRIOR_TAU_ALPHA,
     PRIOR_TAU_CD,
+    PRIOR_THETA_SKEW_ALPHA,
     PRIOR_THETA_T_NU,
     PRIOR_TIME_BETA,
     RH_SLAB_DF,
@@ -76,6 +77,27 @@ def _theta_t_cells(n_rows: int, K: int, nu: float = PRIOR_THETA_T_NU):
     return t - t.mean(axis=0, keepdims=True)
 
 
+def _theta_skew_cells(n_rows: int, K: int, alpha_sd: float = PRIOR_THETA_SKEW_ALPHA):
+    """Independent skew-normal exchangeable theta block, one learned shape per axis.
+
+    theta[m, k] ~ SkewNormal(xi_k, omega_k, alpha_k), alpha_k ~ Normal(0, alpha_sd), with xi_k and
+    omega_k set so each column has mean 0 and sd 1 whatever its shape: the location and scale stay
+    those of the Gaussian block, only the asymmetry moves. Per CELL and independent across axes,
+    like the t block: an independent non-Gaussian column breaks the rotation invariance of the
+    spherical Gaussian block (ICA). Skewed rather than heavy-tailed because that is the abilities'
+    shape (a left tail of old and weak models, a ceiling on the right; the sampler study's
+    figures/ability_distribution_modeA.png).
+
+    NOT re-centered, unlike the t block: the column mean is pinned softly by the zero-mean prior
+    (sd 1/sqrt(n_rows) for the shift D absorbs), which is the version the sampler study tested on the
+    flagship (14 of 30 chains above -14395 against 4 of 30, better LOO on every seed)."""
+    alpha = pm.Normal("theta_skew_alpha", 0.0, alpha_sd, shape=K)
+    delta = alpha / pt.sqrt(1 + alpha ** 2)
+    omega = 1.0 / pt.sqrt(1 - 2 * delta ** 2 / np.pi)                 # unit variance
+    xi = -omega * delta * np.sqrt(2 / np.pi)                           # zero mean
+    return pm.SkewNormal("theta_skew", mu=xi, sigma=omega, alpha=alpha, shape=(n_rows, K))
+
+
 def _assemble_theta(n_models: int, K: int, human_struct=None,
                     human_delta_sd: float = PRIOR_DELTA_HUMAN,
                     human_root_sd: float = PRIOR_HUMAN_ROOT,
@@ -85,6 +107,7 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                     shared_base_zsn: bool = True,
                     time_t=None,
                     theta_t_cells: bool = False,
+                    theta_skew: bool = False,
                     lineage_links: bool = True,
                     effort_means: bool = False):
     """Stitch the structured theta blocks and the unstructured rows into ONE
@@ -149,7 +172,13 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     The structured INCREMENTS (HalfNormal human steps, positive-mean lineage
     steps) are left alone: they are already non-Gaussian and already
     orientation-bearing, so heavier tails there add nothing to identification.
+
+    theta_skew: the same block, independent skew-normal per axis with a learned
+    shape instead (see _theta_skew_cells). Exclusive with theta_t_cells.
     """
+    if theta_t_cells and theta_skew:
+        raise ValueError("theta_t_cells and theta_skew both replace the exchangeable "
+                         "theta block; pick one.")
     human_rows = human_struct[0] if human_struct is not None else np.empty(0, dtype=int)
     lin_rows = lin.row_idx if lin is not None else np.empty(0, dtype=int)
     claimed = np.concatenate([human_rows, lin_rows]).astype(int)
@@ -175,6 +204,8 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     if claimed.size == 0:
         if theta_t_cells:
             return finish(_theta_t_cells(n_models, K))
+        if theta_skew:
+            return finish(_theta_skew_cells(n_models, K))
         theta_t = pm.ZeroSumNormal("theta_t", sigma=1.0, dims=("latent", "model"))
         return finish(theta_t.T)
 
@@ -187,6 +218,7 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                          "the ZeroSumNormal location pin; every model is structured.")
     n_shared = rest.size + (n_chains if shared_base_zsn else 0)
     zsn = (_theta_t_cells(n_shared, K) if theta_t_cells
+           else _theta_skew_cells(n_shared, K) if theta_skew
            else pm.ZeroSumNormal("theta_zsn_t", sigma=1.0, shape=(K, n_shared)).T)
     theta_full = pt.zeros((n_models, K))
     theta_full = pt.set_subtensor(theta_full[rest, :], zsn[:rest.size])
@@ -609,6 +641,7 @@ def build_mirt_model(data: ECIData, K: int,
                       shared_base_zsn: bool = True,
                       time_t: np.ndarray | None = None,
                       theta_t_cells: bool = False,
+                      theta_skew: bool = False,
                       theta_pos: bool = False,
                       link: str = "linear") -> pm.Model:
     """Build the K-factor compensatory Beta-MIRT model.
@@ -739,6 +772,15 @@ def build_mirt_model(data: ECIData, K: int,
     Read the coverage caveat with it: a heavy-tailed prior lets a thinly-measured
     model's ability wander further than a Gaussian one does, so the extrapolated
     abilities the coverage mask already hides get wider, not narrower.
+
+    theta_skew: the same block (unstructured rows plus human-root/chain-founder
+    slices) independent skew-normal per axis, standardised, with a learned shape
+    alpha_k ~ Normal(0, config.PRIOR_THETA_SKEW_ALPHA) (see _theta_skew_cells).
+    The other non-Gaussian identification channel, fitted to the abilities'
+    actual shape (a left tail). In the sampler study (2026-10-13/16) it was the
+    one change that made chains agree more AND fit better: on the flagship,
+    14 of 30 chains above -14395 against 4 of 30, better LOO on each of three
+    seeds, fewer divergences. Exclusive with theta_t_cells.
 
     theta_pos: the likelihood reads a POSITIVE ability, exactly the
     semi-compensatory convention (models/mirt_interaction.py): raw theta keeps
@@ -1109,7 +1151,7 @@ def build_mirt_model(data: ECIData, K: int,
             lin=lineage, lineage_bm=lineage_bm,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,
-            theta_t_cells=theta_t_cells, lineage_links=lineage_links,
+            theta_t_cells=theta_t_cells, theta_skew=theta_skew, lineage_links=lineage_links,
             effort_means=effort_means)
         # Likelihood-side ability. Raw theta stays the reported ability (it
         # carries the location pin and the order structure); the positive copy
