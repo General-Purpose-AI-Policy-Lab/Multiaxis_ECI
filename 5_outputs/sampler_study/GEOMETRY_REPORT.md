@@ -91,6 +91,17 @@ Sur batterie à partir de minuit, la file a été réordonnée : troisième pair
 - **Option `--theta-skew` ajoutée au dépôt le 16 octobre**, désactivée par défaut. Elle passe par `build_mirt_model(..., theta_skew=True)`, `config.PRIOR_THETA_SKEW_ALPHA`, et apparaît dans `docs/model_math.md` §5.4 et dans `docs/cli.md`. C'est la version testée ici : skew-normal standardisée par axe sur le bloc partagé, sans recentrage exact. À évaluer au refit en LOO face au fit phare, au même titre que `--ceiling-noise`.
 - Garder la matrice de masse low-rank.
 - Ne pas poursuivre CNC, les mouvements de rotation, la parcimonie Gamma ni la corrélation libre.
-- Skew-normal + corrélation positive à un facteur, sur le banc : corrélations apprises faibles (0,02 à 0,15), pas de gain par rapport au skew-normal seul. La variante avec un niveau général g lui-même asymétrique est moins bonne. Sur le flagship, le test est en cours le 16 au matin.
+- Skew-normal + corrélation positive à un facteur (θ_k = λ_k·g + √(1 − λ_k²)·s_k) : pas de gain par rapport au skew-normal seul.
+  - Sur le banc, les corrélations apprises sont faibles (0,02 à 0,15). La variante avec un niveau général g lui-même asymétrique est moins bonne.
+  - Sur le flagship, le modèle se sert du niveau général (λ de 0,53 à 0,80), mais :
+
+    | graines 201000 / 202000 | skew-normal seul | skew + un facteur |
+    |---|---|---|
+    | chaînes au-dessus de −14 395 | 5/10 et 4/10 (9/20) | 2/10 et 5/10 (7/20) |
+    | meilleure log-vraisemblance | −14 377 / −14 341 | −14 390 / −14 384 |
+    | correspondance médiane entre paires de chaînes | 0,82 / 0,64 | 0,46 / 0,73 |
+    | elpd LOO | −15 434 / −15 465 | −15 481 / −15 450 |
+
+    Les résultats sont mitigés ou un peu moins bons. Le skew-normal seul reste la recommandation.
 
 La figure citée plus haut (`figures/`) n'est pas suivie par git (règle `5_outputs/**/figures/`). Elle se régénère avec le script de la session, dans `~/sampler_study/night/`.
