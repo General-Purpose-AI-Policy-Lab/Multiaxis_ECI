@@ -1089,14 +1089,57 @@ class TestMIRT:
     def test_ceiling_noise_gap_is_noise_sized(self, data_all):
         """the estimated ceiling stays a noise-sized gap under 1, never a wall:
         e = 0.25 * Beta(1.43, 4.67), benchmark-forecasting's population of 1 - L
-        (median 0.051, P(e > 0.10) = 0.16), capped at 0.25."""
-        m = build_mirt_model(data_all, K=1, ceiling_noise=True)
-        d = pm.draw(m["ceiling_d"], draws=400, random_seed=0)
-        assert d.shape == (400, data_all.n_benchmarks)
-        gap = 1.0 - d
-        assert np.all((gap >= 0.0) & (gap <= 0.25 + 1e-12))
+        (median 0.051, P(e > 0.10) = 0.16), capped at 0.25. The model carries
+        that Beta in a Potential over a Uniform on the allowed interval (the
+        observed-best truncation), which pm.draw ignores: the population is drawn
+        from config, the model's draws checked for the cap only."""
+        from multiaxis_eci.config import PRIOR_CEILING_GAP as G
+        gap = G["scale"] * pm.draw(pm.Beta.dist(G["alpha"], G["beta"]), draws=4000,
+                                   random_seed=0)
         assert 0.035 < np.median(gap) < 0.065
         assert 0.10 < (gap > 0.10).mean() < 0.22
+        m = build_mirt_model(data_all, K=1, ceiling_noise=True)
+        d = pm.draw(m["ceiling_d"], draws=50, random_seed=0)
+        assert d.shape == (50, data_all.n_benchmarks)
+        assert np.all((1.0 - d >= 0.0) & (1.0 - d <= G["scale"] + 1e-12))
+
+    def test_ceiling_noise_floor_is_the_best_observed(self, data_all):
+        """the ceiling never sits below the best performance observed on its
+        benchmark, a model score or a human baseline (benchmark-forecasting's
+        L_floor_observed, 2026-10-19): d_b >= best over the whole transformed
+        line, d_b = 1 where someone scored 1.0, and the Beta density is
+        truncated, not reshaped."""
+        from multiaxis_eci.config import PRIOR_CEILING_GAP as G
+        from multiaxis_eci.data import load_observed_best
+        best = load_observed_best(data_all)
+        m = build_mirt_model(data_all, K=1, ceiling_noise=True, ceiling_lower=best)
+        vv = m.rvs_to_values[m["ceiling_gap_raw"]]
+        (d_out,) = m.replace_rvs_by_values([m["ceiling_d"]])
+        d_of = pytensor.function([vv], d_out, on_unused_input="ignore")
+        z0 = m.initial_point()[vv.name]
+        reached = best >= 1.0 - 1e-9
+        assert reached.any(), "some benchmark has a 1.0 (InterCode-CTF, NL2Bash, ...)"
+        for z in (-30.0, 0.0, 30.0):
+            d = d_of(np.full_like(z0, z))
+            assert np.all(d >= np.minimum(best, 1.0) - 1e-9)
+            assert np.all(d[reached] == 1.0)
+        # where the bound does not bite, the far end of the line is the plain cap
+        free = best <= 1.0 - G["scale"]
+        np.testing.assert_allclose(d_of(np.full_like(z0, 30.0))[free], 1.0 - G["scale"])
+        # the Potential is the Beta log-density of the estimated raw gaps, unnormalised
+        top = np.clip((1.0 - best) / G["scale"], 0.0, 1.0)
+        z = np.linspace(-2.0, 2.0, data_all.n_benchmarks)
+        raw = np.maximum(top, 1e-6) / (1.0 + np.exp(-z))
+        beta_lp = pm.logp(pm.Beta.dist(G["alpha"], G["beta"]), raw).eval()
+        lp = m.point_logps({**m.initial_point(), vv.name: z}, round_vals=12)
+        np.testing.assert_allclose(lp["ceiling_gap_prior"], beta_lp[~reached].sum(), rtol=1e-8)
+        # the human baselines count even when the tiers are not fitted (the flagship)
+        machines = load_eci_data(include_all_benchmarks=True, fit_humans=False)
+        model_best = np.full(machines.n_benchmarks, -np.inf)
+        np.maximum.at(model_best, machines.bench_idx, machines.scores)
+        best_m = load_observed_best(machines)
+        assert np.all(best_m >= model_best)
+        assert (best_m > model_best + 0.01).any(), "a human baseline above every model"
 
     def test_ceiling_noise_gap_is_absolute_and_known_ceilings_kept(self, data_all):
         """the gap does not scale with the chance floor (a share of wrong keys

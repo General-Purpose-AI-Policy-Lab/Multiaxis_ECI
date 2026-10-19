@@ -69,6 +69,7 @@ from multiaxis_eci.data import (
     load_binomial_n,
     load_boundary_eps,
     load_eci_data,
+    load_observed_best,
     release_time_covariate,
 )
 from multiaxis_eci.lineage import build_lineage_structure
@@ -200,6 +201,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                              ceiling_noise=ceiling_noise, known_se=known_se,
                              known_ceiling=(load_benchmark_ceilings(data) if ceiling_noise
                                             else None),
+                             ceiling_lower=load_observed_best(data) if ceiling_noise else None,
                              censor_eps=censor_eps, binomial_n=binomial_n,
                              pooled_noise=pooled_noise, sigma_b_floor=sigma_b_floor,
                              shared_base_zsn=shared_base_zsn,

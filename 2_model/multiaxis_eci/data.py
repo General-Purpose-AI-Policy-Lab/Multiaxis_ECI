@@ -209,6 +209,22 @@ def load_benchmark_ceilings(data: ECIData) -> np.ndarray:
     return ceilings
 
 
+
+def load_observed_best(data: ECIData) -> np.ndarray:
+    """Per-benchmark best performance observed, in blookup order: the highest score in `data`
+    (models, and the human tiers when they are fitted) or in human_baselines.csv (whether or
+    not the tiers are fitted). `build_mirt_model(ceiling_lower=)` under `--ceiling-noise`: a
+    ceiling never sits below what a model or a human has reached (benchmark-forecasting's
+    L_floor_observed)."""
+    benchmarks = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+    best = np.full(len(benchmarks), -np.inf)
+    np.maximum.at(best, np.asarray(data.bench_idx), np.asarray(data.scores, dtype=np.float64))
+    humans = _load_human_baselines_as_models()
+    if len(humans):
+        top = humans.groupby("benchmark")["score"].max()
+        best = np.fmax(best, np.array([top.get(b, -np.inf) for b in benchmarks], dtype=np.float64))
+    return best
+
 BENCHMARK_CLIPS_FILE = CURATED_DIR / "benchmark_score_clips.csv"
 N_ITEMS_FILE = CURATED_DIR / "benchmark_n_items.csv"
 MODEL_OPENNESS_FILE = CURATED_DIR / "model_openness.csv"

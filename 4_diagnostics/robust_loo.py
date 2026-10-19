@@ -97,8 +97,12 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
     observation or on those where `keep` is True. Returns (model, data, post): `data` is the
     FULL data scope either way, `post` the trace's posterior."""
     from multiaxis_eci.analysis.fitspec import FitSpec, sampled_human_order
-    from multiaxis_eci.data import (load_benchmark_ceilings, load_boundary_eps,
-                                    release_time_covariate)
+    from multiaxis_eci.data import (
+        load_benchmark_ceilings,
+        load_boundary_eps,
+        load_observed_best,
+        release_time_covariate,
+    )
     from multiaxis_eci.lineage import build_lineage_structure
     from multiaxis_eci.models.mirt import build_mirt_model
 
@@ -121,6 +125,7 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
         lineage=lineage, lineage_bm=spec.lineage_bm, effort_means=spec.effort_means,
         floor_c=floor_c, ceiling_noise=spec.ceiling_noise, known_se=spec.known_se,
         known_ceiling=load_benchmark_ceilings(fit_data) if spec.ceiling_noise else None,
+        ceiling_lower=load_observed_best(fit_data) if spec.ceiling_noise else None,
         censor_eps=censor_eps, binomial_n=binomial_n, pooled_noise=spec.pooled_noise,
         sigma_b_floor=spec.sigma_b_floor,
         shared_base_zsn=not spec.private_bases, time_t=time_t, theta_t_cells=spec.theta_t,

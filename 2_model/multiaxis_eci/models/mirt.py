@@ -633,6 +633,7 @@ def build_mirt_model(data: ECIData, K: int,
                       floor_c: np.ndarray | None = None,
                       ceiling_noise: bool = False,
                       known_ceiling: np.ndarray | None = None,
+                      ceiling_lower: np.ndarray | None = None,
                       known_se: bool = False,
                       censor_eps: np.ndarray | None = None,
                       binomial_n: np.ndarray | None = None,
@@ -880,6 +881,15 @@ def build_mirt_model(data: ECIData, K: int,
     known_ceiling: per-benchmark ceiling the pipeline records (NaN elsewhere,
     data.load_benchmark_ceilings); under ceiling_noise those benchmarks keep it
     instead of estimating one. Ignored without ceiling_noise.
+
+    ceiling_lower: per-benchmark best performance observed outside `data` (NaN where none),
+    data.load_observed_best: under ceiling_noise the ceiling never sits below the best
+    performance observed on the benchmark, the highest score in `data` (always applied) or in
+    this array (the human baselines, fitted or not). The rule is benchmark-forecasting's
+    L_floor_observed, under which PRIOR_CEILING_GAP was estimated: the gap's Beta is truncated
+    to e_b <= 1 - best (density not renormalised, a constant per benchmark with fixed
+    hyperparameters), and a benchmark where someone scored 1.0 gets d_b = 1. Ignored without
+    ceiling_noise.
 
     binomial_n: per-observation item count N of the benchmark (NaN for a benchmark whose
     score is not a share of items): the score enters as k = score * N successes of a
@@ -1321,13 +1331,37 @@ def build_mirt_model(data: ECIData, K: int,
             if np.any(c_full >= 1.0 - PRIOR_CEILING_GAP["scale"]):
                 raise ValueError("a chance floor reaches the lowest possible ceiling "
                                  f"(1 - {PRIOR_CEILING_GAP['scale']})")
-            gap_raw = pm.Beta("ceiling_gap_raw", alpha=PRIOR_CEILING_GAP["alpha"],
-                              beta=PRIOR_CEILING_GAP["beta"], dims="bench")
-            gap = PRIOR_CEILING_GAP["scale"] * gap_raw
+            # The ceiling is at least the best performance observed on the benchmark
+            # (benchmark-forecasting's L_floor_observed, the rule PRIOR_CEILING_GAP was
+            # estimated under): the gap's Beta is truncated to e_b <= 1 - best, as a Uniform
+            # on the allowed interval carrying the Beta density in a Potential. Where the
+            # bound does not bite (best <= 1 - scale) this is the plain Beta, logp included;
+            # where someone scored 1.0 the gap is 0. Forward draws (pm.draw) ignore the
+            # Potential, so they are uniform on the interval: read the prior off config.
+            scale = PRIOR_CEILING_GAP["scale"]
+            best = np.full(data.n_benchmarks, -np.inf)
+            np.maximum.at(best, np.asarray(data.bench_idx), np.asarray(data.scores, float))
+            if ceiling_lower is not None:
+                best = np.fmax(best, np.asarray(ceiling_lower, dtype=np.float64))
+            top = np.clip((1.0 - best) / scale, 0.0, 1.0)          # allowed share of the scale
+            reached = top <= 1e-9                                   # someone scored 1.0
+            gap_raw = pm.Uniform("ceiling_gap_raw", lower=0.0, upper=np.maximum(top, 1e-6),
+                                 dims="bench")
+            gap_lp = pm.logp(pm.Beta.dist(alpha=PRIOR_CEILING_GAP["alpha"],
+                                          beta=PRIOR_CEILING_GAP["beta"]), gap_raw)
+            gap = pt.switch(reached, 0.0, scale * gap_raw)
             if known_ceiling is not None:
                 known = np.asarray(known_ceiling, dtype=np.float64)
                 pinned = np.isfinite(known)
+                if np.any(pinned & (best > known + 1e-9)):
+                    import warnings
+                    warnings.warn("ceiling_noise: a recorded ceiling sits below the best score "
+                                  "observed on its benchmark; the recorded ceiling is kept",
+                                  UserWarning)
                 gap = pt.switch(pinned, 1.0 - np.where(pinned, known, 1.0), gap)
+                reached = reached | pinned
+            # the Beta density of the estimated gaps only (a pinned one's draw is unused)
+            pm.Potential("ceiling_gap_prior", pt.sum(pt.switch(reached, 0.0, gap_lp)))
             gap = pm.Deterministic("ceiling_gap", gap, dims="bench")
             d_b = pm.Deterministic("ceiling_d", 1.0 - gap, dims="bench")
             c_obs = c_full[data.bench_idx]

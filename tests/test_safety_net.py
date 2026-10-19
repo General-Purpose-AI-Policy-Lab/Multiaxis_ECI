@@ -629,7 +629,9 @@ class TestGoldenLogp:
         # The live exploratory base, bifactor loadings: both theta priors,
         # Brownian lineage, 3PL floors, estimated noise ceiling (absolute gap with
         # benchmark-forecasting's population prior and the pipeline's known ceilings
-        # since 2026-10-15; the relative Beta(1, 20) gap gave -195869.637522).
+        # since 2026-10-15; the relative Beta(1, 20) gap gave -195869.637522), the
+        # gap truncated at the best observed score since 2026-10-19 (-211740.068299
+        # before: at the initial point a bounded gap sits mid-interval, closer to the data).
         from multiaxis_eci.data import (clip_scores_to_floors, load_benchmark_ceilings,
                                         load_benchmark_floors)
         floors = load_benchmark_floors(data_all)
@@ -640,7 +642,7 @@ class TestGoldenLogp:
             floor_c=floors, ceiling_noise=True,
             known_ceiling=load_benchmark_ceilings(clipped))
         np.testing.assert_allclose(
-            total_logp(model), -211740.068299, rtol=self.RTOL)
+            total_logp(model), -201480.913298, rtol=self.RTOL)
 
     def test_mirt_k3_anchored(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial
