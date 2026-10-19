@@ -541,11 +541,11 @@ gemini-2.5-flash-preview-05-20_24K,Google,gemini-flash,flash 2.5 2025-05-20,,202
 gemini-2.5-flash-preview-05-20_8K,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,token:8k,yes,2
 gemini-2.5-flash-preview-05-20,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,bare,yes,5
 gemini-2.5-flash-preview-05-20_none,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,effort:none,yes,1
+gemini-2.5-flash_none,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,effort:none,yes,1
+gemini-2.5-flash_thinking,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,thinking,yes,1
+gemini-2.5-flash,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,bare,yes,8
 gemini-2.5-flash-preview-05-20_thinking,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,thinking,yes,1
 gemini-2.5-flash-2025-05,Google,gemini-flash,flash 2.5 2025-05-20,,2025-05-20,bare,yes,1
-gemini-2.5-flash_none,Google,gemini-flash,flash 2.5 2025-06-17,,2025-06-17,effort:none,yes,1
-gemini-2.5-flash_thinking,Google,gemini-flash,flash 2.5 2025-06-17,,2025-06-17,thinking,yes,1
-gemini-2.5-flash,Google,gemini-flash,flash 2.5 2025-06-17,,2025-06-17,bare,yes,8
 gemini-2.5-flash-preview-09-2025,Google,gemini-flash,flash 2.5 2025-09-25,,2025-09-25,bare,yes,2
 gemini-2.5-flash-preview-09-2025_16k,Google,gemini-flash,flash 2.5 2025-09-25,,2025-09-25,token:16k,yes,1
 gemini-3-flash-preview_high,Google,gemini-flash,flash 3,,2025-12-17,effort:high,yes,24
