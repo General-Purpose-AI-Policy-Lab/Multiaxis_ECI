@@ -218,6 +218,9 @@ claude-haiku-4-5-20251001_low,reasoning,on,run mode on
 claude-haiku-4-5-20251001_none,non-reasoning,off,non-reasoning pattern
 claude-haiku-4-5-20251001_thinking,reasoning,on,run mode on
 claude-haiku-4-5-20251001_xhigh,reasoning,on,run mode on
+claude-haiku-5-5_low,reasoning,on,run mode on
+claude-haiku-5-5_max,reasoning,on,run mode on
+claude-haiku-5-5_none,non-reasoning,off,non-reasoning pattern
 claude-instant-1.1,non-reasoning,off,non-reasoning pattern
 claude-instant-1.2,non-reasoning,off,non-reasoning pattern
 claude-mythos-5,reasoning,default,pattern 'claude-mythos'

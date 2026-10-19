@@ -218,6 +218,9 @@ claude-haiku-4-5-20251001_low,closed,epoch:API access
 claude-haiku-4-5-20251001_none,closed,epoch:API access
 claude-haiku-4-5-20251001_thinking,closed,epoch:API access
 claude-haiku-4-5-20251001_xhigh,closed,family:claude-haiku-4-5-20251001
+claude-haiku-5-5_low,unknown,
+claude-haiku-5-5_max,unknown,
+claude-haiku-5-5_none,unknown,
 claude-instant-1.1,closed,epoch:API access
 claude-instant-1.2,closed,epoch:API access
 claude-mythos-5,closed,override

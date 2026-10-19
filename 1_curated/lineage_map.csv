@@ -333,11 +333,14 @@ claude-haiku-4-5-20251001_16K,Anthropic,haiku,Haiku 4.5,,2025-10-15,token:16k,ye
 claude-haiku-4-5-20251001_1K,Anthropic,haiku,Haiku 4.5,,2025-10-15,token:1k,yes,3
 claude-haiku-4-5-20251001_32K,Anthropic,haiku,Haiku 4.5,,2025-10-15,token:32k,yes,6
 claude-haiku-4-5-20251001_8K,Anthropic,haiku,Haiku 4.5,,2025-10-15,token:8k,yes,2
-claude-haiku-4-5-20251001_none,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:none,yes,8
+claude-haiku-4-5-20251001_none,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:none,yes,20
 claude-haiku-4-5-20251001_thinking,Anthropic,haiku,Haiku 4.5,,2025-10-15,thinking,yes,7
 claude-haiku-4-5-20251001_low,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:low,yes,1
 claude-haiku-4-5-20251001,Anthropic,haiku,Haiku 4.5,,2025-10-15,bare,yes,1
 claude-haiku-4-5-20251001_xhigh,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:xhigh,yes,1
+claude-haiku-5-5_low,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:low,yes,11
+claude-haiku-5-5_max,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:max,yes,8
+claude-haiku-5-5_none,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:none,yes,11
 claude-mythos-preview-early,Anthropic,mythos-fable,Mythos Preview Early,,2026-04-06,preview,yes,8
 claude-mythos-preview,Anthropic,mythos-fable,Mythos Preview,,2026-04-07,preview,yes,5
 claude-fable-5_none,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:none,yes,1
@@ -353,7 +356,7 @@ claude-fable-5-1_high,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:high,y
 claude-fable-5-1_thinking,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,thinking,yes,3
 claude-fable-5-1_low,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:low,yes,5
 claude-fable-5-1_max,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:max,yes,15
-claude-fable-5-1_medium,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:medium,yes,6
+claude-fable-5-1_medium,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:medium,yes,8
 claude-fable-5-1_xhigh,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:xhigh,yes,7
 claude-fable-5-1,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,bare,yes,3
 claude-3-opus-20240229,Anthropic,opus,Opus 3,,2024-02-29,bare,yes,34
@@ -390,7 +393,7 @@ claude-opus-4-6_max,Anthropic,opus,Opus 4.6,,2026-02-05,effort:max,yes,19
 claude-opus-4-6_120K,Anthropic,opus,Opus 4.6,,2026-02-05,token:120k,yes,2
 claude-opus-4-6_thinking,Anthropic,opus,Opus 4.6,,2026-02-05,thinking,yes,8
 claude-opus-4-6_high,Anthropic,opus,Opus 4.6,,2026-02-05,effort:high,yes,6
-claude-opus-4-6_none,Anthropic,opus,Opus 4.6,,2026-02-05,effort:none,yes,11
+claude-opus-4-6_none,Anthropic,opus,Opus 4.6,,2026-02-05,effort:none,yes,15
 claude-opus-4-6_low,Anthropic,opus,Opus 4.6,,2026-02-05,effort:low,yes,2
 claude-opus-4-6_medium,Anthropic,opus,Opus 4.6,,2026-02-05,effort:medium,yes,1
 claude-opus-4-6_32K,Anthropic,opus,Opus 4.6,,2026-02-05,token:32k,yes,2
@@ -401,7 +404,7 @@ claude-opus-4-7_high,Anthropic,opus,Opus 4.7,,2026-04-16,effort:high,yes,5
 claude-opus-4-7_low,Anthropic,opus,Opus 4.7,,2026-04-16,effort:low,yes,2
 claude-opus-4-7_medium,Anthropic,opus,Opus 4.7,,2026-04-16,effort:medium,yes,2
 claude-opus-4-7_thinking,Anthropic,opus,Opus 4.7,,2026-04-16,thinking,yes,5
-claude-opus-4-7_none,Anthropic,opus,Opus 4.7,,2026-04-16,effort:none,yes,4
+claude-opus-4-7_none,Anthropic,opus,Opus 4.7,,2026-04-16,effort:none,yes,8
 claude-opus-4-7_xhigh,Anthropic,opus,Opus 4.7,,2026-04-16,effort:xhigh,yes,4
 claude-opus-4-8_max,Anthropic,opus,Opus 4.8,,2026-05-28,effort:max,yes,19
 claude-opus-4-8_high,Anthropic,opus,Opus 4.8,,2026-05-28,effort:high,yes,7
@@ -410,18 +413,18 @@ claude-opus-4-8_medium,Anthropic,opus,Opus 4.8,,2026-05-28,effort:medium,yes,5
 claude-opus-4-8_thinking,Anthropic,opus,Opus 4.8,,2026-05-28,thinking,yes,5
 claude-opus-4-8,Anthropic,opus,Opus 4.8,,2026-05-28,bare,yes,4
 claude-opus-4-8_xhigh,Anthropic,opus,Opus 4.8,,2026-05-28,effort:xhigh,yes,5
-claude-opus-4-8_none,Anthropic,opus,Opus 4.8,,2026-05-28,effort:none,yes,7
+claude-opus-4-8_none,Anthropic,opus,Opus 4.8,,2026-05-28,effort:none,yes,16
 claude-opus-5_max,Anthropic,opus,Opus 5,,2026-07-24,effort:max,yes,22
 claude-opus-5_high,Anthropic,opus,Opus 5,,2026-07-24,effort:high,yes,8
 claude-opus-5_thinking,Anthropic,opus,Opus 5,,2026-07-24,thinking,yes,4
 claude-opus-5_low,Anthropic,opus,Opus 5,,2026-07-24,effort:low,yes,7
 claude-opus-5_medium,Anthropic,opus,Opus 5,,2026-07-24,effort:medium,yes,5
 claude-opus-5_xhigh,Anthropic,opus,Opus 5,,2026-07-24,effort:xhigh,yes,9
-claude-opus-5_none,Anthropic,opus,Opus 5,,2026-07-24,effort:none,yes,7
+claude-opus-5_none,Anthropic,opus,Opus 5,,2026-07-24,effort:none,yes,11
 claude-opus-5,Anthropic,opus,Opus 5,,2026-07-24,bare,yes,1
 claude-opus-5-5_max,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:max,yes,17
 claude-opus-5-5_xhigh,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:xhigh,yes,4
-claude-opus-5-5_medium,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:medium,yes,1
+claude-opus-5-5_medium,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:medium,yes,5
 claude-opus-5-5,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,bare,yes,1
 claude-3-sonnet-20240229,Anthropic,sonnet,Sonnet 3,,2024-02-29,bare,yes,23
 claude-3-5-sonnet-20240620,Anthropic,sonnet,Sonnet 3.5-Jun,,2024-06-20,bare,yes,29
@@ -462,22 +465,22 @@ claude-sonnet-4-5-20250929_12K,Anthropic,sonnet,Sonnet 4.5,,2025-09-29,token:12k
 claude-sonnet-4-6_high,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:high,yes,10
 claude-sonnet-4-6_max,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:max,yes,10
 claude-sonnet-4-6_thinking,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,thinking,yes,4
-claude-sonnet-4-6_none,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:none,yes,6
-claude-sonnet-4-6_low,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:low,yes,2
+claude-sonnet-4-6_none,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:none,yes,15
+claude-sonnet-4-6_low,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:low,yes,6
 claude-sonnet-4-6,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,bare,yes,1
 claude-sonnet-4-6_32K,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,token:32k,yes,1
 claude-sonnet-4-6_medium,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:medium,yes,4
 claude-sonnet-5_thinking,Anthropic,sonnet,Sonnet 5,,2026-06-30,thinking,yes,6
 claude-sonnet-5_high,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:high,yes,5
 claude-sonnet-5_max,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:max,yes,10
-claude-sonnet-5_low,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:low,yes,3
-claude-sonnet-5_medium,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:medium,yes,4
+claude-sonnet-5_low,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:low,yes,7
+claude-sonnet-5_medium,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:medium,yes,8
 claude-sonnet-5_xhigh,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:xhigh,yes,5
-claude-sonnet-5_none,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:none,yes,2
+claude-sonnet-5_none,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:none,yes,13
 claude-sonnet-5-5_max,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:max,yes,11
 claude-sonnet-5-5_medium,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:medium,yes,2
 claude-sonnet-5-5_high,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:high,yes,1
-claude-sonnet-5-5_low,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:low,yes,1
+claude-sonnet-5-5_low,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:low,yes,5
 claude-sonnet-5-5_xhigh,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:xhigh,yes,2
 deepseek-v4-flash_high,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:high,yes,2
 deepseek-v4-flash_max,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:max,yes,4
