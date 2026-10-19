@@ -2,6 +2,7 @@ benchmark,model_version,is_human,original_score,lower_bound,clipped_score,releas
 ARC AI2,opt-1.3b,False,0.232,0.25,0.25,2022-05-11,old/weak
 Furniture Assembly,qwen3.8-max-0902_xhigh,False,0.2,0.3,0.3,2026-09-01,frontier
 Furniture Assembly,grok-4.7_xhigh,False,0.2083333333333333,0.3,0.3,2026-09-21,frontier
+Furniture Assembly,mistral-large-4-0_high,False,0.2083333333333333,0.3,0.3,2026-10-06,frontier
 Furniture Assembly,kimi-k2.6_thinking,False,0.2166666666666666,0.3,0.3,2026-04-20,frontier
 Furniture Assembly,grok-4.5_high,False,0.225,0.3,0.3,2026-07-08,frontier
 Furniture Assembly,gemini-3.6-flash_high,False,0.2333333333333333,0.3,0.3,2026-07-21,frontier
@@ -51,6 +52,7 @@ Mystery Game Puzzles,MiniMax-M3_thinking,False,0.07,0.0922,0.0922,2026-06-01,fro
 Mystery Game Puzzles,claude-opus-4-6_low,False,0.07,0.0922,0.0922,2026-02-05,frontier
 Mystery Game Puzzles,gpt-4.1-mini-2025-04-14,False,0.07,0.0922,0.0922,2025-04-14,old/weak
 Mystery Game Puzzles,gpt-5.4-mini-2026-03-17_medium,False,0.07,0.0922,0.0922,2026-03-17,frontier
+Mystery Game Puzzles,gpt-6-luna_max,False,0.07,0.0922,0.0922,2026-09-22,frontier
 Mystery Game Puzzles,o3-mini-2025-01-31_high,False,0.07,0.0922,0.0922,2025-01-31,old/weak
 Mystery Game Puzzles,qwen3.6-27b_none,False,0.07,0.0922,0.0922,2026-04-22,frontier
 Mystery Game Puzzles,MiniMax-M3_none,False,0.08,0.0922,0.0922,2026-06-01,frontier

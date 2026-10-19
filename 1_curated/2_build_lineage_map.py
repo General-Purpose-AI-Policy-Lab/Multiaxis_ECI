@@ -422,6 +422,12 @@ def classify(mv, org):
     if 'meta' in ol or 'llama' in tl or 'muse-spark' in tl:
         # muse-spark 1 (2026-04-08) -> 1.1 (2026-07-09) -> 1.2 -> 1.3 ...: one node per
         # version read off the name, each version's effort rungs tied to it
+        if 'muse-spark-open' in tl:
+            # The open-weights Muse Spark (816B-A42B, 2026-10-15): a release of its own, not a
+            # snapshot of the hosted Muse Spark of 2026-04-08 (refresh of 2026-10-19). Its own
+            # line, so its effort rungs stay tied by the variant offsets.
+            return dict(vendor='Meta AI', chain='muse-spark-open', node='spark open',
+                        variant=variant(t), in_chain='yes')
         if 'muse-spark' in tl:
             mo = re.search(r'muse-spark-(\d+(?:\.\d+)?)', tl)
             node = f'spark {mo.group(1)}' if mo else 'spark 1'
@@ -485,7 +491,10 @@ def classify(mv, org):
                 # Any YYMM snapshot (the former list ended at 2508, so 2506, 2603 and
                 # 2604 fell onto the undated 'small-?' / 'medium-?' nodes of 2023-24).
                 mo = re.search(r'(?<!\d)(2[3-9][01]\d)(?!\d)', tl)
-                node = f'{line}-{mo.group(1)}' if mo else (f'{line}-2505' if 'medium 3' in tl else f'{line}-?')
+                # A major version named instead of a YYMM snapshot (mistral-large-4-0, 2026-10-06)
+                mv = re.search(rf'{line}-(\d+)-\d+(?:_|$)', tl)
+                node = (f'{line}-{mo.group(1)}' if mo else f'{line}-{mv.group(1)}' if mv
+                        else (f'{line}-2505' if 'medium 3' in tl else f'{line}-?'))
                 return dict(vendor='Mistral', chain=f'mistral-{line}', node=node, variant=v, in_chain='yes')
         if 'mistral-7b' in tl or re.search(r'mistral.*7b|7b.*mistral', tl):
             ver = 'v0.3' if 'v0.3' in tl else 'v0.2' if 'v0.2' in tl else 'v0.1'

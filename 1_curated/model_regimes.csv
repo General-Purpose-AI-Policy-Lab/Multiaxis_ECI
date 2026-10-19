@@ -104,6 +104,8 @@ Mixtral-8x22B-Instruct-v0.1,non-reasoning,default,no reasoning evidence
 Mixtral-8x22B-v0.1,non-reasoning,default,no reasoning evidence
 Mixtral-8x7B-Instruct-v0.1,non-reasoning,default,no reasoning evidence
 Mixtral-8x7B-v0.1,non-reasoning,default,no reasoning evidence
+Muse-Spark-Open-816B-A42B,undetermined,default,bare run of a hybrid release
+Muse-Spark-Open-816B-A42B_xhigh,reasoning,on,run mode on
 Nemotron-4 15B,non-reasoning,default,no reasoning evidence
 PaLM 2-L,non-reasoning,default,no reasoning evidence
 PaLM 2-M,non-reasoning,default,no reasoning evidence
@@ -218,12 +220,17 @@ claude-haiku-4-5-20251001_low,reasoning,on,run mode on
 claude-haiku-4-5-20251001_none,non-reasoning,off,non-reasoning pattern
 claude-haiku-4-5-20251001_thinking,reasoning,on,run mode on
 claude-haiku-4-5-20251001_xhigh,reasoning,on,run mode on
+claude-haiku-5-5,undetermined,default,bare run of a hybrid release
+claude-haiku-5-5_high,reasoning,on,run mode on
 claude-haiku-5-5_low,reasoning,on,run mode on
 claude-haiku-5-5_max,reasoning,on,run mode on
+claude-haiku-5-5_medium,reasoning,on,run mode on
 claude-haiku-5-5_none,non-reasoning,off,non-reasoning pattern
+claude-haiku-5-5_xhigh,reasoning,on,run mode on
 claude-instant-1.1,non-reasoning,off,non-reasoning pattern
 claude-instant-1.2,non-reasoning,off,non-reasoning pattern
 claude-mythos-5,reasoning,default,pattern 'claude-mythos'
+claude-mythos-5-1,reasoning,default,pattern 'claude-mythos'
 claude-mythos-preview,reasoning,default,pattern 'claude-mythos'
 claude-mythos-preview-early,reasoning,default,pattern 'claude-mythos'
 claude-opus-4-1-20250805,undetermined,default,bare run of a hybrid release
@@ -282,8 +289,11 @@ claude-opus-4-8_thinking,reasoning,on,run mode on
 claude-opus-4-8_xhigh,reasoning,on,run mode on
 claude-opus-5,undetermined,default,bare run of a hybrid release
 claude-opus-5-5,undetermined,default,bare run of a hybrid release
+claude-opus-5-5_high,reasoning,on,run mode on
+claude-opus-5-5_low,reasoning,on,run mode on
 claude-opus-5-5_max,reasoning,on,run mode on
 claude-opus-5-5_medium,reasoning,on,run mode on
+claude-opus-5-5_thinking,reasoning,on,run mode on
 claude-opus-5-5_xhigh,reasoning,on,run mode on
 claude-opus-5_high,reasoning,on,run mode on
 claude-opus-5_low,reasoning,on,run mode on
@@ -322,6 +332,8 @@ claude-sonnet-4-6_max,reasoning,on,run mode on
 claude-sonnet-4-6_medium,reasoning,on,run mode on
 claude-sonnet-4-6_none,non-reasoning,off,non-reasoning pattern
 claude-sonnet-4-6_thinking,reasoning,on,run mode on
+claude-sonnet-5,undetermined,default,bare run of a hybrid release
+claude-sonnet-5-5,undetermined,default,bare run of a hybrid release
 claude-sonnet-5-5_high,reasoning,on,run mode on
 claude-sonnet-5-5_low,reasoning,on,run mode on
 claude-sonnet-5-5_max,reasoning,on,run mode on
@@ -370,9 +382,11 @@ deepseek-v4-pro_high,reasoning,on,run mode on
 deepseek-v4-pro_max,reasoning,on,run mode on
 deepseek-v4-pro_none,non-reasoning,off,non-reasoning pattern
 deepseek-v4-pro_xhigh,reasoning,on,run mode on
-deepseek-v4.1-flash,reasoning,default,a run of the release thinks
+deepseek-v4.1-flash,undetermined,default,bare run of a hybrid release
 deepseek-v4.1-flash_high,reasoning,on,run mode on
+deepseek-v4.1-flash_low,reasoning,on,run mode on
 deepseek-v4.1-flash_max,reasoning,on,run mode on
+deepseek-v4.1-flash_none,non-reasoning,off,non-reasoning pattern
 devstral-small-2512,non-reasoning,default,no reasoning evidence
 dolly-v2-12b,non-reasoning,default,no reasoning evidence
 falcon-11b,non-reasoning,default,no reasoning evidence
@@ -473,6 +487,9 @@ gemini-3.8-flash,reasoning,default,a run of the release thinks
 gemini-3.8-flash_high,reasoning,on,run mode on
 gemini-3.8-flash_low,reasoning,on,run mode on
 gemini-3.8-flash_medium,reasoning,on,run mode on
+gemini-4-argon,reasoning,default,a run of the release thinks
+gemini-4-argon_high,reasoning,on,run mode on
+gemini-4-argon_medium,reasoning,on,run mode on
 gemini-exp-1206,non-reasoning,default,no reasoning evidence
 gemini-robotics-er-1.5-preview,reasoning,default,pattern 'gemini-robotics-er'
 gemini-robotics-er-1.6-preview,reasoning,default,pattern 'gemini-robotics-er'
@@ -517,7 +534,10 @@ glm-5.2_minimal,non-reasoning,off,run mode off
 glm-5.2_none,non-reasoning,off,non-reasoning pattern
 glm-5.2_xhigh,reasoning,on,run mode on
 glm-5.3,reasoning,default,a run of the release thinks
+glm-5.3-flash_high,reasoning,on,run mode on
+glm-5.3-flash_low,reasoning,on,run mode on
 glm-5.3-flash_max,reasoning,on,run mode on
+glm-5.3_low,reasoning,on,run mode on
 glm-5.3_max,reasoning,on,run mode on
 glm-5_high,reasoning,on,run mode on
 glm-5_thinking,reasoning,on,run mode on
@@ -595,6 +615,7 @@ gpt-5.4-2026-03-05_low,reasoning,on,run mode on
 gpt-5.4-2026-03-05_medium,reasoning,on,run mode on
 gpt-5.4-2026-03-05_none,non-reasoning,off,non-reasoning pattern
 gpt-5.4-2026-03-05_xhigh,reasoning,on,run mode on
+gpt-5.4-mini-2026-03-17,undetermined,default,bare run of a hybrid release
 gpt-5.4-mini-2026-03-17_high,reasoning,on,run mode on
 gpt-5.4-mini-2026-03-17_low,reasoning,on,run mode on
 gpt-5.4-mini-2026-03-17_medium,reasoning,on,run mode on
@@ -666,6 +687,7 @@ gpt-6-sol_max,reasoning,on,run mode on
 gpt-6-sol_medium,reasoning,on,run mode on
 gpt-6-sol_none,non-reasoning,off,non-reasoning pattern
 gpt-6-sol_xhigh,reasoning,on,run mode on
+gpt-6.1-sol,reasoning,default,a run of the release thinks
 gpt-6.1-sol_high,reasoning,on,run mode on
 gpt-6.1-sol_low,reasoning,on,run mode on
 gpt-6.1-sol_max,reasoning,on,run mode on
@@ -674,6 +696,7 @@ gpt-6.1-sol_xhigh,reasoning,on,run mode on
 gpt-j-6b,non-reasoning,default,no reasoning evidence
 gpt-neo-2.7B,non-reasoning,default,no reasoning evidence
 gpt-neox-20b,non-reasoning,default,no reasoning evidence
+gpt-oss-120b,reasoning,default,a run of the release thinks
 gpt-oss-120b_high,reasoning,on,run mode on
 gpt-oss-120b_low,reasoning,on,run mode on
 gpt-oss-120b_medium,reasoning,on,run mode on
@@ -722,6 +745,9 @@ grok-4.6_low,reasoning,on,run mode on
 grok-4.6_medium,reasoning,on,run mode on
 grok-4.6_xhigh,reasoning,on,run mode on
 grok-4.7,reasoning,default,a run of the release thinks
+grok-4.7_high,reasoning,on,run mode on
+grok-4.7_low,reasoning,on,run mode on
+grok-4.7_medium,reasoning,on,run mode on
 grok-4.7_xhigh,reasoning,on,run mode on
 grok-build-0.1,reasoning,default,pattern 'grok-build'
 grok-code-fast-1,reasoning,default,pattern 'grok-code-fast'
@@ -750,6 +776,7 @@ kimi-k3_max,reasoning,on,run mode on
 kimi-k3_none,non-reasoning,off,non-reasoning pattern
 laguna-m.1,reasoning,default,pattern 'laguna'
 laguna-xs.2,reasoning,default,pattern 'laguna'
+launa-omni-1,non-reasoning,default,no reasoning evidence
 magistral-medium-2506,undetermined,default,bare run of a hybrid release
 magistral-medium-2506_thinking,reasoning,on,run mode on
 magistral-medium-2509,reasoning,default,pattern 'magistral'
@@ -763,12 +790,16 @@ mimo-v2-pro_high,reasoning,on,run mode on
 mimo-v2.5,reasoning,default,pattern 'mimo-v2'
 mimo-v2.5-pro,undetermined,default,bare run of a hybrid release
 mimo-v2.5-pro_thinking,reasoning,on,run mode on
+mimo-v2.6-flash,reasoning,default,pattern 'mimo-v2'
+mimo-v2.6-pro,reasoning,default,pattern 'mimo-v2'
 ministral-3b-2410,non-reasoning,default,no reasoning evidence
 ministral-8b-2410,non-reasoning,default,no reasoning evidence
 mistral-large-2402,non-reasoning,default,no reasoning evidence
 mistral-large-2407,non-reasoning,default,no reasoning evidence
 mistral-large-2411,non-reasoning,default,no reasoning evidence
 mistral-large-2512,non-reasoning,default,no reasoning evidence
+mistral-large-4-0,reasoning,default,a run of the release thinks
+mistral-large-4-0_high,reasoning,on,run mode on
 mistral-medium-2312,non-reasoning,default,no reasoning evidence
 mistral-medium-2505,non-reasoning,default,no reasoning evidence
 mistral-medium-2508,non-reasoning,default,no reasoning evidence
@@ -785,6 +816,7 @@ ml-elephant,non-reasoning,default,no reasoning evidence
 mpt-30b,non-reasoning,default,no reasoning evidence
 mpt-30b-instruct,non-reasoning,default,no reasoning evidence
 mpt-7b,non-reasoning,default,no reasoning evidence
+muse-glimmer_high,reasoning,on,run mode on
 muse-spark,undetermined,default,config.REGIME_IGNORED
 muse-spark-1.1,undetermined,default,bare run of a hybrid release
 muse-spark-1.1_high,reasoning,on,run mode on
@@ -798,6 +830,9 @@ muse-spark-1.3_max,reasoning,on,run mode on
 muse-spark-1.3_xhigh,reasoning,on,run mode on
 muse-spark_max,reasoning,on,run mode on
 muse-spark_thinking,reasoning,on,run mode on
+muse-wonder-1.0,reasoning,default,a run of the release thinks
+muse-wonder-1.0_max,reasoning,on,run mode on
+muse-wonder-1.0_xhigh,reasoning,on,run mode on
 nemotron-3-super,reasoning,default,pattern 'nemotron-3'
 nemotron-3-ultra,undetermined,default,bare run of a hybrid release
 nemotron-3-ultra_thinking,reasoning,on,run mode on
