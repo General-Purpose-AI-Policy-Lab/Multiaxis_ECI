@@ -1,0 +1,18 @@
+{
+  "n_obs": 5274,
+  "n_nonzero_score": 5191,
+  "n_zero_score": 83,
+  "n_one_score": 21,
+  "zero_diag_threshold": 0.005,
+  "rmse": 0.0459514848061465,
+  "mae": 0.03092419453263078,
+  "bayesian_r2": 0.9612332192059713,
+  "ks_stat": 0.05548478100626755,
+  "ks_p": 2.6194546526595403e-12,
+  "pit_mean": 0.5083305814115363,
+  "pit_var": 0.06783270327506058,
+  "pit_kind": "loo",
+  "pit_n": 4435,
+  "pit_n_pareto_k_high": 735,
+  "zero_pred_below_threshold": 0.579644578313253
+}
