@@ -127,6 +127,23 @@ closed frontier, and in the all-benchmarks scope, where nothing precedes it, dat
 (a record that needs this in more than two thirds of the draws is left out:
 `analysis.frontier_gap.MAX_DATED_BACK_FRAC`). In a class, an open record counts only
 within `RECORD_FRONTIER_TOL` (5) ECI-H of the open record of its date on all benchmarks.
+`--frontier-k` (default `FRONTIER_K`, 2) reads the running top-k of both groups against each
+other: the open points are the records and their runners-up, each read against the first date
+the closed second-best stood at or above it, and the trend lines run through those points
+(1: the records against the first closed model above, Ihle's reading; the top-2 doubles the
+points and narrows every interval by a quarter, user decision 2026-10-20). A record needs
+`--record-min-obs` scores (default `RECORD_MIN_OBS`, 2, the candidate rule;
+3 drops the two-score lucky medians but empties the private scope, and the same rule has to
+hold on every scope for them to compare).
+Closed candidates whose posterior SD exceeds `LEADER_SD_CAP` (6 ECI-H: two-score releases
+of 2019-2023) date no crossing; each record's lag is reported as its posterior mean (the
+dot) and median. The same lag is also read as a function of calendar time, every month,
+from the two per-draw frontiers (`lag_function`: the open frontier of the month against
+the first closed model at or above it; a sawtooth whose minima are the record lags), and
+its twelve-month trailing mean is a row of the table (`lag_12m_mean`, the lag on an average
+day of the past year: larger than the mean of the record lags when records are sparse).
+The curve of the months-behind figures is the 6-month Gaussian kernel through the per-draw
+record lags.
 One trend line per group through its records (`--top-k`, default 1) released since
 `--fit-start` (default `2024-10-01`), and the lag it implies today, gap over the closed
 slope. `--group country` compares US and CN instead; `--results-dir DIR`

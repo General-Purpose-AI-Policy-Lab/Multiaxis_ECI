@@ -2,10 +2,11 @@
 French and in English (`lang`), in the lab's house style (navy ink, 11 pt body, a solid date axis with outward ticks and no label, no
 vertical axis, horizontal grid only, text written on the curves with a white halo, a handful of
 well-known models named, the lab's marks in the corners). Same data as `frontier_gap.lag_fig`:
-one dot per follower record (open-weights models, or Chinese models with `group="country"`) with its
-50% interval, one smoothed curve per access scope with its 80% band, from 2024 (`GAP_START`) on an
-axis cut at 20 months (`LAG_Y_MAX`). Dots that overlap share one disc split into sectors, one per
-colour. The interactive twin stays the Plotly figure.
+one dot per follower record (open-weights models, or Chinese models with `group="country"`), the
+posterior mean of its lag with its 50% interval, one smoothed curve per access scope with its 80%
+band (`frontier_gap._lag_curve`, a 6-month Gaussian kernel through the per-draw record lags), from
+2024 (`GAP_START`) on an axis cut at 20 months (`LAG_Y_MAX`). Dots that overlap share one disc
+split into sectors, one per colour. The interactive twin stays the Plotly figure.
 
 What one adjusts (texts, colours, named models and their offsets, sizes) is a named constant below.
 """
@@ -178,11 +179,11 @@ def lag_fig_print(results: dict, scopes: list[str], *, today=None, counts: dict 
             ax.fill_between(grid_d, lo, hi, color=col, alpha=BANDE_ALPHA, lw=0, zorder=1)
             ax.plot(grid_d, med, color=col, lw=COURBE_LW, zorder=3, solid_capstyle="round")
             df = results[s].lag_df
-            df = df[df["lag_months_median"].notna() & (df["release_date"] >= w0)]
+            df = df[df["lag_months_mean"].notna() & (df["release_date"] >= w0)]
             ax.vlines(df["release_date"], df["lag_hdi50_low"], df["lag_hdi50_high"], color=col,
                       lw=BARRE_LW, alpha=BARRE_ALPHA, zorder=2)
             dots += [(pd.Timestamp(d), float(v), col)
-                     for d, v in zip(df["release_date"], df["lag_months_median"])]
+                     for d, v in zip(df["release_date"], df["lag_months_mean"])]
             inside = (pd.DatetimeIndex(grid_d) >= w0)
             lows += [np.nanmin(lo[inside]), float(df["lag_hdi50_low"].min())]
             highs += [np.nanmax(hi[inside]), float(df["lag_hdi50_high"].max())]
@@ -223,8 +224,8 @@ def lag_fig_print(results: dict, scopes: list[str], *, today=None, counts: dict 
         # A few well-known records named beside their dot
         df = results[label_scope].lag_df.set_index("name")
         for key, (text, (dx, dy), ha, va) in MODELES.get(group, {}).items():
-            if key in df.index and np.isfinite(df.at[key, "lag_months_median"]):
-                ax.annotate(text, (df.at[key, "release_date"], df.at[key, "lag_months_median"]),
+            if key in df.index and np.isfinite(df.at[key, "lag_months_mean"]):
+                ax.annotate(text, (df.at[key, "release_date"], df.at[key, "lag_months_mean"]),
                             xytext=(dx, dy), textcoords="offset points", ha=ha, va=va,
                             fontsize="x-small", color=ENCRE, path_effects=HALO, zorder=7)
 

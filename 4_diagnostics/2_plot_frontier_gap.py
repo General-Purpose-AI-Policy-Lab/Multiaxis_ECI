@@ -55,9 +55,13 @@ TABLE_ROWS = [
     ("envelope_lag_latest_record", None, "Lag of the latest {follower_n} record", "months", False),
     ("envelope_lag_last_12m_mean", None, "Mean lag of the last 12 months' {follower_n} records",
      "months", False),
+    ("lag_12m_mean", None, "Mean lag over the last 12 months, {follower_n} frontier to {leader_n} frontier",
+     "months", False),
 ]
 # Per-draw arrays behind each table row, for the differences against the all-benchmarks scope.
-DRAWS = {"slope_leader": lambda r: r.leader.fit.b if r.leader.fit else None,
+DRAWS = {"lag_12m_mean": lambda r: (r.lag_fn_mean[:, -1] if r.lag_fn_mean.size
+                                    and np.isfinite(r.lag_fn_mean[:, -1]).any() else None),
+         "slope_leader": lambda r: r.leader.fit.b if r.leader.fit else None,
          "slope_follower": lambda r: r.follower.fit.b if r.follower.fit else None,
          "slope_diff": lambda r: r.line.get("slope_diff"),
          "gap_today": lambda r: r.line.get("gap_eci"),
@@ -116,9 +120,12 @@ def markdown_table(df: pd.DataFrame) -> str:
     return "\n".join(lines) + "\n"
 
 
-# The displayed table: the lags in months only, headline first, one column per scope and no
-# differences between scopes. The long CSV keeps every quantity and every difference.
+# The displayed table: the lags in months only, headline first (the records' mean lag, the
+# figure's own reading; then the lag on an average day of the last twelve months, frontier to
+# frontier, of which the record lags are the minima), one column per scope and no differences
+# between scopes. The long CSV keeps every quantity and every difference.
 SHOWN_ROWS = [("envelope_lag_last_12m_mean", "Mean lag of the last 12 months' {follower_n} records"),
+              ("lag_12m_mean", "Mean lag over the last 12 months, {follower_n} frontier to {leader_n} frontier"),
               ("envelope_lag_latest_record", "Lag of the latest {follower_n} record"),
               ("lag_today", "Lag today on the trend lines (gap / {leader_n} slope)")]
 

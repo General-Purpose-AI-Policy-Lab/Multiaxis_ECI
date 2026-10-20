@@ -34,9 +34,13 @@ sys.path.insert(0, str(ROOT / "2_model"))
 from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis.frontier_gap import (  # noqa: E402
     GROUP_PAIRS,
+    FRONTIER_K,
     GROUP_TITLES,
+    LAG_MEAN_MONTHS,
+    LEADER_SD_CAP,
     LINE_TOP_K,
     LINK_MIN_OBS,
+    RECORD_MIN_OBS,
     LINK_ORGANIZATIONS,
     RECORD_FRONTIER_TOL,
     SCOPES,
@@ -122,9 +126,13 @@ def reference_frontiers(ref_dir: Path, args, model_dates: pd.Series, n_draws: in
         & (mini.n_obs_per_model >= args.min_obs)
     names = mini.mlookup.sort_values("model_idx")["model"].tolist()
     labels = group_labels(args.group, names)
+    leader = GROUP_PAIRS[args.group][0]
     return tuple(build_group_frontier(E, names, model_dates,
                                       keep & np.array([labels.get(m) == g for m in names]), g,
-                                      fit_start=args.fit_start, top_k=args.top_k)
+                                      fit_start=args.fit_start, top_k=args.top_k,
+                                      env_sd_cap=LEADER_SD_CAP if g == leader else None,
+                                      n_obs=mini.n_obs_per_model, record_min_obs=args.record_min_obs,
+                                      frontier_k=args.frontier_k)
                  for g in GROUP_PAIRS[args.group])
 
 
@@ -150,6 +158,14 @@ def main():
     ap.add_argument("--top-k", type=int, default=LINE_TOP_K,
                     help="a release joins the trend fit when it is in the running top-k of "
                          f"medians at its date (default {LINE_TOP_K}: the records)")
+    ap.add_argument("--record-min-obs", type=int, default=RECORD_MIN_OBS,
+                    help="a candidate needs at least this many scores in the scope to be a record "
+                         f"(default {RECORD_MIN_OBS}, the candidate rule; 3 drops the lucky medians "
+                         "but empties the private scope, and one rule must hold for every scope)")
+    ap.add_argument("--frontier-k", type=int, default=FRONTIER_K,
+                    help="read the running top-k of both groups against each other (default "
+                         f"{FRONTIER_K}: records and runners-up against the leader's second-best; "
+                         "1: records against the first leader model above, Ihle's reading)")
     ap.add_argument("--min-obs", type=int, default=2,
                     help="a candidate needs at least this many scores in the scope (default 2: "
                          "the K=1 reading of the K-axis coverage rule, one benchmark alone is "
@@ -203,9 +219,12 @@ def main():
         ref_leader, ref_follower = reference_frontiers(ref_dir, args, model_dates)
         print(f"  crossings before the class's first measured day read off the {ref_leader.label} "
               f"frontier of {ref_dir.name} ({len(ref_leader.tl)} candidates)")
+    # One record rule for every scope (RECORD_MIN_OBS), or the scopes stop comparing.
+    record_min_obs = args.record_min_obs
     res = scope_gap(E, mini, model_dates, keep, scope=args.access, kind=args.group,
                     fit_start=args.fit_start, top_k=args.top_k, today=args.today,
-                    reference=ref_leader, reference_follower=ref_follower)
+                    reference=ref_leader, reference_follower=ref_follower,
+                    record_min_obs=record_min_obs, frontier_k=args.frontier_k)
     if res.off_frontier:
         print(f"  {res.follower.label} running maxima not counted as records (more than "
               f"{RECORD_FRONTIER_TOL:g} ECI-H under the {res.follower.label} record of their date on "
@@ -238,10 +257,19 @@ def main():
               + (f", slope {np.median(g.fit.b):+.1f} ECI-H/yr" if g.fit is not None else ", no line"))
     pd.set_option("display.width", 200)
     print(res.summary.round(2).to_string(index=False))
-    print("\n  envelope lag per record (months behind, median [50%]):")
+    n_env = len(res.leader.env_names)
+    print(f"\n  crossings dated by {n_env} of the {len(res.leader.tl)} {res.leader.label} candidates "
+          f"(posterior SD at most {LEADER_SD_CAP:g} ECI-H)")
+    if res.lag_fn_mean.size and np.isfinite(res.lag_fn_mean[:, -1]).any():
+        m = res.lag_fn_mean[:, -1]
+        print(f"  months behind on an average day of the last {LAG_MEAN_MONTHS} months "
+              f"(to {res.lag_grid[-1]:%Y-%m}): {np.nanmedian(m):.1f} "
+              f"[{np.nanpercentile(m, 10):.1f}, {np.nanpercentile(m, 90):.1f}]")
+    print("  envelope lag per record (months behind: posterior mean, median [50%]):")
     for _, r in res.lag_df.iterrows():
         print(f"    {r['release_date']:%Y-%m-%d}  {r['name']:<40s} ECI-H {r['level_eci_median']:6.1f}  "
-              f"{r['lag_months_median']:5.1f} [{r['lag_hdi50_low']:5.1f}, {r['lag_hdi50_high']:5.1f}]"
+              f"mean {r['lag_months_mean']:5.1f}  {r['lag_months_median']:5.1f} "
+              f"[{r['lag_hdi50_low']:5.1f}, {r['lag_hdi50_high']:5.1f}]"
               + (f"  undefined in {r['frac_undefined']:.0%} of draws" if r['frac_undefined'] > 0.05 else ""))
 
 

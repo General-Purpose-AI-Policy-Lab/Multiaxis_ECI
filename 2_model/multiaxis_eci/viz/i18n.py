@@ -43,6 +43,8 @@ def _frontier_gap_entries() -> tuple[list[tuple[str, str]], list[tuple[str, str]
              f"Mois de retard sur la frontière des {lp}, médiane [intervalle à 80 %]"),
             (f"Release date of the {fn} record", f"Date de sortie du record des {fp}"),
             # The summary table's rows
+            (f"Mean lag over the last 12 months, {fn} frontier to {ln} frontier",
+             f"Retard moyen des 12 derniers mois, de la frontière des {fp} à celle des {lp}"),
             (f"Mean lag of the last 12 months' {fn} records",
              f"Retard moyen des records des {fp} des 12 derniers mois"),
             (f"Lag of the latest {fn} record", f"Retard du dernier record des {fp}"),
