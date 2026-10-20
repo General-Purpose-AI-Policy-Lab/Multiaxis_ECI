@@ -95,8 +95,12 @@ texput.log
 # Per-fit run logs
 5_outputs/**/*.log
 
-# Agent tooling
-.claude/
+# Agent tooling: local settings stay out, the repository's procedures (.claude/skills/,
+# e.g. data-refresh) are shared. `!.claude/` re-includes the folder a global excludes file
+# may ignore.
+!.claude/
+.claude/*
+!.claude/skills/
 
 # Local environment and scratch
 .venv/

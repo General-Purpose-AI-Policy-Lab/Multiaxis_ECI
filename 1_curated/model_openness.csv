@@ -104,8 +104,8 @@ Mixtral-8x22B-Instruct-v0.1,open,epoch:Open weights (unrestricted)
 Mixtral-8x22B-v0.1,open,epoch:Open weights (unrestricted)
 Mixtral-8x7B-Instruct-v0.1,open,epoch:Open weights (unrestricted)
 Mixtral-8x7B-v0.1,open,epoch:Open weights (unrestricted)
-Muse-Spark-Open-816B-A42B,unknown,
-Muse-Spark-Open-816B-A42B_xhigh,unknown,
+Muse-Spark-Open-816B-A42B,open,family:Muse-Spark-Open-816B-A42B_xhigh
+Muse-Spark-Open-816B-A42B_xhigh,open,epoch:Open weights (restricted use)
 Nemotron-4 15B,closed,epoch:Unreleased
 PaLM 2-L,closed,override
 PaLM 2-M,closed,override
@@ -220,17 +220,17 @@ claude-haiku-4-5-20251001_low,closed,epoch:API access
 claude-haiku-4-5-20251001_none,closed,epoch:API access
 claude-haiku-4-5-20251001_thinking,closed,epoch:API access
 claude-haiku-4-5-20251001_xhigh,closed,family:claude-haiku-4-5-20251001
-claude-haiku-5-5,unknown,
-claude-haiku-5-5_high,unknown,
-claude-haiku-5-5_low,unknown,
-claude-haiku-5-5_max,unknown,
-claude-haiku-5-5_medium,unknown,
-claude-haiku-5-5_none,unknown,
-claude-haiku-5-5_xhigh,unknown,
+claude-haiku-5-5,closed,epoch:API access
+claude-haiku-5-5_high,closed,epoch:API access
+claude-haiku-5-5_low,closed,epoch:API access
+claude-haiku-5-5_max,closed,epoch:API access
+claude-haiku-5-5_medium,closed,epoch:API access
+claude-haiku-5-5_none,closed,family:claude-haiku-5-5_high
+claude-haiku-5-5_xhigh,closed,epoch:API access
 claude-instant-1.1,closed,epoch:API access
 claude-instant-1.2,closed,epoch:API access
 claude-mythos-5,closed,override
-claude-mythos-5-1,unknown,
+claude-mythos-5-1,closed,override
 claude-mythos-preview,closed,override
 claude-mythos-preview-early,closed,override
 claude-opus-4-1-20250805,closed,epoch:API access
@@ -288,12 +288,12 @@ claude-opus-4-8_none,closed,epoch:API access
 claude-opus-4-8_thinking,closed,epoch:API access
 claude-opus-4-8_xhigh,closed,epoch:API access
 claude-opus-5,closed,epoch:API access
-claude-opus-5-5,closed,family:claude-opus-5-5_max
-claude-opus-5-5_high,closed,family:claude-opus-5-5_max
-claude-opus-5-5_low,closed,family:claude-opus-5-5_max
+claude-opus-5-5,closed,family:claude-opus-5-5_high
+claude-opus-5-5_high,closed,epoch:API access
+claude-opus-5-5_low,closed,epoch:API access
 claude-opus-5-5_max,closed,epoch:API access
 claude-opus-5-5_medium,closed,epoch:API access
-claude-opus-5-5_thinking,closed,family:claude-opus-5-5_max
+claude-opus-5-5_thinking,closed,epoch:API access
 claude-opus-5-5_xhigh,closed,epoch:API access
 claude-opus-5_high,closed,epoch:API access
 claude-opus-5_low,closed,epoch:API access
@@ -333,7 +333,7 @@ claude-sonnet-4-6_medium,closed,epoch:API access
 claude-sonnet-4-6_none,closed,epoch:API access
 claude-sonnet-4-6_thinking,closed,epoch:API access
 claude-sonnet-5,closed,epoch:API access
-claude-sonnet-5-5,closed,family:claude-sonnet-5-5_high
+claude-sonnet-5-5,closed,epoch:API access
 claude-sonnet-5-5_high,closed,epoch:API access
 claude-sonnet-5-5_low,closed,epoch:API access
 claude-sonnet-5-5_max,closed,epoch:API access
@@ -348,7 +348,7 @@ claude-sonnet-5_thinking,closed,epoch:API access
 claude-sonnet-5_xhigh,closed,epoch:API access
 code-davinci-002,closed,epoch:API access
 codestral-2501,closed,override
-codex-mini-2025-05-16_medium,unknown,
+codex-mini-2025-05-16_medium,closed,override
 cogito-671b-v2.1,open,epoch:Open weights (unrestricted)
 command-a-plus-05-2026,open,epoch:Open weights (unrestricted)
 computer-use-preview-2025-03-11,closed,override
@@ -384,9 +384,9 @@ deepseek-v4-pro_none,open,epoch:Open weights (unrestricted)
 deepseek-v4-pro_xhigh,open,family:deepseek-v4-pro_high
 deepseek-v4.1-flash,open,epoch:Open weights (unrestricted)
 deepseek-v4.1-flash_high,open,epoch:Open weights (unrestricted)
-deepseek-v4.1-flash_low,open,family:deepseek-v4.1-flash_high
+deepseek-v4.1-flash_low,open,epoch:Open weights (unrestricted)
 deepseek-v4.1-flash_max,open,epoch:Open weights (unrestricted)
-deepseek-v4.1-flash_none,open,family:deepseek-v4.1-flash_high
+deepseek-v4.1-flash_none,open,epoch:Open weights (unrestricted)
 devstral-small-2512,open,epoch:Open weights (unrestricted)
 dolly-v2-12b,open,epoch:Open weights (unrestricted)
 falcon-11b,open,epoch:Open weights (restricted use)
@@ -487,9 +487,9 @@ gemini-3.8-flash,closed,epoch:API access
 gemini-3.8-flash_high,closed,epoch:API access
 gemini-3.8-flash_low,closed,epoch:API access
 gemini-3.8-flash_medium,closed,epoch:API access
-gemini-4-argon,unknown,
-gemini-4-argon_high,unknown,
-gemini-4-argon_medium,unknown,
+gemini-4-argon,closed,epoch:Limited access
+gemini-4-argon_high,closed,epoch:Limited access
+gemini-4-argon_medium,closed,epoch:Limited access
 gemini-exp-1206,closed,epoch:API access
 gemini-robotics-er-1.5-preview,closed,override
 gemini-robotics-er-1.6-preview,closed,epoch:API access
@@ -535,9 +535,9 @@ glm-5.2_none,open,epoch:Open weights (unrestricted)
 glm-5.2_xhigh,open,family:glm-5.2_high
 glm-5.3,open,override
 glm-5.3-flash_high,open,epoch:Open weights (unrestricted)
-glm-5.3-flash_low,open,family:glm-5.3-flash_high
+glm-5.3-flash_low,open,epoch:Open weights (unrestricted)
 glm-5.3-flash_max,open,epoch:Open weights (unrestricted)
-glm-5.3_low,open,family:glm-5.3_max
+glm-5.3_low,open,epoch:Open weights (restricted use)
 glm-5.3_max,open,override
 glm-5_high,open,family:glm-5
 glm-5_thinking,open,epoch:Open weights (unrestricted)
@@ -744,7 +744,7 @@ grok-4.6_high,closed,epoch:API access
 grok-4.6_low,closed,epoch:API access
 grok-4.6_medium,closed,epoch:API access
 grok-4.6_xhigh,closed,epoch:API access
-grok-4.7,closed,family:grok-4.7_high
+grok-4.7,closed,epoch:API access
 grok-4.7_high,closed,epoch:API access
 grok-4.7_low,closed,epoch:API access
 grok-4.7_medium,closed,epoch:API access
@@ -776,7 +776,7 @@ kimi-k3_max,open,epoch:Open weights (non-commercial)
 kimi-k3_none,open,epoch:Open weights (non-commercial)
 laguna-m.1,open,override
 laguna-xs.2,open,epoch:Open weights (unrestricted)
-launa-omni-1,unknown,
+launa-omni-1,closed,override
 magistral-medium-2506,closed,epoch:API access
 magistral-medium-2506_thinking,closed,epoch:API access
 magistral-medium-2509,closed,epoch:API access
@@ -790,16 +790,16 @@ mimo-v2-pro_high,closed,epoch:API access
 mimo-v2.5,open,epoch:Open weights (unrestricted)
 mimo-v2.5-pro,open,epoch:Open weights (unrestricted)
 mimo-v2.5-pro_thinking,open,epoch:Open weights (unrestricted)
-mimo-v2.6-flash,unknown,
-mimo-v2.6-pro,unknown,
+mimo-v2.6-flash,open,override
+mimo-v2.6-pro,open,override
 ministral-3b-2410,closed,epoch:API access
 ministral-8b-2410,open,epoch:Open weights (non-commercial)
 mistral-large-2402,closed,epoch:API access
 mistral-large-2407,open,epoch:Open weights (non-commercial)
 mistral-large-2411,open,epoch:Open weights (non-commercial)
 mistral-large-2512,open,epoch:Open weights (unrestricted)
-mistral-large-4-0,unknown,
-mistral-large-4-0_high,unknown,
+mistral-large-4-0,closed,override
+mistral-large-4-0_high,closed,family:mistral-large-4-0
 mistral-medium-2312,closed,epoch:API access
 mistral-medium-2505,closed,epoch:API access
 mistral-medium-2508,closed,epoch:API access
@@ -812,11 +812,11 @@ mistral-small-2603,open,epoch:Open weights (unrestricted)
 mistral-small-3-2501,open,epoch:Open weights (unrestricted)
 mistral-small-3.1-2503,open,epoch:Open weights (unrestricted)
 mistral-small-3.2-2506,open,epoch:Open weights (unrestricted)
-ml-elephant,unknown,
+ml-elephant,closed,override
 mpt-30b,open,epoch:Open weights (unrestricted)
 mpt-30b-instruct,open,epoch:Open weights (unrestricted)
 mpt-7b,open,epoch:Open weights (unrestricted)
-muse-glimmer_high,unknown,
+muse-glimmer_high,open,epoch:Open weights (unrestricted)
 muse-spark,closed,epoch:API access
 muse-spark-1.1,closed,epoch:API access
 muse-spark-1.1_high,closed,epoch:API access
@@ -830,9 +830,9 @@ muse-spark-1.3_max,closed,epoch:API access
 muse-spark-1.3_xhigh,closed,epoch:API access
 muse-spark_max,closed,family:muse-spark
 muse-spark_thinking,closed,family:muse-spark
-muse-wonder-1.0,unknown,
-muse-wonder-1.0_max,unknown,
-muse-wonder-1.0_xhigh,unknown,
+muse-wonder-1.0,closed,epoch:API access
+muse-wonder-1.0_max,closed,epoch:API access
+muse-wonder-1.0_xhigh,closed,epoch:API access
 nemotron-3-super,open,epoch:Open weights (unrestricted)
 nemotron-3-ultra,open,epoch:Open weights (unrestricted)
 nemotron-3-ultra_thinking,open,family:nemotron-3-ultra
@@ -981,7 +981,7 @@ text-davinci-001,closed,epoch:API access
 text-davinci-002,closed,epoch:API access
 text-davinci-003,closed,override
 tiny-recursion-model,open,override
-tml-interaction-small,unknown,
+tml-interaction-small,closed,override
 trinity-large-thinking,open,override
 vicuna-13b-v1.1,open,override
 vicuna-13b-v1.3,open,epoch:Open weights (restricted use)

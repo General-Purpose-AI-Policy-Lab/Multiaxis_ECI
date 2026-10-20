@@ -419,9 +419,17 @@ def classify(mv, org):
         return dict(vendor='Zhipu', chain='', node='UNROUTED', variant=v, in_chain='no')  # unknown GLM version → flag for review
 
     # ================= META LLAMA =================
-    if 'meta' in ol or 'llama' in tl or 'muse-spark' in tl:
+    if 'meta' in ol or 'llama' in tl or 'muse-spark' in tl or 'muse-wonder' in tl:
         # muse-spark 1 (2026-04-08) -> 1.1 (2026-07-09) -> 1.2 -> 1.3 ...: one node per
         # version read off the name, each version's effort rungs tied to it
+        if 'muse-wonder' in tl:
+            # Muse Wonder (2026-10-12), Meta's first frontier tier, a size above Muse Spark rather
+            # than the release after Spark 1.3: a line of its own, as Opus beside Sonnet (user,
+            # 2026-10-20). One node per version read off the name.
+            mo = re.search(r'muse-wonder-(\d+(?:\.\d+)?)', tl)
+            return dict(vendor='Meta AI', chain='muse-wonder',
+                        node=f'wonder {mo.group(1)}' if mo else 'wonder 1.0',
+                        variant=variant(t), in_chain='yes')
         if 'muse-spark-open' in tl:
             # The open-weights Muse Spark (816B-A42B, 2026-10-15): a release of its own, not a
             # snapshot of the hosted Muse Spark of 2026-04-08 (refresh of 2026-10-19). Its own

@@ -280,23 +280,40 @@ def write_modes(idata, trace_path, match_thresh: float) -> tuple:
     return out, out_path
 
 
-def write_tables(idata, trace_path: Path) -> None:
+def write_tables(idata, trace_path: Path, secondary: bool = False) -> None:
     """fit.py writes the axis tables on every chain, before any mode split exists. On a
     multimodal fit those pool incompatible solutions, and `mirt_loadings.csv` is the frame every
     chain group's figures are put back on, so the tables are rewritten on the chains the
-    deliverables read (`best_mode_chains`: the selection, else the best mode)."""
-    from multiaxis_eci.analysis import FitSpec, best_mode_chains, prepare_fit, trace_loading_prior
+    deliverables read (`best_mode_chains`: the selection, else the best mode).
+
+    `secondary`: the same tables on the modes file's `secondary_chains`, written into
+    `secondary_mode/` beside the trace with an axis-names template, for a secondary mode whose
+    axes are not the primary's (`secondary_frame_dir`): its figures and its human placement are
+    then drawn on its own frame, under its own axis names."""
+    from multiaxis_eci.analysis import (
+        FitSpec,
+        best_mode_chains,
+        prepare_fit,
+        propose_axis_names,
+        secondary_mode_chains,
+        trace_loading_prior,
+    )
+    from multiaxis_eci.analysis.human_placement import SECONDARY_DIR
     from multiaxis_eci.scripts import load
-    chains = best_mode_chains(trace_path)
+    chains = secondary_mode_chains(trace_path) if secondary else best_mode_chains(trace_path)
     if chains is None:
-        print("  one mode and no selection: the tables fit.py wrote already read every chain")
+        print("  the modes file names no secondary_chains" if secondary else
+              "  one mode and no selection: the tables fit.py wrote already read every chain")
         return
     spec = FitSpec.from_trace(idata, trace_path)
     data, _, _ = spec.load_data(idata)
     view = prepare_fit(idata.sel(chain=chains), data)
-    load("3_fit/fit.py").write_axis_tables(view, data, spec.results_dir,
-                                           trace_loading_prior(idata))
-    print(f"  axis tables rewritten on chains {chains} → {spec.results_dir}")
+    out = Path(trace_path).parent / SECONDARY_DIR if secondary else spec.results_dir
+    out.mkdir(parents=True, exist_ok=True)
+    load("3_fit/fit.py").write_axis_tables(view, data, out, trace_loading_prior(idata))
+    if secondary:
+        propose_axis_names(view, data, out)
+    print(f"  axis tables rewritten on chains {chains} → {out}")
 
 
 def _eta_rhat_subset(idata, data, chains):
@@ -356,6 +373,10 @@ def main():
                          "and the tau, factor-correlation and factor-score tables) on the "
                          "chains the deliverables read, then stop; run it once the modes file "
                          "and any selected_chains are final")
+    ap.add_argument("--secondary", action="store_true",
+                    help="with --write-tables: write them on the secondary_chains into "
+                         "secondary_mode/, the own frame of a secondary mode whose axes are not "
+                         "the primary's (then name its axes in secondary_mode/axis_names.json)")
     ap.add_argument("--out-csv",
                     default=str(config.COMPARISONS_DIR / "chain_verdicts.csv"))
     args = ap.parse_args()
@@ -376,7 +397,7 @@ def main():
         print(f"  {len(out['modes'])} mode(s) → {out_path}")
         return
     if args.write_tables:
-        write_tables(idata, Path(args.trace))
+        write_tables(idata, Path(args.trace), secondary=args.secondary)
         return
     if not args.name:
         ap.error("--name is required unless --write-modes")

@@ -67,3 +67,25 @@ Fluid Intelligence & Mathematics,WinoGrande,no,2026-10-08 claude (validated by t
 Fluid Intelligence & Mathematics,Visual Task Assessment (VISTA),yes,2026-10-08 claude (validated by the user),"visual reasoning, a plausible link like VPCT (semicomp0 mode A only)"
 Agentic Capabilities & Programming,LAB-Bench Cloning,no,2026-10-08 claude (validated by the user),"biology lab knowledge (semicomp0 mode A only)"
 Agentic Capabilities & Programming,METR Time Horizons,yes,2026-10-08 claude (validated by the user),"long autonomous software tasks (semicomp0 mode A only)"
+Agentic & Cyber Capabilities,Cybench,yes,2026-10-20 user,CTF challenges
+Agentic & Cyber Capabilities,OSWorld,yes,2026-10-20 user,computer-use tasks
+Agentic & Cyber Capabilities,The Agent Company,yes,2026-10-20 user,simulated workplace agent tasks
+Agentic & Cyber Capabilities,EBR-bench,yes,2026-10-20 user,a plausible link (long-horizon agentic game play)
+Agentic & Cyber Capabilities,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)"
+Agentic & Cyber Capabilities,BlueprintBench 2,no,2026-10-20 user,floor plans from photos (spatial reasoning)
+Agentic & Cyber Capabilities,Furniture Assembly,no,2026-10-20 user,assembly from photos of IKEA builds
+Agentic & Cyber Capabilities,TriviaQA,no,2026-10-20 user,trivia recall
+Visual & Commonsense,GeoBench,yes,2026-10-20 user,geolocation from photos
+Visual & Commonsense,VPCT,yes,2026-10-20 user,visual physics comprehension
+Visual & Commonsense,SpireClimb,yes,2026-10-20 user,game played through screenshots
+Visual & Commonsense,HellaSwag,yes,2026-10-20 user,commonsense sentence completion
+Visual & Commonsense,OpenBookQA,yes,2026-10-20 user,elementary science and commonsense questions
+Visual & Commonsense,SimpleQA Verified,no,2026-10-20 user,"recall of obscure facts, neither visual nor commonsense"
+Scientific Knowledge & Reasoning,DTBench,yes,2026-10-20 user,a plausible link through reasoning (decision-theory questions)
+Scientific Knowledge & Reasoning,LMCA,yes,2026-10-20 user,a plausible link through reasoning (grading arguments against expert ratings)
+Cyber Capabilities,BlueprintBench 2,no,2026-10-20 user,floor plans from photos (spatial reasoning)
+Cyber Capabilities,SpireClimb,no,2026-10-20 user,card game played through screenshots
+Cyber Capabilities,The Agent Company,no,2026-10-20 user,simulated office tasks
+Cyber Capabilities,VPCT,no,2026-10-20 user,visual physics comprehension
+Agentic Capabilities & Programming,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)"
+Agentic Capabilities & Programming,HellaSwag,no,2026-10-20 user,commonsense sentence completion

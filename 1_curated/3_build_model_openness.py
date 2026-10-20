@@ -42,7 +42,7 @@ OUT = ROOT / "1_curated" / "model_openness.csv"
 OVERRIDES = ROOT / "1_curated" / "model_openness_overrides.csv"
 OPEN_CLASSES = ("Open weights (unrestricted)", "Open weights (restricted use)",
                 "Open weights (non-commercial)")
-CLOSED_CLASSES = ("API access", "Hosted access (no API)", "Unreleased")
+CLOSED_CLASSES = ("API access", "Hosted access (no API)", "Limited access", "Unreleased")
 
 
 def epoch_labels(pipeline: Path, models: pd.DataFrame) -> dict[str, tuple[str, str]]:

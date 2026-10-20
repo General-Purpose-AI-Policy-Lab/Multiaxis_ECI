@@ -12,7 +12,9 @@ again whenever the selected chains, the axis names, the human baselines or
 
 `--secondary` places the tiers on the chains the modes file names under `secondary_chains` and
 writes into `secondary_mode/` beside the trace, which 3_plot_mirt.py reads for the secondary
-mode's figures.
+mode's figures. A secondary mode with axes of its own (`diagnose_chains.py --write-tables
+--secondary`) is placed on its own frame and under its own names, `secondary_mode/`'s
+`mirt_loadings.csv` and `axis_names.json`.
 """
 from __future__ import annotations
 
@@ -31,6 +33,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
     align_to_reference_loadings,
     best_mode_chains,
+    secondary_frame_dir,
     secondary_mode_chains,
     load_axis_titles,
     prepare_fit,
@@ -70,10 +73,12 @@ def main() -> None:
     beta = (float(idata.posterior["comp_beta"].median()) if spec.link == "semicomp0" else None)
     data, floor_c, _ = spec.load_data(idata)
     view = prepare_fit(idata, data)
-    ref = trace.parent / "mirt_loadings.csv"
+    # The frame and the names: the fit's, or a secondary mode's own (secondary_frame_dir)
+    frame = (secondary_frame_dir(trace) if args.secondary else None) or trace.parent
+    ref = frame / "mirt_loadings.csv"
     if ref.exists():
         view = align_to_reference_loadings(view, data, ref)
-    titles = load_axis_titles(trace.parent, view, data)
+    titles = load_axis_titles(frame, view, data)
     print(f"{trace.name}: chains {chains}; axes {titles}"
           + (f"; softmin beta {beta:.2f}" if beta is not None else ""), flush=True)
     out = run_placement(trace, view, data, spec, titles, floor_c, out_dir=out_dir, beta=beta,

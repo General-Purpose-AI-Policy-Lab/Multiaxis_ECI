@@ -75,3 +75,15 @@ def test_group_builders():
     markers = [t for t in cf.data if t.mode == "markers"]
     assert [len(t.x) for t in markers] == [2, 1]                        # the None row is skipped
     assert cf.layout.xaxis.range == ("2014-07-25", "2035-06-10")
+
+
+def test_secondary_frame_dir_only_once_written(tmp_path):
+    """A secondary mode is drawn on the fit's frame until `diagnose_chains.py --write-tables
+    --secondary` gives it one of its own in secondary_mode/."""
+    from multiaxis_eci.analysis import secondary_frame_dir
+    trace = tmp_path / "trace_mirt_k4_x.nc"
+    assert secondary_frame_dir(trace) is None
+    (tmp_path / "secondary_mode").mkdir()
+    assert secondary_frame_dir(trace) is None          # a placement alone is not a frame
+    (tmp_path / "secondary_mode" / "mirt_loadings.csv").write_text("benchmark,axis,loading_median\n")
+    assert secondary_frame_dir(trace) == tmp_path / "secondary_mode"

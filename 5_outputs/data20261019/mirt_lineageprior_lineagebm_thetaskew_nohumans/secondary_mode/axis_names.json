@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Secondary mode B of the flagship of 2026-10-19 (chains 0, 1, 18), kept beside mode A by the user (2026-10-20) on a frame of its own: its axes are the previous flagship's (data 2026-10-01), whose names are carried over, each to the axis whose top benchmarks hold its signature. Top benchmarks are mode B's by share of their loading variance.",
+  "axes": {
+    "axis1": {
+      "title": "Fluid Intelligence & Formal Sciences",
+      "title_fr": "Intelligence fluide & Sciences formelles",
+      "signature": [
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "OTIS Mock AIME 2024-2025"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "CritPt",
+        "MATH Level 5",
+        "MCP Atlas",
+        "DeepSWE",
+        "AudioMultiChallenge",
+        "ARC-AGI-2",
+        "CAISI CTF-Archive"
+      ]
+    },
+    "axis2": {
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
+      "signature": [
+        "MMLU Biology",
+        "GSM8K",
+        "GPQA Main Biology"
+      ],
+      "top_benchmarks": [
+        "GSM8K",
+        "MMLU Biology",
+        "WMDP Biology",
+        "SimpleQA Verified",
+        "WMDP Chemistry",
+        "GeoBench",
+        "LAB-Bench Protocol",
+        "LAB-Bench LitQA2"
+      ]
+    },
+    "axis3": {
+      "title": "Cyber Capabilities",
+      "title_fr": "Capacités cyber",
+      "signature": [
+        "CyScenarioBench",
+        "CyberGym",
+        "Cybench"
+      ],
+      "top_benchmarks": [
+        "CyScenarioBench",
+        "ExploitBench",
+        "AISI Cyber Ranges - The Last Ones",
+        "VisualToolBench",
+        "CyScenarioBench (Anthropic)",
+        "CyberGym",
+        "Furniture Assembly",
+        "AISI Cyber Ranges - Cooling Tower"
+      ]
+    },
+    "axis4": {
+      "title": "Agentic Capabilities & Programming",
+      "title_fr": "Capacités agentiques & Programmation",
+      "signature": [
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents"
+      ],
+      "top_benchmarks": [
+        "TriviaQA",
+        "MirrorCode",
+        "OSWorld",
+        "FrontierSWE v2",
+        "HellaSwag",
+        "GBAEval",
+        "PostTrainBench v1.1",
+        "FrontierMath Erdos"
+      ]
+    }
+  }
+}

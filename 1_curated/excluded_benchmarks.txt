@@ -28,3 +28,6 @@ VisualToolBench
 EnigmaEval
 # Furniture Assembly (Epoch, photos of IKEA builds) joins them on the same rule (2026-09-29 refresh).
 Furniture Assembly
+# SpireClimb (Epoch, Slay the Spire played through screenshots by a computer-use agent, top humans
+# winning 80-95% against at most 26% for the models) fits the rule but stays in, like OSWorld
+# (user decision, 2026-10-20).

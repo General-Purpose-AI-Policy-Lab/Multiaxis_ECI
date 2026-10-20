@@ -154,7 +154,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
         if not tl.empty:
             fig = capability_timeline_fig(tl, human_stats=hstat,
                                           human_labels=human_labels)
-            fig.update_layout(title=dict(text=f"{disp}: measured (50% intervals){suffix}", x=0.5),
+            fig.update_layout(title=dict(text=f"{disp} · measured models (50% intervals){suffix}", x=0.5),
                               yaxis=dict(title=y_label))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}"] = fig
         # ALL-models companion: every dated model, the ones not evaluated on the axis
@@ -165,7 +165,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
             fig_all = capability_timeline_fig(tl_all, human_stats=hstat,
                                               human_labels=human_labels)
             fig_all.update_layout(
-                title=dict(text=f"{disp}: all models (50% intervals){suffix}", x=0.5),
+                title=dict(text=f"{disp} · all models (50% intervals){suffix}", x=0.5),
                 yaxis=dict(title=y_label))
             figs[f"{prefix}timeline_{k+1}_{_slug(names[k])}{tag}_all"] = fig_all
     if A is not None and K >= 2:
@@ -300,7 +300,7 @@ def forecast_figures(view, data, raw, names, th_fc,
         if len(cx):
             figs[f"forecast_{k+1}_{slug}_when"] = crossover_panels_fig(
                 cx, [names[k]], {names[k]: disp}, probs=(0.5, 0.8),
-                title=f"Forecast: {disp} (crossing dates)")
+                title=f"{disp} · forecast crossing dates")
     return figs
 
 

@@ -1,6 +1,6 @@
 # Benchmarks by access class (canonical scope, curated exclusions applied)
 
-## public (58)
+## public (61)
 
 - APEX-Agents
 - ARC AI2
@@ -8,6 +8,9 @@
 - AudioMultiChallenge
 - Balrog
 - BioLP-bench
+- CAISI CVE-Bench
+- CAISI Cybench
+- CAISI SEC-Bench Pro
 - CL-bench
 - CL-bench Life
 - CTI-REALM
@@ -74,7 +77,7 @@
 - Remote Labor Index
 - WeirdML v2
 
-## private (14)
+## private (19)
 
 - AISI CTF Suites - Apprentice
 - AISI CTF Suites - Expert
@@ -82,7 +85,12 @@
 - AISI CTF Suites - Technical Non-Expert
 - AISI Cyber Ranges - Cooling Tower
 - AISI Cyber Ranges - The Last Ones
+- CAISI CTF-Archive
+- CAISI CTF-Archive-Diamond
+- CAISI ExploitGym Userspace
+- CAISI OSS-Fuzz
 - CyScenarioBench
+- CyScenarioBench (Anthropic)
 - EBR-bench
 - Fiction.LiveBench
 - FrontierCode

@@ -488,6 +488,18 @@ def secondary_mode_chains(trace_path) -> list[int] | None:
     return sorted(sec["chains"]) if sec else None
 
 
+def secondary_frame_dir(trace_path) -> Path | None:
+    """The secondary mode's own display frame, for a secondary mode that carries another
+    solution than the primary (axes that do not match the fit's `mirt_loadings.csv`): the
+    `secondary_mode/` folder beside the trace once it holds that mode's `mirt_loadings.csv`
+    (`diagnose_chains.py --write-tables --secondary`), with its own `axis_names.json`. None
+    when the secondary mode is drawn on the fit's frame (user, 2026-10-20: the flagship of
+    2026-10-19 keeps its mode B, with a separate agentic axis, beside mode A)."""
+    from multiaxis_eci.analysis.human_placement import SECONDARY_DIR
+    d = Path(trace_path).parent / SECONDARY_DIR
+    return d if (d / "mirt_loadings.csv").exists() else None
+
+
 def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
     """The flagship posterior, thinned. `chains=None` reads every chain, "best" the
     best-log-density mode (`best_mode_chains`), every chain when there is one mode.

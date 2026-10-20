@@ -1,0 +1,98 @@
+{
+ "trace": "trace_mirt_k4_lineageprior_lineagebm_thetaskew_nohumans.nc",
+ "n_chains": 20,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -13.4,
+  -26.4,
+  -15.0,
+  -15.0,
+  -18.2,
+  0.0,
+  -7.7,
+  -0.6,
+  -14.0,
+  -12.8,
+  -0.7,
+  -3.5,
+  -6.9,
+  -7.8,
+  -7.5,
+  -3.3,
+  -4.3,
+  -6.5,
+  -9.4,
+  -6.7
+ ],
+ "modes": [
+  {
+   "chains": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    19
+   ],
+   "mean_logp": -22684.51355486477,
+   "min_matched_corr": 0.848,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    0,
+    1,
+    18
+   ],
+   "mean_logp": -22693.22597996674,
+   "min_matched_corr": 0.925,
+   "label": "B",
+   "delta_logp": -8.7,
+   "matched_corr_to_best": 0.025
+  }
+ ],
+ "selected_chains": {
+  "chains": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   19
+  ],
+  "why": "User, 2026-10-20: mode A, the best-log-density mode and the one 17 of the 20 chains reach. Its axes: fluid intelligence, scientific knowledge, agentic and cyber merged on one axis, and a visual and commonsense axis; the names were given anew. Integrated LOO was not run: 4_diagnostics/integrated_loo.py takes the exchangeable abilities as N(0, I), not the skew-normal of --theta-skew."
+ },
+ "secondary_chains": {
+  "chains": [
+   0,
+   1,
+   18
+  ],
+  "why": "User, 2026-10-20: mode B (chains [0, 1, 18], -8.7 nats below A), kept beside the primary mode for comparison: it holds the previous flagship's structure, with an agentic axis of its own (MirrorCode, OSWorld, FrontierSWE v2)."
+ }
+}

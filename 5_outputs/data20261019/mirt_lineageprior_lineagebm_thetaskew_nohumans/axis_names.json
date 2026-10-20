@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Named on 2026-10-20 (user: accept mode A and rename) on the flagship fitted with --theta-skew on the data of 2026-10-19 (20 chains, seed 42 + seed 43 merged; primary mode A, 17 chains). Axes 1 and 3 keep the previous flagship's names and signatures; the previous agentic and cyber axes merge into axis 2 (GDPval, MirrorCode, FrontierSWE v2 and OSWorld load on it with the cyber benchmarks), and axis 4 is new: visual and commonsense benchmarks (GeoBench, SpireClimb, VPCT, VisualToolBench, OpenBookQA, HellaSwag), most of them outside the canonical index. Top benchmarks are the primary mode's by share of their loading variance.",
+  "axes": {
+    "axis1": {
+      "title": "Fluid Intelligence & Formal Sciences",
+      "title_fr": "Intelligence fluide & Sciences formelles",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI-2",
+        "MATH Level 5"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "CritPt",
+        "MATH Level 5",
+        "MCP Atlas",
+        "DeepSWE",
+        "AudioMultiChallenge",
+        "ARC-AGI-2",
+        "CAISI CTF-Archive"
+      ]
+    },
+    "axis2": {
+      "title": "Agentic & Cyber Capabilities",
+      "title_fr": "Capacités agentiques & cyber",
+      "signature": [
+        "GDPval",
+        "MirrorCode",
+        "CyberGym"
+      ],
+      "top_benchmarks": [
+        "GBAEval",
+        "GDPval",
+        "Furniture Assembly",
+        "CyScenarioBench",
+        "CyberGym",
+        "MirrorCode",
+        "FrontierSWE v2",
+        "Cybench"
+      ]
+    },
+    "axis3": {
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
+      "signature": [
+        "MMLU Biology",
+        "GSM8K",
+        "GPQA Main Biology"
+      ],
+      "top_benchmarks": [
+        "GSM8K",
+        "MMLU Biology",
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "DeepResearch Bench",
+        "MMLU",
+        "MMLU Pro Biology",
+        "GPQA Main Biology"
+      ]
+    },
+    "axis4": {
+      "title": "Visual & Commonsense",
+      "title_fr": "Visuel & sens commun",
+      "signature": [
+        "GeoBench",
+        "VPCT",
+        "OpenBookQA"
+      ],
+      "top_benchmarks": [
+        "GeoBench",
+        "SpireClimb",
+        "CyScenarioBench (Anthropic)",
+        "VPCT",
+        "OpenBookQA",
+        "SWE-Bench Pro V2",
+        "SimpleQA Verified",
+        "VisualToolBench"
+      ]
+    }
+  }
+}

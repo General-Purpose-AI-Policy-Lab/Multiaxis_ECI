@@ -49,6 +49,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     attach_placement,
     axis_title_translations,
     best_mode_chains,
+    secondary_frame_dir,
     secondary_mode_chains,
     human_unit_affine,
     load_axis_titles,
@@ -183,17 +184,22 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
     # half-way ("Axe 1 : Intelligence fluide & Mathematics").
     fr_titles = axis_title_translations(results_dir)
 
-    def render(idata, view, figures_dir: Path, suffix: str, note: str, fr_dir: Path) -> dict:
+    def render(idata, view, figures_dir: Path, suffix: str, note: str, fr_dir: Path,
+               names_dir: Path | None = None) -> dict:
         """The figure set for one posterior (the fit, or one chain group), saved
         under `figures_dir` with `suffix` in every file name, the main figures
         also in French under `fr_dir` (one `fr/` for the whole fit). Every figure,
         the posterior predictive and its calibration included, follows the
         posterior it is given: a chain group is a mode of its own, and its
         predictive is that mode's, where the pooled predictive would mix two
-        incompatible solutions. Whole-fit metrics live in the fit's tables."""
+        incompatible solutions. Whole-fit metrics live in the fit's tables. `names_dir` holds
+        the axis names (and the display frame) of the axes `view` is on: the fit's folder, or a
+        secondary mode's own (`secondary_frame_dir`)."""
+        names_dir = names_dir or results_dir
         figures_dir.mkdir(parents=True, exist_ok=True)
-        axis_titles = (load_axis_titles(results_dir, view, data)
+        axis_titles = (load_axis_titles(names_dir, view, data)
                        if K >= 2 and view.A is not None else None)
+        group_fr = axis_title_translations(names_dir) if names_dir != results_dir else fr_titles
         names = view.names
         bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
         mod = data.mlookup.sort_values("model_idx")["model"].tolist()
@@ -229,7 +235,9 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             axis_tl = {k: rescale_frame(mirt_model_timeline_df(view.theta, k, data, raw,
                                                               A_draws=view.A), k, affine)
                        for k in range(n_axes)}
-            figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, names, n_axes)
+            # the axes under their titles (Axis k: <title>) where they are named
+            shown = [(axis_titles or {}).get(n, n) for n in names]
+            figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, shown, n_axes)
             keep = (mirt_informed_mask(view.theta)[:, :n_axes].all(axis=1)
                     & ~data.is_human & ~data.is_low_obs)
             idx = np.where(keep)[0]
@@ -237,11 +245,11 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                 orgs = np.array([model_organization(mod[i]) or "other" for i in idx])
                 top = pd.Series(orgs).value_counts().head(7).index.tolist()
                 tmean = rescale_theta(view.theta, affine).mean(axis=0)
-                dfm = pd.DataFrame({names[k]: tmean[idx, k] for k in range(n_axes)})
+                dfm = pd.DataFrame({shown[k]: tmean[idx, k] for k in range(n_axes)})
                 dfm["model"] = [mod[i] for i in idx]
                 dfm["org"] = np.where(np.isin(orgs, top), orgs, "other")
                 figs["axes_scatter_matrix"] = axes_scatter_matrix_fig(
-                    dfm, [names[k] for k in range(n_axes)])
+                    dfm, [shown[k] for k in range(n_axes)])
 
         # ── K vs 1D block (reuses the cached K=1 baseline; no extra fit) ──────────
         if idata_1d is not None:
@@ -280,7 +288,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
         # The French renders are the write-up's figures: taken before the chain-group note,
         # which stays on the English diagnostics (the file name still says the group).
-        fr_figs = {name: translate_fig(fig, first=fr_titles) for name, fig in figs.items()
+        fr_figs = {name: translate_fig(fig, first=group_fr) for name, fig in figs.items()
                    if name.split("_")[0] in MAIN_FIGURE_PREFIXES or name in MAIN_FIGURES}
         if note:
             for fig in figs.values():
@@ -297,7 +305,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
             if name in fr_figs:
                 twin = svg_twins.get(name)
                 save_fig(fr_figs[name], figure_filename(name) + suffix + "_fr", fr_dir, svg=True,
-                         svg_fig=translate_fig(twin, first=fr_titles) if twin else None)
+                         svg_fig=translate_fig(twin, first=group_fr) if twin else None)
         print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
               f"MAE={gof.metrics['mae']:.3f}")
         print(f"figures → {figures_dir}")
@@ -310,13 +318,17 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         return figures_dir
     # A multimodal posterior: the folder holds the primary mode's figures, the secondary
     # group's under secondary/. Both groups are put back on the fit's display frame
-    # (mirt_loadings.csv), so axis k is the same axis in both.
-    ref = results_dir / "mirt_loadings.csv"
+    # (mirt_loadings.csv), so axis k is the same axis in both; a secondary mode with axes of
+    # its own (secondary_frame_dir) is put on its own frame, under its own names, and the
+    # side-by-side comparison, which needs one set of axes, is left out.
+    own = secondary_frame_dir(trace_path) if split["secondary_is_mode"] else None
     views = {}
     for chains, sub_dir, suffix in ((split["primary"], figures_dir, "_primary"),
                                     (split["secondary"], figures_dir / "secondary", "_secondary")):
         sub = idata.sel(chain=chains)
         view = prepare_fit(sub, data)
+        frame = own if (suffix == "_secondary" and own is not None) else results_dir
+        ref = frame / "mirt_loadings.csv"
         if K >= 2 and view.A is not None:
             if ref.exists():
                 try:
@@ -342,10 +354,12 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         group = ("primary mode" if label == "primary" else
                  "secondary mode" if split["secondary_is_mode"] else "other chains")
         render(sub, view, sub_dir, suffix,
-               f"{group}: chains {','.join(map(str, chains))} / {split['n_chains']}",
-               figures_dir / "fr")
+               f"{group}, {len(chains)} of {split['n_chains']} chains",
+               figures_dir / "fr", names_dir=frame)
     # Side by side: where the two groups disagree (chain_groups/).
-    if K >= 2 and views["primary"].A is not None:
+    if own is not None:
+        print(f"  secondary mode on its own axes ({own.name}/): no chain-group comparison")
+    elif K >= 2 and views["primary"].A is not None:
         titles = load_axis_titles(results_dir, views["primary"], data)
         modes_doc = json.loads(modes_path(trace_path).read_text())
         cmp_dir = figures_dir / "chain_groups"
