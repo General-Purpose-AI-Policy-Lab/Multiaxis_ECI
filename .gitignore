@@ -59,11 +59,7 @@ nohup.out
 *.swp
 *.bak-*
 
-# Local scoring-harness artifacts (internal_evals/*): run outputs are large and regenerable, the
-# dataset is third-party and fetched on demand, and a key file must never be
-# committed. The harness reads OPENROUTER_API_KEY from the environment.
-internal_evals/*/out/
-internal_evals/*/data_cache/
+# A key file must never be committed.
 .env
 
 # Agent tool scratch

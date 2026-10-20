@@ -35,14 +35,6 @@ The feeds, their licences and the per-source processing are documented in [`benc
 The Epoch Capabilities Index this project recreates is Epoch AI's:
 <https://epoch.ai/eci>.
 
-## Evaluation harness
-
-`internal_evals/lab_bench_cloning/` runs the public CloningScenarios split of
-**LAB-Bench** ([futurehouse/lab-bench](https://huggingface.co/datasets/futurehouse/lab-bench),
-[arXiv 2407.10362](https://arxiv.org/abs/2407.10362)). The dataset is fetched on
-demand and is **not** redistributed here; its own license applies. Run outputs
-under `internal_evals/*/out/` are gitignored.
-
 ## Attribution when citing
 
 > Beta-MIRT recreation of the Epoch Capabilities Index by the General-Purpose

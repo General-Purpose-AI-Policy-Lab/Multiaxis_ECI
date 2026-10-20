@@ -2968,7 +2968,7 @@ class TestLayoutPaths:
         # git-visible files only, when git is available: tracked plus
         # untracked-but-not-ignored (--others --exclude-standard), so a new
         # file is scanned BEFORE it is staged, while gitignored local
-        # artifacts (figures/html/, memo/, internal_evals/*/out/) cannot raise false alarms
+        # artifacts (figures/html/, memo/) cannot raise false alarms
         # a fresh cloner can never reproduce. Falls back to the rglob sweep
         # when the tree is not a git checkout (a tarball download) — including
         # when git succeeds but sees nothing, which happens when the tarball

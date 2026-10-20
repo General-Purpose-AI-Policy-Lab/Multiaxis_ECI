@@ -120,7 +120,6 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 ├── 4_diagnostics/       # step 4: post-fit tools, the numbered four in reproduction order
 ├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace, figures/; pre_pipeline/ holds the post's fits, open_closed_frontier/ and us_cn_frontier/ the open-weights vs closed and US vs Chinese frontier notes
 ├── 6_writeups/          # step 6: the post's figure scripts (6_writeups/blogpost/), the dashboard's card registry
-├── internal_evals/      # the lab's own scoring runs (LAB-Bench cloning through OpenRouter); needs OPENROUTER_API_KEY
 ├── archive/             # kept for the record, not maintained: notebooks (one-off investigations), results_old (superseded fits)
 ├── docs/                # model math, CLI reference, figure catalogue, the README's figures (figures/, make_readme_figures.py)
 ├── tests/               # fast unit tests + golden logp locks

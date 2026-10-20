@@ -39,7 +39,7 @@ markers = [
 line-length = 100
 target-version = "py311"
 src = ["2_model", "tests"]
-extend-exclude = ["archive", "internal_evals", "5_outputs", "6_writeups/blogpost/ladder"]
+extend-exclude = ["archive", "5_outputs", "6_writeups/blogpost/ladder"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "B", "UP"]
