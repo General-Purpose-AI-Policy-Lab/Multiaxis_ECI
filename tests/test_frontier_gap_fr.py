@@ -33,11 +33,11 @@ def _captions(kind: str) -> list[str]:
     out += [label.format(**names) for _, label in plot.SHOWN_ROWS]
     out += [f"Months behind the {nouns[leader][0]} frontier, median [80% interval]",
             f"Months behind the {nouns[leader][0]}<br>frontier (ECI-H)",
-            f"Release date of the {nouns[follower][0]} record",
+            f"Release date of the {nouns[follower][0]} frontier point",
             f"{titles[leader]} vs {titles[follower]} (ECI-H), by benchmark access",
             f"first {nouns[leader][1]} above:"]
     for g in (leader, follower):
-        out += [f"{titles[g]}: frontier record", f"{titles[g]}: trend (80% band)",
+        out += [f"{titles[g]}: frontier point", f"{titles[g]}: trend (80% band)",
                 f"{titles[g]} trend", titles[g]]
     return out
 
@@ -55,5 +55,5 @@ def test_french_names_the_right_groups(kind):
     nouns = GROUP_NOUNS[kind]
     title = translate_text(f"Months behind the {nouns[leader][0]} frontier, median [80% interval]")
     assert FR_GROUPS[leader][1] in title
-    row = translate_text(f"Lag of the latest {nouns[follower][0]} record")
+    row = translate_text(f"Lag of the latest {nouns[follower][0]} frontier point")
     assert row.endswith(FR_GROUPS[follower][1])

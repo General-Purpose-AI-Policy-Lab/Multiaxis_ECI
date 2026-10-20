@@ -3,7 +3,7 @@ scope it finds (all / public / semi_private / private) and draws them side by si
 loaded.
 
   frontier_gap_<group>_panels      one frontier panel per scope, same ECI-H range
-  frontier_gap_<group>_lag         months behind the leader's frontier per follower record and scope
+  frontier_gap_<group>_lag         months behind the leader's frontier per follower frontier point and scope
                                    (the figure of Ihle 2026, on ECI-H)
   frontier_gap_<group>_crossovers  human-tier crossing dates of each group's line, per scope (CSV only)
   frontier_gap_<group>_table       the summary table (PNG, CSV and Markdown), with the change of
@@ -52,8 +52,8 @@ TABLE_ROWS = [
     ("slope_diff", None, "Slope difference ({leader} - {follower})", "ECI-H / yr", True),
     ("gap_today", None, "Gap today ({leader} - {follower} trend lines)", "ECI-H", True),
     ("lag_today", None, "Lag today (gap / {leader_n} slope)", "months", False),
-    ("envelope_lag_latest_record", None, "Lag of the latest {follower_n} record", "months", False),
-    ("envelope_lag_last_12m_mean", None, "Mean lag of the last 12 months' {follower_n} records",
+    ("envelope_lag_latest_record", None, "Lag of the latest {follower_n} frontier point", "months", False),
+    ("envelope_lag_last_12m_mean", None, "Mean lag of the last 12 months' {follower_n} frontier points",
      "months", False),
     ("lag_12m_mean", None, "Mean lag over the last 12 months, {follower_n} frontier to {leader_n} frontier",
      "months", False),
@@ -124,9 +124,9 @@ def markdown_table(df: pd.DataFrame) -> str:
 # figure's own reading; then the lag on an average day of the last twelve months, frontier to
 # frontier, of which the record lags are the minima), one column per scope and no differences
 # between scopes. The long CSV keeps every quantity and every difference.
-SHOWN_ROWS = [("envelope_lag_last_12m_mean", "Mean lag of the last 12 months' {follower_n} records"),
+SHOWN_ROWS = [("envelope_lag_last_12m_mean", "Mean lag of the last 12 months' {follower_n} frontier points"),
               ("lag_12m_mean", "Mean lag over the last 12 months, {follower_n} frontier to {leader_n} frontier"),
-              ("envelope_lag_latest_record", "Lag of the latest {follower_n} record"),
+              ("envelope_lag_latest_record", "Lag of the latest {follower_n} frontier point"),
               ("lag_today", "Lag today on the trend lines (gap / {leader_n} slope)")]
 
 

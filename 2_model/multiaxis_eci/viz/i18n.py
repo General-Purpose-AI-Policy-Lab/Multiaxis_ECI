@@ -41,13 +41,13 @@ def _frontier_gap_entries() -> tuple[list[tuple[str, str]], list[tuple[str, str]
              f"Mois de retard sur la frontière<br>des {lp} (ECI-H)"),
             (f"Months behind the {ln} frontier, median [80% interval]",
              f"Mois de retard sur la frontière des {lp}, médiane [intervalle à 80 %]"),
-            (f"Release date of the {fn} record", f"Date de sortie du record des {fp}"),
+            (f"Release date of the {fn} frontier point", f"Date de sortie du point de frontière des {fp}"),
             # The summary table's rows
             (f"Mean lag over the last 12 months, {fn} frontier to {ln} frontier",
              f"Retard moyen des 12 derniers mois, de la frontière des {fp} à celle des {lp}"),
-            (f"Mean lag of the last 12 months' {fn} records",
-             f"Retard moyen des records des {fp} des 12 derniers mois"),
-            (f"Lag of the latest {fn} record", f"Retard du dernier record des {fp}"),
+            (f"Mean lag of the last 12 months' {fn} frontier points",
+             f"Retard moyen des points de frontière des {fp} des 12 derniers mois"),
+            (f"Lag of the latest {fn} frontier point", f"Retard du dernier point de frontière des {fp}"),
             (f"Gap today ({lt} - {ft} trend lines)",
              f"Écart aujourd'hui (droites de tendance : {lp} − {fp})"),
             (f"Slope difference ({lt} - {ft})", f"Différence de pente ({lp} − {fp})"),
@@ -60,7 +60,7 @@ def _frontier_gap_entries() -> tuple[list[tuple[str, str]], list[tuple[str, str]
         ]
         for g in (fol, lead):
             cap, plural, _ = FR_GROUPS[g]
-            legend += [(f"{titles[g]}: frontier record", f"{cap} : record de la frontière"),
+            legend += [(f"{titles[g]}: frontier point", f"{cap} : point de frontière"),
                        (f"{titles[g]}: trend (80% band)", f"{cap} : tendance (bande à 80 %)"),
                        (f"{titles[g]} trend", f"tendance des {plural}")]
             bare.append((titles[g], cap))

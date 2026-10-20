@@ -108,14 +108,14 @@ def frontier_panels_fig(results: dict, scopes: list[str], *, style: FigureStyle 
                 row=i, col=1)
             fig.add_trace(go.Scatter(
                 x=recs["release_date"], y=recs["mean"], mode="markers",
-                name=f"{gname}: frontier record", legendgroup=g.label, showlegend=(i == 1),
+                name=f"{gname}: frontier point", legendgroup=g.label, showlegend=(i == 1),
                 marker=dict(color=col, size=style.marker + 3, symbol="diamond",
                             line=dict(width=1, color="white")),
                 error_y=dict(type="data", symmetric=False, array=recs["hdi_high"] - recs["mean"],
                              arrayminus=recs["mean"] - recs["hdi_low"], thickness=style.errbar,
                              width=0, color=_rgba(col, 0.55)),
                 text=recs["name"],
-                hovertemplate="%{text}<br>%{x|%Y-%m-%d}: ECI-H %{y:.1f}<extra>record</extra>"),
+                hovertemplate="%{text}<br>%{x|%Y-%m-%d}: ECI-H %{y:.1f}<extra>frontier point</extra>"),
                 row=i, col=1)
             fc = g.forecast(horizon=window[1])
             if fc is None:
@@ -449,7 +449,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             y = sub["lag_months_mean"]
             fig.add_trace(go.Scatter(
                 x=sub["release_date"], y=y, mode="markers",
-                legendgroup=scope, name=f"{name}: records", showlegend=False,
+                legendgroup=scope, name=f"{name}: frontier points", showlegend=False,
                 marker=dict(color=col, size=dot_px, symbol=symbol, opacity=opacity,
                             line=dict(width=1.5 if key else 1, color=col if key else "white")),
                 error_y=dict(type="data", symmetric=False,
@@ -504,7 +504,7 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
     # months run into each other well before the axis is five years long.
     span_years = (w1 - w0).days / 365.25
     by_year = span_years > 2.5
-    fig.update_xaxes(title_text=f"Release date of the {follower_title} record", range=list(window),
+    fig.update_xaxes(title_text=f"Release date of the {follower_title} frontier point", range=list(window),
                      dtick="M12" if by_year else "M6", tickformat="%Y" if by_year else "%Y-%m",
                      tickangle=0, gridcolor="#f4f4f4")
     # Ticks (and their gridlines) every four months, and only where there is data: the band of
