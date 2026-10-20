@@ -40,7 +40,7 @@ unmarked to both.
 | `--theta-pos` | `[expl]` eta reads softplus(theta), the semi-compensatory convention. Raw theta stays the reported ability |
 | `--time-prior` | `[expl]` add a learned per-axis linear trend in release year to the theta prior MEAN, so a thinly-evaluated model is shrunk toward its era's level rather than the whole population's. The slope is signed and centered at zero, so a flat population reduces to the plain prior |
 | `--theta-t` | `[expl]` cell-wise leptokurtic theta: each (model, axis) cell of the exchangeable block gets a Student-t(4) marginal (direct closed-form density, no extra latents) instead of a Gaussian one |
-| `--theta-skew` | `[expl]` skew-normal theta: the exchangeable block (unstructured models and chain founders) independent skew-normal per axis, standardised, with a learned shape per axis (`config.PRIOR_THETA_SKEW_ALPHA`). Matches the abilities' left tail and identifies the axes' orientation; exclusive with `--theta-t`; emits `_thetaskew` |
+| `--normal-theta` | `[expl]` the Gaussian theta block instead of the default skew-normal one (since 2026-10-20). By default the exchangeable block (unstructured models and chain founders) is independent skew-normal per axis, standardised, with a learned shape per axis (`config.PRIOR_THETA_SKEW_ALPHA`): it matches the abilities' left tail and identifies the axes' orientation (`5_outputs/sampler_study/GEOMETRY_REPORT.md`). Emits `_normaltheta`; folders of 2026-10-16 to 2026-10-20 carried the option as `_thetaskew`, which still parses. `--theta-t` replaces the block either way. The canonical K=1 index keeps the Gaussian block |
 | `--private-bases` | `[expl]` give each chain founder a private Normal(0,1) base and let the ZeroSumNormal span only the unstructured rows (human roots always have their own Normal(0, `PRIOR_HUMAN_ROOT` = 3) base). Same marginal scale; changes how much of the population the location pin carries |
 
 **Data scope**
@@ -93,7 +93,7 @@ A fit's flags become one tag, and the tag names the results folder and the trace
 ```
 flags    --K 4 --lineage-prior --lineage-bm --no-humans
 tag      _lineageprior_lineagebm_nohumans
-results  5_outputs/data20261001/mirt_lineageprior_lineagebm_nohumans/
+results  5_outputs/data20261019/mirt_lineageprior_lineagebm_nohumans/
 trace      ├── trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
 placement  ├── human_placement.json, human_placement_draws.npz   (4_diagnostics/5_place_humans.py)
            ├── secondary_mode/human_placement.json, …_draws.npz (5_place_humans.py --secondary)
@@ -174,7 +174,7 @@ and copies the deliverables, French included, into that folder (`GROUP=country` 
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --trace \
-  5_outputs/data20261001/mirt_lineageprior_lineagebm_nohumans/trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
+  5_outputs/data20261019/mirt_lineageprior_lineagebm_nohumans/trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
 ```
 
 Figures land in the fit's own `figures/k{K}/`, one PNG each with the HTML twin
@@ -185,8 +185,8 @@ destination. Full catalogue: [plots.md](plots.md).
 ### Plot everything
 
 ```bash
-python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261001/ --dry-run   # decisions only
-python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261001/             # render
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261019/ --dry-run   # decisions only
+python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261019/             # render
 ```
 
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder

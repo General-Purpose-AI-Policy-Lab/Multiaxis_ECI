@@ -928,8 +928,10 @@ class TestThetaTCells:
 
 
 class TestThetaSkew:
-    """--theta-skew: the exchangeable theta block is independent skew-normal per axis,
-    standardised, with a learned shape per axis (sampler study 2026-10-13/16)."""
+    """The skew-normal theta block, the fits' default since 2026-10-20 (`--normal-theta` opts
+    out): the exchangeable block is independent skew-normal per axis, standardised, with a
+    learned shape per axis (sampler study 2026-10-13/16). The builder keeps the Gaussian block
+    by default, so the goldens and the canonical K=1 index are unchanged."""
 
     def test_block_replaces_the_zero_sum_block_and_covers_the_same_rows(self, data):
         # same rows as the t block: the unstructured models plus one base per chain founder
@@ -961,9 +963,37 @@ class TestThetaSkew:
     def test_spec_reads_the_flag_back_from_the_trace_attrs(self):
         from types import SimpleNamespace
         from multiaxis_eci.analysis.fitspec import FitSpec, _attr_flags
-        assert FitSpec(K=4).theta_skew is False
+        assert FitSpec(K=4).theta_skew is True
         assert _attr_flags(SimpleNamespace(attrs={"mirt_theta_skew": "true"})).get("theta_skew") is True
         assert "theta_skew" not in _attr_flags(SimpleNamespace(attrs={}))
+
+    def test_tag_grammar_default_opt_out_and_legacy(self):
+        """Skew-normal untagged, the Gaussian block `_normaltheta`, the t block `_thetat` alone;
+        the legacy `_thetaskew` token still reads as the skew-normal block."""
+        from multiaxis_eci.analysis.fitspec import FLAGSHIP, FitSpec, _parse_tag
+        base = dict(K=4, lineage_prior=True, lineage_bm=True, no_humans=True)
+        assert FitSpec(**base).tag == "_lineageprior_lineagebm_nohumans"
+        assert FitSpec(**base, theta_skew=False).tag == "_lineageprior_lineagebm_normaltheta_nohumans"
+        t = FitSpec(**base, theta_t=True)
+        assert t.theta_skew is False and t.tag == "_lineageprior_lineagebm_thetat_nohumans"
+        assert _parse_tag("_lineageprior_lineagebm_normaltheta_nohumans")["theta_skew"] is False
+        assert _parse_tag("_lineageprior_lineagebm_thetaskew_nohumans")["theta_skew"] is True
+        assert "theta_skew" not in _parse_tag("_lineageprior_lineagebm_nohumans")
+        assert FLAGSHIP.theta_skew and FLAGSHIP.results_dir.name == "mirt_lineageprior_lineagebm_nohumans"
+
+    def test_cli_default_and_opt_out(self):
+        """3_fit/fit.py fits the skew-normal block unless --normal-theta is passed."""
+        import argparse
+        from multiaxis_eci.analysis.fitspec import FitSpec
+        ns = dict(K=4, loading_prior="normal", link="linear", human_prior=False, human_merge=False,
+                  lineage_prior=True, lineage_bm=True, effort_means=True, time_prior=False,
+                  theta_t=False, theta_pos=False, no_sg=False, apply_exclusions=False,
+                  keep_isolated=False, simpleqa_original=False, drop_benchmarks=None,
+                  private_bases=False, floors=True, ceiling_noise=False, known_se=False,
+                  pooled_noise=True, censor_bounds=False, beta_binomial=True, no_humans=True)
+        assert FitSpec.from_args(argparse.Namespace(**ns, theta_skew=True)).theta_skew is True
+        assert FitSpec.from_args(argparse.Namespace(**ns, theta_skew=False)).tag.endswith(
+            "_normaltheta_nohumans")
 
 
 class TestThetaPos:

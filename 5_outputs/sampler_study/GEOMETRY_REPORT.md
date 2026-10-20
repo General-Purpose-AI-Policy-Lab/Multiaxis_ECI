@@ -89,6 +89,7 @@ Sur batterie à partir de minuit, la file a été réordonnée : troisième pair
 ## Suite donnée
 
 - **Option `--theta-skew` ajoutée au dépôt le 16 octobre**, désactivée par défaut. Elle passe par `build_mirt_model(..., theta_skew=True)`, `config.PRIOR_THETA_SKEW_ALPHA`, et apparaît dans `docs/model_math.md` §5.4 et dans `docs/cli.md`. C'est la version testée ici : skew-normal standardisée par axe sur le bloc partagé, sans recentrage exact. À évaluer au refit en LOO face au fit phare, au même titre que `--ceiling-noise`.
+- **Le skew-normal est devenu le défaut des fits K-axes le 20 octobre** (`FitSpec.theta_skew`, `--normal-theta` pour revenir au bloc gaussien), après le refit sur les données du 19 octobre : 2 modes au lieu de 7, dont le meilleur atteint par 17 chaînes sur 20. L'indice canonique K=1 garde le bloc gaussien.
 - Garder la matrice de masse low-rank.
 - Ne pas poursuivre CNC, les mouvements de rotation, la parcimonie Gamma ni la corrélation libre.
 - Skew-normal + corrélation positive à un facteur (θ_k = λ_k·g + √(1 − λ_k²)·s_k) : pas de gain par rapport au skew-normal seul.

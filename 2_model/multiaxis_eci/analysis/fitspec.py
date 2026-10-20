@@ -85,7 +85,13 @@ class FitSpec:
     effort_means: bool = True
     time_prior: bool = False
     theta_t: bool = False
-    theta_skew: bool = False
+    # Skew-normal exchangeable theta block (models/mirt._theta_skew_cells): the default since
+    # 2026-10-20 (user), after the sampler study and the refit of 2026-10-19 (two modes instead of
+    # seven, the best one reached by 17 chains of 20). ON carries no token, the Gaussian block
+    # emits `_normaltheta`; folders from 2026-10-16 to 2026-10-20 carried `_thetaskew`. A trace
+    # whose spec lacks the field was fitted Gaussian (`from_trace`). The t block (`theta_t`)
+    # replaces it.
+    theta_skew: bool = True
     theta_pos: bool = False
     no_sg: bool = False
     apply_exclusions: bool = False
@@ -152,6 +158,8 @@ class FitSpec:
             object.__setattr__(self, "effort_means", False)
         if self.censor_bounds and self.beta_binomial:
             object.__setattr__(self, "beta_binomial", False)
+        if self.theta_t and self.theta_skew:
+            object.__setattr__(self, "theta_skew", False)
 
     # ── identity ────────────────────────────────────────────────────────────
     @property
@@ -170,7 +178,7 @@ class FitSpec:
         if self.lineage_prior and not self.effort_means: tag += "_noeffortmeans"
         if self.time_prior: tag += "_timeprior"
         if self.theta_t: tag += "_thetat"
-        if self.theta_skew: tag += "_thetaskew"
+        elif not self.theta_skew: tag += "_normaltheta"
         if self.theta_pos: tag += "_thetapos"
         if self.no_sg: tag += "_noSG"
         if self.apply_exclusions: tag += "_excluded"
@@ -242,7 +250,7 @@ class FitSpec:
                 lineage_prior=args.lineage_prior, lineage_bm=args.lineage_bm,
                 effort_means=args.effort_means,
                 time_prior=args.time_prior, theta_t=args.theta_t,
-                theta_skew=getattr(args, "theta_skew", False),
+                theta_skew=getattr(args, "theta_skew", True),
                 theta_pos=args.theta_pos,
                 no_sg=args.no_sg,
                 apply_exclusions=args.apply_exclusions,
@@ -292,6 +300,7 @@ class FitSpec:
             # before the effort means became the default (2026-10-03) without them.
             d.setdefault("beta_binomial", False)
             d.setdefault("effort_means", False)
+            d.setdefault("theta_skew", False)     # a spec from before the skew-normal block
             d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
             d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
             d.setdefault("sigma_b_floor", 0.0)
@@ -316,6 +325,7 @@ class FitSpec:
             # Without mirt_spec the trace predates the Beta-binomial: the Beta, unless an attr says so.
             spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
                                    "beta_binomial": False, "effort_means": False,
+                                   "theta_skew": False,
                                    "human_delta_sd": LEGACY_HUMAN_DELTA_SD,
                                    "human_root_sd": LEGACY_HUMAN_ROOT_SD, "sigma_b_floor": 0.0,
                                    **attr})
@@ -427,13 +437,13 @@ class FitSpec:
 # are named explicitly although both hold the default: the flagship is a statement of one fit,
 # and a later default change must not silently redefine it.
 FLAGSHIP = FitSpec(K=4, loading_prior="normal", lineage_prior=True, lineage_bm=True,
-                   floors=True, no_humans=True)
+                   floors=True, theta_skew=True, no_humans=True)
 # The former flagship, the human tiers fitted inside under the merged order: kept as a secondary
 # fit in its own folder (`mirt_humanmerge_lineageprior_lineagebm/`), refitted on new data only on
 # request (`3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm`), out of the default
 # run and of the dashboard (user, 2026-10-08).
 JOINT_FIT = FitSpec(K=4, loading_prior="normal", human_merge=True, lineage_prior=True,
-                    lineage_bm=True, floors=True)
+                    lineage_bm=True, floors=True, theta_skew=True)
 # The one path every consumer reads, so the figures, the dashboard card and the
 # post cannot name different traces: the flagship fit of the CURRENT data
 # generation (`config.RESULTS_DIR`). It exists once `3_fit/fit.py --K 4 --lineage-prior
@@ -629,11 +639,19 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
             out[fl] = True
     if take("_noeffortmeans"):
         out["effort_means"] = False
-    for tok, fl in (("_timeprior", "time_prior"),
-                    ("_thetat", "theta_t"), ("_thetaskew", "theta_skew"),
-                    ("_thetapos", "theta_pos")):
-        if take(tok):
-            out[fl] = True
+    # Theta block, two grammars: today the skew-normal is the untagged default and the Gaussian
+    # emits `_normaltheta`; from 2026-10-16 to 2026-10-20 the skew-normal was the option
+    # `_thetaskew`. An untagged legacy folder holds a Gaussian fit, which its trace's spec says.
+    if take("_timeprior"):
+        out["time_prior"] = True
+    if take("_thetat"):
+        out["theta_t"] = True
+    if take("_thetaskew"):
+        out["theta_skew"] = True
+    elif take("_normaltheta"):
+        out["theta_skew"] = False
+    if take("_thetapos"):
+        out["theta_pos"] = True
     for tok, fl in (("_noSG", "no_sg"), ("_excluded", "apply_exclusions"),
                     ("_keepiso", "keep_isolated"),
                     ("_cyber", "cyber"), ("_sqaorig", "simpleqa_original")):
@@ -727,8 +745,11 @@ def _check_round_trip(spec: FitSpec, trace_path: Path) -> None:
     # `beta_binomial` too: ON is untagged, and every trace from before 2026-10-01 sits in an
     # untagged folder with a Beta likelihood. And `effort_means`, untagged when ON since
     # 2026-10-03, every lineage trace from before sitting in an untagged folder without them.
+    # `theta_skew` too: ON is untagged since 2026-10-20, every trace from before sitting in an
+    # untagged folder with the Gaussian block (or in a `_thetaskew` one).
     if replace(got, floors=want.floors, pooled_noise=want.pooled_noise,
-               beta_binomial=want.beta_binomial, effort_means=want.effort_means) != want:
+               beta_binomial=want.beta_binomial, effort_means=want.effort_means,
+               theta_skew=want.theta_skew) != want:
         raise ValueError(f"spec round-trip failed: folder tag {folder_tag!r} names "
                          f"a different flag set than the recovered spec, whose own "
                          f"tag is {spec.tag!r}")

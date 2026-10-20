@@ -352,7 +352,7 @@ geometry (no flat translation direction, no post-hoc recentering needed). This
 is the only thing anchoring the overall location, which is why the difficulty
 prior can leave $D$'s location free.
 
-**Skew-normal option (`--theta-skew`, exploration, 2026-10-16).** The same exchangeable block
+**Skew-normal block (the K-axis fits' default since 2026-10-20; `--normal-theta` restores the Gaussian one; an option `--theta-skew` from 2026-10-16).** The same exchangeable block
 (unstructured models plus the chain founders) becomes independent skew-normal per axis,
 standardised to mean 0 and sd 1, with a learned shape per axis:
 
@@ -375,7 +375,10 @@ location is pinned softly by the zero mean (sd $1/\sqrt{n}$ on the common shift)
 sum-to-zero constraint. `config.PRIOR_THETA_SKEW_ALPHA`; exclusive with `--theta-t`. In the
 sampler study (`5_outputs/sampler_study/GEOMETRY_REPORT.md`) the shapes came out at $-8$ to $-10$
 on three axes and $\approx 0$ on one, every chain; on the flagship 14 of 30 chains reached the
-log-likelihood criterion against 4 of 30, with a better LOO on each of three seeds.
+log-likelihood criterion against 4 of 30, with a better LOO on each of three seeds; on the refit of 2026-10-19 the 20
+flagship chains fell into two modes, 17 of them in the best, where the Gaussian block had left five to seven. The
+builder's own default (`build_mirt_model(theta_skew=False)`) stays Gaussian, so the canonical K=1 index and the golden
+log-probabilities are unchanged; `FitSpec.theta_skew` carries the default of the K-axis fits.
 
 **Optional substantive $\theta$ structure** (composes with any loading prior;
 both are priors on $\theta$ only, and the unstructured models keep the

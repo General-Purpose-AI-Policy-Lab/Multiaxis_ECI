@@ -2715,9 +2715,10 @@ class TestFitSpec:
         # floors ON emits no token; the baseline is fit pooled_noise=False
         # (3_fit/fit.py's baseline rule), which the tag now names, and an attr-less
         # trace predates the Beta-binomial, so `_betalik` too. Harmless for
-        # folders: a baseline lives untagged in its K-fit's folder.
+        # folders: a baseline lives untagged in its K-fit's folder. Its theta block is the
+        # Gaussian one (the skew-normal default is not forwarded), hence `_normaltheta`.
         assert not spec.beta_binomial
-        assert spec.tag == "_cyber_knownse_unpooled_betalik"
+        assert spec.tag == "_normaltheta_cyber_knownse_unpooled_betalik"
 
     def test_spec_written_before_beta_binomial_reads_as_beta(self):
         # Every trace up to 2026-10-01 carries a mirt_spec without the field and was fit with

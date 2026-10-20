@@ -298,7 +298,9 @@ PRIOR_TIME_BETA = 0.5
 # unit scale the rest of the theta priors assume.
 PRIOR_THETA_T_NU = 4.0
 
-# Skew-normal theta block (models/mirt.py, build_mirt_model(..., theta_skew=True)). Each axis's
+# Skew-normal theta block (models/mirt.py, build_mirt_model(..., theta_skew=True)), the K-axis fits' default since
+# 2026-10-20 (FitSpec.theta_skew; `--normal-theta` opts out; the builder and the canonical index keep the Gaussian
+# block). Each axis's
 # column is skew-normal, standardised to mean 0 and sd 1, with its own shape alpha_k ~
 # Normal(0, PRIOR_THETA_SKEW_ALPHA), learned. The abilities have a left tail (old and weak models far
 # below the frontier, a ceiling on the right), and independent skewed columns identify the rotation

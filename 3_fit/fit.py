@@ -769,7 +769,7 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_shared_base_zsn"] = json.dumps(False)
     if args.theta_t:
         attrs["mirt_theta_t_cells"] = json.dumps(True)
-    if args.theta_skew:
+    if spec.theta_skew:
         attrs["mirt_theta_skew"] = json.dumps(True)
     if args.theta_pos:
         attrs["mirt_theta_pos"] = json.dumps(True)
@@ -1137,14 +1137,15 @@ def main():
                              "are the ICA identification channel, so the likelihood "
                              "can prefer one orientation. Widens the abilities of "
                              "thinly-measured models")
-    parser.add_argument("--theta-skew", action="store_true",
-                        help="[exploration] skew-normal theta: the exchangeable block "
-                             "(unstructured models and chain founders) independent "
-                             "skew-normal per axis, standardised, with a learned shape "
-                             "per axis (config.PRIOR_THETA_SKEW_ALPHA). Matches the "
+    parser.add_argument("--normal-theta", dest="theta_skew", action="store_false",
+                        help="[exploration] Gaussian theta block instead of the default "
+                             "skew-normal one (since 2026-10-20): the exchangeable block "
+                             "(unstructured models and chain founders) is then N(0, I) "
+                             "rather than independent skew-normal per axis with a learned "
+                             "shape (config.PRIOR_THETA_SKEW_ALPHA), which matches the "
                              "abilities' left tail and identifies the axes' orientation "
-                             "(ICA); see 5_outputs/sampler_study/GEOMETRY_REPORT.md. "
-                             "Exclusive with --theta-t")
+                             "(5_outputs/sampler_study/GEOMETRY_REPORT.md). Emits "
+                             "`_normaltheta`; --theta-t replaces the block either way")
     parser.add_argument("--theta-pos", action="store_true",
                         help="[exploration] positive likelihood-side ability, the "
                              "semi-compensatory convention: eta reads "
