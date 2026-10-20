@@ -230,7 +230,7 @@ def _record_label(raw: str) -> str:
 def _record_names(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     """The records that carry a lag and a name (not in UNLABELLED_RECORDS), in release order, with
     the name each one is labelled by."""
-    rows = df[df["lag_months_median"].notna() & ~df["name"].isin(UNLABELLED_RECORDS)] \
+    rows = df[df["lag_months_mean"].notna() & ~df["name"].isin(UNLABELLED_RECORDS)] \
         .sort_values("release_date")
     return rows, [("≥ " if bool(r.get("censored", False)) else "") + _record_label(r["name"])
                   for _, r in rows.iterrows()]
@@ -252,8 +252,12 @@ def _label_band_px(texts: list[str], font: int) -> float:
 
 
 def _lag_curve(r, smooth_months: float, today_d: pd.Timestamp):
-    """(dates, median, lo, hi) of one scope's smoothed lag curve, or None when it has no record.
-    The curve rests on every dated lag; the censored lower bounds stay out of it."""
+    """(dates, median, lo, hi) of one scope's smoothed lag curve, or None when it has no record:
+    a Gaussian-kernel smooth (bandwidth `smooth_months`) of the per-draw record lags, median and
+    10-90% band across draws. The curve rests on every dated lag; the censored lower bounds stay
+    out of it. The user kept this reading over the twelve-month mean of the months-behind
+    function (2026-10-20): the curve passes through the records, which are what the figure
+    shows; `ScopeGap.lag_fn_mean` stays available for the table's frontier-to-frontier row."""
     df, draws = r.lag_df, r.lag_draws
     if not len(df):
         return None
@@ -274,12 +278,12 @@ def _split_dots(results: dict, drawn: list[str], w0, w1, to_px_x, to_px_y, dot_p
     dots = []
     for s in drawn:
         df = results[s].lag_df
-        ok = df["lag_months_median"].notna() & (df["release_date"] >= w0) & (df["release_date"] <= w1)
+        ok = df["lag_months_mean"].notna() & (df["release_date"] >= w0) & (df["release_date"] <= w1)
         for c in ("censored", "backcast"):
             if c in df:
                 ok &= ~df[c].astype(bool)
         for _, r in df[ok].iterrows():
-            dots.append((s, r["name"], pd.Timestamp(r["release_date"]), float(r["lag_months_median"])))
+            dots.append((s, r["name"], pd.Timestamp(r["release_date"]), float(r["lag_months_mean"])))
     if not dots:
         return [], set()
     xy = np.array([(to_px_x(d), to_px_y(v)) for _, _, d, v in dots])
@@ -311,9 +315,10 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             label_scope: str = "all", title: str | None = None,
             follower_title: str = "open-weights models", leader_title: str = "closed models",
             leader_one: str = "closed model", scope_titles: dict | None = None) -> go.Figure:
-    """Months behind the leader's frontier, per follower record and access scope: a dot with its
-    50% interval per record, and a Gaussian-smoothed curve (bandwidth `smooth_months`) with its
-    80% band across posterior draws per scope, named at its right end. The records of
+    """Months behind the leader's frontier, per follower record and access scope: a dot (the
+    posterior mean of the record's lag) with its 50% interval per record, and a Gaussian-smoothed
+    curve (bandwidth `smooth_months`) with its 80% band across posterior draws per scope, named
+    at its right end. The records of
     `label_scope` are named beside their dot, the names spread so they do not cover one another.
     The group names are as a sentence carries them (analysis.frontier_gap.GROUP_NOUNS), the
     leader's in the plural and, for the hover, in the singular (`leader_one`).
@@ -439,14 +444,17 @@ def lag_fig(results: dict, scopes: list[str], *, style: FigureStyle = DASHBOARD,
             if ((sub["release_date"] >= w0) & (sub["release_date"] <= w1)).any():
                 shapes_seen.add(key)
             opacity = [0.0 if not key and (scope, n) in hidden else 1.0 for n in sub["name"]]
+            # The dot is the posterior mean, the bar the 50% interval; a mean pulled outside
+            # the interval by a tail keeps a bar that reaches it (no negative error lengths).
+            y = sub["lag_months_mean"]
             fig.add_trace(go.Scatter(
-                x=sub["release_date"], y=sub["lag_months_median"], mode="markers",
+                x=sub["release_date"], y=y, mode="markers",
                 legendgroup=scope, name=f"{name}: records", showlegend=False,
                 marker=dict(color=col, size=dot_px, symbol=symbol, opacity=opacity,
                             line=dict(width=1.5 if key else 1, color=col if key else "white")),
                 error_y=dict(type="data", symmetric=False,
-                             array=sub["lag_hdi50_high"] - sub["lag_months_median"],
-                             arrayminus=sub["lag_months_median"] - sub["lag_hdi50_low"],
+                             array=np.maximum(sub["lag_hdi50_high"] - y, 0.0),
+                             arrayminus=np.maximum(y - sub["lag_hdi50_low"], 0.0),
                              thickness=style.errbar, width=0, color=_rgba(col, 0.6)),
                 text=sub["name"],
                 customdata=np.column_stack([(sub[f"frac_{key}"] * 100).round() if key else np.zeros(len(sub)),

@@ -38,7 +38,22 @@ readings of the gap:
    assumption in more than `MAX_DATED_BACK_FRAC` of draws is dropped from the series. In a class
    scope, a follower record also has to be a frontier model overall: within `RECORD_FRONTIER_TOL`
    ECI-H of the follower's record of its date on all benchmarks (`off_frontier_records`), or it
-   is only the best of the few follower models the class happened to score.
+   is only the best of the few follower models the class happened to score. Leader candidates
+   whose posterior is wider than `LEADER_SD_CAP` do not date crossings (`env_sd_cap`): a model
+   scored on two benchmarks with a 10-point SD beats a record in a tenth of the draws and puts
+   a year-long tail on its lag. Each record's lag is reported by its posterior mean as well as
+   its median: the draws take a handful of values (release date differences), so the median
+   jumps between two of them when their shares cross one half, the mean moves with the shares.
+   The study of 2026-10-20 behind these choices is in 5_outputs/us_cn_frontier/investigation_2026-10-20/.
+   `lag_function`: the same lag as a function of calendar time, per draw: at every month of a
+   grid, the follower's frontier of that month (its running max over the candidates released
+   so far, per draw) against the first leader candidate at or above it, so it is defined every
+   month and reads every follower model through the running max, not only the median records.
+   It is a sawtooth whose minima are the record lags: between two records the follower's level
+   does not move and the lag grows a month a month. Its trailing mean over `LAG_MEAN_MONTHS`
+   months (`lag_12m_mean`) is the lag on an average day of the past year, which the mean of the
+   record lags understates when records are sparse (records are the minima); it is a row of the
+   table. The figures' curve stays the kernel smooth through the record lags (user, 2026-10-20).
 2. `line_gap`: one straight line per group fitted on the posterior medians of its records
    released since `fit_start` (top-`top_k`, 1 by default: the diamonds of the panels;
    `regimes.weighted_line_fit` on centred medians, each point weighted by its posterior SD plus
@@ -53,7 +68,7 @@ readings of the gap:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
@@ -96,6 +111,45 @@ LINE_TOP_K = 1
 # "records" on private benchmarks were Llama 3.1 8B and Pixtral 12B, the open models the class
 # scored, not the open frontier (Llama 3.1 405B, 15 points higher on all benchmarks).
 RECORD_FRONTIER_TOL = 5.0
+# A leader candidate dates crossings (the envelope the lags are read off) only when its posterior
+# SD in ECI-H is at most this (2026-10-20): on the 2026-10-01 data the models above it are two-score
+# releases of 2019-2023 (PaLM 2, GPT-2 XL, Dolly), none a record, and PaLM 2-L alone (SD 10.6) put
+# a 19-month tail on DeepSeek-V3's lag. The 2026 frontier (Claude Mythos, Fable 5, GPT-6, SD 4 to
+# 5) stays. davinci (SD 6.1) goes, so the all-benchmarks field opens with text-davinci-001 (2022).
+LEADER_SD_CAP = 6.0
+# The months-behind curve: trailing mean of `lag_function` over this many months.
+LAG_MEAN_MONTHS = 12
+# Scores a release needs in the scope to be a record, the same as a candidate (the CLI's
+# --min-obs, 2). A record is picked for having the highest median, and with two scores that is
+# often a lucky median: at 3 the three 2-score Chinese records of 2025-2026 went and the
+# all-benchmarks lag rose by about a month (2026-10-20). But a class scores most candidates on two
+# benchmarks (18 of the 20 Chinese candidates on private benchmarks), so 3 empties it, and one
+# rule for the all-benchmarks scope and another for the classes would make them incomparable
+# (user, 2026-10-20): one rule everywhere, 2. The option stays (--record-min-obs).
+RECORD_MIN_OBS = 2
+# The frontier the lags are read on: the running top-k of both groups against each other. With
+# 2 (the default since 2026-10-20, user: less noise), the follower's points are its records and
+# their runners-up, the crossing is the first date the leader's second-best stood at or above
+# the point (symmetric, so a runner-up is not read against a frontier it was never the equal
+# of), and the trend lines run through those points. Against top-1 on the 2026-10-01 data: twice
+# the points (29 against 17 since 2024 on all benchmarks), intervals a quarter narrower, levels
+# within 0.3 month on all benchmarks and 0.8 lower on public (the leader's second-best is
+# closer to its first than the follower's). 1 is the record reading of Ihle (2026).
+FRONTIER_K = 2
+
+
+def running_kth_max(X: np.ndarray, k: int) -> np.ndarray:
+    """(S, F) the k-th largest value of X[:, :j + 1] at every column j (running max for k = 1),
+    -inf while fewer than k columns are in."""
+    if k == 1:
+        return np.maximum.accumulate(X, axis=1)
+    S, F = X.shape
+    out = np.full((S, F), -np.inf)
+    buf = np.full((S, k), -np.inf)
+    for j in range(F):
+        buf = -np.sort(-np.concatenate([buf, X[:, j:j + 1]], axis=1), axis=1)[:, :k]
+        out[:, j] = buf[:, k - 1]
+    return out
 # A class fit's scale is linked through the leader's candidates from these organizations with at
 # least LINK_MIN_OBS scores in the scope.
 LINK_ORGANIZATIONS = ("Anthropic", "Google DeepMind", "Google Research", "OpenAI")
@@ -142,18 +196,20 @@ def linking_members(names: list[str], candidates: np.ndarray, n_obs: np.ndarray,
 
 
 def off_frontier_records(group: GroupFrontier, reference: GroupFrontier,
-                         tol: float = RECORD_FRONTIER_TOL) -> frozenset:
+                         tol: float = RECORD_FRONTIER_TOL, *, records_only: bool = True) -> frozenset:
     """The records of `group` (a class scope) whose release stands more than `tol` ECI-H below
     the same group's record of its date in `reference` (the all-benchmarks scope), both read on
     the reference's posterior medians: the best of the models the class scored, not a frontier
     model. A release is its best effort on the reference (`data.model_product`), so kimi-k3_max is
     judged as Kimi K3, whichever effort holds the reference's record. A release the reference
-    does not hold is kept."""
+    does not hold is kept. `records_only=False` judges every candidate of the group the same way:
+    the ones the class's per-draw envelope (`lag_function`) must not read as the frontier."""
     ref = reference.tl.assign(family=reference.tl["name"].map(model_product))
     level = ref.groupby("family")["mean"].max()
     ref_recs = ref[ref["is_record"]]
     out = set()
-    for _, r in group.tl[group.tl["is_record"]].iterrows():
+    rows = group.tl[group.tl["is_record"]] if records_only else group.tl
+    for _, r in rows.iterrows():
         fam = model_product(r["name"])
         if fam not in level.index:
             continue
@@ -187,8 +243,11 @@ class GroupFrontier:
     tl: pd.DataFrame            # candidates: name, release_date, mean, hdi_low, hdi_high, sd, is_record, in_fit
     records: list[str]          # the frontier: running max of posterior-median ECI-H
     fit: LineFit | None         # the trend line through the frontier (ECI-H per year)
-    env_years: np.ndarray       # (F,) candidate release years, ascending
-    env_E: np.ndarray           # (S, F) running max of per-draw ECI-H over the candidates so far
+    env_years: np.ndarray       # (F,) release years of the envelope's candidates, ascending
+    env_E: np.ndarray           # (S, F) running max of per-draw ECI-H over those candidates so far
+    # (F,) their names, aligned with env_E's columns: the candidates minus the ones kept out of
+    # the envelope (`env_sd_cap`, `env_exclude` of build_group_frontier).
+    env_names: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=object))
 
     def forecast(self, horizon="2030-01-01", hdi_prob: float = 0.8) -> ForecastResult | None:
         """The line as a ForecastResult (fit_basis 'regimes', no other regime), for the crossover
@@ -209,20 +268,30 @@ class GroupFrontier:
 def build_group_frontier(E: np.ndarray, names: list[str], model_dates: pd.Series,
                          members: np.ndarray, label: str, *, fit_start: str,
                          top_k: int = LINE_TOP_K, hdi_prob: float = 0.8,
-                         not_records: frozenset = frozenset()) -> GroupFrontier:
+                         not_records: frozenset = frozenset(), env_sd_cap: float | None = None,
+                         env_exclude: frozenset = frozenset(), n_obs: np.ndarray | None = None,
+                         record_min_obs: int = RECORD_MIN_OBS,
+                         frontier_k: int = FRONTIER_K) -> GroupFrontier:
     """One group's candidates (`members`, (n,) bool over `names`, already restricted to the
     timelines' candidates), its records, its trend line and its per-draw envelope, from the
     per-draw ECI-H array `E` (S, n). `not_records` are running maxima that do not count as
-    records (`off_frontier_records`)."""
+    records (`off_frontier_records`). The envelope (the per-draw frontier the lags are read
+    off) leaves out the candidates whose posterior SD exceeds `env_sd_cap` (the leader's
+    LEADER_SD_CAP) and the names in `env_exclude` (a class scope's follower candidates that are
+    not frontier models overall); the candidates, records and line keep them. With `n_obs`
+    (scores per model, (n,)), a record needs at least `record_min_obs` of them: the thinner
+    candidates stay in the cloud and the envelope. `frontier_k` > 1 makes the "records" the
+    running top-k (`frontier_topk`) and the envelope the running k-th max of the draws, its
+    first k - 1 columns dropped (no k-th best yet)."""
     idx = np.flatnonzero(members)
     rows = []
     for i in idx:
         med, lo, hi = post_stats(E[:, i], hdi_prob=hdi_prob)
         rows.append({"name": names[i], "release_date": pd.Timestamp(model_dates[names[i]]),
                      "mean": med, "hdi_low": lo, "hdi_high": hi, "sd": float(E[:, i].std()),
-                     "idx": int(i)})
+                     "n_obs": int(n_obs[i]) if n_obs is not None else -1, "idx": int(i)})
     tl = pd.DataFrame(rows, columns=["name", "release_date", "mean", "hdi_low", "hdi_high",
-                                     "sd", "idx"])
+                                     "sd", "n_obs", "idx"])
     tl = tl.sort_values("release_date", kind="stable").reset_index(drop=True)
     # Records and fit points are read on one effort per family, the best on the axis, and one
     # release per organization and day (`regimes.family_best`, `one_per_org_day`: the trend
@@ -231,9 +300,12 @@ def build_group_frontier(E: np.ndarray, names: list[str], model_dates: pd.Series
     # the organization: two records on one day would be one record and an instant runner-up.
     # The cloud keeps every effort.
     best = one_per_org_day(family_best(tl)) if len(tl) else tl
+    if n_obs is not None and len(best):
+        best = best[best["n_obs"] >= record_min_obs]
     per_day = (best.sort_values("mean", ascending=False).drop_duplicates("release_date")
                    .sort_values("release_date", kind="stable")) if len(tl) else tl
-    records = [m for m in frontier_topk(per_day, 1) if m not in not_records] if len(tl) else []
+    pool = per_day if frontier_k == 1 else best
+    records = [m for m in frontier_topk(pool, frontier_k) if m not in not_records] if len(tl) else []
     tl["is_record"] = tl["name"].isin(records)
     front = records if top_k == 1 else (frontier_topk(best, top_k) if len(tl) else [])
     fit_pts = (best[best["name"].isin(front)
@@ -250,14 +322,19 @@ def build_group_frontier(E: np.ndarray, names: list[str], model_dates: pd.Series
                                 fit_pts["name"].tolist(), s_grid=LINE_S_GRID,
                                 prior_sd=LINE_PRIOR_SD)
         fit.a = fit.a + y.mean()
-    if len(tl):
-        order = tl["idx"].to_numpy()
-        env_E = np.maximum.accumulate(E[:, order], axis=1)
-        env_years = _to_year(pd.DatetimeIndex(tl["release_date"]))
+    env = tl[~tl["name"].isin(env_exclude)] if len(tl) else tl
+    if env_sd_cap is not None and len(env):
+        env = env[env["sd"] <= env_sd_cap]
+    if len(env) >= frontier_k:
+        order = env["idx"].to_numpy()
+        env_E = running_kth_max(E[:, order], frontier_k)[:, frontier_k - 1:]
+        env_years = _to_year(pd.DatetimeIndex(env["release_date"]))[frontier_k - 1:]
+        env_names = env["name"].to_numpy().astype(object)[frontier_k - 1:]
     else:
         env_E, env_years = np.zeros((E.shape[0], 0)), np.zeros(0)
+        env_names = np.zeros(0, dtype=object)
     return GroupFrontier(label=label, tl=tl, records=records, fit=fit,
-                         env_years=env_years, env_E=env_E)
+                         env_years=env_years, env_E=env_E, env_names=env_names)
 
 
 # The closed frontier before its first measurement is unobserved. A level it already exceeded on
@@ -316,7 +393,7 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
         span = float(years[iw] - d0)
         with np.errstate(divide="ignore", invalid="ignore"):
             early_rate = (M[:, iw] - F0) / span if span > 0 else np.zeros(S)
-        leader_names = leader.tl["name"].to_numpy()                        # (F,) by release date
+        leader_names = leader.env_names                                    # (F,) by release date
     use_ref = has_leader and reference is not None and reference.env_E.shape[1] > 0
     if use_ref:
         R = reference.env_E
@@ -344,7 +421,7 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
                 t_ref = np.minimum(yR[r_first], d0)
                 # A borrowed crossing is the reference model's (the class's first-day model when
                 # the reference reached the level no earlier).
-                ref_names = reference.tl["name"].to_numpy()[r_first]
+                ref_names = reference.env_names[r_first]
                 who_names = np.where(borrowed & (yR[r_first] < d0), ref_names, who_names)
             with np.errstate(divide="ignore", invalid="ignore"):
                 t_back = d0 - (F0 - level) / early_rate
@@ -367,7 +444,8 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
                "frac_backcast": float(backcast.mean()), "backcast": bool(backcast.mean() > 0.5),
                "frac_censored": float(censored.mean()), "censored": bool(censored.mean() > 0.5),
                "first_leader_above": first_above,
-               "lag_months_median": float(np.median(finite)) if finite.size else np.nan}
+               "lag_months_median": float(np.median(finite)) if finite.size else np.nan,
+               "lag_months_mean": float(np.mean(finite)) if finite.size else np.nan}
         for p in probs:
             tag = f"{int(round(p * 100))}"
             if finite.size:
@@ -376,7 +454,8 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
                 lo = hi = np.nan
             row[f"lag_hdi{tag}_low"], row[f"lag_hdi{tag}_high"] = float(lo), float(hi)
         rows.append(row)
-    cols = ["name", "release_date", "level_eci_median", "lag_months_median", "frac_undefined",
+    cols = ["name", "release_date", "level_eci_median", "lag_months_median", "lag_months_mean",
+            "frac_undefined",
             "frac_borrowed", "frac_backcast", "backcast", "frac_censored", "censored", "first_leader_above"] \
         + [f"lag_hdi{int(round(p * 100))}_{s}" for p in probs for s in ("low", "high")]
     df = pd.DataFrame(rows, columns=cols)
@@ -384,6 +463,71 @@ def frontier_lag(follower: GroupFrontier, leader: GroupFrontier, E: np.ndarray,
     # the assumed early rate of the leader's frontier rather than a crossing anyone observed.
     keep = ((df["frac_backcast"] + df["frac_censored"]) <= MAX_DATED_BACK_FRAC).to_numpy()
     return df[keep].reset_index(drop=True), lags[:, keep]
+
+
+def lag_grid(follower: GroupFrontier, today) -> pd.DatetimeIndex:
+    """The months `lag_function` is evaluated at: the first of every month from the month of the
+    follower's first envelope candidate to the last month start on or before `today` (the
+    curve's "today" value is that month's)."""
+    if follower.env_E.shape[1] == 0:
+        return pd.DatetimeIndex([])
+    first = pd.Timestamp(follower.tl["release_date"].min()).replace(day=1)
+    return pd.date_range(first, pd.Timestamp(today), freq="MS")
+
+
+def lag_function(follower: GroupFrontier, leader: GroupFrontier, grid: pd.DatetimeIndex,
+                 reference: GroupFrontier | None = None) -> np.ndarray:
+    """(S, G) months behind at every date of `grid`, per draw: the follower's frontier of that
+    date (its envelope: the running max of the draws over its candidates released so far) against
+    the release of the first leader candidate, by date, whose draw is at or above it, every
+    leader candidate counting (records or not, released after the date or not: the lag is
+    negative while the follower leads and the leader catches up later, NaN when it never does).
+    The same reading as `frontier_lag` at a record's date, between records it grows a month a
+    month, so the record lags are the minima of this sawtooth. A level the leader's field had
+    already passed on its first measured day is read off `reference` (the all-benchmarks leader
+    frontier, class scopes) as in `frontier_lag`, and NaN where that is not available: nothing
+    is dated back here, the grid of the figures starts in 2024."""
+    S, G = leader.env_E.shape[0], len(grid)
+    out = np.full((S, G), np.nan)
+    if G == 0 or follower.env_E.shape[1] == 0 or leader.env_E.shape[1] == 0:
+        return out
+    gy = _to_year(pd.DatetimeIndex(grid))
+    fy, years, M = follower.env_years.astype(float), leader.env_years.astype(float), leader.env_E
+    d0 = float(years[0])
+    i0 = int(np.flatnonzero(years <= d0 + 1e-9)[-1])
+    F0 = M[:, i0]
+    use_ref = reference is not None and reference.env_E.shape[1] > 0
+    if use_ref:
+        R = reference.env_E
+        pick = np.random.default_rng(0).choice(R.shape[0], size=S, replace=R.shape[0] < S)
+        MR, yR = R[pick], reference.env_years.astype(float)
+    for g, t in enumerate(gy):
+        j = int(np.searchsorted(fy, t + 1e-9, side="right")) - 1
+        if j < 0:
+            continue
+        level = follower.env_E[:, j]
+        reached = M >= level[:, None]
+        any_ = reached.any(axis=1)
+        first = np.argmax(reached, axis=1)
+        cross = years[first]
+        on_day_one = any_ & (first <= i0) & (level < F0)
+        if use_ref:
+            r_reached = MR >= level[:, None]
+            r_first = np.argmax(r_reached, axis=1)
+            r_ok = r_reached.any(axis=1) & ~((r_first == 0) & (level < MR[:, 0]))
+            borrowed = on_day_one & r_ok
+            cross = np.where(borrowed, np.minimum(yR[r_first], d0), cross)
+            on_day_one &= ~borrowed
+        out[:, g] = np.where(any_ & ~on_day_one, (t - cross) * 12.0, np.nan)
+    return out
+
+
+def trailing_mean(lag_fn: np.ndarray, months: int = LAG_MEAN_MONTHS) -> np.ndarray:
+    """(S, G) mean of `lag_function` over the last `months` grid points, per draw; NaN until
+    `months` points are in hand and wherever one of them is undefined."""
+    if lag_fn.size == 0:
+        return lag_fn.copy()
+    return pd.DataFrame(lag_fn.T).rolling(months, min_periods=months).mean().T.to_numpy()
 
 
 def line_gap(leader: GroupFrontier, follower: GroupFrontier, at) -> dict[str, np.ndarray]:
@@ -461,6 +605,9 @@ class ScopeGap:
     crossovers: pd.DataFrame
     summary: pd.DataFrame       # one row per quantity
     off_frontier: frozenset = frozenset()   # follower running maxima not counted as records
+    lag_grid: pd.DatetimeIndex = field(default_factory=lambda: pd.DatetimeIndex([]))  # (G,)
+    lag_fn: np.ndarray = field(default_factory=lambda: np.zeros((0, 0)))        # (S, G) lag_function
+    lag_fn_mean: np.ndarray = field(default_factory=lambda: np.zeros((0, 0)))   # (S, G) its trailing mean
 
     def summary_rows(self, probs=(0.5, 0.8)) -> pd.DataFrame:
         rows = []
@@ -469,6 +616,9 @@ class ScopeGap:
             s = summarize(x, probs)
             rows.append({"scope": self.scope, "quantity": q, "group": group, "unit": unit, **s})
 
+        if self.lag_fn_mean.size and np.isfinite(self.lag_fn_mean[:, -1]).any():
+            # The lag on an average day of the last LAG_MEAN_MONTHS months
+            add(f"lag_{LAG_MEAN_MONTHS}m_mean", self.follower.label, self.lag_fn_mean[:, -1], "months")
         for g in (self.leader, self.follower):
             if g.fit is not None:
                 add("slope", g.label, g.fit.b, "ECI-H per year")
@@ -496,7 +646,8 @@ def scope_gap(E: np.ndarray, data, model_dates: pd.Series, keep: np.ndarray, *, 
               kind: str = "openness", fit_start: str = config.FORECAST_KW["fit_start"],
               top_k: int = LINE_TOP_K, today=None, hdi_prob: float = 0.8,
               reference: GroupFrontier | None = None,
-              reference_follower: GroupFrontier | None = None) -> ScopeGap:
+              reference_follower: GroupFrontier | None = None,
+              record_min_obs: int = RECORD_MIN_OBS, frontier_k: int = FRONTIER_K) -> ScopeGap:
     """Everything one scope yields. `E` (S, n) is per-draw ECI-H, `keep` (n,) the timelines'
     candidate mask; a kept candidate without a group label raises (fix the curated file)."""
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
@@ -513,17 +664,29 @@ def scope_gap(E: np.ndarray, data, model_dates: pd.Series, keep: np.ndarray, *, 
     for lab in (leader_lab, follower_lab):
         members = np.array([keep[i] and labels.get(m) == lab for i, m in enumerate(names)])
         groups[lab] = build_group_frontier(E, names, model_dates, members, lab,
-                                           fit_start=fit_start, top_k=top_k, hdi_prob=hdi_prob)
+                                           fit_start=fit_start, top_k=top_k, hdi_prob=hdi_prob,
+                                           env_sd_cap=LEADER_SD_CAP if lab == leader_lab else None,
+                                           n_obs=data.n_obs_per_model, record_min_obs=record_min_obs,
+                                           frontier_k=frontier_k)
     leader, follower = groups[leader_lab], groups[follower_lab]
     drop = frozenset()
     if reference_follower is not None:
         drop = off_frontier_records(follower, reference_follower)
-        if drop:
+        # The class's per-draw follower envelope reads no candidate that is not a frontier model
+        # overall either, or the class's "frontier" between records would be whichever follower
+        # model it happened to score.
+        drop_env = off_frontier_records(follower, reference_follower, records_only=False)
+        if drop or drop_env:
             members = np.array([keep[i] and labels.get(m) == follower_lab for i, m in enumerate(names)])
             follower = build_group_frontier(E, names, model_dates, members, follower_lab,
                                             fit_start=fit_start, top_k=top_k, hdi_prob=hdi_prob,
-                                            not_records=drop)
+                                            not_records=drop, env_exclude=drop_env,
+                                            n_obs=data.n_obs_per_model, record_min_obs=record_min_obs,
+                                           frontier_k=frontier_k)
     lag_df, lag_draws = frontier_lag(follower, leader, E, reference=reference)
+    grid = lag_grid(follower, today)
+    lag_fn = lag_function(follower, leader, grid, reference=reference)
+    lag_fn_mean = trailing_mean(lag_fn)
     line = line_last = {}
     if leader.fit is not None and follower.fit is not None:
         line = line_gap(leader, follower, today)
@@ -533,7 +696,8 @@ def scope_gap(E: np.ndarray, data, model_dates: pd.Series, keep: np.ndarray, *, 
     out = ScopeGap(scope=scope, kind=kind, leader=leader, follower=follower,
                    humans=human_tiers(E, names, data.is_human, hdi_prob), lag_df=lag_df,
                    lag_draws=lag_draws, line=line, line_last=line_last, crossovers=cx,
-                   summary=pd.DataFrame(), off_frontier=drop)
+                   summary=pd.DataFrame(), off_frontier=drop, lag_grid=grid, lag_fn=lag_fn,
+                   lag_fn_mean=lag_fn_mean)
     out.summary = out.summary_rows()
     return out
 
@@ -567,6 +731,10 @@ def save_scope(res: ScopeGap, out_dir) -> list:
     write(res.humans, "humans")
     write(res.crossovers, "crossovers")
     arrays = {"lag_draws": res.lag_draws}
+    if len(res.lag_grid):
+        arrays["lag_grid"] = res.lag_grid.values.astype("datetime64[D]")
+        arrays["lag_fn"] = res.lag_fn
+        arrays["lag_fn_mean"] = res.lag_fn_mean
     for g in (res.leader, res.follower):
         if g.fit is not None:
             arrays[f"fit_a_{g.label}"] = g.fit.a
@@ -613,7 +781,14 @@ def load_scope(out_dir, kind: str, scope: str) -> ScopeGap:
     for c in cx_cols:
         if c in cx:
             cx[c] = pd.to_datetime(cx[c])
+    lag_df = read("records", parse_dates=["release_date"])
+    if "lag_months_mean" not in lag_df:          # outputs written before 2026-10-20
+        lag_df["lag_months_mean"] = lag_df["lag_months_median"]
+    has_fn = "lag_fn" in npz.files
     return ScopeGap(scope=scope, kind=kind, leader=groups[leader_lab], follower=groups[follower_lab],
-                    humans=read("humans"), lag_df=read("records", parse_dates=["release_date"]),
+                    humans=read("humans"), lag_df=lag_df,
                     lag_draws=npz["lag_draws"], line=line, line_last=line_last, crossovers=cx,
-                    summary=read("summary"))
+                    summary=read("summary"),
+                    lag_grid=pd.DatetimeIndex(npz["lag_grid"]) if has_fn else pd.DatetimeIndex([]),
+                    lag_fn=npz["lag_fn"] if has_fn else np.zeros((0, 0)),
+                    lag_fn_mean=npz["lag_fn_mean"] if has_fn else np.zeros((0, 0)))
