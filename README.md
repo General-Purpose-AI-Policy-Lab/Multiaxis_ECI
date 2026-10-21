@@ -21,7 +21,7 @@ The flagship lives in `5_outputs/data20261019/mirt_lineageprior_lineagebm/`. Its
 
 Mathematics and abstract reasoning share an axis with scientific knowledge, agentic and cyber benchmarks load apart, and the commonsense and factual benchmarks form the fourth axis. The axes are distinct: their largest correlation is 0.64 (axes 1 and 2).
 
-The 20 chains fall into four posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read mode A, the best log-density and the most chains (9). Mode D, 33 nats lower, carves the space as the fit without ceilings does (agentic and cyber together, a science axis and a visual axis) and is drawn on its own axes in `secondary_mode/`.
+The 20 chains fall into four posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read mode A, the best log-density and the most chains (9); no other mode stands out enough to be drawn beside it.
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines) placed on that axis. Abilities are on the fitted scale (the models' mean at 0 on each axis). A tier is drawn only where its own scores place it, on benchmarks that measure the axis, so the agentic and cyber axes carry few tiers: no human baseline exists for most of their benchmarks.
 
@@ -86,9 +86,7 @@ Then find the posterior modes, write the axis tables on the chains the deliverab
 ```bash
 python 4_diagnostics/diagnose_chains.py --trace <trace> --write-modes
 python 4_diagnostics/diagnose_chains.py --trace <trace> --write-tables   # once selected_chains is final
-python 4_diagnostics/diagnose_chains.py --trace <trace> --write-tables --secondary   # a secondary mode with axes of its own
 python 4_diagnostics/5_place_humans.py --trace <trace>
-python 4_diagnostics/5_place_humans.py --trace <trace> --secondary
 python 4_diagnostics/3_plot_mirt.py --forecast --trace <trace>
 python 4_diagnostics/4_build_dashboard.py --force-all
 ```

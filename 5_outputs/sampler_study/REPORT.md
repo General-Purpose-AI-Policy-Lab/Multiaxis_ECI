@@ -172,6 +172,6 @@ sur la moyenne et la dispersion de log σ_b), puis vérifier que les résultats 
    aussi bonnes les unes que les autres sur les données. Les remèdes sont du côté du modèle et des données :
    - une structure plus confirmatoire des loadings ;
    - un plancher sur σ_b ;
-   - des mesures ciblées : voir `data_wishlist.md`, alternatives classées par question (refaite le 21 octobre pour les modes A et B du flagship avec plafonds, par `data_wishlist.py` ; la version du 12 octobre est dans l’historique git) ;
+   - des mesures ciblées : voir `data_wishlist.md`, alternatives classées par question (refaite le 21 octobre pour les quatre modes A–D du flagship avec plafonds, 20 chaînes, par `data_wishlist.py` ; la version du 12 octobre est dans l’historique git) ;
    - et, en attendant, rapporter la sensibilité des conclusions au mode choisi.
 3. **Le modèle a des pics d'effondrement du bruit** : à corriger avant tout nouveau fit de référence.
