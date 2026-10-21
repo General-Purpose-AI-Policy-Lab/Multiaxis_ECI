@@ -1,0 +1,7 @@
+a,b,diff_all,se_all,diff_reliable,se_reliable,n_reliable
+"flagship A (merged + visual, no ceilings)","flagship B (agentic apart, no ceilings)",145.53,77.63,33.22,5.75,3567
+"flagship A (merged + visual, no ceilings)",ceilings A (agentic apart),185.93,112.65,-41.34,11.34,3336
+"flagship A (merged + visual, no ceilings)",ceilings B (merged + visual),364.35,112.30,-43.26,8.81,3564
+"flagship B (agentic apart, no ceilings)",ceilings A (agentic apart),40.39,116.56,-87.94,12.48,3708
+"flagship B (agentic apart, no ceilings)",ceilings B (merged + visual),218.82,155.50,-90.54,12.17,4146
+ceilings A (agentic apart),ceilings B (merged + visual),178.43,104.96,3.17,8.28,3755

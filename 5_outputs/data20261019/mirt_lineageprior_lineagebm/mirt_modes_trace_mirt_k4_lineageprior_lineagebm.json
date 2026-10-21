@@ -1,0 +1,55 @@
+{
+ "trace": "trace_mirt_k4_lineageprior_lineagebm.nc",
+ "n_chains": 10,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -23.8,
+  0.0,
+  -10.7,
+  -30.2,
+  -15.8,
+  -44.2,
+  -11.7,
+  -13.5,
+  -7.1,
+  -49.2
+ ],
+ "modes": [
+  {
+   "chains": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "mean_logp": -22683.62218267809,
+   "min_matched_corr": 0.812,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    3,
+    9
+   ],
+   "mean_logp": -22707.469384231947,
+   "min_matched_corr": 0.936,
+   "label": "B",
+   "delta_logp": -23.8,
+   "matched_corr_to_best": 0.054
+  }
+ ],
+ "secondary_chains": {
+  "chains": [
+   3,
+   9
+  ],
+  "why": "Investigation 2026-10-21 (Claude): mode B, the axis structure of the fit without ceilings (_noceiling, mode A) (agentic and cyber merged, a visual axis) with ceilings, drawn on a frame of its own to compare the human placement with the flagship's at equal structure."
+ }
+}

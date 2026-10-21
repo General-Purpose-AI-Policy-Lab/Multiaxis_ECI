@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Investigation 2026-10-21 (Claude, provisional): the names of the fit without ceilings (mirt_lineageprior_lineagebm_noceiling, its mode B) carried to the axes whose top benchmarks hold their signatures; an axis no signature matches stays unnamed.",
+  "axes": {
+    "axis1": {
+      "title": "Fluid Intelligence & Formal Sciences",
+      "title_fr": "Intelligence fluide & Sciences formelles",
+      "signature": [
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "OTIS Mock AIME 2024-2025"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MMLU Chemistry",
+        "MATH Level 5",
+        "AudioMultiChallenge",
+        "GPQA Main Chemistry",
+        "GPQA Main Biology",
+        "MMLU Pro Chemistry",
+        "MMLU Biology"
+      ]
+    },
+    "axis2": {
+      "title": "Agentic Capabilities & Programming",
+      "title_fr": "Capacités agentiques & Programmation",
+      "signature": [
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents"
+      ],
+      "top_benchmarks": [
+        "OSWorld",
+        "SWE Atlas",
+        "DeepSWE",
+        "MCP Atlas",
+        "APEX-Agents",
+        "FrontierCode",
+        "PostTrainBench v1.1",
+        "CritPt"
+      ]
+    },
+    "axis3": {
+      "title": "Cyber Capabilities",
+      "title_fr": "Capacités cyber",
+      "signature": [
+        "CyScenarioBench",
+        "CyberGym",
+        "Cybench"
+      ],
+      "top_benchmarks": [
+        "CyScenarioBench",
+        "CyberGym",
+        "Furniture Assembly",
+        "GBAEval",
+        "Lech Mazur Writing",
+        "AISI Cyber Ranges - Cooling Tower",
+        "EBR-bench",
+        "GDPval"
+      ]
+    },
+    "axis4": {
+      "title": "Visual & Commonsense",
+      "title_fr": "Visuel & sens commun",
+      "signature": [
+        "GeoBench",
+        "VPCT",
+        "OpenBookQA"
+      ],
+      "top_benchmarks": [
+        "OpenBookQA",
+        "ARC AI2",
+        "SimpleQA Verified",
+        "SimpleBench",
+        "PIQA",
+        "HellaSwag",
+        "DeepResearch Bench",
+        "WinoGrande"
+      ]
+    }
+  }
+}

@@ -1,0 +1,2 @@
+fit,type,K,free_loadings,R2,RMSE,MAE,PIT_var,eta_rhat,divergences,max_phi
+K=4 · no humans · flagship,exploratory,4,428,0.9638,0.0441,0.0298,0.0669,1.165,59,0.551

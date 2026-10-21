@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Investigation 2026-10-21 (Claude, provisional): the mode A names of the fit without ceilings (mirt_lineageprior_lineagebm_noceiling) carried to the axes whose top benchmarks hold their signatures.",
+  "axes": {
+    "axis1": {
+      "title": "Fluid Intelligence & Formal Sciences",
+      "title_fr": "Intelligence fluide & Sciences formelles",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI-2",
+        "MATH Level 5"
+      ],
+      "top_benchmarks": [
+        "CritPt",
+        "MCP Atlas",
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "ARC-AGI-2",
+        "DeepSWE",
+        "ARC-AGI",
+        "CAISI CTF-Archive"
+      ]
+    },
+    "axis2": {
+      "title": "Agentic & Cyber Capabilities",
+      "title_fr": "Capacités agentiques & cyber",
+      "signature": [
+        "GDPval",
+        "MirrorCode",
+        "CyberGym"
+      ],
+      "top_benchmarks": [
+        "GBAEval",
+        "GDPval",
+        "CyScenarioBench",
+        "Furniture Assembly",
+        "CyberGym",
+        "MirrorCode",
+        "FrontierSWE v2",
+        "EBR-bench"
+      ]
+    },
+    "axis3": {
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
+      "signature": [
+        "MMLU Biology",
+        "GSM8K",
+        "GPQA Main Biology"
+      ],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "GSM8K",
+        "MMLU Biology",
+        "SimpleBench",
+        "GPQA Main Biology",
+        "WMDP Biology",
+        "LAB-Bench Cloning",
+        "WMDP Chemistry"
+      ]
+    },
+    "axis4": {
+      "title": "Visual & Commonsense",
+      "title_fr": "Visuel & sens commun",
+      "signature": [
+        "GeoBench",
+        "VPCT",
+        "OpenBookQA"
+      ],
+      "top_benchmarks": [
+        "GeoBench",
+        "SpireClimb",
+        "OpenBookQA",
+        "CAISI ExploitGym Userspace",
+        "ARC AI2",
+        "VPCT",
+        "CAISI SEC-Bench Pro",
+        "CyScenarioBench (Anthropic)"
+      ]
+    }
+  }
+}

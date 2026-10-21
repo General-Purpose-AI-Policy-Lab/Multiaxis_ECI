@@ -1,0 +1,758 @@
+{
+ "trace": "trace_mirt_k4_lineageprior_lineagebm.nc",
+ "rule": "dominant axis (largest loading-variance share), content filter 1_curated/human_axis_content.csv, ordered tiers (HUMAN_ORDER_MERGED), other axes at the typical-model profile; drawn: own score below the ceiling or between two such tiers",
+ "softmin_beta": null,
+ "ceiling_d": true,
+ "axes": [
+  {
+   "axis": "axis1",
+   "title": "Fluid Intelligence & Formal Sciences",
+   "benchmarks_with_human_scores": [
+    "ARC-AGI",
+    "ARC-AGI-2",
+    "DTBench",
+    "FrontierMath Tiers 1-3 v2",
+    "GPQA Diamond Biology",
+    "GPQA Main Biology",
+    "LAB-Bench LitQA2",
+    "MATH Level 5",
+    "MMLU Biology",
+    "OTIS Mock AIME 2024-2025",
+    "SpireClimb",
+    "VPCT",
+    "Visual Task Assessment (VISTA)",
+    "WMDP Biology",
+    "WMDP Chemistry"
+   ],
+   "unjudged_benchmarks": [
+    "GPQA Diamond Biology",
+    "GPQA Main Biology",
+    "LAB-Bench LitQA2",
+    "MMLU Biology",
+    "SpireClimb",
+    "Visual Task Assessment (VISTA)",
+    "WMDP Biology",
+    "WMDP Chemistry"
+   ],
+   "drawn": [
+    "Average Human",
+    "Skilled Generalist",
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Top Performer",
+    "Committee of Average Humans",
+    "Committee of Skilled Generalists",
+    "High School Qualifier",
+    "High School Top Performer"
+   ],
+   "tiers": {
+    "Average Human": [
+     1.678,
+     1.722,
+     1.765
+    ],
+    "Skilled Generalist": [
+     1.72,
+     1.784,
+     1.877
+    ],
+    "Domain Expert": [
+     1.772,
+     1.883,
+     2.077
+    ],
+    "Committee of Domain Experts": [
+     2.13,
+     2.23,
+     2.357
+    ],
+    "Top Performer": [
+     5.416,
+     5.913,
+     6.529
+    ],
+    "Committee of Average Humans": [
+     2.085,
+     2.178,
+     2.288
+    ],
+    "Committee of Skilled Generalists": [
+     2.108,
+     2.205,
+     2.32
+    ],
+    "High School Qualifier": [
+     0.583,
+     0.713,
+     0.836
+    ],
+    "High School Top Performer": [
+     1.562,
+     1.879,
+     2.329
+    ]
+   },
+   "convergence": {
+    "rhat": 1.0,
+    "ess_bulk": 2246.0,
+    "ess_tail": 2269.0,
+    "divergences": 0,
+    "n_scores": 22
+   },
+   "consistency": [
+    {
+     "tier": "Average Human",
+     "benchmark": "ARC-AGI",
+     "observed": 0.77,
+     "predicted": 0.903,
+     "predicted_q10": 0.888,
+     "predicted_q90": 0.916,
+     "first_model_at_score": "2025-11"
+    },
+    {
+     "tier": "Committee of Average Humans",
+     "benchmark": "ARC-AGI",
+     "observed": 0.98,
+     "predicted": 0.98,
+     "predicted_q10": 0.972,
+     "predicted_q90": 0.987,
+     "first_model_at_score": "2026-02"
+    },
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "ARC-AGI",
+     "observed": 0.98,
+     "predicted": 0.921,
+     "predicted_q10": 0.902,
+     "predicted_q90": 0.942,
+     "first_model_at_score": "2026-02"
+    },
+    {
+     "tier": "Average Human",
+     "benchmark": "ARC-AGI-2",
+     "observed": 0.6,
+     "predicted": 0.607,
+     "predicted_q10": 0.554,
+     "predicted_q90": 0.655,
+     "first_model_at_score": "2026-02"
+    },
+    {
+     "tier": "Committee of Average Humans",
+     "benchmark": "ARC-AGI-2",
+     "observed": 1.0,
+     "predicted": 0.933,
+     "predicted_q10": 0.899,
+     "predicted_q90": 0.959,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "DTBench",
+     "observed": 0.987,
+     "predicted": 0.941,
+     "predicted_q10": 0.93,
+     "predicted_q90": 0.955,
+     "first_model_at_score": "2026-09"
+    },
+    {
+     "tier": "Committee of Domain Experts",
+     "benchmark": "FrontierMath Tiers 1-3 v2",
+     "observed": 0.35,
+     "predicted": 0.859,
+     "predicted_q10": 0.829,
+     "predicted_q90": 0.89,
+     "first_model_at_score": "2025-04"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "GPQA Diamond Biology",
+     "observed": 0.831,
+     "predicted": 0.819,
+     "predicted_q10": 0.808,
+     "predicted_q90": 0.837,
+     "first_model_at_score": "2026-04"
+    },
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "GPQA Diamond Biology",
+     "observed": 0.25,
+     "predicted": 0.809,
+     "predicted_q10": 0.802,
+     "predicted_q90": 0.819,
+     "first_model_at_score": "2023-06"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "GPQA Main Biology",
+     "observed": 0.667,
+     "predicted": 0.87,
+     "predicted_q10": 0.861,
+     "predicted_q90": 0.882,
+     "first_model_at_score": "2024-04"
+    },
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "GPQA Main Biology",
+     "observed": 0.432,
+     "predicted": 0.862,
+     "predicted_q10": 0.857,
+     "predicted_q90": 0.869,
+     "first_model_at_score": "2023-12"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "LAB-Bench LitQA2",
+     "observed": 0.7,
+     "predicted": 0.533,
+     "predicted_q10": 0.521,
+     "predicted_q90": 0.553,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "MATH Level 5",
+     "observed": 0.9,
+     "predicted": 0.991,
+     "predicted_q10": 0.99,
+     "predicted_q90": 0.993,
+     "first_model_at_score": "2024-12"
+    },
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "MATH Level 5",
+     "observed": 0.4,
+     "predicted": 0.99,
+     "predicted_q10": 0.989,
+     "predicted_q90": 0.991,
+     "first_model_at_score": "2023-11"
+    },
+    {
+     "tier": "High School Top Performer",
+     "benchmark": "MMLU Biology",
+     "observed": 0.898,
+     "predicted": 0.826,
+     "predicted_q10": 0.808,
+     "predicted_q90": 0.848,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "High School Qualifier",
+     "benchmark": "OTIS Mock AIME 2024-2025",
+     "observed": 0.53,
+     "predicted": 0.535,
+     "predicted_q10": 0.433,
+     "predicted_q90": 0.628,
+     "first_model_at_score": "2024-12"
+    },
+    {
+     "tier": "High School Top Performer",
+     "benchmark": "OTIS Mock AIME 2024-2025",
+     "observed": 0.93,
+     "predicted": 0.978,
+     "predicted_q10": 0.943,
+     "predicted_q90": 0.995,
+     "first_model_at_score": "2025-12"
+    },
+    {
+     "tier": "Top Performer",
+     "benchmark": "SpireClimb",
+     "observed": 0.9,
+     "predicted": 0.867,
+     "predicted_q10": 0.767,
+     "predicted_q90": 0.939,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Average Human",
+     "benchmark": "VPCT",
+     "observed": 1.0,
+     "predicted": 0.786,
+     "predicted_q10": 0.761,
+     "predicted_q90": 0.808,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "Visual Task Assessment (VISTA)",
+     "observed": 0.554,
+     "predicted": 0.558,
+     "predicted_q10": 0.549,
+     "predicted_q90": 0.57,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "WMDP Biology",
+     "observed": 0.605,
+     "predicted": 0.877,
+     "predicted_q10": 0.877,
+     "predicted_q90": 0.878,
+     "first_model_at_score": "2023-06"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "WMDP Chemistry",
+     "observed": 0.433,
+     "predicted": 0.84,
+     "predicted_q10": 0.835,
+     "predicted_q90": 0.847,
+     "first_model_at_score": "2023-06"
+    }
+   ],
+   "order": [
+    "Average Human",
+    "Skilled Generalist",
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Top Performer",
+    "Committee of Average Humans",
+    "Committee of Skilled Generalists",
+    "High School Qualifier",
+    "High School Top Performer"
+   ]
+  },
+  {
+   "axis": "axis2",
+   "title": "Agentic Capabilities & Programming",
+   "benchmarks_with_human_scores": [
+    "METR Time Horizons",
+    "OSWorld",
+    "The Agent Company"
+   ],
+   "unjudged_benchmarks": [],
+   "drawn": [
+    "Skilled Generalist",
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Committee of Skilled Generalists"
+   ],
+   "tiers": {
+    "Average Human": [
+     -2.079,
+     -0.317,
+     0.887
+    ],
+    "Skilled Generalist": [
+     1.232,
+     1.391,
+     1.53
+    ],
+    "Domain Expert": [
+     1.407,
+     1.525,
+     1.659
+    ],
+    "Committee of Domain Experts": [
+     1.943,
+     2.236,
+     2.654
+    ],
+    "Top Performer": [
+     1.874,
+     3.196,
+     5.479
+    ],
+    "Committee of Average Humans": [
+     -0.897,
+     0.714,
+     1.655
+    ],
+    "Committee of Skilled Generalists": [
+     1.47,
+     1.814,
+     2.277
+    ],
+    "High School Qualifier": [
+     -4.544,
+     -1.154,
+     0.947
+    ],
+    "High School Top Performer": [
+     -3.247,
+     0.264,
+     2.977
+    ]
+   },
+   "convergence": {
+    "rhat": 1.01,
+    "ess_bulk": 260.0,
+    "ess_tail": 383.0,
+    "divergences": 0,
+    "n_scores": 3
+   },
+   "consistency": [
+    {
+     "tier": "Committee of Domain Experts",
+     "benchmark": "METR Time Horizons",
+     "observed": 0.83,
+     "predicted": 0.842,
+     "predicted_q10": 0.812,
+     "predicted_q90": 0.873,
+     "first_model_at_score": "2026-04"
+    },
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "OSWorld",
+     "observed": 0.724,
+     "predicted": 0.658,
+     "predicted_q10": 0.588,
+     "predicted_q90": 0.713,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "The Agent Company",
+     "observed": 0.75,
+     "predicted": 0.768,
+     "predicted_q10": 0.728,
+     "predicted_q90": 0.806,
+     "first_model_at_score": null
+    }
+   ],
+   "order": [
+    "Average Human",
+    "Skilled Generalist",
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Top Performer",
+    "Committee of Average Humans",
+    "Committee of Skilled Generalists",
+    "High School Qualifier",
+    "High School Top Performer"
+   ]
+  },
+  {
+   "axis": "axis3",
+   "title": "Cyber Capabilities",
+   "benchmarks_with_human_scores": [
+    "Cybench",
+    "FrontierMath Erdos",
+    "GeoBench"
+   ],
+   "unjudged_benchmarks": [
+    "FrontierMath Erdos",
+    "GeoBench"
+   ],
+   "drawn": [
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Top Performer"
+   ],
+   "tiers": {
+    "Average Human": [
+     -5.997,
+     -3.645,
+     -1.774
+    ],
+    "Skilled Generalist": [
+     -4.753,
+     -2.299,
+     -0.703
+    ],
+    "Domain Expert": [
+     -1.384,
+     -0.095,
+     0.576
+    ],
+    "Committee of Domain Experts": [
+     0.542,
+     0.717,
+     0.919
+    ],
+    "Top Performer": [
+     1.05,
+     2.215,
+     4.183
+    ],
+    "Committee of Average Humans": [
+     -4.817,
+     -2.297,
+     -0.585
+    ],
+    "Committee of Skilled Generalists": [
+     -2.985,
+     -0.604,
+     0.459
+    ],
+    "High School Qualifier": [
+     -4.254,
+     -1.707,
+     -0.187
+    ],
+    "High School Top Performer": [
+     -2.998,
+     -0.012,
+     2.085
+    ]
+   },
+   "convergence": {
+    "rhat": 1.01,
+    "ess_bulk": 1402.0,
+    "ess_tail": 1491.0,
+    "divergences": 0,
+    "n_scores": 3
+   },
+   "consistency": [
+    {
+     "tier": "Committee of Domain Experts",
+     "benchmark": "Cybench",
+     "observed": 0.75,
+     "predicted": 0.763,
+     "predicted_q10": 0.668,
+     "predicted_q90": 0.846,
+     "first_model_at_score": "2025-11"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "FrontierMath Erdos",
+     "observed": 0.0,
+     "predicted": 0.001,
+     "predicted_q10": 0.0,
+     "predicted_q90": 0.002,
+     "first_model_at_score": "2026-04"
+    },
+    {
+     "tier": "Top Performer",
+     "benchmark": "GeoBench",
+     "observed": 0.9,
+     "predicted": 0.881,
+     "predicted_q10": 0.776,
+     "predicted_q90": 0.937,
+     "first_model_at_score": null
+    }
+   ],
+   "order": [
+    "Average Human",
+    "Skilled Generalist",
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Top Performer",
+    "Committee of Average Humans",
+    "Committee of Skilled Generalists",
+    "High School Qualifier",
+    "High School Top Performer"
+   ]
+  },
+  {
+   "axis": "axis4",
+   "title": "Visual & Commonsense",
+   "benchmarks_with_human_scores": [
+    "GSM8K",
+    "HellaSwag",
+    "InterCode-CTF",
+    "LAB-Bench Cloning",
+    "LAB-Bench Protocol",
+    "MMLU",
+    "OpenBookQA",
+    "PIQA",
+    "SimpleBench",
+    "TriviaQA",
+    "WinoGrande"
+   ],
+   "unjudged_benchmarks": [
+    "GSM8K",
+    "InterCode-CTF",
+    "LAB-Bench Cloning",
+    "LAB-Bench Protocol",
+    "MMLU",
+    "PIQA",
+    "SimpleBench",
+    "TriviaQA",
+    "WinoGrande"
+   ],
+   "drawn": [
+    "Average Human",
+    "Skilled Generalist",
+    "Domain Expert",
+    "Top Performer",
+    "Committee of Average Humans",
+    "Committee of Skilled Generalists",
+    "High School Top Performer"
+   ],
+   "tiers": {
+    "Average Human": [
+     -1.132,
+     -1.036,
+     -0.935
+    ],
+    "Skilled Generalist": [
+     0.343,
+     0.658,
+     0.977
+    ],
+    "Domain Expert": [
+     0.888,
+     1.066,
+     1.254
+    ],
+    "Committee of Domain Experts": [
+     3.841,
+     5.363,
+     7.509
+    ],
+    "Top Performer": [
+     2.336,
+     3.019,
+     4.67
+    ],
+    "Committee of Average Humans": [
+     1.498,
+     2.01,
+     2.73
+    ],
+    "Committee of Skilled Generalists": [
+     3.02,
+     3.858,
+     5.005
+    ],
+    "High School Qualifier": [
+     -2.292,
+     -0.575,
+     0.352
+    ],
+    "High School Top Performer": [
+     0.39,
+     0.587,
+     0.859
+    ]
+   },
+   "convergence": {
+    "rhat": 1.01,
+    "ess_bulk": 533.0,
+    "ess_tail": 589.0,
+    "divergences": 1,
+    "n_scores": 13
+   },
+   "consistency": [
+    {
+     "tier": "Skilled Generalist",
+     "benchmark": "GSM8K",
+     "observed": 0.968,
+     "predicted": 0.948,
+     "predicted_q10": 0.913,
+     "predicted_q90": 0.965,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Committee of Average Humans",
+     "benchmark": "HellaSwag",
+     "observed": 0.956,
+     "predicted": 0.954,
+     "predicted_q10": 0.942,
+     "predicted_q90": 0.964,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "InterCode-CTF",
+     "observed": 0.956,
+     "predicted": 0.965,
+     "predicted_q10": 0.944,
+     "predicted_q90": 0.978,
+     "first_model_at_score": "2025-04"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "LAB-Bench Cloning",
+     "observed": 0.6,
+     "predicted": 0.622,
+     "predicted_q10": 0.569,
+     "predicted_q90": 0.676,
+     "first_model_at_score": "2025-02"
+    },
+    {
+     "tier": "Domain Expert",
+     "benchmark": "LAB-Bench Protocol",
+     "observed": 0.79,
+     "predicted": 0.785,
+     "predicted_q10": 0.747,
+     "predicted_q90": 0.818,
+     "first_model_at_score": "2026-10"
+    },
+    {
+     "tier": "Average Human",
+     "benchmark": "MMLU",
+     "observed": 0.345,
+     "predicted": 0.497,
+     "predicted_q10": 0.468,
+     "predicted_q90": 0.529,
+     "first_model_at_score": "2021-12"
+    },
+    {
+     "tier": "High School Top Performer",
+     "benchmark": "MMLU",
+     "observed": 0.898,
+     "predicted": 0.901,
+     "predicted_q10": 0.88,
+     "predicted_q90": 0.922,
+     "first_model_at_score": "2024-12"
+    },
+    {
+     "tier": "Average Human",
+     "benchmark": "OpenBookQA",
+     "observed": 0.92,
+     "predicted": 0.485,
+     "predicted_q10": 0.461,
+     "predicted_q90": 0.513,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Committee of Skilled Generalists",
+     "benchmark": "PIQA",
+     "observed": 0.949,
+     "predicted": 0.948,
+     "predicted_q10": 0.936,
+     "predicted_q90": 0.958,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Average Human",
+     "benchmark": "SimpleBench",
+     "observed": 0.837,
+     "predicted": 0.171,
+     "predicted_q10": 0.17,
+     "predicted_q90": 0.172,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Top Performer",
+     "benchmark": "SimpleBench",
+     "observed": 0.954,
+     "predicted": 0.964,
+     "predicted_q10": 0.937,
+     "predicted_q90": 0.97,
+     "first_model_at_score": null
+    },
+    {
+     "tier": "Average Human",
+     "benchmark": "TriviaQA",
+     "observed": 0.797,
+     "predicted": 0.663,
+     "predicted_q10": 0.644,
+     "predicted_q90": 0.682,
+     "first_model_at_score": "2022-04"
+    },
+    {
+     "tier": "Committee of Average Humans",
+     "benchmark": "WinoGrande",
+     "observed": 0.94,
+     "predicted": 0.947,
+     "predicted_q10": 0.932,
+     "predicted_q90": 0.959,
+     "first_model_at_score": null
+    }
+   ],
+   "order": [
+    "Average Human",
+    "Skilled Generalist",
+    "Domain Expert",
+    "Committee of Domain Experts",
+    "Top Performer",
+    "Committee of Average Humans",
+    "Committee of Skilled Generalists",
+    "High School Qualifier",
+    "High School Top Performer"
+   ]
+  }
+ ]
+}

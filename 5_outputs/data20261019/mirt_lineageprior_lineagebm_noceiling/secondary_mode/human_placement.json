@@ -1,5 +1,5 @@
 {
- "trace": "trace_mirt_k4_lineageprior_lineagebm_nohumans.nc",
+ "trace": "trace_mirt_k4_lineageprior_lineagebm_noceiling.nc",
  "rule": "dominant axis (largest loading-variance share), content filter 1_curated/human_axis_content.csv, ordered tiers (HUMAN_ORDER_MERGED), other axes at the typical-model profile; drawn: own score below the ceiling or between two such tiers",
  "softmin_beta": null,
  "axes": [
