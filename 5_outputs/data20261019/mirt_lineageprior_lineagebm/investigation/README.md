@@ -150,3 +150,13 @@ Comme LMCA, elles tiennent le plafond en l'air pour de mauvaises raisons. Cela p
 
 - **Adopter les plafonds dans le flagship.** La LOO robuste confirme le gain (+56 ± 12 nats sur les scores bien couverts), qui tient aussi à structure d'axes égale ; les plafonds informés concordent avec MBF. À faire au prochain refit, avec 20 chaînes (deux graines) pour stabiliser les modes, et après extension de la LOO intégrée au skew-normal et aux plafonds si l'on veut départager les modes proprement.
 - **Le choix de structure reste ouvert.** La structure retenue le 20 octobre (agentique & cyber fusionnés, axe visuel) est aussi la meilleure en LOO avec plafonds. Mais l'écart avec la structure à agentique séparé est petit, et s'inverse selon le critère (log-densité ou LOO).
+
+## Plafonds tenus par un score humain (21 octobre, `7_human_bound_ceilings.py`)
+
+Le plafond ne descend jamais sous le meilleur score observé, modèle ou humain. Sur 21 benchmarks une ligne humaine dépasse tous les modèles (`human_bound_ceilings.csv`). La borne ne change le plafond que là où elle dépasse nettement ce que le prior donnerait seul (médiane 0,95, d ≥ 0,75 toujours) :
+
+- **LMCA** : humain 0,87 (corrélation entre deux experts, sur un sous-ensemble plus facile ; ~0,84 corrigé), meilleur modèle 0,68, plafond 0,88 [0,87 ; 0,91], collé à la borne ;
+- **MMLU Biology / Chemistry** (sous-ensembles RAND) : 0,898 est l'estimation du papier MMLU pour tout MMLU, pas une mesure sur ces items. Mais la figure `mmlu_subsets_saturation.png` (`8_figure_mmlu_subsets.py`) montre que les données s'arrêtent aux modèles de mi-2025 (o1, o3, o4-mini, R1 vers 0,77) et que la courbe monte encore : le plafond n'y est pas identifié, il reste près du prior (0,93 et 0,94, contre 0,944 pour MBF) et la borne à 0,898 pèse peu ;
+- ailleurs (SimpleQA Verified, SimpleBench, PIQA, WinoGrande, GSM8K, OpenBookQA, HellaSwag, GeoBench), la borne tombe près de la médiane du prior et pèse peu ; sous 0,75 (The Agent Company, LitQA2, OSWorld, VISTA, BlueprintBench) elle ne pèse rien.
+
+**Décision (utilisateur, 21 octobre)** : la borne par les scores humains reste telle quelle, LMCA compris ; elle ne pèse vraiment que sur LMCA.

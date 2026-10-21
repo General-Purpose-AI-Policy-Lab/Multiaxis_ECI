@@ -18,11 +18,11 @@ def test_content_file_parses_and_names_known_axes():
     assert rules["Cyber Capabilities"]["Furniture Assembly"] is False
     assert rules["Cyber Capabilities"]["Cybench"] is True
     assert rules["Scientific Knowledge & Reasoning"]["InterCode-CTF"] is True
-    # the flagship of 2026-10-19: mode A's four axes, and mode B's (the previous flagship's
-    # names, its secondary frame)
+    # the flagships of 2026-10-19, without and with ceilings: each one's modes A and B
     flagship = {"Fluid Intelligence & Formal Sciences", "Scientific Knowledge & Reasoning",
                 "Agentic & Cyber Capabilities", "Visual & Commonsense",
-                "Agentic Capabilities & Programming", "Cyber Capabilities"}
+                "Agentic Capabilities & Programming", "Cyber Capabilities",
+                "Commonsense & Factual Knowledge"}
     # an exploration fit's own titles (semicomp0 mode A, 2026-10-08) borrow the flagship's
     # judgments through 5_place_humans.RULE_TITLES
     exploration = {"Cyber Capabilities & Reasoning", "Fluid Intelligence & Mathematics",

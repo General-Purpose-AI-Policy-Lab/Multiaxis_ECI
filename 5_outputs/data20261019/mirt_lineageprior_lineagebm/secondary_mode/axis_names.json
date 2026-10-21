@@ -1,6 +1,6 @@
 {
   "confirmed": true,
-  "how": "Investigation 2026-10-21 (Claude, provisional): the mode A names of the fit without ceilings (mirt_lineageprior_lineagebm_noceiling) carried to the axes whose top benchmarks hold their signatures.",
+  "how": "User, 2026-10-21: the mode A names of the fit without ceilings, validated for this secondary mode.",
   "axes": {
     "axis1": {
       "title": "Fluid Intelligence & Formal Sciences",

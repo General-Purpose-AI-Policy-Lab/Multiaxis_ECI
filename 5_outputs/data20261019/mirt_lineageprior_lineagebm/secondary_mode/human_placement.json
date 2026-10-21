@@ -612,10 +612,7 @@
     "VPCT",
     "WinoGrande"
    ],
-   "unjudged_benchmarks": [
-    "PIQA",
-    "WinoGrande"
-   ],
+   "unjudged_benchmarks": [],
    "drawn": [
     "Average Human",
     "Skilled Generalist",

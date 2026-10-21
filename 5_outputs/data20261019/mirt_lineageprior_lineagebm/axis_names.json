@@ -1,14 +1,14 @@
 {
   "confirmed": true,
-  "how": "Investigation 2026-10-21 (Claude, provisional): the names of the fit without ceilings (mirt_lineageprior_lineagebm_noceiling, its mode B) carried to the axes whose top benchmarks hold their signatures; an axis no signature matches stays unnamed.",
+  "how": "User, 2026-10-21, from the primary mode's top benchmarks (figures/k4/loadings_per_axis_primary.png).",
   "axes": {
     "axis1": {
-      "title": "Fluid Intelligence & Formal Sciences",
-      "title_fr": "Intelligence fluide & Sciences formelles",
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
       "signature": [
-        "ARC-AGI",
-        "ARC-AGI-2",
-        "OTIS Mock AIME 2024-2025"
+        "OTIS Mock AIME 2024-2025",
+        "MMLU Chemistry",
+        "GPQA Main Chemistry"
       ],
       "top_benchmarks": [
         "OTIS Mock AIME 2024-2025",
@@ -60,12 +60,12 @@
       ]
     },
     "axis4": {
-      "title": "Visual & Commonsense",
-      "title_fr": "Visuel & sens commun",
+      "title": "Commonsense & Factual Knowledge",
+      "title_fr": "Sens commun & connaissances factuelles",
       "signature": [
-        "GeoBench",
-        "VPCT",
-        "OpenBookQA"
+        "OpenBookQA",
+        "ARC AI2",
+        "SimpleQA Verified"
       ],
       "top_benchmarks": [
         "OpenBookQA",

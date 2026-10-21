@@ -89,3 +89,29 @@ Cyber Capabilities,The Agent Company,no,2026-10-20 user,simulated office tasks
 Cyber Capabilities,VPCT,no,2026-10-20 user,visual physics comprehension
 Agentic Capabilities & Programming,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)"
 Agentic Capabilities & Programming,HellaSwag,no,2026-10-20 user,commonsense sentence completion
+Scientific Knowledge & Reasoning,OTIS Mock AIME 2024-2025,yes,2026-10-21 user (validated with the batch),"competition mathematics"
+Scientific Knowledge & Reasoning,MATH Level 5,yes,2026-10-21 user (validated with the batch),"competition mathematics"
+Scientific Knowledge & Reasoning,VPCT,yes,2026-10-21 user (validated with the batch),"predicting a physical trajectory from a picture"
+Scientific Knowledge & Reasoning,ARC-AGI,yes,2026-10-21 user (validated with the batch),"abstract visual reasoning puzzles"
+Scientific Knowledge & Reasoning,ARC-AGI-2,yes,2026-10-21 user (validated with the batch),"abstract visual reasoning puzzles"
+Scientific Knowledge & Reasoning,GPQA Diamond,yes,2026-10-21 user (validated with the batch),"graduate science questions"
+Scientific Knowledge & Reasoning,LAB-Bench SeqQA,yes,2026-10-21 user (validated with the batch),"biology sequence questions"
+Scientific Knowledge & Reasoning,BioLP-bench,yes,2026-10-21 user (validated with the batch),"troubleshooting biology lab protocols"
+Scientific Knowledge & Reasoning,FrontierMath Tiers 1-3 v2,yes,2026-10-21 user (validated with the batch),"research mathematics"
+Commonsense & Factual Knowledge,OpenBookQA,yes,2026-10-21 user (validated with the batch),"elementary science and commonsense questions"
+Commonsense & Factual Knowledge,SimpleQA Verified,yes,2026-10-21 user (validated with the batch),"recall of obscure facts"
+Commonsense & Factual Knowledge,HellaSwag,yes,2026-10-21 user (validated with the batch),"commonsense sentence completion"
+Commonsense & Factual Knowledge,PIQA,yes,2026-10-21 user (validated with the batch),"physical commonsense"
+Commonsense & Factual Knowledge,SimpleBench,yes,2026-10-21 user (validated with the batch),"commonsense trick questions"
+Commonsense & Factual Knowledge,WinoGrande,yes,2026-10-21 user (validated with the batch),"commonsense pronoun resolution"
+Commonsense & Factual Knowledge,MMLU,no,2026-10-21 user,"academic exam knowledge, not commonsense or everyday facts"
+Cyber Capabilities,FrontierMath Erdos,no,2026-10-21 user (validated with the batch),"open mathematics problems, no security content"
+Cyber Capabilities,GeoBench,no,2026-10-21 user (validated with the batch),"geolocating photos"
+Commonsense & Factual Knowledge,LAB-Bench Cloning,no,2026-10-21 user (validated with the batch),"specialised biology lab procedures"
+Commonsense & Factual Knowledge,TriviaQA,yes,2026-10-21 user,trivia recall
+Commonsense & Factual Knowledge,GSM8K,yes,2026-10-21 user,grade-school mathematics word problems
+Commonsense & Factual Knowledge,LAB-Bench Protocol,no,2026-10-21 user,biology lab protocols
+Commonsense & Factual Knowledge,InterCode-CTF,no,2026-10-21 user,security capture-the-flag in a shell
+Scientific Knowledge & Reasoning,SpireClimb,no,2026-10-21 user,card game played through screenshots
+Visual & Commonsense,PIQA,yes,2026-10-21 user,physical commonsense
+Visual & Commonsense,WinoGrande,yes,2026-10-21 user,commonsense pronoun resolution
