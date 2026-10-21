@@ -1,0 +1,58 @@
+axis,profile,tier,median,q10,q90,profile_at_1
+Scientific Knowledge & Reasoning,typical,Average Human,1.398,1.354,1.444,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,Skilled Generalist,1.402,1.358,1.448,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,Domain Expert,1.414,1.368,1.462,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,Committee of Domain Experts,2.228,2.123,2.351,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,Committee of Average Humans,2.176,2.083,2.282,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,Committee of Skilled Generalists,2.202,2.103,2.317,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,High School Qualifier,0.712,0.586,0.837,0.90 0.35 0.65
+Scientific Knowledge & Reasoning,typical,High School Top Performer,2.117,1.813,2.494,0.90 0.35 0.65
+Agentic Capabilities & Programming,typical,Skilled Generalist,1.391,1.232,1.53,0.95 0.41 0.65
+Agentic Capabilities & Programming,typical,Domain Expert,1.525,1.407,1.659,0.95 0.41 0.65
+Agentic Capabilities & Programming,typical,Committee of Domain Experts,2.236,1.943,2.654,0.95 0.41 0.65
+Agentic Capabilities & Programming,typical,Committee of Skilled Generalists,1.814,1.47,2.277,0.95 0.41 0.65
+Cyber Capabilities,typical,Committee of Domain Experts,0.715,0.529,0.915,1.09 1.25 0.72
+Commonsense & Factual Knowledge,typical,Average Human,1.677,1.54,1.845,1.05 1.01 0.41
+Commonsense & Factual Knowledge,typical,Skilled Generalist,2.801,1.911,4.182,1.05 1.01 0.41
+Commonsense & Factual Knowledge,typical,Domain Expert,4.603,2.819,7.063,1.05 1.01 0.41
+Commonsense & Factual Knowledge,typical,Top Performer,6.387,3.979,9.462,1.05 1.01 0.41
+Commonsense & Factual Knowledge,typical,Committee of Average Humans,2.244,1.792,3.215,1.05 1.01 0.41
+Commonsense & Factual Knowledge,typical,Committee of Skilled Generalists,4.219,3.319,5.617,1.05 1.01 0.41
+Scientific Knowledge & Reasoning,frontier,Average Human,1.77,1.718,1.821,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,Skilled Generalist,1.774,1.722,1.826,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,Domain Expert,1.789,1.734,1.844,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,Committee of Domain Experts,2.685,2.576,2.816,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,Committee of Average Humans,2.63,2.531,2.744,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,Committee of Skilled Generalists,2.657,2.554,2.779,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,High School Qualifier,0.923,0.79,1.058,0.33 0.09 0.67
+Scientific Knowledge & Reasoning,frontier,High School Top Performer,2.321,2.021,2.714,0.33 0.09 0.67
+Agentic Capabilities & Programming,frontier,Skilled Generalist,1.529,1.355,1.685,0.75 0.22 0.68
+Agentic Capabilities & Programming,frontier,Domain Expert,1.706,1.579,1.859,0.75 0.22 0.68
+Agentic Capabilities & Programming,frontier,Committee of Domain Experts,2.478,2.159,2.91,0.75 0.22 0.68
+Agentic Capabilities & Programming,frontier,Committee of Skilled Generalists,2.021,1.628,2.505,0.75 0.22 0.68
+Cyber Capabilities,frontier,Committee of Domain Experts,0.898,0.735,1.079,0.95 0.93 0.62
+Commonsense & Factual Knowledge,frontier,Average Human,2.113,1.971,2.27,0.46 0.37 -0.01
+Commonsense & Factual Knowledge,frontier,Skilled Generalist,3.242,2.341,4.572,0.46 0.37 -0.01
+Commonsense & Factual Knowledge,frontier,Domain Expert,4.946,3.295,7.231,0.46 0.37 -0.01
+Commonsense & Factual Knowledge,frontier,Top Performer,6.684,4.454,9.663,0.46 0.37 -0.01
+Commonsense & Factual Knowledge,frontier,Committee of Average Humans,2.695,2.244,3.626,0.46 0.37 -0.01
+Commonsense & Factual Knowledge,frontier,Committee of Skilled Generalists,4.66,3.735,6.041,0.46 0.37 -0.01
+Scientific Knowledge & Reasoning,today,Average Human,0.873,0.798,0.947,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,Skilled Generalist,0.878,0.804,0.953,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,Domain Expert,0.896,0.819,0.974,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,Committee of Domain Experts,2.428,2.238,2.666,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,Committee of Average Humans,2.32,2.153,2.524,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,Committee of Skilled Generalists,2.372,2.197,2.596,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,High School Qualifier,0.167,0.0,0.332,1.67 1.03 0.78
+Scientific Knowledge & Reasoning,today,High School Top Performer,2.146,1.755,2.668,1.67 1.03 0.78
+Agentic Capabilities & Programming,today,Skilled Generalist,1.408,1.201,1.625,1.41 0.55 0.77
+Agentic Capabilities & Programming,today,Domain Expert,1.61,1.414,1.853,1.41 0.55 0.77
+Agentic Capabilities & Programming,today,Committee of Domain Experts,2.911,2.355,3.649,1.41 0.55 0.77
+Agentic Capabilities & Programming,today,Committee of Skilled Generalists,2.213,1.607,3.003,1.41 0.55 0.77
+Cyber Capabilities,today,Committee of Domain Experts,0.083,-0.217,0.434,1.42 1.67 0.87
+Commonsense & Factual Knowledge,today,Average Human,1.647,1.401,1.907,1.64 1.38 0.33
+Commonsense & Factual Knowledge,today,Skilled Generalist,3.153,1.944,4.843,1.64 1.38 0.33
+Commonsense & Factual Knowledge,today,Domain Expert,4.928,2.922,7.479,1.64 1.38 0.33
+Commonsense & Factual Knowledge,today,Top Performer,6.614,4.074,9.636,1.64 1.38 0.33
+Commonsense & Factual Knowledge,today,Committee of Average Humans,2.515,1.861,3.773,1.64 1.38 0.33
+Commonsense & Factual Knowledge,today,Committee of Skilled Generalists,5.172,4.01,6.787,1.64 1.38 0.33

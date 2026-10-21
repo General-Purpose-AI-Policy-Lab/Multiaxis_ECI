@@ -116,7 +116,7 @@ Audits publiés du taux d'erreur, statements des mainteneurs, et scores publiés
 **Bilan.** Aucun des deux modèles ne domine. MX est meilleur sur les benchmarks qui ne sont plus évalués et partout où des scores récents dépassent MBF (7 cas). MBF est meilleur sur les benchmarks agentiques et cyber en montée rapide (3 cas), où le plafond MX est tiré par la pente (voir `ceiling_vs_slope.png`). Les deux sont trop bas là où des scores publiés hors de nos données les dépassent (CyberGym, peut-être WMDP Biologie).
 
 **Ce que cela apprend sur la borne.** Trois des « meilleurs scores observés » qui bornent nos plafonds sont des lignes humaines mesurées dans d'autres conditions :
-- SimpleQA Verified (0,944, mesuré sur le SimpleQA *original* et avec vérification des sources ; le meilleur modèle est à 0,775) ;
+- SimpleQA Verified (0,944, mesuré sur le SimpleQA *original* et avec vérification des sources ; le meilleur modèle est à 0,775) ; retirée du pipeline le 21 octobre (utilisateur), sans effet sur ce fit, qui en garde la borne jusqu'au prochain refit ;
 - OpenBookQA (0,92, une borne basse de crowdworkers) ;
 - HellaSwag (0,956, items validés par des humains à la construction).
 
@@ -160,3 +160,18 @@ Le plafond ne descend jamais sous le meilleur score observé, modèle ou humain.
 - ailleurs (SimpleQA Verified, SimpleBench, PIQA, WinoGrande, GSM8K, OpenBookQA, HellaSwag, GeoBench), la borne tombe près de la médiane du prior et pèse peu ; sous 0,75 (The Agent Company, LitQA2, OSWorld, VISTA, BlueprintBench) elle ne pèse rien.
 
 **Décision (utilisateur, 21 octobre)** : la borne par les scores humains reste telle quelle, LMCA compris ; elle ne pèse vraiment que sur LMCA.
+
+## Profil des autres axes au placement des humains (21 octobre, `9_human_profile_sensitivity.py`)
+
+Le placement lit un tier avec ses autres axes au profil d'un modèle typique de même ability sur l'axe placé (régression sur tous les modèles). Hypothèse testée : les modèles de la frontière, au-dessus de ce profil sur les axes 1 et 2, tireraient de ces axes ce que les humains doivent gagner sur l'axe 4, ce qui pousserait les tiers vers le haut. Trois profils sur les mêmes scores, chaînes du mode A du fit seed 42 seul (8 chaînes, avant la fusion du seed 43), baseline SimpleQA Verified retirée (`human_profile_sensitivity.csv`) : typique (la règle des livrables), régression sur les seuls modèles de la frontière de l'axe, et frontière d'aujourd'hui figée (médiane des modèles de la frontière des 12 derniers mois).
+
+| axe 4, médiane | typique | frontière (régression) | frontière d'aujourd'hui |
+|---|---|---|---|
+| Average Human | 1,68 | 2,11 | 1,65 |
+| Committee of Average Humans | 2,24 | 2,70 | 2,52 |
+| Skilled Generalist | 2,80 | 3,24 | 3,15 |
+| Committee of Skilled Generalists | 4,22 | 4,66 | 5,17 |
+| Domain Expert | 4,60 | 4,95 | 4,93 |
+| Top Performer | 6,39 | 6,68 | 6,61 |
+
+**Hypothèse réfutée.** Sur l'axe 4, les tiers montent jusqu'à 0,95 sous les deux profils de frontière ; aucun ne descend de plus de 0,03 (l'Average Human sous la frontière figée). La régression sur tous les modèles prête aux tiers hauts des axes 1 et 2 au-delà de toute la frontière (θ1 = 3,6 et θ2 = 3,3 à θ4 = 5, contre 1,9 pour claude-fable-5_max), ce qui les tire vers le bas. Le profil typique est donc le plus favorable aux modèles. L'écart entre humains et modèles sur l'axe 4 tient aux scores humains collés au plafond et aux petits loadings, pas au profil. Sur l'axe 1, la frontière figée abaisse au contraire les tiers individuels (1,40 → 0,87), la régression sur la frontière les remonte (1,77).

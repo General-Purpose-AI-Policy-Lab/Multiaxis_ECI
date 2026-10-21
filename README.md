@@ -19,9 +19,9 @@ The flagship lives in `5_outputs/data20261019/mirt_lineageprior_lineagebm/`. Its
 3. **Cyber Capabilities** (CyScenarioBench, CyberGym, GBAEval, with AISI Cyber Ranges, EBR-bench, Cybench)
 4. **Commonsense & Factual Knowledge** (OpenBookQA, ARC AI2, SimpleQA Verified, with HellaSwag, PIQA, SimpleBench, WinoGrande)
 
-Mathematics and abstract reasoning share an axis with scientific knowledge, agentic and cyber benchmarks load apart, and the commonsense and factual benchmarks form the fourth axis. The axes are distinct: their largest correlation is 0.67 (axes 1 and 2).
+Mathematics and abstract reasoning share an axis with scientific knowledge, agentic and cyber benchmarks load apart, and the commonsense and factual benchmarks form the fourth axis. The axes are distinct: their largest correlation is 0.64 (axes 1 and 2).
 
-The posterior has two modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read mode A, the best log-density and most of the chains. Mode B, 23.8 nats lower, carves the space as the fit without ceilings does (agentic and cyber together, a science axis and a visual axis) and is drawn on its own axes in `secondary_mode/`. The fit has 10 chains so far; 10 more with a second seed are being merged in.
+The 20 chains fall into four posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read mode A, the best log-density and the most chains (9). Mode D, 33 nats lower, carves the space as the fit without ceilings does (agentic and cyber together, a science axis and a visual axis) and is drawn on its own axes in `secondary_mode/`.
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines) placed on that axis. Abilities are on the fitted scale (the models' mean at 0 on each axis). A tier is drawn only where its own scores place it, on benchmarks that measure the axis, so the agentic and cyber axes carry few tiers: no human baseline exists for most of their benchmarks.
 
@@ -39,7 +39,7 @@ The 20 benchmarks with the largest share of each axis, their loadings (median an
 
 `python docs/make_readme_figures.py` redraws these five figures from the flagship trace, with the builders of the per-fit folders.
 
-The K=4 fit sees 5,487 observations, 887 models and 107 benchmarks; 42 human scores fall on benchmarks that measure an axis and place the tiers. The canonical K=1 index, which also applies the curated exclusions and fits the tiers inside, sees 4,410 observations on 93 benchmarks.
+The K=4 fit sees 5,487 observations, 887 models and 107 benchmarks; 40 human scores fall on benchmarks that measure an axis and place the tiers. The canonical K=1 index, which also applies the curated exclusions and fits the tiers inside, sees 4,410 observations on 93 benchmarks.
 
 ## Setup
 
@@ -163,9 +163,9 @@ Whether the chains agree on those axes is a different question, with its own num
 
 ## Limitations
 
-- **The K=4 posterior is multimodal.** The chains fall into two modes: A, 8 of the first 10 chains, and B, 2 chains 23.8 nats below with another set of axes. The modes are not an extra axis but discrete ways, under non-negative loadings, of carving the same space.
-- **Choosing the mode.** PSIS-LOO cannot rank the modes: a large share of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) does not separate the two (+3 ± 8 nats for A on the reliable scores). The deliverables read mode A, the best log-density and the mode most chains reach.
-- **Few human scores per axis.** The tiers rest on the scores of the benchmarks that measure each axis: 29 on scientific knowledge & reasoning, 3 on agentic capabilities (OSWorld, The Agent Company, METR Time Horizons), 1 on cyber (Cybench) and 9 on commonsense & factual knowledge. Where a tier has several scores they can disagree beyond what any one ability explains (the Skilled Generalist at 0.40 on MATH Level 5 but 0.98 on ARC-AGI; the Domain Expert above every model on GPQA Main Chemistry and below most on WMDP), and a crossing date read on the trend can differ from the date the frontier first reached a score on the benchmark itself.
+- **The K=4 posterior is multimodal.** Its 20 chains (10 with seed 42, 10 with seed 43) fall into four modes: A, 9 chains; B, 2 chains 16 nats below (a visual axis, agentic and cyber together); C, 7 chains 27 nats below (the same agentic and cyber axes as A, but factual and scientific knowledge on one axis and mathematics and abstract reasoning on another); D, 2 chains 33 nats below. The modes are not an extra axis but discrete ways, under non-negative loadings, of carving the same space.
+- **Choosing the mode.** PSIS-LOO cannot rank the modes: a large share of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) did not separate A from D on the first 10 chains (+3 ± 8 nats for A on the reliable scores). The deliverables read mode A, the best log-density and the mode most chains reach.
+- **Few human scores per axis.** The tiers rest on the scores of the benchmarks that measure each axis: 30 on scientific knowledge & reasoning, 3 on agentic capabilities (OSWorld, The Agent Company, METR Time Horizons), 1 on cyber (Cybench) and 6 on commonsense & factual knowledge. Where a tier has several scores they can disagree beyond what any one ability explains (the Skilled Generalist at 0.40 on MATH Level 5 but 0.98 on ARC-AGI; the Domain Expert above every model on GPQA Main Chemistry and below most on WMDP), and a crossing date read on the trend can differ from the date the frontier first reached a score on the benchmark itself.
 - **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
