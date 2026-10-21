@@ -108,6 +108,16 @@ A flag tagged `[canonical]` or `[exploration]` in `--help` is refused in the oth
 `FitSpec.from_trace` reads that identity back off a trace, so a trace path is
 the only thing a plotting or diagnostic caller has to name.
 
+## Sensitivity fits beside the flagship
+
+- **The joint fit**: the human tiers fitted inside the K=4 model under the merged order (`analysis.JOINT_FIT`, folder `mirt_lineageprior_lineagebm_humanmerge/`; on the 2026-10-19 data, fitted without ceilings, `mirt_lineageprior_lineagebm_noceiling_humanmerge/`). The compensatory sum lets the tiers trade one axis against another there, which is why the flagship places them afterwards. Out of the default run and of the dashboard; its modes, tables and figures follow the flagship's steps, without `5_place_humans.py`:
+
+  ```bash
+  python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --chains 10 --seed 42
+  ```
+
+- **Without ceilings**: `--no-ceiling` (folder `..._noceiling/`), the flagship before 2026-10-21; the comparison is in the flagship's `investigation/README.md`.
+
 ## Frontier gap: open weights vs closed, by benchmark access (reproduction steps 1-2)
 
 ```bash
