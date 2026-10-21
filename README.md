@@ -12,6 +12,8 @@ This repository rebuilds the index in PyMC as a **K-axis compensatory 2PL Beta-M
 
 ## Current results: the K=4 flagship on the 2026-10-19 build
 
+**Since 2026-10-21 the flagship estimates each benchmark's ceiling** (see [Method](#method)). Its first 10 chains are in `5_outputs/data20261019/mirt_lineageprior_lineagebm/`, under provisional axis names, until a second seed brings it to the usual 20 chains and its axes are named. Until then the results below are those of the same fit without ceilings, `mirt_lineageprior_lineagebm_noceiling/`; the comparison of the two is in the ceiling fit's `investigation/README.md`.
+
 The axes carry no names of their own. They are named by hand after the benchmarks that load most on them, in the fit folder's `axis_names.json`, and a refit keeps a name only while its signature benchmarks still define the axis (see [docs/plots.md](docs/plots.md)). The current flagship's four:
 
 1. **Fluid Intelligence & Formal Sciences** (OTIS Mock AIME, ARC-AGI-2, MATH Level 5, with CritPt, MCP Atlas, DeepSWE)
@@ -65,15 +67,15 @@ Two modeling-stage filters apply at load time: the curated exclusion list below,
 
 What stays in this repository is what belongs to the model, under `1_curated/`: the "easy for humans" exclusion list of the canonical K=1 index, the reviewed lineage map and its overrides, the data-driven SOTA list, the reviewed clips of below-floor scores, the models' openness labels, the optional SimpleQA original column and Epoch's reference ECI table. See [`1_curated/README.md`](1_curated/README.md).
 
-Every output goes under `5_outputs/<data generation>/`, named after the day the pipeline run it was fitted on happened (`config.DATA_TAG`), whatever the day of the fit: the current flagship is `5_outputs/data20261019/mirt_lineageprior_lineagebm_nohumans/`, the canonical K=1 index `5_outputs/data20261019/canonical_humanmerge/`. A fit on a newer build never overwrites an older one; only the data generations still in use are kept (2026-10-20: 2026-09-30, 2026-10-01 and 2026-10-16 removed, still in the git history). `5_outputs/pre_pipeline/` holds the post's fits as they were published; the K=4 trace was deleted and is regenerated from `blogpost-frozen` (`5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/REGENERATE.md`).
+Every output goes under `5_outputs/<data generation>/`, named after the day the pipeline run it was fitted on happened (`config.DATA_TAG`), whatever the day of the fit: the current flagship is `5_outputs/data20261019/mirt_lineageprior_lineagebm/`, the canonical K=1 index `5_outputs/data20261019/canonical_humanmerge/`. A fit on a newer build never overwrites an older one; only the data generations still in use are kept (2026-10-20: 2026-09-30, 2026-10-01 and 2026-10-16 removed, still in the git history). `5_outputs/pre_pipeline/` holds the post's fits as they were published; the K=4 trace was deleted and is regenerated from `blogpost-frozen` (`5_outputs/pre_pipeline/mirt_humanmerge_lineageprior_lineagebm/REGENERATE.md`).
 
 ## Run
 
-The K=4 flagship (skew-normal abilities, the default; `--normal-theta` fits the Gaussian block and emits `_normaltheta`): 2,500 draws after 2,000 tuning steps on 10 chains, then 10 more chains with another seed merged in, so that more starting points explore the modes (copy the trace out of the fit folder first, as the second run writes over it):
+The K=4 flagship (models only, skew-normal abilities and estimated ceilings, all three the defaults: `--humans` fits the human tiers inside and emits `_humans`, `--normal-theta` fits the Gaussian block and emits `_normaltheta`, `--no-ceiling` fixes every ceiling at 1 and emits `_noceiling`): 2,500 draws after 2,000 tuning steps on 10 chains, then 10 more chains with another seed merged in, so that more starting points explore the modes (copy the trace out of the fit folder first, as the second run writes over it):
 
 ```bash
-python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --no-humans --chains 10 --seed 42
-python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --no-humans --chains 10 --seed 43 \
+python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 42
+python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 43 \
     --merge-chains <copy of the first trace>
 ```
 
@@ -91,7 +93,7 @@ python 4_diagnostics/3_plot_mirt.py --forecast --trace <trace>
 python 4_diagnostics/4_build_dashboard.py --force-all
 ```
 
-**The joint fit (secondary).** The former flagship, with the human tiers fitted inside under the merged order, stays in its own folder (`mirt_humanmerge_lineageprior_lineagebm/`, `analysis.JOINT_FIT`) for comparison. It is out of the default run and of the dashboard; to bring it to a new data generation:
+**The joint fit (secondary).** The former flagship, with the human tiers fitted inside under the merged order, stays in its own folder (`mirt_lineageprior_lineagebm_humanmerge/`, `analysis.JOINT_FIT`; the 2026-10-19 one, fitted before the ceilings, is `mirt_lineageprior_lineagebm_noceiling_humanmerge/`) for comparison. It is out of the default run and of the dashboard; to bring it to a new data generation:
 
 ```bash
 python 3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm --chains 10 --seed 42
@@ -132,9 +134,9 @@ Full model math, priors and identification: [docs/model_math.md](docs/model_math
 
 ## Method
 
-Each test-taker *m* has K abilities θ forming a skill profile, the way a student can be strong in algebra and weak in essay writing. Each benchmark weighs those skills through K non-negative loadings *A*, which also set how sharply it separates test-takers, what psychometrics calls discrimination. Difficulty *D* is the bar the weighted skills must clear, and a chance floor *c*, fixed per benchmark and never estimated, starts the curve where guessing does:
+Each test-taker *m* has K abilities θ forming a skill profile, the way a student can be strong in algebra and weak in essay writing. Each benchmark weighs those skills through K non-negative loadings *A*, which also set how sharply it separates test-takers, what psychometrics calls discrimination. Difficulty *D* is the bar the weighted skills must clear. A chance floor *c*, fixed per benchmark and never estimated, starts the curve where guessing does, and a ceiling *d* ends it where a perfect model would still lose points to wrong answer keys and ambiguous items:
 
-<p align="center"><em>µ = c<sub>b</sub> + (1 − c<sub>b</sub>) σ( Σ<sub>k</sub> A<sub>b,k</sub> θ<sub>m,k</sub> − D<sub>b</sub> )</em>,  &nbsp; <em>p ~ Beta(µφ<sub>b</sub>, (1−µ)φ<sub>b</sub>)</em>,  &nbsp; observed <em>y N<sub>b</sub> ~ Binomial(N<sub>b</sub>, p)</em></p>
+<p align="center"><em>µ = c<sub>b</sub> + (d<sub>b</sub> − c<sub>b</sub>) σ( Σ<sub>k</sub> A<sub>b,k</sub> θ<sub>m,k</sub> − D<sub>b</sub> )</em>,  &nbsp; <em>p ~ Beta(µφ<sub>b</sub>, (1−µ)φ<sub>b</sub>)</em>,  &nbsp; observed <em>y N<sub>b</sub> ~ Binomial(N<sub>b</sub>, p)</em></p>
 
 Most scores are a share of a benchmark's N<sub>b</sub> items, so they enter as y N<sub>b</sub> successes of a Beta-binomial: item sampling sets a noise floor no benchmark can fall below, and a score of 0 or 1 is an ordinary outcome. The 23 benchmarks whose score is not a share of items (correlations, areas, rubric fractions, dependent steps of one scenario) keep the Beta density y ~ Beta(µφ<sub>b</sub>, (1−µ)φ<sub>b</sub>), their exact zeros at 0.005. N<sub>b</sub> and that split are in `1_curated/benchmark_n_items.csv`. A Beta on every score was the likelihood until 2026-10-01, when one axis of the K=4 fit captured Chess Puzzles, its noise collapsed to almost nothing and six of eight chains froze in that spike.
 
@@ -146,6 +148,8 @@ This is the *compensatory* family: a strong skill can make up for a weak one ins
 - `--human-merge` sets a **hard** partial order on the human tiers when they are fitted (the canonical index, and the placement below). A Domain Expert is at least as good as a Skilled Generalist, a committee at least as good as its members, on every axis. It says nothing about the size of the gaps, and leaves genuinely incomparable tiers unordered.
 
 On the post's data, where the tiers were inside the K=4 fit, both were needed: runs without priors split into two sets of axes, the human ordering alone left them in disagreement, and both together brought them into agreement; on leave-one-out cross-validation that model beat the no-prior version by about 107 ± 18 and the 1D index by about 1,000 ± 33. On the 2026-09-08 build, dropping the lineage prior leaves the eight chains on eight separate solutions, hundreds of nats apart (the README of that fit, `5_outputs/data20260908/mirt_humanmerge/README.md`, deleted with the 2026-09-08 outputs on 2026-10-01, stays in the git history); with both priors the chains still fall into several modes (see [Limitations](#limitations)).
+
+**Estimated ceilings.** In the K-axis fits each benchmark's ceiling is d<sub>b</sub> = 1 − e<sub>b</sub>, the gap e<sub>b</sub> drawn from benchmark-forecasting's population of gaps, 0.25 · Beta(1.43, 4.67) (mean 0.06), and never below the best score observed on the benchmark, by a model or a human baseline; a ceiling the pipeline records is kept fixed (default since 2026-10-21; `--no-ceiling` fixes d<sub>b</sub> = 1). Without it, the flattening of top scores near a benchmark's ceiling has to be explained by abilities and slopes, and on the 2026-10-19 data a slow science axis partly stood in for the missing plateaus. At equal axis structure the ceilings predict held-out scores better (robust mixture leave-one-out, +56 ± 12 nats on the 4,967 reliable scores), and the estimated ceilings agree with benchmark-forecasting's (median gap 0.054 against 0.055). A ceiling trades off against its benchmark's slope and leaves the prior only where many top scores press on it ([docs/model_math.md](docs/model_math.md) §4.4).
 
 **Skew-normal abilities.** In the K-axis fits the abilities of the models outside the release chains, and of each chain's founder, are independent skew-normal per axis, standardised, with a shape learned per axis (default since 2026-10-20; `--normal-theta` restores the Gaussian block). A Gaussian block can be rotated without changing the prior or the likelihood, so only the non-negative loadings fixed the axes and chains settled in different orientations; skewed columns fix them, and match the abilities' shape, a left tail of old and weak models below the frontier. In the sampler study it put 14 of 30 flagship chains in the best region against 4 of 30, with a better leave-one-out (`5_outputs/sampler_study/GEOMETRY_REPORT.md`); on the 2026-10-19 refit, two modes instead of seven. The canonical K=1 index keeps the Gaussian prior.
 
@@ -170,7 +174,7 @@ Whether the chains agree on those axes is a different question, with its own num
 ## Limitations
 
 - **The K=4 posterior is multimodal.** Its 20 chains (2,500 draws after 2,000 tuning steps each; 10 with seed 42, then 10 with seed 43, merged with `fit.py --merge-chains`) fall into two modes: A, 17 chains, and B, 3 chains 8.7 nats below with another set of axes (agentic and cyber apart, no visual axis). The Gaussian prior of the previous flagship left five to seven modes, the best reached by 3 or 4 chains. The modes are not an extra axis but discrete ways, under non-negative loadings, of carving the same space.
-- **Choosing the mode.** PSIS-LOO cannot rank the modes: a large share of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) ranked the previous flagship's modes, but it takes the exchangeable abilities as Gaussian and does not cover the skew-normal prior yet. The deliverables read mode A, the best log-density and the mode most chains reach (user, 2026-10-20).
+- **Choosing the mode.** PSIS-LOO cannot rank the modes: a large share of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) ranked the previous flagship's modes, and now covers the skew-normal prior (importance sampling around the Laplace fit) and the ceilings: on the fit without ceilings it favours mode A by 33 ± 6 nats on the reliable scores. The deliverables read mode A, the best log-density and the mode most chains reach (user, 2026-10-20).
 - **Few human scores per axis.** The tiers rest on the scores of the benchmarks that measure each axis: 11 on fluid intelligence, 6 on agentic & cyber (OSWorld, The Agent Company, Cybench, EBR-bench, FrontierMath Erdos), 21 on scientific knowledge and 5 on the visual axis. Where a tier has several scores they can disagree beyond what any one ability explains (the Skilled Generalist at 0.40 on MATH Level 5 but 0.98 on ARC-AGI; the Domain Expert above every model on GPQA Main Chemistry and below most on WMDP), and a crossing date read on the trend can differ from the date the frontier first reached a score on the benchmark itself.
 - **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), the 2026-10-01 data let some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers; it holds about e^-14 of the posterior mass. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.

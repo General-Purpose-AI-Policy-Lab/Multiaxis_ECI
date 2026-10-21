@@ -49,6 +49,15 @@ def test_a_ceiling_score_places_nothing_alone():
     assert drawn == ["Average Human"]
 
 
-def test_flagship_folder_carries_no_humans():
+def test_flagship_is_fitted_without_humans_and_says_so_only_when_they_are_in():
+    """Models only is the untagged default since 2026-10-21; humans in emit `_humans`, an order
+    token implies them, and the legacy `_nohumans` still parses."""
     from multiaxis_eci.analysis import FLAGSHIP
-    assert FLAGSHIP.no_humans and FLAGSHIP.tag.endswith("_nohumans")
+    from multiaxis_eci.analysis.fitspec import FitSpec, _parse_tag
+    assert FLAGSHIP.no_humans and "humans" not in FLAGSHIP.tag
+    assert FitSpec(K=4, lineage_prior=True, no_humans=False).tag == "_lineageprior_humans"
+    merged = FitSpec(K=4, human_merge=True, lineage_prior=True)
+    assert merged.no_humans is False and merged.tag == "_lineageprior_humanmerge"
+    assert _parse_tag("_humanmerge_lineageprior_lineagebm")["human_merge"] is True       # legacy
+    assert _parse_tag("_lineageprior_lineagebm_nohumans")["no_humans"] is True
+    assert _parse_tag("_lineageprior_humans")["no_humans"] is False

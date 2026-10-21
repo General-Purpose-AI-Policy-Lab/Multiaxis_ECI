@@ -27,6 +27,10 @@ from multiaxis_eci.config import (
 )
 
 LINEAGE_MAP = CURATED_DIR / "lineage_map.csv"
+# The map a fit was sampled with, copied beside its trace by 3_fit/fit.py: the reviewed map moves
+# on (a new line, a node moved), and a model rebuilt from an older trace must index the lineage
+# draws it was sampled with (`trace_lineage_structure`).
+FITTED_MAP_NAME = "lineage_map_fitted.csv"
 # The reviewed reasoning regime of every run (1_curated/4_build_model_regimes.py): where a run
 # names no effort, it decides the run's effort level.
 MODEL_REGIMES = CURATED_DIR / "model_regimes.csv"
@@ -300,3 +304,24 @@ def build_lineage_structure(mlookup: pd.DataFrame,
         node_parent=np.array([-1 if parent_of[k] is None else node_pos[parent_of[k]]
                               for k in node_keys], dtype=int),
         node_date=np.array([date_of[k] for k in node_keys], dtype="datetime64[ns]"))
+
+
+def trace_lineage_structure(mlookup: pd.DataFrame, trace_path, post=None,
+                            csv_path=None) -> LineageStructure | None:
+    """The lineage structure a trace was sampled with: built from `csv_path` if given, else from
+    the map frozen beside the trace (`FITTED_MAP_NAME`), else from the current reviewed map. With
+    the trace's posterior `post`, its chains are checked against the `mirt_lineage_chains` attr:
+    a mismatch (the map edited after the fit, and no frozen copy) raises instead of silently
+    re-indexing the lineage draws."""
+    import json
+    from pathlib import Path
+    frozen = Path(trace_path).parent / FITTED_MAP_NAME
+    path = Path(csv_path) if csv_path else frozen if frozen.exists() else LINEAGE_MAP
+    lin = build_lineage_structure(mlookup, csv_path=path)
+    sampled = post.attrs.get("mirt_lineage_chains") if post is not None else None
+    if sampled and lin is not None and list(lin.chain_names) != list(json.loads(sampled)):
+        raise ValueError(
+            f"{path.name} gives {len(lin.chain_names)} lineage chains, the trace was sampled with "
+            f"{len(json.loads(sampled))}: the map changed after the fit. Put the map of the fit "
+            f"beside the trace as {FITTED_MAP_NAME} (`git show <commit>:1_curated/lineage_map.csv`).")
+    return lin

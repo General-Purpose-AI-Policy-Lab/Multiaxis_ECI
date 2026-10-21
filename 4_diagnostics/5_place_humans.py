@@ -67,10 +67,13 @@ def main() -> None:
     if spec.link not in ("linear", "semicomp0"):
         sys.exit(f"{trace.name}: the placement handles the compensatory and semicomp0 links, "
                  f"not {spec.link}")
-    idata = spec.open_posterior(keep=("A", "theta", "tau_A", "D", "phi_b", "comp_beta"),
+    idata = spec.open_posterior(keep=("A", "theta", "tau_A", "D", "phi_b", "comp_beta", "ceiling_d"),
                                 path=trace, chains=chains)
     # semicomp0: the softmin eta at the chains' median sharpness
     beta = (float(idata.posterior["comp_beta"].median()) if spec.link == "semicomp0" else None)
+    # --ceiling-noise: the curve the tiers are read on stops at the fit's own ceilings
+    ceiling_d = (idata.posterior["ceiling_d"].median(("chain", "draw")).values
+                 if "ceiling_d" in idata.posterior else None)
     data, floor_c, _ = spec.load_data(idata)
     view = prepare_fit(idata, data)
     # The frame and the names: the fit's, or a secondary mode's own (secondary_frame_dir)
@@ -82,7 +85,7 @@ def main() -> None:
     print(f"{trace.name}: chains {chains}; axes {titles}"
           + (f"; softmin beta {beta:.2f}" if beta is not None else ""), flush=True)
     out = run_placement(trace, view, data, spec, titles, floor_c, out_dir=out_dir, beta=beta,
-                        rule_titles=RULE_TITLES)
+                        rule_titles=RULE_TITLES, ceiling_d=ceiling_d)
     for ax in out["axes"]:
         print(f"\n{ax['axis']}: {ax['title'] or '(no confirmed name: no tier)'}")
         if ax["unjudged_benchmarks"]:

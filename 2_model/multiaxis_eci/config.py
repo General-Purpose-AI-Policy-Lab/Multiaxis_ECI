@@ -104,7 +104,7 @@ PRIOR_SIGMA_B_POOLED = dict(mu_loc=math.log(0.05), mu_sd=0.5, tau_sd=0.5)
 # thousands of nats above the modes NUTS samples, found by MAP optimisation (2026-10-13, user:
 # floor at 0.005; mode A's smallest sigma_b are ~0.013).
 SIGMA_B_FLOOR = 0.005
-# --ceiling-noise (exploration): each benchmark's ceiling d_b = 1 - e_b, e_b the share of items a
+# Ceilings (K-axis default since 2026-10-21, --no-ceiling opts out): each benchmark's ceiling d_b = 1 - e_b, e_b the share of items a
 # perfect model still fails (wrong keys, two defensible answers, judge disagreement). With a share
 # e of wrong keys, mu = c + (1 - c - e) * sigmoid(eta): the gap below 1 is e whatever the chance
 # floor c, so it is drawn on the absolute scale. Prior: benchmark-forecasting's posterior

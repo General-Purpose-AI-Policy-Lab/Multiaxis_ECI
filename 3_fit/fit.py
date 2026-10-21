@@ -728,6 +728,12 @@ def run_exploration(args, parser) -> None:
         print(f"  --lineage-prior ({kind}): {lineage.n_chains} chains / "
               f"{lineage.n_nodes} nodes / {len(lineage.row_idx)} chained models",
               flush=True)
+        # the map this fit is sampled with, frozen beside its trace (lineage.FITTED_MAP_NAME):
+        # a later edit of the reviewed map must not re-index the lineage draws of a rebuild
+        import shutil
+
+        from multiaxis_eci.lineage import FITTED_MAP_NAME, LINEAGE_MAP
+        shutil.copyfile(LINEAGE_MAP, results_dir / FITTED_MAP_NAME)
 
     # Time covariate needs the lineage structure (chained rows take their chain
     # founder's date), so it is built after it and works with lineage=None too.
@@ -948,7 +954,7 @@ def run_exploration(args, parser) -> None:
             idata_1d, _ = sample_mirt(
                 data, 1, sample_kw, loading_prior="normal",
                 floor_c=floor_c, sigma_b_floor=spec.baseline_spec().sigma_b_floor,
-                ceiling_noise=args.ceiling_noise,
+                ceiling_noise=spec.ceiling_noise,
                 known_se=args.known_se,
                 censor_eps=censor_eps, binomial_n=binomial_n,
                 stream_path=(results_dir / "live_draws_k1.zarr"
@@ -1028,12 +1034,18 @@ def main():
                         help="[canonical] keep the curated-excluded benchmarks in the fit; "
                              "results go to canonical_allbenchmarks/")
     parser.add_argument("--no-humans", action="store_true",
-                        help="leave the human baselines out of the fit, so the index "
+                        help="[canonical] leave the human baselines out of the fit, so the index "
                              "is a pure model-vs-model scale (ECI-H's two anchors are models, so "
                              "it survives). Compose it with --include-all-benchmarks to put the "
                              "'intentionally easy for humans' exclusions back: they are excluded "
                              "for what they do to the human tiers, which are gone here. Results "
-                             "go to canonical_nohumans/; an exploration fit emits `_nohumans`")
+                             "go to canonical_nohumans/. The K-axis fits leave the humans out by "
+                             "default (--humans puts them in)")
+    parser.add_argument("--humans", action="store_true",
+                        help="[exploration] fit the human tiers with the models (emits `_humans`). "
+                             "The K-axis fits leave them out by default since 2026-10-21 and place "
+                             "them afterwards, axis by axis (4_diagnostics/5_place_humans.py); "
+                             "--human-merge / --human-prior put them in under an order")
     parser.add_argument("--access", choices=list(ACCESS_SCOPES), default=None,
                         help="[canonical] fit one access class of benchmarks only "
                              "(the `access` column of 0_input/benchmarks.csv: public, "
@@ -1185,11 +1197,12 @@ def main():
                              "estimated. This is the sensitivity run: a "
                              "below-chance score becomes a point demand on ability "
                              "again rather than reading as uninformative-low")
-    parser.add_argument("--ceiling-noise", action="store_true",
-                        help="[exploration] noise 4PL: estimate a per-benchmark "
-                             "upper asymptote confined to a noise-sized gap, "
-                             "Beta(1,20) (mean 0.048, P(gap>0.10)=0.122) — grading "
-                             "noise, not walls. Read ceiling_d off the trace")
+    parser.add_argument("--no-ceiling", dest="ceiling_noise", action="store_false",
+                        help="[exploration] no per-benchmark ceiling (the curve rises to 1); emits "
+                             "`_noceiling`. By default since 2026-10-21 each benchmark has an "
+                             "estimated ceiling d_b = 1 - e_b, e_b ~ 0.25 Beta(1.43, 4.67) "
+                             "(config.PRIOR_CEILING_GAP), never below the best observed score; "
+                             "benchmarks with a known ceiling keep it. Read ceiling_d off the trace")
     parser.add_argument("--known-se", action="store_true",
                         help="[exploration] split the Beta noise: fixed per-cell "
                              "instrument precision from reported harness stderr "

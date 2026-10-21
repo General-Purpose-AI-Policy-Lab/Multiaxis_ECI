@@ -119,11 +119,13 @@ def _tier_theta(th, k, K, profile, xp):
     return xp.stack([cols[i] for i in range(K)], axis=-1)
 
 
-def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=81, beta=None):
+def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=81, beta=None,
+               ceiling_d=None):
     """Posterior draws (S, n_tiers) of the tiers on axis k from `scores` (rows of
     `human_scores` restricted to the axis's benchmarks), and the sampler's convergence. `beta`
     (the softmin links' sharpness, fixed at the fit's median) swaps the compensatory eta for the
-    softmin one (`models.mirt.softmin_eta`, no offset: semicomp0)."""
+    softmin one (`models.mirt.softmin_eta`, no offset: semicomp0). `ceiling_d` (per benchmark, the
+    fit's median d_b under --ceiling-noise) caps the curve as the fit does: mu = c + (d - c) sigmoid."""
     import arviz as az
     import pymc as pm
     import pytensor.tensor as pt
@@ -143,6 +145,7 @@ def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=8
     n = scores.n_items.values
     kk = np.clip(y, 0, 1) * n
     c = floor_c[b] if floor_c is not None else np.zeros(len(b))
+    d = ceiling_d[b] if ceiling_d is not None else np.ones(len(b))
     slope = A[b, k] + A[b][:, others] @ coef[1]
     icpt = A[b][:, others] @ coef[0] - D[b]
     with pm.Model():
@@ -154,7 +157,7 @@ def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=8
         else:
             eta = softmin_eta(A[b], _tier_theta(th[t], k, A.shape[1], (others, coef), pt), D[b],
                               beta, lse=pt.logsumexp, log=pt.log)
-        mu = c + (1 - c) * pm.math.sigmoid(eta)
+        mu = c + (d - c) * pm.math.sigmoid(eta)
         pm.Potential("lik", _beta_binomial_logp(yc, mu * phi[b], (1 - mu) * phi[b], n, kk).sum())
         tr = pm.sample(1000, tune=1000, chains=4, nuts_sampler="nutpie", random_seed=seed,
                        progressbar=False, target_accept=0.95)
@@ -165,7 +168,8 @@ def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=8
     return order, tr.posterior["th"].values.reshape(-1, len(order)), conv, (others, coef)
 
 
-def consistency(k, scores, bench, A, D, floor_c, order, draws, profile, data, dates, beta=None):
+def consistency(k, scores, bench, A, D, floor_c, order, draws, profile, data, dates, beta=None,
+                ceiling_d=None):
     """Per score a placement used: observed, predicted (median and 80% interval at the tier's
     draws), and the release date of the first model that reached the score."""
     from scipy.special import expit
@@ -180,7 +184,8 @@ def consistency(k, scores, bench, A, D, floor_c, order, draws, profile, data, da
             from multiaxis_eci.models.mirt import softmin_eta
             eta = softmin_eta(A[b], _tier_theta(th, k, A.shape[1], profile, np), D[b], beta)
         c = floor_c[b] if floor_c is not None else 0.0
-        pred = c + (1 - c) * expit(eta)
+        d = ceiling_d[b] if ceiling_d is not None else 1.0
+        pred = c + (d - c) * expit(eta)
         sel = data.bench_idx == b
         hit = dates.iloc[data.model_idx[sel][data.scores[sel] >= r.score]].dropna()
         rows.append({"tier": r.tier, "benchmark": r.benchmark, "observed": round(float(r.score), 3),
@@ -193,12 +198,12 @@ def consistency(k, scores, bench, A, D, floor_c, order, draws, profile, data, da
 
 def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
                   out_dir: Path | None = None, beta: float | None = None,
-                  rule_titles: dict | None = None) -> dict:
+                  rule_titles: dict | None = None, ceiling_d: np.ndarray | None = None) -> dict:
     """Place every axis's tiers; write `human_placement.json` and its draws in `out_dir` (default:
     beside the trace). `view` must be the aligned view the figures read (same axis order and
     names). `beta`: a semicomp0 fit's median sharpness (softmin eta). `rule_titles` maps an axis
     title to the title whose content judgments it borrows (an exploration fit naming its axes
-    otherwise)."""
+    otherwise). `ceiling_d`: a --ceiling-noise fit's median ceilings, per benchmark."""
     if np.asarray(data.is_human).any():
         raise ValueError("the 2b placement reads a fit without human baselines (--no-humans)")
     rules = content_rules()
@@ -219,7 +224,8 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
     out = {"trace": trace.name, "rule": "dominant axis (largest loading-variance share), "
            "content filter 1_curated/human_axis_content.csv, ordered tiers (HUMAN_ORDER_MERGED), "
            "other axes at the typical-model profile; drawn: own score below the ceiling or "
-           "between two such tiers", "softmin_beta": beta, "axes": []}
+           "between two such tiers", "softmin_beta": beta,
+           "ceiling_d": ceiling_d is not None, "axes": []}
     draws_out = {}
     for k, name in enumerate(view.names):
         title = titles.get(name, name).partition(": ")[2] or None
@@ -236,13 +242,13 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
               "consistency": []}
         if title and len(sc):
             order, draws, conv, prof = place_axis(k, sc, bench, A, D, phi, floor_c, theta_models,
-                                                  tiers, beta=beta)
+                                                  tiers, beta=beta, ceiling_d=ceiling_d)
             ax["drawn"] = drawn_tiers(sc, order)
             ax["tiers"] = {t: [round(float(q), 3) for q in np.quantile(draws[:, i], [0.1, 0.5, 0.9])]
                            for i, t in enumerate(order)}
             ax["convergence"] = conv
             ax["consistency"] = consistency(k, sc, bench, A, D, floor_c, order, draws, prof,
-                                            data, dates, beta=beta)
+                                            data, dates, beta=beta, ceiling_d=ceiling_d)
             ax["order"] = order
             draws_out[name] = draws
         out["axes"].append(ax)

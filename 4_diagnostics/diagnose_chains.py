@@ -38,8 +38,8 @@ Outputs:
   <fit>/mirt_modes_<stem>.json            — with --write-modes: chains, Δlogp
                                             and matched loading corr per mode.
 
-Run (T = the fit's trace, e.g. 5_outputs/<data generation>/mirt_humanmerge_lineageprior_lineagebm/
-trace_mirt_k4_humanmerge_lineageprior_lineagebm.nc):
+Run (T = the fit's trace, e.g. 5_outputs/<data generation>/mirt_lineageprior_lineagebm/
+trace_mirt_k4_lineageprior_lineagebm.nc):
   python 4_diagnostics/diagnose_chains.py --trace T --name k4_main --fig
   python 4_diagnostics/diagnose_chains.py --trace T --write-modes
   python 4_diagnostics/diagnose_chains.py --trace T --write-tables   # once selected_chains is final

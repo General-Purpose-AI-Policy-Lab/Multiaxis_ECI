@@ -2623,11 +2623,10 @@ class TestFitSpec:
         # and the 3PL floors are defaults and carry no token; FrontierMath v1 and
         # AlgoTune are out of scope through the retirement list, so no `_drop`
         # either. Non-negative loadings are the default too, so no prior token. Fitted
-        # without the human baselines since 2026-10-08 (the tiers are placed afterwards).
-        assert analysis.FLAGSHIP.tag == (
-            "_lineageprior_lineagebm_nohumans")
-        assert analysis.FLAGSHIP.trace_path.name == (
-            "trace_mirt_k4_lineageprior_lineagebm_nohumans.nc")
+        # without the human baselines since 2026-10-08 (the tiers are placed afterwards), the
+        # untagged default since 2026-10-21.
+        assert analysis.FLAGSHIP.tag == "_lineageprior_lineagebm"
+        assert analysis.FLAGSHIP.trace_path.name == "trace_mirt_k4_lineageprior_lineagebm.nc"
         assert analysis.FLAGSHIP.no_humans and not analysis.FLAGSHIP.human_merge
         assert analysis.FLAGSHIP.pooled_noise and analysis.FLAGSHIP.floors
         assert analysis.FLAGSHIP.loading_prior == "normal"
@@ -2716,9 +2715,11 @@ class TestFitSpec:
         # (3_fit/fit.py's baseline rule), which the tag now names, and an attr-less
         # trace predates the Beta-binomial, so `_betalik` too. Harmless for
         # folders: a baseline lives untagged in its K-fit's folder. Its theta block is the
-        # Gaussian one (the skew-normal default is not forwarded), hence `_normaltheta`.
+        # Gaussian one (the skew-normal default is not forwarded), hence `_normaltheta`; the human
+        # tiers of its folder stay in its data, but not their order, hence `_humans`; a legacy
+        # fit had no ceiling, hence `_noceiling`.
         assert not spec.beta_binomial
-        assert spec.tag == "_normaltheta_cyber_knownse_unpooled_betalik"
+        assert spec.tag == "_normaltheta_cyber_noceiling_knownse_unpooled_betalik_humans"
 
     def test_spec_written_before_beta_binomial_reads_as_beta(self):
         # Every trace up to 2026-10-01 carries a mirt_spec without the field and was fit with
@@ -2856,7 +2857,7 @@ class TestFitSpec:
         if attrs and "mirt_spec" in attrs:
             spec = analysis.FitSpec(K=3, loading_prior="normal", floors=True)
             spec = (dc.replace(spec, K=4) if attrs["mirt_spec"] == "K4"
-                    else dc.replace(spec, ceiling_noise=True))
+                    else dc.replace(spec, known_se=True))
             attrs = {"mirt_spec": analysis.spec_json(spec)}
         idata = self._idata(K=3, attrs=attrs)
         p = PROJECT_ROOT / "results" / folder / fname
@@ -2872,9 +2873,9 @@ class TestFitSpec:
     def test_effort_means_are_the_untagged_default(self):
         spec = analysis.FitSpec(K=4, human_merge=True, lineage_prior=True, lineage_bm=True)
         assert spec.effort_means and spec == analysis.JOINT_FIT
-        assert spec.tag == "_humanmerge_lineageprior_lineagebm"
+        assert spec.tag == "_lineageprior_lineagebm_humanmerge"
         off = dataclasses.replace(spec, effort_means=False)
-        assert off.tag == "_humanmerge_lineageprior_lineagebm_noeffortmeans"
+        assert off.tag == "_lineageprior_lineagebm_noeffortmeans_humanmerge"
         for s in (spec, off):
             idata = self._idata(K=4, attrs={"mirt_spec": analysis.spec_json(s)})
             assert analysis.FitSpec.from_trace(idata, s.trace_path) == s

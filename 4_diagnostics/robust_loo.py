@@ -103,13 +103,14 @@ def build_model(trace_path: Path, keep: np.ndarray | None = None):
         load_observed_best,
         release_time_covariate,
     )
-    from multiaxis_eci.lineage import build_lineage_structure
+    from multiaxis_eci.lineage import trace_lineage_structure
     from multiaxis_eci.models.mirt import build_mirt_model
 
     post = xr.open_dataset(trace_path, group="posterior")
     spec = FitSpec.from_trace(az.InferenceData(posterior=post), trace_path)
     data, floor_c, _ = spec.load_data(az.InferenceData(posterior=post))
-    lineage = build_lineage_structure(data.mlookup) if spec.lineage_prior else None
+    lineage = (trace_lineage_structure(data.mlookup, trace_path, post) if spec.lineage_prior
+               else None)
     time_t = release_time_covariate(data.mlookup, lineage) if spec.time_prior else None
     # Per-observation inputs are read on the full data, then cut with it.
     binomial_n = spec.binomial_n(data)

@@ -8,7 +8,7 @@ plotted data set cannot drift apart.
 `from_trace` recovers the spec of an already-fitted trace. Three sources, in
 order: the `mirt_spec` JSON attr, which 3_fit/fit.py writes, the individual `mirt_*`
 attrs, and the tokens of the results-folder name for the flags no attr carries
-(`--apply-exclusions`, `--no-sg`, `--ceiling-noise`). A flag a tag cannot carry
+(`--apply-exclusions`, `--no-sg`). A flag a tag cannot carry
 losslessly is REFUSED, not guessed: `_dropFrontierMathv1AlgoTune` cannot be
 split back into benchmark names, so a trace with that token and no attr raises.
 An unrecognized token raises too — a partial parse would load the wrong data
@@ -110,7 +110,13 @@ class FitSpec:
     # The default (ON) carries no token; the opt-out emits `_nofloors`, so a
     # sensitivity run gets its own folder instead of overwriting the default's.
     floors: bool = True
-    ceiling_noise: bool = False
+    # A per-benchmark ceiling d_b = 1 - e_b, the gap e_b (wrong keys, broken items) drawn from
+    # benchmark-forecasting's population and never below the best observed score: the K-axis
+    # default since 2026-10-21 (user, after the ceiling study of
+    # 5_outputs/data20261019/mirt_lineageprior_lineagebm/investigation/). ON carries no token,
+    # the opt-out emits `_noceiling`; folders of 2026-10-15 to 2026-10-21 carried the option as
+    # `_ceilnoise`, which still parses.
+    ceiling_noise: bool = True
     known_se: bool = False
     # Censored Beta likelihood at the score bounds (data.load_boundary_eps); off by default,
     # emits `_censor`.
@@ -138,16 +144,19 @@ class FitSpec:
     # prior; a spec without it was sampled with none (0.0).
     sigma_b_floor: float = SIGMA_B_FLOOR
     # The human baselines left out of the data (load_eci_data(fit_humans=False)): a pure
-    # model-vs-model scale, the humans placed afterwards on the frozen benchmark side.
-    # Emits `_nohumans`. Exploration, 2026-10-07.
-    no_humans: bool = False
+    # model-vs-model scale, the humans placed afterwards on the frozen benchmark side. The
+    # K-axis fits' default since 2026-10-21 (user): models only is untagged, a fit with the human
+    # tiers inside emits `_humans` (or names their order, `_humanmerge` / `_humanprior`, which
+    # implies them). From 2026-10-07 to 2026-10-21 the models-only fits carried `_nohumans`,
+    # which still parses; a spec without the field had its humans in (`from_trace`).
+    no_humans: bool = True
 
     def __post_init__(self):
         # The cross-flag constraint the model cannot express on its own. Checked
         # here so every construction path pays it, not just the CLI.
-        if self.no_humans and (self.human_merge or self.human_prior):
-            raise ValueError("--no-humans and the ordered-human priors cannot compose: there "
-                             "are no human test-takers left to order.")
+        # an order on the human tiers needs them in the fit
+        if self.human_merge or self.human_prior:
+            object.__setattr__(self, "no_humans", False)
         if self.link not in LINKS:
             raise ValueError(f"unknown link {self.link!r} (one of {', '.join(LINKS)})")
         if self.lineage_bm and not self.lineage_prior:
@@ -171,8 +180,6 @@ class FitSpec:
         untagged so its folders reduce to the canonical mirt_humanprior etc."""
         tag = "" if self.loading_prior == "normal" else f"_{self.loading_prior}"
         if self.link != "linear": tag += f"_{self.link}"
-        if self.human_merge: tag += "_humanmerge"
-        elif self.human_prior: tag += "_humanprior"
         if self.lineage_prior: tag += "_lineageprior"
         if self.lineage_bm: tag += "_lineagebm"
         if self.lineage_prior and not self.effort_means: tag += "_noeffortmeans"
@@ -190,12 +197,15 @@ class FitSpec:
                                      for b in self.drop_benchmarks)
         if self.private_bases: tag += "_privbase"
         if not self.floors: tag += "_nofloors"
-        if self.ceiling_noise: tag += "_ceilnoise"
+        if not self.ceiling_noise: tag += "_noceiling"
         if self.known_se: tag += "_knownse"
         if not self.pooled_noise: tag += "_unpooled"
         if self.censor_bounds: tag += "_censor"
         elif not self.beta_binomial: tag += "_betalik"
-        if self.no_humans: tag += "_nohumans"
+        # the human tiers last (user, 2026-10-21): under their order, or plainly in
+        if self.human_merge: tag += "_humanmerge"
+        elif self.human_prior: tag += "_humanprior"
+        elif not self.no_humans: tag += "_humans"
         return tag
 
     @property
@@ -263,7 +273,7 @@ class FitSpec:
                 pooled_noise=args.pooled_noise,
                 censor_bounds=args.censor_bounds,
                 beta_binomial=args.beta_binomial,
-                no_humans=getattr(args, "no_humans", False))
+                no_humans=not getattr(args, "humans", False))
         except ValueError as e:
             if parser is None:
                 raise
@@ -301,6 +311,7 @@ class FitSpec:
             d.setdefault("beta_binomial", False)
             d.setdefault("effort_means", False)
             d.setdefault("theta_skew", False)     # a spec from before the skew-normal block
+            d.setdefault("no_humans", False)      # ... from before the models-only fits
             d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
             d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
             d.setdefault("sigma_b_floor", 0.0)
@@ -323,9 +334,11 @@ class FitSpec:
                     "Verify the recovered spec before trusting derived numbers.")
             tag = _folder_tag(trace_path)
             # Without mirt_spec the trace predates the Beta-binomial: the Beta, unless an attr says so.
-            spec = FitSpec(K=K, **{**_parse_tag(tag, attr.get("drop_benchmarks", ())),
+            # The defaults of later grammars (the skew-normal block, the models-only fits, the
+            # ceilings) were off then: they give way to the folder's tokens, which name them when on.
+            legacy_off = dict(theta_skew=False, no_humans=False, ceiling_noise=False)
+            spec = FitSpec(K=K, **{**legacy_off, **_parse_tag(tag, attr.get("drop_benchmarks", ())),
                                    "beta_binomial": False, "effort_means": False,
-                                   "theta_skew": False,
                                    "human_delta_sd": LEGACY_HUMAN_DELTA_SD,
                                    "human_root_sd": LEGACY_HUMAN_ROOT_SD, "sigma_b_floor": 0.0,
                                    **attr})
@@ -430,24 +443,24 @@ class FitSpec:
 # scope, fitted on the MODELS ALONE (user, 2026-10-08): the human tiers are placed afterwards,
 # axis by axis, with the benchmark side frozen (analysis.human_placement,
 # 4_diagnostics/5_place_humans.py). Fitted with the human tiers (`human_merge`, the flagship
-# until that day, still fitted under `mirt_humanmerge_lineageprior_lineagebm/`), the
+# until that day, still fitted under `mirt_lineageprior_lineagebm_humanmerge/`), the
 # compensatory model put them about 5 sd below the models on one axis and 8 above on another.
 # The blog post reports the 2026-08 run of that joint fit (10 chains x 12,000 draws on the
 # pre-pipeline snapshot, archived under 5_outputs/pre_pipeline/). `loading_prior` and `floors`
 # are named explicitly although both hold the default: the flagship is a statement of one fit,
 # and a later default change must not silently redefine it.
 FLAGSHIP = FitSpec(K=4, loading_prior="normal", lineage_prior=True, lineage_bm=True,
-                   floors=True, theta_skew=True, no_humans=True)
+                   floors=True, theta_skew=True, ceiling_noise=True, no_humans=True)
 # The former flagship, the human tiers fitted inside under the merged order: kept as a secondary
-# fit in its own folder (`mirt_humanmerge_lineageprior_lineagebm/`), refitted on new data only on
+# fit in its own folder (`mirt_lineageprior_lineagebm_humanmerge/`), refitted on new data only on
 # request (`3_fit/fit.py --K 4 --human-merge --lineage-prior --lineage-bm`), out of the default
 # run and of the dashboard (user, 2026-10-08).
 JOINT_FIT = FitSpec(K=4, loading_prior="normal", human_merge=True, lineage_prior=True,
-                    lineage_bm=True, floors=True, theta_skew=True)
+                    lineage_bm=True, floors=True, theta_skew=True, ceiling_noise=True)
 # The one path every consumer reads, so the figures, the dashboard card and the
 # post cannot name different traces: the flagship fit of the CURRENT data
 # generation (`config.RESULTS_DIR`). It exists once `3_fit/fit.py --K 4 --lineage-prior
-# --lineage-bm --no-humans` has run on that generation (and 5_place_humans.py has placed the
+# --lineage-bm` has run on that generation (and 5_place_humans.py has placed the
 # tiers); `open_flagship` says so when it has not. `FLAGSHIP_TRACE.parent` is the fit's
 # results folder and holds its CSVs and caches.
 FLAGSHIP_TRACE = FLAGSHIP.trace_path
@@ -520,7 +533,7 @@ def open_flagship(keep=None, thin: int = FLAGSHIP_THIN, chains=FLAGSHIP_CHAINS):
     if not FLAGSHIP_TRACE.exists():
         raise FileNotFoundError(
             f"{FLAGSHIP_TRACE}: the flagship K=4 fit does not exist for this data generation; "
-            "run `python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --no-humans` first "
+            "run `python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm` first "
             "(the published run sits under 5_outputs/pre_pipeline/).")
     if chains == "best":
         chains = best_mode_chains(FLAGSHIP_TRACE)
@@ -630,6 +643,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         if take(f"_{lk}"):
             out["link"] = lk
             break
+    # Legacy position of the human order (before 2026-10-21 it followed the link; it now ends
+    # the tag, read below).
     if take("_humanmerge"):
         out["human_merge"] = True
     elif take("_humanprior"):
@@ -679,7 +694,13 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["floors"] = False
     else:
         out["floors"] = take("_floors")
-    for tok, fl in (("_ceilnoise", "ceiling_noise"), ("_knownse", "known_se")):
+    # Ceilings, two grammars: ON is untagged since 2026-10-21 and OFF emits `_noceiling`; until
+    # then the option was `_ceilnoise`. An untagged legacy folder had none, which its spec says.
+    if take("_ceilnoise"):
+        out["ceiling_noise"] = True
+    elif take("_noceiling"):
+        out["ceiling_noise"] = False
+    for tok, fl in (("_knownse", "known_se"),):
         if take(tok):
             out[fl] = True
     # Legacy token: ON used to be tagged `_poolednoise`; it names the value the
@@ -692,8 +713,18 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["censor_bounds"] = True
     if take("_betalik"):
         out["beta_binomial"] = False
+    # Humans in or out, two grammars: today models only is untagged and a fit with the tiers
+    # inside emits `_humans` (an order token implies them); from 2026-10-07 to 2026-10-21 the
+    # models-only fits emitted `_nohumans`. An untagged legacy folder held the humans, which
+    # its trace's spec says.
     if take("_nohumans"):
         out["no_humans"] = True
+    elif take("_humanmerge"):
+        out["human_merge"] = True
+    elif take("_humanprior"):
+        out["human_prior"] = True
+    elif take("_humans"):
+        out["no_humans"] = False
     if rest:
         raise ValueError(f"unrecognized tag token {rest!r} in folder tag {tag!r} "
                          "— refusing to guess the fit's data scope")
@@ -749,7 +780,8 @@ def _check_round_trip(spec: FitSpec, trace_path: Path) -> None:
     # untagged folder with the Gaussian block (or in a `_thetaskew` one).
     if replace(got, floors=want.floors, pooled_noise=want.pooled_noise,
                beta_binomial=want.beta_binomial, effort_means=want.effort_means,
-               theta_skew=want.theta_skew) != want:
+               theta_skew=want.theta_skew, no_humans=want.no_humans,
+               ceiling_noise=want.ceiling_noise) != want:
         raise ValueError(f"spec round-trip failed: folder tag {folder_tag!r} names "
                          f"a different flag set than the recovered spec, whose own "
                          f"tag is {spec.tag!r}")

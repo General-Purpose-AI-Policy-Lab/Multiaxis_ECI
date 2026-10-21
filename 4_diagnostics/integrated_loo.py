@@ -19,6 +19,11 @@ The latent block of a score is
     (a founder's own base is one entry of the ZeroSumNormal, taken as N(0, 1));
   * for a model outside the chains: its theta, prior N(0, I) (the ZeroSumNormal entry);
   * human tiers (ordered prior) are not integrated: their scores keep plain PSIS.
+Under the skew-normal theta block (the K-axis default since 2026-10-20) the founders' bases and the
+models outside the chains have a skew-normal prior per axis, SkewNormal(xi_k, omega_k, alpha_k) at
+the draw's alpha: it enters the Laplace fit with its exact gradient and curvature, the conditional
+posterior staying close to Gaussian wherever the scores pin the block. Under --ceiling-noise the
+curve stops at the draw's ceilings, mu = c + (d - c) sigmoid(eta).
 For each draw, the block's conditional posterior (prior times every score of the block) is
 approximated by a Laplace fit; removing score i gives its cavity Gaussian in closed form, and
 since score i sees the block only through eta_i = A_i . (psi + offset) - D_i, the predictive
@@ -54,7 +59,7 @@ import arviz as az
 import numpy as np
 import pandas as pd
 import xarray as xr
-from scipy.special import expit, gammaln, logsumexp
+from scipy.special import expit, gammaln, log_ndtr, logsumexp
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
@@ -67,10 +72,10 @@ LOG_GH_W = np.log(GH_W / np.sqrt(2 * np.pi))
 
 # ── likelihood, in numpy, as models/mirt.py writes it ───────────────────────────────────────
 
-def obs_loglik(eta, c, phi, n_items, k, y):
+def obs_loglik(eta, c, phi, n_items, k, y, d=1.0):
     """log p(y | eta) of the fixed-c 3PL Beta-binomial (n_items > 0) / Beta (n_items == 0)
-    likelihood; every argument broadcasts."""
-    mu = c + (1.0 - c) * expit(eta)
+    likelihood, capped at the ceiling d (1 without --ceiling-noise); every argument broadcasts."""
+    mu = c + (d - c) * expit(eta)
     a, b = mu * phi, (1.0 - mu) * phi
     is_b = n_items > 0
     n = np.where(is_b, n_items, 1.0)
@@ -86,6 +91,29 @@ def eta_derivatives(eta, args, h: float = 1e-3):
     """First and second derivative of obs_loglik in eta, by central differences."""
     f0, fp, fm = obs_loglik(eta, *args), obs_loglik(eta + h, *args), obs_loglik(eta - h, *args)
     return f0, (fp - fm) / (2 * h), (fp - 2 * f0 + fm) / h ** 2
+
+
+# ── the skew-normal prior of the exchangeable block ─────────────────────────────────────────
+
+def skew_params(alpha):
+    """(xi, omega) of the standardised skew-normal of shape alpha (models/mirt._theta_skew_cells)."""
+    delta = alpha / np.sqrt(1 + alpha ** 2)
+    omega = 1.0 / np.sqrt(1 - 2 * delta ** 2 / np.pi)
+    return -omega * delta * np.sqrt(2 / np.pi), omega
+
+
+def skew_terms(x, skew):
+    """log density (up to its constant in x), gradient and second derivative of the skew-normal
+    prior at x, per coordinate: z = (x - xi) / omega, t = alpha z, lambda = phi(t) / Phi(t),
+    d/dx = (-z + alpha lambda) / omega, d2/dx2 = (-1 - alpha^2 lambda (t + lambda)) / omega^2."""
+    xi, omega, alpha = skew
+    z = (x - xi) / omega
+    t = alpha * z
+    log_cdf = log_ndtr(t)
+    lam = np.exp(-0.5 * t ** 2 - 0.5 * np.log(2 * np.pi) - log_cdf)
+    return (-0.5 * z ** 2 + log_cdf - np.log(omega),
+            (-z + alpha * lam) / omega,
+            (-1.0 - alpha ** 2 * lam * (t + lam)) / omega ** 2)
 
 
 # ── one latent block, every draw at once ─────────────────────────────────────────────────────
@@ -106,14 +134,15 @@ def eta_jac(f, A_o, xo, D_o):
     return -s * lse / b - D_o, s[..., None] * pi
 
 
-def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10):
+def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10, skew=None):
     """log p(y_i | y_-i, phi_s) for every score i of one latent block and every draw s.
 
     A_o (S, J, K) loadings of the block's J scores, off (S, J, K) the per-score offset added to
     the block value (a variant's offset from its release level; 0 outside the chains), D_o (S, J)
     difficulties, args the per-score likelihood inputs broadcast to (S, J), m0 / p0 (S, K) the
     block's Gaussian prior mean and precision (diagonal), x0 (S, K) a starting value (the draw's
-    own block value). Returns (S, J). On a softmin link eta is not linear in the block: the
+    own block value), skew None or (xi, omega, alpha) (S, K) of a skew-normal prior factor on
+    top of the Gaussian one (`skew_terms`). Returns (S, J). On a softmin link eta is not linear in the block: the
     Laplace fit is Gauss-Newton on its gradient J (`eta_jac`) and serves as the proposal of
     `softmin_block_is`; on the linear link J = A_o and the cavity is exact as before.
     """
@@ -123,7 +152,11 @@ def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10):
         _, d1, d2 = eta_derivatives(eta, args)
         w = np.maximum(-d2, 1e-8)                                 # curvature, kept positive
         grad = np.einsum("sj,sjk->sk", d1, J) - p0 * (x - m0)
-        P = np.einsum("sj,sjk,sjl->skl", w, J, J) + p0[:, :, None] * np.eye(x.shape[1])
+        pp = p0
+        if skew is not None:
+            _, g1, g2 = skew_terms(x, skew)
+            grad, pp = grad + g1, p0 + np.maximum(-g2, 1e-8)
+        P = np.einsum("sj,sjk,sjl->skl", w, J, J) + pp[:, :, None] * np.eye(x.shape[1])
         step = np.clip(np.linalg.solve(P, grad[..., None])[..., 0], -1.0, 1.0)   # damped
         x = x + step
         if np.abs(step).max() < 1e-6:
@@ -131,10 +164,13 @@ def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10):
     eta, J = eta_jac(f, A_o, x[:, None, :] + off, D_o)
     _, d1, d2 = eta_derivatives(eta, args)
     w = np.maximum(-d2, 1e-8)
-    P = np.einsum("sj,sjk,sjl->skl", w, J, J) + p0[:, :, None] * np.eye(x.shape[1])
+    pp = p0 if skew is None else p0 + np.maximum(-skew_terms(x, skew)[2], 1e-8)
+    P = np.einsum("sj,sjk,sjl->skl", w, J, J) + pp[:, :, None] * np.eye(x.shape[1])
     Sigma = np.linalg.inv(P)
-    if f["beta"] is not None:
-        return softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma)
+    if f["beta"] is not None or skew is not None:
+        # a softmin link, or a skew-normal prior: the conditional posterior is skewed, and the
+        # Laplace cavity misses the exact integral by up to 0.1 nats a score (tests)
+        return softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma, skew=skew)
     v_full = np.einsum("sjk,skl,sjl->sj", J, Sigma, J)            # J_i' Sigma J_i
     # Cavity of score i (Sherman-Morrison): drop its curvature and its pull on the mode.
     v_cav = v_full / (1.0 - w * v_full)
@@ -154,7 +190,7 @@ IS_CHUNK = 16         # posterior draws per chunk (memory: chunk x IS_DRAWS x J 
 _IS_Z = np.random.default_rng(20261007).standard_t(5, size=(IS_DRAWS, 8))
 
 
-def softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma):
+def softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma, skew=None):
     """The integrated predictive of a softmin-link block by importance sampling: the block's
     conditional posterior is far from Gaussian there (the minimum switches axes away from the
     mode, so a Laplace or cubature cavity misses it by 0.1 to 0.4 nats a score), so the exact
@@ -173,9 +209,15 @@ def softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma):
         logdet = np.log(np.diagonal(L, axis1=-2, axis2=-1)).sum(-1)          # (s,)
         logq = -logdet[:, None] - 3.0 * np.log1p(z ** 2 / 5).sum(-1)[None, :]
         logprior = -0.5 * (p0[sl, None, :] * (xs - m0[sl, None, :]) ** 2).sum(-1)
-        beta = f["beta"][sl, None, None]
-        th = xs[:, :, None, :] + off[sl, None] + f["offset"][sl, None, None, :]
-        eta = softmin_eta(A_o[sl, None], th, D_o[sl, None], beta)            # (s, M, J)
+        if skew is not None:
+            logprior = logprior + skew_terms(xs, tuple(s_[sl, None, :] for s_ in skew))[0].sum(-1)
+        if f["beta"] is None:                                                 # linear link
+            th = xs[:, :, None, :] + off[sl, None]
+            eta = np.einsum("smjk,sjk->smj", th, A_o[sl]) - D_o[sl, None, :]
+        else:
+            beta = f["beta"][sl, None, None]
+            th = xs[:, :, None, :] + off[sl, None] + f["offset"][sl, None, None, :]
+            eta = softmin_eta(A_o[sl, None], th, D_o[sl, None], beta)        # (s, M, J)
         ll = obs_loglik(eta, *[np.asarray(g)[sl, None] for g in args])
         lw = logprior + ll.sum(-1) - logq                                     # (s, M)
         out[sl] = logsumexp(lw, axis=1)[:, None] - logsumexp(lw[..., None] - ll, axis=1)
@@ -205,20 +247,21 @@ def lineage_graph(lin):
     return parent, d_in, children
 
 
-def load_fit(trace_path: Path, chains: list[int]):
+def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = None):
     from multiaxis_eci.analysis.fitspec import FitSpec, sampled_human_order
     from multiaxis_eci.models.mirt import trace_softmin
-    from multiaxis_eci.lineage import build_lineage_structure
+    from multiaxis_eci.lineage import trace_lineage_structure
     from multiaxis_eci.models.mirt import _human_structure
 
     post_all = xr.open_dataset(trace_path, group="posterior")
     spec = FitSpec.from_trace(az.InferenceData(posterior=post_all), trace_path)
     if spec.time_prior or spec.theta_pos or spec.theta_t \
             or spec.link not in ("linear", "semicomp", "noncomp", "semicomp0") \
-            or spec.ceiling_noise or spec.known_se or spec.censor_bounds or not spec.lineage_bm:
+            or spec.known_se or spec.censor_bounds or not spec.lineage_bm:
         raise SystemExit("integrated_loo covers the flagship's specification only")
     data, floor_c, _ = spec.load_data(az.InferenceData(posterior=post_all))
-    lin = build_lineage_structure(data.mlookup)
+    # the map the trace was sampled with (frozen beside it), its chains checked against the trace
+    lin = trace_lineage_structure(data.mlookup, trace_path, post_all, csv_path=lineage_map)
     names = data.mlookup.sort_values("model_idx")["model"].tolist()
     hs = _human_structure(sampled_human_order(post_all, spec), names)
     human_rows = np.asarray(hs[0]) if hs is not None else np.array([], dtype=int)
@@ -229,6 +272,12 @@ def load_fit(trace_path: Path, chains: list[int]):
         return p[v].values.reshape(S, *p[v].shape[2:])
 
     A, theta, D, phi = flat("A"), flat("theta"), flat("D"), flat("phi_b")
+    ceil = flat("ceiling_d") if "ceiling_d" in p else np.ones_like(D)
+    skew = None
+    if "theta_skew_alpha" in p:
+        alpha = flat("theta_skew_alpha")
+        xi, omega = skew_params(alpha)
+        skew = (xi, omega, alpha)
     base, z = flat("lin_base"), flat("lin_delta_z")
     drift, spread = flat("lin_drift"), flat("lin_spread")
     dt = lin.delta_dt
@@ -250,7 +299,7 @@ def load_fit(trace_path: Path, chains: list[int]):
         beta = np.asarray(beta).reshape(S) if np.ndim(beta) else np.full(S, float(beta))
         offset = offset.reshape(S, -1)
     return dict(data=data, lin=lin, human_rows=human_rows, A=A, theta=theta, D=D, phi=phi,
-                beta=beta, offset=offset,
+                beta=beta, offset=offset, ceil=ceil, skew=skew,
                 psi=psi, drift=drift, spread=spread, n_items=n_items, k=k, y=y, c=c, S=S)
 
 
@@ -258,7 +307,8 @@ def conditional_loglik(f) -> np.ndarray:
     """log p(y_n | theta_s), (S, n_obs), recomputed in numpy from the posterior."""
     d = f["data"]
     eta, _ = eta_jac(f, f["A"][:, d.bench_idx], f["theta"][:, d.model_idx], f["D"][:, d.bench_idx])
-    return obs_loglik(eta, f["c"], f["phi"][:, d.bench_idx], f["n_items"], f["k"], f["y"])
+    return obs_loglik(eta, f["c"], f["phi"][:, d.bench_idx], f["n_items"], f["k"], f["y"],
+                      f["ceil"][:, d.bench_idx])
 
 
 def integrated_loglik(f) -> tuple[np.ndarray, np.ndarray]:
@@ -271,13 +321,14 @@ def integrated_loglik(f) -> tuple[np.ndarray, np.ndarray]:
     parent, d_in, children = lineage_graph(lin)
     spread2 = f["spread"] ** 2                                        # (S, K)
 
-    def run(obs, block_value, off, m0, p0):
+    def run(obs, block_value, off, m0, p0, skew=None):
         b = d.bench_idx[obs]
         args = (f["c"][obs][None, :], f["phi"][:, b], f["n_items"][obs][None, :],
-                f["k"][obs][None, :], f["y"][obs][None, :])
+                f["k"][obs][None, :], f["y"][obs][None, :], f["ceil"][:, b])
         args = tuple(np.broadcast_to(a, (S, len(obs))) for a in args)
         with np.errstate(all="ignore"):
-            res = block_predictive(f, f["A"][:, b], off, f["D"][:, b], args, m0, p0, block_value)
+            res = block_predictive(f, f["A"][:, b], off, f["D"][:, b], args, m0, p0, block_value,
+                                   skew=skew)
         bad = ~np.isfinite(res)
         # A rare draw whose Newton fit runs off (extreme eta) keeps its conditional value.
         res[bad] = out[:, obs][bad]
@@ -293,7 +344,7 @@ def integrated_loglik(f) -> tuple[np.ndarray, np.ndarray]:
             continue
         p0 = np.zeros((S, K))
         num = np.zeros((S, K))
-        if parent[n] < 0:
+        if parent[n] < 0 and f["skew"] is None:
             p0 += 1.0                                                 # founder: ZSN entry
         else:
             v = spread2 * lin.delta_dt[d_in[n]]
@@ -303,18 +354,24 @@ def integrated_loglik(f) -> tuple[np.ndarray, np.ndarray]:
             v = spread2 * lin.delta_dt[d_in[ch]]
             p0 += 1.0 / v
             num += (f["psi"][:, ch] - f["drift"] * lin.delta_dt[d_in[ch]]) / v
-        m0 = num / p0
+        m0 = np.divide(num, p0, out=np.zeros_like(num), where=p0 > 0)
         off = f["theta"][:, d.model_idx[obs]] - f["psi"][:, n][:, None, :]
-        run(obs, f["psi"][:, n], off, m0, p0)
+        # a founder's base under the skew-normal block: its prior is that cell's skew-normal
+        run(obs, f["psi"][:, n], off, m0, p0, skew=f["skew"] if parent[n] < 0 else None)
 
-    # Models outside the chains and the human tiers: their own theta, prior N(0, I).
+    # Models outside the chains and the human tiers: their own theta, prior N(0, I), or the
+    # skew-normal cell under the skew-normal block.
     claimed = np.concatenate([f["human_rows"], lin.row_idx])
     for m in np.setdiff1d(np.arange(d.n_models), claimed):
         obs = np.flatnonzero(d.model_idx == m)
         if obs.size == 0:
             continue
-        run(obs, f["theta"][:, m], np.zeros((S, obs.size, K)), np.zeros((S, K)),
-            np.ones((S, K)))
+        if f["skew"] is None:
+            run(obs, f["theta"][:, m], np.zeros((S, obs.size, K)), np.zeros((S, K)),
+                np.ones((S, K)))
+        else:
+            run(obs, f["theta"][:, m], np.zeros((S, obs.size, K)), np.zeros((S, K)),
+                np.zeros((S, K)), skew=f["skew"])
     return out, done
 
 
@@ -324,9 +381,9 @@ def psis_elpd(loglik: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return logsumexp(lw + loglik.T, axis=1), k
 
 
-def score_chain(trace_path: Path, chain: int, stored) -> dict:
+def score_chain(trace_path: Path, chain: int, stored, lineage_map: Path | None = None) -> dict:
     """Integrated and conditional PSIS-LOO of one chain (pointwise elpd and k)."""
-    f = load_fit(trace_path, [chain])
+    f = load_fit(trace_path, [chain], lineage_map)
     cond = conditional_loglik(f)
     gap = float(np.abs(cond - stored.isel(chain=[chain]).values.reshape(f["S"], -1)).max())
     if gap > 1e-6:
@@ -349,6 +406,9 @@ def main() -> None:
     ap.add_argument("--groups", nargs="+", default=None, metavar="NAME:C1,C2",
                     help="chain groups to compare (default: the modes of the modes file); "
                          "the first is the reference")
+    ap.add_argument("--lineage-map", type=Path, default=None,
+                    help="the lineage map the trace was fitted with, when 1_curated/lineage_map.csv "
+                         "has changed since (default: the current one)")
     ap.add_argument("--out-dir", type=Path, default=None,
                     help="where the tables go (default: diagnostics/ beside the trace)")
     args = ap.parse_args()
@@ -368,7 +428,7 @@ def main() -> None:
     # the observations still above k = 0.5).
     per_chain = {}
     for c in sorted({c for ch in groups.values() for c in ch}):
-        per_chain[c] = score_chain(args.trace, c, stored)
+        per_chain[c] = score_chain(args.trace, c, stored, args.lineage_map)
         print(f"chain {c}: elpd_int {per_chain[c]['e_int'].sum():.1f}", flush=True)
     f = next(iter(per_chain.values()))["f"]
     d = f["data"]

@@ -972,14 +972,14 @@ class TestThetaSkew:
         the legacy `_thetaskew` token still reads as the skew-normal block."""
         from multiaxis_eci.analysis.fitspec import FLAGSHIP, FitSpec, _parse_tag
         base = dict(K=4, lineage_prior=True, lineage_bm=True, no_humans=True)
-        assert FitSpec(**base).tag == "_lineageprior_lineagebm_nohumans"
-        assert FitSpec(**base, theta_skew=False).tag == "_lineageprior_lineagebm_normaltheta_nohumans"
+        assert FitSpec(**base).tag == "_lineageprior_lineagebm"
+        assert FitSpec(**base, theta_skew=False).tag == "_lineageprior_lineagebm_normaltheta"
         t = FitSpec(**base, theta_t=True)
-        assert t.theta_skew is False and t.tag == "_lineageprior_lineagebm_thetat_nohumans"
+        assert t.theta_skew is False and t.tag == "_lineageprior_lineagebm_thetat"
         assert _parse_tag("_lineageprior_lineagebm_normaltheta_nohumans")["theta_skew"] is False
         assert _parse_tag("_lineageprior_lineagebm_thetaskew_nohumans")["theta_skew"] is True
         assert "theta_skew" not in _parse_tag("_lineageprior_lineagebm_nohumans")
-        assert FLAGSHIP.theta_skew and FLAGSHIP.results_dir.name == "mirt_lineageprior_lineagebm_nohumans"
+        assert FLAGSHIP.theta_skew and FLAGSHIP.results_dir.name == "mirt_lineageprior_lineagebm"
 
     def test_cli_default_and_opt_out(self):
         """3_fit/fit.py fits the skew-normal block unless --normal-theta is passed."""
@@ -989,11 +989,11 @@ class TestThetaSkew:
                   lineage_prior=True, lineage_bm=True, effort_means=True, time_prior=False,
                   theta_t=False, theta_pos=False, no_sg=False, apply_exclusions=False,
                   keep_isolated=False, simpleqa_original=False, drop_benchmarks=None,
-                  private_bases=False, floors=True, ceiling_noise=False, known_se=False,
-                  pooled_noise=True, censor_bounds=False, beta_binomial=True, no_humans=True)
+                  private_bases=False, floors=True, ceiling_noise=True, known_se=False,
+                  pooled_noise=True, censor_bounds=False, beta_binomial=True, humans=False)
         assert FitSpec.from_args(argparse.Namespace(**ns, theta_skew=True)).theta_skew is True
         assert FitSpec.from_args(argparse.Namespace(**ns, theta_skew=False)).tag.endswith(
-            "_normaltheta_nohumans")
+            "_normaltheta")
 
 
 class TestThetaPos:

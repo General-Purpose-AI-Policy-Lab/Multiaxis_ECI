@@ -378,7 +378,7 @@ def check_curated_rows(a: Audit):
 
 def check_placement_judgements(a: Audit, humans):
     """Benchmarks with human scores that the per-axis placement has not judged on the named axes."""
-    names = sorted(config.OUTPUTS_DIR.glob("data*/mirt_lineageprior_lineagebm*nohumans*/axis_names.json"))
+    names = sorted(config.OUTPUTS_DIR.glob("data*/mirt_lineageprior_lineagebm/axis_names.json"))
     if not names:
         return
     axes = json.loads(names[-1].read_text()).get("axes", {})

@@ -197,6 +197,38 @@ raised up to at least $c_{b_n}$): then an at-chance score reads as
 "uninformative-low ability" rather than as a hard demand for very negative
 $\eta$.
 
+### 4.4 Estimated ceiling (the K-axis default since 2026-10-21)
+
+A perfect model does not score 1 on most benchmarks: wrong answer keys, items with two
+defensible answers and judge disagreement leave a share $e_b$ of items it still fails. The
+K-axis fits estimate that **upper asymptote** $d_b = 1 - e_b$:
+
+$$
+\boxed{\;\mu_n = c_{b_n} + \big(d_{b_n} - c_{b_n}\big)\,\sigma(\eta_n)\;}
+\qquad e_b \sim 0.25\cdot\mathrm{Beta}(1.43,\ 4.67)
+$$
+
+- The gap is drawn on the absolute scale (a share $e$ of wrong keys removes $e$ from the
+  top whatever the floor). The prior is benchmark-forecasting's posterior population of
+  $1 - L$ (mean 0.059, median 0.051, $P(e > 0.10) = 0.16$); the cap 0.25 keeps $d_b \ge 0.75$
+  above every chance floor (`config.PRIOR_CEILING_GAP`).
+- A benchmark whose ceiling the pipeline records (`ceiling` column, 1 for verified answers)
+  keeps it fixed.
+- No ceiling sits below the best performance observed on its benchmark, a model score or a
+  human baseline: the prior is truncated to $e_b \le 1 - \text{best}_b$, and $d_b = 1$ where
+  someone scored 1.0 (`data.load_observed_best`, benchmark-forecasting's `L_floor_observed`).
+- Why the default: at equal axis structure the ceilings improve out-of-sample prediction
+  (robust mixture LOO +47 ± 23 nats on all scores, +56 ± 12 on the 4,967 reliable ones), the
+  estimated ceilings agree with benchmark-forecasting's (median gap 0.054 vs 0.055) and they
+  read the flattening of top scores as a plateau rather than as a slow axis
+  (`5_outputs/data20261019/mirt_lineageprior_lineagebm/investigation/`).
+- A ceiling is weakly identified on its own: it trades off against the slope $|A_b|$ (the
+  posterior correlation reaches −0.7 on METR), and it moves away from the prior only where
+  many top scores press on it.
+
+`--no-ceiling` fixes $d_b = 1$ and emits the `_noceiling` tag token; fits before 2026-10-21
+carry no ceiling and are read back as `_noceiling`.
+
 ---
 
 ## 5. Priors
@@ -606,20 +638,21 @@ $$
 \begin{cases}
 \sigma\!\big(A_{b_n}\theta_{m_n} - D_{b_n}\big) & \textbf{1D}\ (K=1)\\[4pt]
 \sigma\!\big(\sum_k A_{b_n,k}\theta_{m_n,k} - D_{b_n}\big) & \textbf{KD}\\[4pt]
-c_{b_n} + (1-c_{b_n})\,\sigma\!\big(\sum_k A_{b_n,k}\theta_{m_n,k} - D_{b_n}\big) & \textbf{KD 3PL}
+c_{b_n} + (1-c_{b_n})\,\sigma\!\big(\sum_k A_{b_n,k}\theta_{m_n,k} - D_{b_n}\big) & \textbf{KD 3PL}\\[4pt]
+c_{b_n} + (d_{b_n}-c_{b_n})\,\sigma\!\big(\sum_k A_{b_n,k}\theta_{m_n,k} - D_{b_n}\big) & \textbf{KD 4PL (default)}
 \end{cases}
 $$
 
 with the same $y_n\sim\mathrm{Beta}(\mu_n\phi_{b_n},(1-\mu_n)\phi_{b_n})$,
 $\phi_b = \tfrac{1}{4\sigma_b^2}-1$, boundary clipping at $\varepsilon=10^{-3}$ (or the Beta-binomial of §2.3 on item-scored benchmarks, the default),
 and the priors of Section 5 throughout. 1D is KD at $K=1$; KD is KD 3PL at
-$c\equiv 0$.
+$c\equiv 0$; KD 3PL is the default at $d\equiv 1$ (`--no-ceiling`).
 
 ---
 
 ## 8. Placing the human tiers on the flagship (fitted without them)
 
-Since 2026-10-08 the K=4 flagship is fitted on the models alone (`--no-humans`) and the human
+Since 2026-10-08 the K=4 flagship is fitted on the models alone (the K-axis default since 2026-10-21; `--humans` puts the tiers in) and the human
 tiers are placed on it afterwards, one axis at a time (`analysis.human_placement`,
 `4_diagnostics/5_place_humans.py`). With the benchmark side frozen at the selected chains'
 medians ($\hat A$, $\hat D$, $\hat\phi$), on axis $k$:

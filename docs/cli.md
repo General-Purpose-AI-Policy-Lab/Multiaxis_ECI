@@ -54,6 +54,7 @@ unmarked to both.
 | `--open-only` / `--closed-only` | `[canon]` aliases of `--access public` / `--access nonpublic` |
 | `--simpleqa-original` | `[expl]` append OpenAI's original SimpleQA (`1_curated/simpleqa_original/`) as a column separate from SimpleQA Verified (different set and grader); adds 2023-2024 era rows |
 | `--no-humans` | `[canon]` leave the human baselines out, a pure model-vs-model scale (the two anchors are models); with `--include-all-benchmarks` the easy-for-humans exclusions come back. Writes to `canonical_nohumans/` |
+| `--humans` | `[expl]` fit the human tiers with the models; emits `_humans`. The K-axis fits leave them out by default since 2026-10-21 and place them afterwards, axis by axis (`5_place_humans.py`); `--human-merge` / `--human-prior` put them in under an order, and their token says so. Folders of 2026-10-07 to 2026-10-21 marked the models-only fits `_nohumans`, which still parses |
 | `--no-sg` | `[expl]` drop the Skilled Generalist tier's observations. The tier keeps its slot in the human-order prior, so its theta becomes prior-only |
 | `--drop-zero-scores` | `[canon]` drop `score == 0` observations. Diagnostic: tells whether the zero rows drive bad NUTS geometry |
 | `--eci-data-only` | `[canon]` fit `1_curated/eci_data.csv`, the original reference ECI dataset, instead of the pipeline's score view |
@@ -64,7 +65,7 @@ unmarked to both.
 |---|---|
 | `--no-floors` | `[expl]` drop the chance floors, which are on by default. Emits the `_nofloors` tag token, so the sensitivity run gets its own folder |
 | `--no-pooled-noise` | `[expl]` drop the hierarchical `sigma_b`, which is on by default, and give a thin benchmark a free scale. Emits the `_unpooled` tag token |
-| `--ceiling-noise` | `[expl]` estimate a per-benchmark upper asymptote d_b = 1 - e_b, the absolute gap e_b (share of items a perfect model fails: wrong keys, ambiguous items) drawn from benchmark-forecasting's population, 0.25 * Beta(1.43, 4.67); benchmarks with a ceiling in the pipeline keep it, and no ceiling sits below the best performance observed on its benchmark, a model score or a human baseline (fitted or not): the gap's Beta is truncated to e_b <= 1 - best, and d_b = 1 where someone scored 1.0 (benchmark-forecasting's `L_floor_observed`, under which the prior was estimated; `data.load_observed_best`). Grading noise, not walls |
+| `--no-ceiling` | `[expl]` fix every ceiling at 1 instead of the default since 2026-10-21, which estimates a per-benchmark upper asymptote d_b = 1 - e_b, the absolute gap e_b (share of items a perfect model fails: wrong keys, ambiguous items) drawn from benchmark-forecasting's population, 0.25 * Beta(1.43, 4.67); benchmarks with a ceiling in the pipeline keep it, and no ceiling sits below the best performance observed on its benchmark, a model score or a human baseline (fitted or not): the gap's Beta is truncated to e_b <= 1 - best, and d_b = 1 where someone scored 1.0 (benchmark-forecasting's `L_floor_observed`, under which the prior was estimated; `data.load_observed_best`). Grading noise, not walls. Emits `_noceiling`; legacy folders tagged `_ceilnoise` read back as the default |
 | `--keep-isolated-families` | keep the model families (base model + snapshot, all efforts and variants together) seen on a single benchmark in the fit's scope; dropped by default since 2026-09-08 because they carry no cross-benchmark information and the 2020-2022 tail of them fed a second posterior mode. Both modes; emits `_keepiso` |
 | `--censor-bounds` | censored Beta likelihood at the score bounds: a reported 0 (or 1) is the event y ≤ eps_b (y ≥ 1 − eps_b), eps_b = 1 / (2 N_b) from `1_curated/benchmark_n_items.csv` (half an item), instead of a density at a clipped 0.001. Both modes; emits `_censor` |
 | `--no-release-nodes` | canonical only: every run a free test-taker. By default a release's effort variants share one level, as in the K-axis fit's lineage prior but without the links between releases (the lineage map's nodes, one base per node in the ZeroSumNormal, variant offsets with `lin_offset_sd`); a variant scored on one benchmark only (a CritPt score per effort) then sits near its release. Emits `_noreleases` |
@@ -91,16 +92,16 @@ Inside a generation, one folder per fit holds its tables, its trace and its figu
 A fit's flags become one tag, and the tag names the results folder and the trace, so the two cannot drift apart. A default contributes no token, so the K=4 command above reduces to:
 
 ```
-flags    --K 4 --lineage-prior --lineage-bm --no-humans
-tag      _lineageprior_lineagebm_nohumans
-results  5_outputs/data20261019/mirt_lineageprior_lineagebm_nohumans/
-trace      ├── trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
+flags    --K 4 --lineage-prior --lineage-bm
+tag      _lineageprior_lineagebm
+results  5_outputs/data20261019/mirt_lineageprior_lineagebm/
+trace      ├── trace_mirt_k4_lineageprior_lineagebm.nc
 placement  ├── human_placement.json, human_placement_draws.npz   (4_diagnostics/5_place_humans.py)
            ├── secondary_mode/human_placement.json, …_draws.npz (5_place_humans.py --secondary)
 figures    └── figures/k4/            (PNG; html/ beneath it)
 ```
 
-A K other than 4 adds `_k<K>` to the results folder (`--K 3` with the same flags writes to `mirt_lineageprior_lineagebm_nohumans_k3/`), so its fixed-name tables, axis names and K=1 baseline never land on the K=4 fit's.
+A K other than 4 adds `_k<K>` to the results folder (`--K 3` with the same flags writes to `mirt_lineageprior_lineagebm_k3/`), so its fixed-name tables, axis names and K=1 baseline never land on the K=4 fit's.
 
 A flag tagged `[canonical]` or `[exploration]` in `--help` is refused in the other mode rather than ignored (`--skip-sampling` without `--preset canonical` used to resample the K-axis fit).
 
@@ -174,7 +175,7 @@ and copies the deliverables, French included, into that folder (`GROUP=country` 
 
 ```bash
 python 4_diagnostics/3_plot_mirt.py --trace \
-  5_outputs/data20261019/mirt_lineageprior_lineagebm_nohumans/trace_mirt_k4_lineageprior_lineagebm_nohumans.nc
+  5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc
 ```
 
 Figures land in the fit's own `figures/k{K}/`, one PNG each with the HTML twin
