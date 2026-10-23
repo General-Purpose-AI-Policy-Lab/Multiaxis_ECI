@@ -21,7 +21,7 @@ The flagship lives in `5_outputs/data20261019/mirt_lineageprior_lineagebm/`. Its
 
 Mathematics and abstract reasoning share an axis with scientific knowledge, agentic and cyber benchmarks load apart, and the commonsense and factual benchmarks form the fourth axis. The axes are distinct: their largest correlation is 0.64 (axes 1 and 2).
 
-The 20 chains fall into four posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read mode A, the best log-density and the most chains (9); no other mode stands out enough to be drawn beside it.
+The 50 chains fall into five posterior modes (see [Limitations](#limitations)). The figures, the dashboard and the forecasts read mode A, the best log-density and the most chains (21); no other mode stands out enough to be drawn beside it.
 
 Per axis, the frontier releases of reasoning models (red) and of the others (purple) each get their own fitted line; the reasoning models' line is projected to 2030 (orange, 80% band) against the human tiers (horizontal lines) placed on that axis. Abilities are on the fitted scale (the models' mean at 0 on each axis). A tier is drawn only where its own scores place it, on benchmarks that measure the axis, so the agentic and cyber axes carry few tiers: no human baseline exists for most of their benchmarks.
 
@@ -71,12 +71,12 @@ Every output goes under `5_outputs/<data generation>/`, named after the day of t
 
 ## Run
 
-The K=4 flagship (models only, skew-normal abilities and estimated ceilings are the defaults; `--humans`, `--normal-theta` and `--no-ceiling` turn them off and say so in the folder name): 2,000 draws after 2,000 tuning steps on 10 chains, then 10 more chains with another seed merged in, so that more starting points explore the modes (copy the trace out of the fit folder first, as the second run writes over it):
+The K=4 flagship (models only, skew-normal abilities and estimated ceilings are the defaults; `--humans`, `--normal-theta` and `--no-ceiling` turn them off and say so in the folder name): 2,000 draws after 2,000 tuning steps on 10 chains per run, five runs with their own seeds (44 to 48) merged into 50 chains, so that many starting points explore the modes (copy the trace out of the fit folder before each added run, as it writes over it):
 
 ```bash
-python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 42
-python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 43 \
-    --merge-chains <copy of the first trace>
+python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 44
+python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 45 \
+    --merge-chains <copy of the trace so far>     # then seeds 46, 47, 48 the same way
 ```
 
 Traces on disk keep every fifth draw (`--save-thin`): convergence and the tables are computed on the full run. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default), so the machine stays usable during a ten-hour fit.
@@ -161,8 +161,8 @@ Whether the chains agree on those axes is a different question, with its own num
 
 ## Limitations
 
-- **The K=4 posterior is multimodal.** Its 20 chains (10 with seed 42, 10 with seed 43) fall into four modes: A, 9 chains; B, 2 chains 16 nats below (a visual axis, agentic and cyber together); C, 7 chains 27 nats below (the same agentic and cyber axes as A, but factual and scientific knowledge on one axis and mathematics and abstract reasoning on another); D, 2 chains 33 nats below. The modes are not an extra axis but discrete ways, under non-negative loadings, of carving the same space.
-- **Choosing the mode.** PSIS-LOO cannot rank the modes: a large share of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) did not separate A from D on the first 10 chains (+3 ± 8 nats for A on the reliable scores). The deliverables read mode A, the best log-density and the mode most chains reach.
+- **The K=4 posterior is multimodal.** Its 50 chains (five runs of 10, seeds 44 to 48) fall into five modes: A, 21 chains; B, 5 chains 10 nats below (a visual axis, agentic and cyber together); C, 19 chains 17 nats below (the same agentic and cyber axes as A, but factual and scientific knowledge on one axis and mathematics and abstract reasoning on another); D, 4 chains 26 nats below (agentic and cyber together, a science axis and a visual axis); E, a single chain 54 nats below. More chains find no new mode, only the same ones more often. The modes are not an extra axis but discrete ways, under non-negative loadings, of carving the same space.
+- **Choosing the mode.** PSIS-LOO cannot rank the modes: a large share of the observations get a Pareto k above 0.7. Integrating each score's own latent block out (`4_diagnostics/integrated_loo.py`, after Vehtari et al. 2016) favours A on the 2,878 scores it estimates reliably in every mode: C −10.0 ± 4.0 nats, D −11.2 ± 6.7, E −33 ± 6, and B, at −2.9 ± 3.0, about as good. The deliverables read mode A, the best log-density and the mode most chains reach.
 - **Few human scores per axis.** The tiers rest on the scores of the benchmarks that measure each axis: 30 on scientific knowledge & reasoning, 3 on agentic capabilities (OSWorld, The Agent Company, METR Time Horizons), 1 on cyber (Cybench) and 6 on commonsense & factual knowledge. Where a tier has several scores they can disagree beyond what any one ability explains (the Skilled Generalist at 0.40 on MATH Level 5 but 0.98 on ARC-AGI; the Domain Expert above every model on GPQA Main Chemistry and below most on WMDP), and a crossing date read on the trend can differ from the date the frontier first reached a score on the benchmark itself.
 - **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.

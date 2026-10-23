@@ -8,8 +8,8 @@ z = |p1 - p2| / s; a score measured there moves the odds between the two by abou
 A cell's utility is its best pair (reported beside it), and z_A its best pair involving mode A,
 the one the deliverables read.
 
-Reads the 2026-10-19 flagship (ceilings, skew-normal, 20 chains of seeds 42 and 43) and the
-modes of its modes file. Writes data_wishlist.csv (the ten best models of every benchmark, among
+Reads the 2026-10-19 flagship (ceilings, skew-normal, every chain of its trace) and the modes
+of its modes file, but a mode reached by a single chain. Writes data_wishlist.csv (the ten best models of every benchmark, among
 all models, among Anthropic's and among open-weight ones) and data_wishlist.md beside this script.
 
     .venv/bin/python 5_outputs/sampler_study/data_wishlist.py
@@ -36,7 +36,9 @@ TRACE = FIT / "trace_mirt_k4_lineageprior_lineagebm.nc"
 N_BENCH, N_MODELS, N_CSV, N_OWN = 15, 5, 10, 10
 
 modes = json.loads((FIT / f"mirt_modes_{TRACE.stem}.json").read_text())
-CHAINS = {m["label"]: m["chains"] for m in modes["modes"]}
+# a mode reached by a single chain is left out: its spread is one chain's
+CHAINS = {m["label"]: m["chains"] for m in modes["modes"] if len(m["chains"]) > 1}
+SINGLE = [m["label"] for m in modes["modes"] if len(m["chains"]) == 1]
 DLOGP = {m["label"]: -m["delta_logp"] for m in modes["modes"]}
 LABELS = sorted(CHAINS)
 
@@ -189,25 +191,23 @@ modes_md = "\n".join(
 
 md = f"""# Wishlist : mesures pour départager les modes du flagship
 
-Générée par `data_wishlist.py` à partir du flagship du 19 octobre (K = 4, sans humains, capacités skew-normal, plafonds estimés), 20 chaînes (graines 42 et 43) en {len(LABELS)} modes :
+Générée par `data_wishlist.py` à partir du flagship du 19 octobre (K = 4, sans humains, capacités skew-normal, plafonds estimés), {post.sizes['chain']} chaînes en {len(LABELS) + len(SINGLE)} modes{f" (le mode {', '.join(SINGLE)}, atteint par une seule chaîne, est laissé de côté)" if SINGLE else ""} :
 
 {modes_md}
 
-Les livrables lisent A. PSIS-LOO ne classe pas les modes et la LOO intégrée ne séparait pas A de D sur les 10 premières chaînes (+3 ± 8 nats pour A) : seules de nouvelles mesures peuvent les départager.
+Les livrables lisent A. PSIS-LOO ne classe pas les modes ; sur les 2 878 scores où la LOO intégrée est fiable dans tous les modes, A prédit le mieux, mais de peu face à B (−2,9 ± 3,0 nats) et de 10 à 11 nats face à C et D (C −10,0 ± 4,0 ; D −11,2 ± 6,7). Seules de nouvelles mesures peuvent les départager franchement.
 
-**Comment lire.** Pour chaque case (modèle, benchmark) sans score, chaque mode donne une prédiction : sa moyenne et son écart-type, qui ajoute à l'incertitude du mode le bruit propre au benchmark. Pour deux modes, l'utilité *z* est l'écart entre leurs moyennes en écarts-types prédictifs ; une mesure tombée sur la prédiction d'un mode multiplie à peu près ses chances contre l'autre par e^(z²/2) (z = 1,5 : × 3 ; z = 2 : × 7). Une case vaut sa meilleure paire, indiquée à côté (`A-C` : la case départage A et C) ; le csv donne aussi `z_A`, sa meilleure paire avec A. Les benchmarks sont classés par leur meilleure case ; pour chacun, les modèles par ordre d'utilité : si un benchmark n'est pas accessible, prendre le suivant ; si un modèle ne l'est pas, le suivant sur la même ligne. Les axes de B, C et D, qui n'ont pas de noms, sont désignés par leurs deux benchmarks les plus colinéaires. La disponibilité en API n'a pas été vérifiée ; `open` = poids ouverts. {f'{n_cells:,}'.replace(',', ' ')} cases non observées ; `data_wishlist.csv` garde les dix meilleurs modèles de chaque benchmark, parmi tous les modèles (`question = benchmark`), parmi ceux d'Anthropic (`anthropic`) et parmi les poids ouverts (`open`).
+**Comment lire.** Pour chaque case (modèle, benchmark) sans score, chaque mode donne une prédiction : sa moyenne et son écart-type, qui ajoute à l'incertitude du mode le bruit propre au benchmark. Pour deux modes, l'utilité *z* est l'écart entre leurs moyennes en écarts-types prédictifs ; une mesure tombée sur la prédiction d'un mode multiplie à peu près ses chances contre l'autre par e^(z²/2) (z = 1,5 : × 3 ; z = 2 : × 7). Une case vaut sa meilleure paire, indiquée à côté (`A-C` : la case départage A et C) ; le csv donne aussi `z_A`, sa meilleure paire avec A. Les benchmarks sont classés par leur meilleure case ; pour chacun, les modèles par ordre d'utilité : si un benchmark n'est pas accessible, prendre le suivant ; si un modèle ne l'est pas, le suivant sur la même ligne. Les axes des modes autres que A, qui n'ont pas de noms, sont désignés par leurs deux benchmarks les plus colinéaires. La disponibilité en API n'a pas été vérifiée ; `open` = poids ouverts. {f'{n_cells:,}'.replace(',', ' ')} cases non observées ; `data_wishlist.csv` garde les dix meilleurs modèles de chaque benchmark, parmi tous les modèles (`question = benchmark`), parmi ceux d'Anthropic (`anthropic`) et parmi les poids ouverts (`open`).
 
 **Paires départagées par les 2 000 meilleures cases** : {', '.join(f'{k} {v}' for k, v in pair_count.items())}.
 
-**Prudence.** B et D ne reposent que sur 2 chaînes chacun.
+## En bref (lecture du 23 octobre, écrite à la main)
 
-## En bref (lecture du 21 octobre, écrite à la main)
-
-1. **La plupart des meilleures cases opposent deux modes que les livrables ne lisent pas** (B-D, C-D, B-C : 1 109 des 2 000 meilleures). Pour les livrables, ce qui compte est de départager A de chacun des autres : voir la section « Départager A ».
-2. **A contre C**, le rival le plus fréquent (7 chaînes, 27 nats plus bas), est le plus difficile à départager : les deux modes ont les mêmes axes agentique et cyber et ne diffèrent que par la frontière entre connaissances et raisonnement. Les meilleures cases sont à z ≈ 2 : gpt-5.4-nano (sans raisonnement) sur ARC AI2 (A 0,79 contre C 0,91) et OpenBookQA (A 0,72 contre C 0,87) ; Phi-3-small sur Lech Mazur Writing ; falcon-180B sur CyberGym.
-3. **A contre D** (l'ancienne structure, 33 nats plus bas) se départage comme avant : petits modèles d'OpenAI et petits modèles ouverts sur les QCM scientifiques (gpt-5.4-nano sur GPQA Main Chimie, A 0,67 contre D 0,46 ; Qwen2.5-Coder 1,5B sur MATH Level 5, A 0,60 contre D 0,16) et sur le sens commun dans l'autre sens (gpt-5-nano sur OpenBookQA, A 0,67 contre D 0,88).
-4. **A contre B** est le moins séparable (meilleure case z = 1,8 : gpt-6-sol sans raisonnement sur GPQA Main Chimie, A 0,78 contre B 0,62).
-5. **Un petit lot teste A contre les trois** : gpt-5.4-nano à plusieurs efforts sur ARC AI2, OpenBookQA et GPQA Main Chimie. Côté Anthropic, Claude Opus 4.1 thinking sur GPQA Main Chimie (A 0,63 contre B 0,74 et D 0,75) départage A de B et de D ; les Claude récents sur ARC AI2 et OpenBookQA séparent surtout C de D.
+1. **A et B ne se départagent presque plus** : la meilleure case est à z = 0,9 (gpt-6-sol sans raisonnement sur GPQA Main Chimie). Sur 50 chaînes, B prédit à peu près comme A ; le choix entre les deux ne change guère les livrables.
+2. **A contre C**, le rival le plus fréquent (19 chaînes, 17 nats plus bas), reste difficile : seules 33 des 2 000 meilleures cases les opposent. Les meilleures sont à z ≈ 1,7-1,8 : gpt-5.4-nano sans raisonnement sur ARC AI2 (A 0,80 contre C 0,91) et sur OpenBookQA (A 0,74 contre C 0,88) ; Qwen2.5-72B sur Lech Mazur Writing.
+3. **A contre D** est le plus facile (1 027 des 2 000 meilleures cases) : gpt-5.4-nano (effort low) sur GPQA Main Chimie (A 0,67 contre D 0,46, z = 2,5), gpt-4.1-nano sur WMDP et GSM8K.
+4. **Un petit lot teste A contre C et D à la fois** : gpt-5.4-nano sans raisonnement et en effort low sur ARC AI2, OpenBookQA et GPQA Main Chimie.
+5. **Côté Anthropic**, Claude Opus 4.1 thinking ou Sonnet 4.5 thinking sur GPQA Main Chimie départagent A de D (A 0,63-0,65 contre D 0,75) ; Claude 3 Haiku et Sonnet 4 sur ARC AI2 et OpenBookQA opposent surtout B à C.
 
 ## Benchmarks classés
 

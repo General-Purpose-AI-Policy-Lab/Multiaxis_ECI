@@ -1,2 +1,2 @@
 fit,chains,draws,R2,RMSE,elpd_loo,loo_se,eta_rhat,ess_min,ess_med,divergences,khat_gt_0.7
-K=4 · no humans · flagship,9/20,3600,0.965,0.043,-16477.5,195.7,1.024,297,3394,32,0.149
+K=4 · no humans · flagship,21/50,8400,0.9649,0.0431,-16526.5,196.4,1.048,276,7699,110,0.152

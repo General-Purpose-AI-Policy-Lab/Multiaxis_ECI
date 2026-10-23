@@ -1,19 +1,13 @@
 # Sync audit, data generation 20261019
 
-Reference: 0_input/ at `HEAD`. Produced by `1_curated/0_audit_sync.py`; the procedure is `.claude/skills/data-refresh/SKILL.md`.
+Reference: 0_input/ at `095dfc0739e1e920a9bfa41f9febe8fc5e87335d~1`. Produced by `1_curated/0_audit_sync.py`; the procedure is `.claude/skills/data-refresh/SKILL.md`.
 
 | level | findings |
 |---|---|
 | BLOCK | 0 |
-| DECIDE | 1 |
+| DECIDE | 0 |
 | CHECK | 4 |
 | INFO | 2 |
-
-## DECIDE
-
-**human placement**
-- `41 benchmarks`: human scores not yet judged against the named axes (mirt_lineageprior_lineagebm), at placement time: ARC-AGI, ARC-AGI-2, BioLP-bench, BlueprintBench 2, Cybench, DTBench, EBR-bench, FrontierMath Erdos, FrontierMath Tiers 1-3 v2, Furniture Assembly, GPQA Diamond, GPQA Diamond Biology, GPQA Diamond Chemistry, GPQA Main Biology, GPQA Main Chemistry, GSM8K, GeoBench, HellaSwag, InterCode-CTF, LAB-Bench Cloning, LAB-Bench LitQA2, LAB-Bench Protocol, LAB-Bench SeqQA, LMCA, MATH Level 5, METR Time Horizons, MMLU, MMLU Biology, MMLU Chemistry, OSWorld, OTIS Mock AIME 2024-2025, PIQA, SimpleBench, SpireClimb, The Agent Company, TriviaQA, VPCT, Visual Task Assessment (VISTA), WMDP Biology, WMDP Chemistry, WinoGrande
-
 
 ## CHECK
 

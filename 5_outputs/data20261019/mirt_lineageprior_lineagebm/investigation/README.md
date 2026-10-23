@@ -175,3 +175,13 @@ Le placement lit un tier avec ses autres axes au profil d'un modèle typique de 
 | Top Performer | 6,39 | 6,68 | 6,61 |
 
 **Hypothèse réfutée.** Sur l'axe 4, les tiers montent jusqu'à 0,95 sous les deux profils de frontière ; aucun ne descend de plus de 0,03 (l'Average Human sous la frontière figée). La régression sur tous les modèles prête aux tiers hauts des axes 1 et 2 au-delà de toute la frontière (θ1 = 3,6 et θ2 = 3,3 à θ4 = 5, contre 1,9 pour claude-fable-5_max), ce qui les tire vers le bas. Le profil typique est donc le plus favorable aux modèles. L'écart entre humains et modèles sur l'axe 4 tient aux scores humains collés au plafond et aux petits loadings, pas au profil. Sur l'axe 1, la frontière figée abaisse au contraire les tiers individuels (1,40 → 0,87), la régression sur la frontière les remonte (1,77).
+
+## LOO intégrée des quatre modes du flagship à 20 chaînes (nuit du 21 au 22 octobre)
+
+`4_diagnostics/integrated_loo.py --groups A:… C:… B:… D:…` sur la trace à 20 chaînes (graines 42 + 43, sauvegardée dans `traces_backup/`), résumé dans `integrated_loo_4modes_20chains.json`. Sur les 3 358 scores dont le k de Pareto est sous 0,7 dans les quatre modes, **A prédit le mieux** : C −15,3 ± 4,5 nats, B −15,2 ± 6,7, D −11,7 ± 7,6. Sur tous les scores, C passe devant (+76 ± 54), mais 1 541 à 1 625 scores par mode ont un k au-dessus de 0,7 et l'erreur Monte-Carlo atteint 44 nats pour C (267 pour D) : ce total n'est pas fiable. A reste donc le mode des livrables, désormais aussi par la prédiction.
+
+*Note du 22 octobre* : les traces du fit sans plafonds (`mirt_lineageprior_lineagebm_noceiling/`) ont été supprimées pour libérer de la place ; ses tables restent. Les scripts 2, 3, 5 et 6, qui les lisent, ne se relancent plus sans refaire ce fit (`3_fit/fit.py ... --no-ceiling`).
+
+## Le flagship sur 50 chaînes (23 octobre)
+
+Cinq runs de 10 chaînes (graines 44 à 48) sur les données sans la baseline SimpleQA Verified, fusionnés : modes A 21 chaînes, C 19 (−17 nats), B 5 (−10), D 4 (−26), E 1 (−54). Aucun mode nouveau par rapport aux 20 chaînes précédentes ; le mode A est le même (axes corrélés à 0,999), le plafond de SimpleQA Verified passe de 0,967 à 0,937. LOO intégrée des cinq modes (`integrated_loo_5modes_50chains.json`), sur les 2 878 scores fiables dans tous les modes : C −10,0 ± 4,0 nats, B −2,9 ± 3,0, D −11,2 ± 6,7, E −32,9 ± 6,2 par rapport à A. Sur tous les scores, C passerait devant (+165 ± 70), mais plus de 2 000 scores par mode ont un k au-dessus de 0,7.
