@@ -377,18 +377,24 @@ def check_curated_rows(a: Audit):
 
 
 def check_placement_judgements(a: Audit, humans):
-    """Benchmarks with human scores that the per-axis placement has not judged on the named axes."""
+    """Benchmarks with human scores whose content the per-axis placement has not judged on the
+    axis they measure: the named axis they are most collinear with (largest loading share)."""
     names = sorted(config.OUTPUTS_DIR.glob("data*/mirt_lineageprior_lineagebm/axis_names.json"))
     if not names:
         return
+    folder = names[-1].parent
     axes = json.loads(names[-1].read_text()).get("axes", {})
-    titles = [ax.get("title") or ax.get("title_en") for ax in axes.values()]
+    titles = {k: ax.get("title") or ax.get("title_en") for k, ax in axes.items()}
+    load = pd.read_csv(folder / "mirt_loadings.csv")
+    dominant = load.loc[load.groupby("benchmark")["axis_share"].idxmax()].set_index("benchmark")["axis"]
     judged = read_now(Path("1_curated/human_axis_content.csv"))
     pairs = set(zip(judged.get("axis_title", []), judged.get("benchmark", [])))
-    todo = sorted({b for b in humans["benchmark"] for t in titles if t and (t, b) not in pairs})
+    todo = sorted({f"{b} ({titles[dominant[b]]})" for b in humans["benchmark"]
+                   if b in dominant.index and titles.get(dominant[b])
+                   and (titles[dominant[b]], b) not in pairs})
     if todo:
         a.add("DECIDE", "human placement", f"{len(todo)} benchmarks", "human scores not yet judged "
-              f"against the named axes ({names[-1].parent.name}), at placement time: " + ", ".join(todo))
+              f"against the axis they measure ({folder.name}), kept until judged: " + ", ".join(todo))
 
 
 # ── report ────────────────────────────────────────────────────────────────────────────────────

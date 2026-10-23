@@ -621,16 +621,19 @@ def run_canonical(args) -> None:
 
 # ── Exploration: the K-axis MIRT campaign driver ────────────────────────────
 
-def data_fingerprint(data, floor_c, binomial_n) -> str:
+def data_fingerprint(data, floor_c, binomial_n, ceilings=None) -> str:
     """A hash of what the likelihood sees: test-takers and benchmarks in order, every observation
-    (who, where, score after clipping), the chance floors and the item counts. Stamped on each
-    trace as `mirt_data_fingerprint`. The data generation's tag survives a pipeline rebuild in
-    place, and the dimension sizes survive a changed score or item count; this does not."""
+    (who, where, score after clipping), the chance floors, the item counts and, under the ceiling
+    model, the known ceilings and the best observed scores that bound the others (`ceilings`, a
+    pair of arrays; a human baseline outside the fit moves them). Stamped on each trace as
+    `mirt_data_fingerprint`. The data generation's tag survives a pipeline rebuild in place, and
+    the dimension sizes survive a changed score or item count; this does not."""
     h = hashlib.sha256()
     for names in (data.mlookup.sort_values("model_idx")["model"],
                   data.blookup.sort_values("benchmark_idx")["benchmark"]):
         h.update("\x1f".join(map(str, names)).encode())
-    for a in (data.model_idx, data.bench_idx, data.scores, floor_c, binomial_n):
+    for a in (data.model_idx, data.bench_idx, data.scores, floor_c, binomial_n,
+              *(ceilings or ())):
         if a is not None:
             h.update(np.ascontiguousarray(np.asarray(a, dtype=float)).tobytes())
     return h.hexdigest()[:16]
@@ -792,7 +795,9 @@ def run_exploration(args, parser) -> None:
     attrs["mirt_beta_binomial"] = json.dumps(spec.beta_binomial)
     censor_eps = load_boundary_eps(data) if args.censor_bounds else None
     binomial_n = spec.binomial_n(data)
-    fingerprint = data_fingerprint(data, floor_c, binomial_n)
+    ceilings = ((load_benchmark_ceilings(data), load_observed_best(data)) if spec.ceiling_noise
+                else None)
+    fingerprint = data_fingerprint(data, floor_c, binomial_n, ceilings)
     attrs["mirt_data_fingerprint"] = fingerprint
     if args.merge_chains:
         # Checked before sampling: a mismatch found after the run costs the whole run.

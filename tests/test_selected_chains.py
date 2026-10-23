@@ -78,6 +78,12 @@ def test_the_data_fingerprint_sees_what_the_dimensions_miss():
     assert fit.data_fingerprint(data, None, np.array([40.0, 40.0, 50.0])) != ref
     data.scores = np.array([0.2, 0.5, 1.0])
     assert fit.data_fingerprint(data, None, n) != ref
+    # under the ceiling model, a bound moved by a human baseline outside the fit (2026-10-21:
+    # SimpleQA Verified's 0.944 withdrawn) must stop a merge too
+    known, best = np.array([np.nan, 1.0]), np.array([0.775, 0.9])
+    with_c = fit.data_fingerprint(data, None, n, (known, best))
+    assert with_c != fit.data_fingerprint(data, None, n)
+    assert fit.data_fingerprint(data, None, n, (known, np.array([0.944, 0.9]))) != with_c
 
 
 def test_a_subset_is_put_on_the_display_frame_only_when_its_axes_match(tmp_path):
