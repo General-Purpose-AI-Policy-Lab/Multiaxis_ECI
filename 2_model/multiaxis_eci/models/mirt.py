@@ -35,6 +35,9 @@ from multiaxis_eci.config import (
     PRIOR_SIGMA_B_POOLED,
     PRIOR_TAU_ALPHA,
     PRIOR_TAU_CD,
+    PRIOR_SHARE_CONC,
+    PRIOR_SHARE_SIZE_SHAPE,
+    PRIOR_THETA_GENERAL,
     PRIOR_THETA_SKEW_ALPHA,
     PRIOR_THETA_T_NU,
     PRIOR_TIME_BETA,
@@ -98,6 +101,22 @@ def _theta_skew_cells(n_rows: int, K: int, alpha_sd: float = PRIOR_THETA_SKEW_AL
     return pm.SkewNormal("theta_skew", mu=xi, sigma=omega, alpha=alpha, shape=(n_rows, K))
 
 
+def _general_loadings(K: int):
+    """The higher-order prior's loadings lambda_k in (0, 1), one per axis: every per-axis
+    innovation of a test-taker is lambda_k * g + sqrt(1 - lambda_k^2) * u_k, g shared by its axes,
+    so two axes correlate a priori at lambda_j * lambda_k (de la Torre & Song 2009). Learned."""
+    a, b = PRIOR_THETA_GENERAL
+    return pm.Beta("theta_general_lambda", alpha=a, beta=b, dims="latent")
+
+
+def _general_mix(z, lam):
+    """Standard-normal cells z (n, K), iid, mixed to the one-factor correlation
+    R = lam lam^T + diag(1 - lam^2): z L^T with L = chol(R), the same distribution as
+    lam * g + sqrt(1 - lam^2) * u without a latent g per row."""
+    R = pt.outer(lam, lam) + pt.diag(1.0 - lam ** 2)
+    return pt.dot(z, pt.linalg.cholesky(R).T)
+
+
 def _assemble_theta(n_models: int, K: int, human_struct=None,
                     human_delta_sd: float = PRIOR_DELTA_HUMAN,
                     human_root_sd: float = PRIOR_HUMAN_ROOT,
@@ -109,7 +128,8 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                     theta_t_cells: bool = False,
                     theta_skew: bool = False,
                     lineage_links: bool = True,
-                    effort_means: bool = False):
+                    effort_means: bool = False,
+                    theta_general: bool = False):
     """Stitch the structured theta blocks and the unstructured rows into ONE
     ZeroSumNormal.
 
@@ -175,6 +195,17 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
 
     theta_skew: the same block, independent skew-normal per axis with a learned
     shape instead (see _theta_skew_cells). Exclusive with theta_t_cells.
+
+    theta_general: a higher-order general level under the axes (de la Torre & Song 2009):
+    every per-axis innovation, the exchangeable block's cells, the lineage steps and the
+    variant offsets alike, is lambda_k * g + sqrt(1 - lambda_k^2) * u_k with one g per
+    innovation shared by its K axes, so the axes correlate a priori at lambda_j * lambda_k
+    (`_general_loadings`, learned). Under independent axes the compensatory sum explains a
+    mixed benchmark's score by whichever axis is already high, and a model strong on one axis
+    is pulled down on another (explaining away); the shared level makes a strong axis raise
+    the expectation of the others instead. In the skew-normal block g is Gaussian and u the
+    skew-normal cells; in the Gaussian blocks the mix is a Cholesky factor (`_general_mix`).
+    The marginals keep unit variance.
     """
     if theta_t_cells and theta_skew:
         raise ValueError("theta_t_cells and theta_skew both replace the exchangeable "
@@ -205,7 +236,12 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
         if theta_t_cells:
             return finish(_theta_t_cells(n_models, K))
         if theta_skew:
-            return finish(_theta_skew_cells(n_models, K))
+            cells = _theta_skew_cells(n_models, K)
+            if theta_general:
+                lam = _general_loadings(K)
+                g = pm.Normal("theta_general_g", 0.0, 1.0, shape=(n_models, 1))
+                cells = g * lam[None, :] + pt.sqrt(1.0 - lam ** 2)[None, :] * cells
+            return finish(cells)
         theta_t = pm.ZeroSumNormal("theta_t", sigma=1.0, dims=("latent", "model"))
         return finish(theta_t.T)
 
@@ -217,9 +253,16 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
         raise ValueError("shared_base_zsn=False needs unstructured rows to carry "
                          "the ZeroSumNormal location pin; every model is structured.")
     n_shared = rest.size + (n_chains if shared_base_zsn else 0)
+    lam = _general_loadings(K) if theta_general else None
+    if lam is not None and not theta_skew:
+        raise ValueError("theta_general is built on the skew-normal block; drop --normal-theta "
+                         "and --theta-t with it.")
     zsn = (_theta_t_cells(n_shared, K) if theta_t_cells
            else _theta_skew_cells(n_shared, K) if theta_skew
            else pm.ZeroSumNormal("theta_zsn_t", sigma=1.0, shape=(K, n_shared)).T)
+    if lam is not None:
+        g = pm.Normal("theta_general_g", 0.0, 1.0, shape=(n_shared, 1))
+        zsn = g * lam[None, :] + pt.sqrt(1.0 - lam ** 2)[None, :] * zsn
     theta_full = pt.zeros((n_models, K))
     theta_full = pt.set_subtensor(theta_full[rest, :], zsn[:rest.size])
     cut = rest.size
@@ -233,9 +276,10 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                   pm.Normal("lin_base", 0.0, 1.0, shape=(n_chains, K)))
         rows_l, theta_l = (_lineage_block(lin, K, base_l, bm=lineage_bm,
                                           variant_offsets=variant_offsets,
-                                          effort_means=effort_means)
+                                          effort_means=effort_means, general=lam)
                            if lineage_links else
-                           _release_block(lin, K, base_l, effort_means=effort_means))
+                           _release_block(lin, K, base_l, effort_means=effort_means,
+                                          general=lam))
         theta_full = pt.set_subtensor(theta_full[rows_l, :], theta_l)
     return finish(theta_full)
 
@@ -343,7 +387,7 @@ def _human_block(struct, K, base, delta_sd: float = PRIOR_DELTA_HUMAN):
 
 
 def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
-                   variant_offsets: bool = True, effort_means: bool = False):
+                   variant_offsets: bool = True, effort_means: bool = False, general=None):
     """Release chains: psi[node] = founder + cumulative increments; each row's
     theta = psi[node] + a tight mean-zero variant offset. Vectorized (no
     per-chain loop) via the precomputed incidence matrices. `base` is the
@@ -379,8 +423,11 @@ def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
     per-axis scales license it (ESS 12, r-hat 1.86, and 336 divergences / 16000
     without the ZeroSumNormal damping the compensating founder movement). Only a
     Q-matrix, whose loading columns have disjoint support, leaves nothing to
-    slide along. Returns (row_idx, theta)."""
+    slide along. `general` (the higher-order loadings, see _assemble_theta) correlates a step's
+    axes and the offsets' axes. Returns (row_idx, theta)."""
     delta_z = pm.Normal("lin_delta_z", 0.0, 1.0, shape=(lin.n_deltas, K))
+    if general is not None:
+        delta_z = _general_mix(delta_z, general)
     # Same two scales either way; bm only changes their units (per year rather
     # than per release) and lets dt enter deterministically.
     drift_s, spread_s = ((PRIOR_LINEAGE_DRIFT_BM, PRIOR_LINEAGE_DELTA_BM) if bm
@@ -400,12 +447,12 @@ def _lineage_block(lin: LineageStructure, K, base, bm: bool = False,
         # offset[group] would be the same quantity twice, identified only in
         # their sum. Drop the offset rather than sample a redundant funnel.
         return lin.row_idx, psi[lin.node_idx]                           # (R, K)
-    offset = _variant_offsets(lin, K, effort_means)
+    offset = _variant_offsets(lin, K, effort_means, general)
     theta_lin = psi[lin.node_idx] + offset[lin.offset_group]            # (R, K)
     return lin.row_idx, theta_lin
 
 
-def _variant_offsets(lin: LineageStructure, K, effort_means: bool = False):
+def _variant_offsets(lin: LineageStructure, K, effort_means: bool = False, general=None):
     """The (node, variant) offsets, (n_groups, K). Non-centered.
 
     Default: mean-zero offsets, one scale tau_o for every effort level and a scale of their
@@ -449,6 +496,8 @@ def _variant_offsets(lin: LineageStructure, K, effort_means: bool = False):
     """
     tau_o = pm.HalfNormal("lin_offset_sd", sigma=PRIOR_LINEAGE_OFFSET)
     z = pm.Normal("lin_offset_z", 0.0, 1.0, shape=(lin.n_groups, K))
+    if general is not None:
+        z = _general_mix(z, general)
     if effort_means:
         if lin.offset_level is None:
             return tau_o * z
@@ -511,7 +560,7 @@ def align_effort_sign(posterior):
     return flip.sum("draw").values
 
 
-def _release_block(lin: LineageStructure, K, base, effort_means: bool = False):
+def _release_block(lin: LineageStructure, K, base, effort_means: bool = False, general=None):
     """Release nodes without the chains: theta = base[node] + the variant offset.
 
     The canonical K=1 index's grouping of a release's effort variants, built like the
@@ -523,7 +572,7 @@ def _release_block(lin: LineageStructure, K, base, effort_means: bool = False):
     one benchmark only (a CritPt score per effort) then sits near its release's level, which
     every run of the release informs, instead of being a free test-taker. Returns
     (row_idx, theta)."""
-    offset = _variant_offsets(lin, K, effort_means)
+    offset = _variant_offsets(lin, K, effort_means, general)
     return lin.row_idx, base[lin.node_idx] + offset[lin.offset_group]
 
 
@@ -643,6 +692,9 @@ def build_mirt_model(data: ECIData, K: int,
                       time_t: np.ndarray | None = None,
                       theta_t_cells: bool = False,
                       theta_skew: bool = False,
+                      theta_general: bool = False,
+                      simple_structure: bool = False,
+                      share_conc: float | None = None,
                       theta_pos: bool = False,
                       link: str = "linear") -> pm.Model:
     """Build the K-factor compensatory Beta-MIRT model.
@@ -774,6 +826,12 @@ def build_mirt_model(data: ECIData, K: int,
     model's ability wander further than a Gaussian one does, so the extrapolated
     abilities the coverage mask already hides get wider, not narrower.
 
+    simple_structure: with the "normal" loading prior, each loading row is a size times
+    simplex shares with a learned concentration (soft between-item structure, see the branch);
+    share_conc fixes that concentration instead (left free, the 2026-10-19 data keep the rows
+    as spread as the flagship's, median top share 0.40).
+    theta_general: a higher-order general level under the axes, which correlates every
+    per-axis innovation of a test-taker (see _assemble_theta, config.PRIOR_THETA_GENERAL).
     theta_skew: the same block (unstructured rows plus human-root/chain-founder
     slices) independent skew-normal per axis, standardised, with a learned shape
     alpha_k ~ Normal(0, config.PRIOR_THETA_SKEW_ALPHA) (see _theta_skew_cells).
@@ -936,6 +994,9 @@ def build_mirt_model(data: ECIData, K: int,
     if K < 1:
         raise ValueError(f"K must be >= 1, got {K}")
 
+    if simple_structure and loading_prior != "normal":
+        raise ValueError("simple_structure reshapes the 'normal' loading prior's rows; "
+                         f"not {loading_prior!r}")
     if loading_prior not in ("normal", "pt1", "signed", "bifactor"):
         raise ValueError(
             f"loading_prior must be 'normal', 'pt1', 'signed', or "
@@ -1162,7 +1223,7 @@ def build_mirt_model(data: ECIData, K: int,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,
             theta_t_cells=theta_t_cells, theta_skew=theta_skew, lineage_links=lineage_links,
-            effort_means=effort_means)
+            effort_means=effort_means, theta_general=theta_general)
         # Likelihood-side ability. Raw theta stays the reported ability (it
         # carries the location pin and the order structure); the positive copy
         # is what eta reads, so with A >= 0 an axis can only add to a score,
@@ -1253,6 +1314,25 @@ def build_mirt_model(data: ECIData, K: int,
             # rejected above) and no positive-family choice to make.
             logA_z = pm.ZeroSumNormal("logA_z", dims=("latent", "bench"))
             A = pm.Deterministic("A", pt.exp(sigma_A * logA_z).T,
+                                 dims=("bench", "latent"))
+        elif simple_structure:
+            # Soft between-item structure (Adams, Wilson & Wang 1997): each benchmark's loading
+            # row is a size times shares on the simplex, A_b = tau_A * r_b * softmax(s * u_b),
+            # u_b ~ N(0, I). The concentration s is learned (config.PRIOR_SHARE_CONC): large s puts
+            # most rows near one axis, s -> 0 spreads them evenly, so the data set how close to
+            # simple structure the loadings sit. Cross-loadings are the channel of compensation
+            # (a mixed benchmark's score explained by whichever axis is already high), and fewer
+            # of them leave fewer models trading one axis for another. The size r_b keeps the
+            # scale of the HalfNormal rows: Gamma with their L1 norm's mean, K sqrt(2/pi).
+            share_conc = (pm.LogNormal("A_share_conc", **PRIOR_SHARE_CONC) if share_conc is None
+                          else pt.as_tensor(float(share_conc)))
+            u = pm.Normal("A_share_z", 0.0, 1.0, dims=("bench", "latent"))
+            shares = pm.Deterministic("A_share", pt.special.softmax(share_conc * u, axis=1),
+                                      dims=("bench", "latent"))
+            size_mean = K * np.sqrt(2 / np.pi)
+            r = pm.Gamma("A_size", alpha=PRIOR_SHARE_SIZE_SHAPE,
+                         beta=PRIOR_SHARE_SIZE_SHAPE / size_mean, dims="bench")
+            A = pm.Deterministic("A", r[:, None] * shares * pt.as_tensor(free_mask) * tau_A,
                                  dims=("bench", "latent"))
         else:
             A_z = pm.HalfNormal("A_z", sigma=1.0, dims=("bench", "latent"))

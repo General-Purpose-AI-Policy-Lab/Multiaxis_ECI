@@ -310,6 +310,21 @@ PRIOR_THETA_T_NU = 4.0
 # axes and ~0 on one, every chain.
 PRIOR_THETA_SKEW_ALPHA = 4.0
 
+# Higher-order general level under the axes (models/mirt.py, build_mirt_model(..., theta_general=True);
+# `--theta-general`, exploration). Each per-axis innovation of a test-taker (exchangeable cell, lineage
+# step, variant offset) is lambda_k * g + sqrt(1 - lambda_k^2) * u_k, so axes j and k correlate a priori
+# at lambda_j * lambda_k; lambda_k ~ Beta(a, b), learned. Beta(2, 2): no mass at the two ends (0, the
+# independent axes of the flagship; 1, a single axis), mean 0.5.
+PRIOR_THETA_GENERAL = (2.0, 2.0)
+
+# Soft simple structure of the loadings (models/mirt.py, build_mirt_model(..., simple_structure=True);
+# `--simple-structure`, exploration): A_b = tau_A * r_b * softmax(s * u_b). The concentration s is
+# LogNormal, median 2 (a typical row then gives about two thirds of its weight to one axis at K=4),
+# wide enough for the data to move it from evenly spread rows (s < 1) to near Q-matrix ones (s > 4).
+# r_b ~ Gamma(shape, shape / (K sqrt(2/pi))): the mean L1 norm of the K HalfNormal(1) cells it replaces.
+PRIOR_SHARE_CONC = dict(mu=math.log(2.0), sigma=0.5)
+PRIOR_SHARE_SIZE_SHAPE = 4.0
+
 # Regularized-horseshoe scales, used by the "bifactor" loading prior
 # (models/mirt.py) and the sparse-gate model's gate horseshoe (models/mirt_sparse.py).
 RH_TAU_SCALE  = 0.5   # global-scale prior width

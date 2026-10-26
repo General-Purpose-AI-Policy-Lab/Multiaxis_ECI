@@ -92,6 +92,12 @@ class FitSpec:
     # whose spec lacks the field was fitted Gaussian (`from_trace`). The t block (`theta_t`)
     # replaces it.
     theta_skew: bool = True
+    # Higher-order general level under the axes (models/mirt._assemble_theta), exploration: `_general`.
+    theta_general: bool = False
+    # Soft simple structure of the loadings (models/mirt.py), exploration: `_simplestruct`.
+    simple_structure: bool = False
+    # Fixed concentration of those shares (None: learned); the tag token carries it, `_simplestruct5`.
+    share_conc: float | None = None
     theta_pos: bool = False
     no_sg: bool = False
     apply_exclusions: bool = False
@@ -169,6 +175,8 @@ class FitSpec:
             object.__setattr__(self, "beta_binomial", False)
         if self.theta_t and self.theta_skew:
             object.__setattr__(self, "theta_skew", False)
+        if not self.simple_structure:                 # a concentration of shares nothing uses
+            object.__setattr__(self, "share_conc", None)
 
     # ── identity ────────────────────────────────────────────────────────────
     @property
@@ -186,6 +194,10 @@ class FitSpec:
         if self.time_prior: tag += "_timeprior"
         if self.theta_t: tag += "_thetat"
         elif not self.theta_skew: tag += "_normaltheta"
+        if self.theta_general: tag += "_general"
+        if self.simple_structure:
+            tag += "_simplestruct" + ("" if self.share_conc is None
+                                      else f"{self.share_conc:g}".replace(".", "p"))
         if self.theta_pos: tag += "_thetapos"
         if self.no_sg: tag += "_noSG"
         if self.apply_exclusions: tag += "_excluded"
@@ -261,6 +273,9 @@ class FitSpec:
                 effort_means=args.effort_means,
                 time_prior=args.time_prior, theta_t=args.theta_t,
                 theta_skew=getattr(args, "theta_skew", True),
+                theta_general=getattr(args, "theta_general", False),
+                simple_structure=getattr(args, "simple_structure", False),
+                share_conc=getattr(args, "share_conc", None),
                 theta_pos=args.theta_pos,
                 no_sg=args.no_sg,
                 apply_exclusions=args.apply_exclusions,
@@ -577,6 +592,12 @@ def _attr_flags(post) -> dict:
         out["theta_t"] = True
     if a.get("mirt_theta_skew"):
         out["theta_skew"] = True
+    if a.get("mirt_theta_general"):
+        out["theta_general"] = True
+    if a.get("mirt_simple_structure"):
+        out["simple_structure"] = True
+    if a.get("mirt_share_conc"):
+        out["share_conc"] = float(json.loads(a["mirt_share_conc"]))
     if a.get("mirt_theta_pos"):
         out["theta_pos"] = True
     if "mirt_shared_base_zsn" in a and not json.loads(a["mirt_shared_base_zsn"]):
@@ -665,6 +686,14 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["theta_skew"] = True
     elif take("_normaltheta"):
         out["theta_skew"] = False
+    if take("_general"):
+        out["theta_general"] = True
+    if take("_simplestruct"):
+        out["simple_structure"] = True
+        conc = re.match(r"\d+(p\d+)?", rest)
+        if conc:
+            take(conc.group(0))
+            out["share_conc"] = float(conc.group(0).replace("p", "."))
     if take("_thetapos"):
         out["theta_pos"] = True
     for tok, fl in (("_noSG", "no_sg"), ("_excluded", "apply_exclusions"),
@@ -739,7 +768,9 @@ _BASELINE_OFF = dict(loading_prior="normal", link="linear",
                      human_prior=False, human_merge=False,
                      lineage_prior=False, lineage_bm=False, effort_means=False,
                      time_prior=False,
-                     theta_t=False, theta_skew=False, theta_pos=False, private_bases=False,
+                     theta_t=False, theta_skew=False, theta_general=False, simple_structure=False,
+                     share_conc=None, theta_pos=False,
+                     private_bases=False,
                      pooled_noise=False)
 
 

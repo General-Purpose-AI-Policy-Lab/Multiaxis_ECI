@@ -150,7 +150,10 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
                 binomial_n=None, pooled_noise=False, sigma_b_floor=0.0, shared_base_zsn=True,
                 time_t=None,
-                theta_t_cells=False, theta_skew=False, theta_pos=False, link="linear",
+                theta_t_cells=False, theta_skew=False, theta_general=False, simple_structure=False,
+                share_conc=None,
+                theta_pos=False,
+                link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None,
                 save_thin: int = config.SAVE_THIN):
     """Build + sample one compensatory MIRT; print identified convergence."""
@@ -182,6 +185,10 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
         tag += ", cell-wise t theta"
     if theta_skew:
         tag += ", skew-normal theta"
+    if theta_general:
+        tag += ", higher-order general level"
+    if simple_structure:
+        tag += ", soft simple structure"
     if theta_pos:
         tag += ", positive theta (softplus link)"
     if link != "linear":
@@ -206,6 +213,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                              pooled_noise=pooled_noise, sigma_b_floor=sigma_b_floor,
                              shared_base_zsn=shared_base_zsn,
                              time_t=time_t, theta_t_cells=theta_t_cells, theta_skew=theta_skew,
+                             theta_general=theta_general, simple_structure=simple_structure,
+                             share_conc=share_conc,
                              theta_pos=theta_pos, link=link)
     # PyMC sampler uses the heartbeat callback below (so its bar stays off);
     # nutpie/numpyro have no heartbeat, so let their own live progress bar show.
@@ -780,6 +789,12 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_theta_t_cells"] = json.dumps(True)
     if spec.theta_skew:
         attrs["mirt_theta_skew"] = json.dumps(True)
+    if spec.theta_general:
+        attrs["mirt_theta_general"] = json.dumps(True)
+    if spec.simple_structure:
+        attrs["mirt_simple_structure"] = json.dumps(True)
+    if spec.share_conc is not None:
+        attrs["mirt_share_conc"] = json.dumps(spec.share_conc)
     if args.theta_pos:
         attrs["mirt_theta_pos"] = json.dumps(True)
     if floor_c is not None:
@@ -840,6 +855,9 @@ def run_exploration(args, parser) -> None:
                                   shared_base_zsn=not spec.private_bases,
                                   theta_t_cells=spec.theta_t,
                                   theta_skew=spec.theta_skew,
+                                  theta_general=spec.theta_general,
+                                  simple_structure=spec.simple_structure,
+                                  share_conc=spec.share_conc,
                                   theta_pos=spec.theta_pos,
                                   link=spec.link,
                                   checkpoint_path=spec.trace_path,
@@ -1163,6 +1181,26 @@ def main():
                              "abilities' left tail and identifies the axes' orientation "
                              "(5_outputs/sampler_study/GEOMETRY_REPORT.md). Emits "
                              "`_normaltheta`; --theta-t replaces the block either way")
+    parser.add_argument("--theta-general", action="store_true",
+                        help="[exploration] higher-order general level under the axes (de la "
+                             "Torre & Song 2009): every per-axis innovation of a test-taker "
+                             "(exchangeable cell, lineage step, variant offset) is "
+                             "lambda_k * g + sqrt(1 - lambda_k^2) * u_k, so the axes correlate "
+                             "a priori at lambda_j * lambda_k (config.PRIOR_THETA_GENERAL, "
+                             "learned). A model strong on one axis is then expected strong on "
+                             "the others, instead of being pulled down there by the "
+                             "compensatory sum (explaining away). Emits `_general`")
+    parser.add_argument("--simple-structure", action="store_true",
+                        help="[exploration] soft between-item structure of the loadings: each "
+                             "benchmark's row is a size times simplex shares softmax(s * u_b) "
+                             "with a learned concentration s (config.PRIOR_SHARE_CONC), so a "
+                             "benchmark leans on one axis unless the data ask for more. Fewer "
+                             "cross-loadings, less compensation between axes. 'normal' loading "
+                             "prior only; emits `_simplestruct`")
+    parser.add_argument("--share-conc", type=float, default=None,
+                        help="[exploration] with --simple-structure: fix the shares' "
+                             "concentration s at this value instead of learning it (5: rows near "
+                             "one axis, median top share 0.94 a priori; 2.5: about 0.75)")
     parser.add_argument("--theta-pos", action="store_true",
                         help="[exploration] positive likelihood-side ability, the "
                              "semi-compensatory convention: eta reads "
