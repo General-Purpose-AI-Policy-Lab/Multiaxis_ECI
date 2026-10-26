@@ -53,6 +53,8 @@ Scripts dans ce dossier (`1_…` à `3_…`), lancés depuis la racine du dépô
 
 Script `4_integrated_loo_compare.py` ; tableaux `diagnostics/integrated_loo_*.csv` des deux fits.
 
+> **Faussé (26 octobre).** Jusqu'au 26 octobre, `integrated_loo.py` donnait à chaque fondateur de lignée, sous le prior skew-normal, un faux pas gaussien venu du dernier nœud de la carte. Les deux fits de ce tableau étaient skew-normaux, donc les chiffres ci-dessous en sont faussés, et leurs traces n'existent plus pour les recalculer. La conclusion sur les plafonds repose sur la LOO robuste plus bas (+56 ± 12 nats), qui reconstruit le modèle PyMC et n'est pas touchée. Les modes du flagship actuel sont recalculés dans la section du 26 octobre.
+
 | comparaison | scores fiables (k < 0,7 des deux côtés) | tous les scores |
 |---|---|---|
 | plafonds B − flagship A (structure du flagship) | **+43 ± 9** | −364 ± 112 |
@@ -178,10 +180,30 @@ Le placement lit un tier avec ses autres axes au profil d'un modèle typique de 
 
 ## LOO intégrée des quatre modes du flagship à 20 chaînes (nuit du 21 au 22 octobre)
 
+> **Faussé (26 octobre)** par le même bug que plus haut ; la trace à 20 chaînes a été supprimée. Voir la section du 26 octobre pour les modes actuels.
+
 `4_diagnostics/integrated_loo.py --groups A:… C:… B:… D:…` sur la trace à 20 chaînes (graines 42 + 43, sauvegardée dans `traces_backup/`), résumé dans `integrated_loo_4modes_20chains.json`. Sur les 3 358 scores dont le k de Pareto est sous 0,7 dans les quatre modes, **A prédit le mieux** : C −15,3 ± 4,5 nats, B −15,2 ± 6,7, D −11,7 ± 7,6. Sur tous les scores, C passe devant (+76 ± 54), mais 1 541 à 1 625 scores par mode ont un k au-dessus de 0,7 et l'erreur Monte-Carlo atteint 44 nats pour C (267 pour D) : ce total n'est pas fiable. A reste donc le mode des livrables, désormais aussi par la prédiction.
 
 *Note du 22 octobre* : les traces du fit sans plafonds (`mirt_lineageprior_lineagebm_noceiling/`) ont été supprimées pour libérer de la place ; ses tables restent. Les scripts 2, 3, 5 et 6, qui les lisent, ne se relancent plus sans refaire ce fit (`3_fit/fit.py ... --no-ceiling`).
 
 ## Le flagship sur 50 chaînes (23 octobre)
 
-Cinq runs de 10 chaînes (graines 44 à 48) sur les données sans la baseline SimpleQA Verified, fusionnés : modes A 21 chaînes, C 19 (−17 nats), B 5 (−10), D 4 (−26), E 1 (−54). Aucun mode nouveau par rapport aux 20 chaînes précédentes ; le mode A est le même (axes corrélés à 0,999), le plafond de SimpleQA Verified passe de 0,967 à 0,937. LOO intégrée des cinq modes (`integrated_loo_5modes_50chains.json`), sur les 2 878 scores fiables dans tous les modes : C −10,0 ± 4,0 nats, B −2,9 ± 3,0, D −11,2 ± 6,7, E −32,9 ± 6,2 par rapport à A. Sur tous les scores, C passerait devant (+165 ± 70), mais plus de 2 000 scores par mode ont un k au-dessus de 0,7.
+Cinq runs de 10 chaînes (graines 44 à 48) sur les données sans la baseline SimpleQA Verified, fusionnés : modes A 21 chaînes, C 19 (−17 nats), B 5 (−10), D 4 (−26), E 1 (−54). Aucun mode nouveau par rapport aux 20 chaînes précédentes ; le mode A est le même (axes corrélés à 0,999), le plafond de SimpleQA Verified passe de 0,967 à 0,937. LOO intégrée des cinq modes : voir la section du 26 octobre (les chiffres d'abord écrits ici étaient faussés par le bug du fondateur).
+
+## LOO intégrée corrigée (26 octobre)
+
+**Le bug.** Jusqu'au 26 octobre, `4_diagnostics/integrated_loo.py` traitait mal les fondateurs de lignée sous le prior skew-normal, le défaut depuis le 20 octobre. Un fondateur tombait dans la branche des nœuds enfants et recevait un faux pas gaussien « entrant », calculé avec le dernier nœud et le dernier pas de la carte (indices −1). Sur une chaîne de ce flagship, l'erreur atteint environ 2 900 nats.
+- Le correctif et les tests qui l'empêchent de revenir sont dans le commit 211e576. Ces tests confrontent le prior de chaque bloc au log-prior du modèle PyMC, sur un petit modèle de lignée.
+- La LOO robuste (`robust_loo.py`) reconstruit le modèle PyMC : elle n'est pas touchée.
+
+**Les cinq modes recalculés.** Le script est `10_integrated_loo_fixed.py`, le résumé `integrated_loo_5modes_50chains.json`, et les tableaux par mode sont dans `diagnostics/`.
+
+| mode (chaînes) | écart à A, 3 116 scores fiables dans tous les modes | écart à A, tous les scores | scores à k > 0,7 |
+|---|---|---|---|
+| A (21) | — | — | 1 797 |
+| B (5) | −6,5 ± 3,2 | −26,7 ± 7,6 | 1 109 |
+| C (19) | −9,0 ± 4,1 | −18,4 ± 9,1 | 1 754 |
+| D (4) | −14,4 ± 6,9 | −10,5 ± 15,9 | 928 |
+| E (1) | −35,7 ± 6,4 | −66,9 ± 14,1 | 420 |
+
+**Lecture.** A prédit le mieux sur les scores fiables, et désormais aussi sur tous les scores. L'inversion « C devant sur tous les scores » venait du bug. Le choix du mode A est conforté.
