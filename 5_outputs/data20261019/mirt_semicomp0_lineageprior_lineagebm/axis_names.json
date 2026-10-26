@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GDPval",
+        "CyberGym",
+        "FrontierSWE v2",
+        "EBR-bench",
+        "CyScenarioBench",
+        "Furniture Assembly",
+        "Cybench",
+        "CL-bench"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OSWorld",
+        "MirrorCode",
+        "HellaSwag",
+        "MCP Atlas",
+        "TriviaQA",
+        "CadEval",
+        "PostTrainBench v1.1",
+        "DeepResearch Bench"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "MATH Level 5",
+        "OTIS Mock AIME 2024-2025",
+        "TutorBench",
+        "GPQA Main Chemistry",
+        "MMLU Chemistry",
+        "VisualToolBench",
+        "GPQA Diamond Chemistry",
+        "VPCT"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "GSM8K",
+        "ARC AI2",
+        "LAB-Bench Protocol",
+        "OpenBookQA",
+        "MMLU",
+        "WMDP Chemistry",
+        "Balrog"
+      ]
+    }
+  }
+}

@@ -1,0 +1,242 @@
+{
+ "trace": "trace_mirt_k4_lineageprior_lineagebm_general_simplestruct5.nc",
+ "n_chains": 50,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -1.9,
+  -169.0,
+  -123.3,
+  -139.8,
+  -99.8,
+  -203.0,
+  -174.6,
+  -186.6,
+  -164.8,
+  -143.6,
+  -92.6,
+  -41.4,
+  -123.5,
+  -194.5,
+  -156.9,
+  -129.9,
+  -179.9,
+  0.0,
+  -102.3,
+  -93.5,
+  -184.6,
+  -176.1,
+  -91.9,
+  -153.9,
+  -160.6,
+  -176.2,
+  -139.6,
+  -149.0,
+  -214.7,
+  -165.4,
+  -83.6,
+  -29.6,
+  -25.0,
+  -148.7,
+  -62.9,
+  -100.5,
+  -108.3,
+  -96.1,
+  -206.9,
+  -149.9,
+  -65.5,
+  -166.1,
+  -94.5,
+  -91.1,
+  -172.2,
+  -208.2,
+  -148.9,
+  -192.1,
+  -91.2,
+  -80.8
+ ],
+ "modes": [
+  {
+   "chains": [
+    0,
+    17
+   ],
+   "mean_logp": -23183.46983729963,
+   "min_matched_corr": 0.992,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    31,
+    32
+   ],
+   "mean_logp": -23209.829026428084,
+   "min_matched_corr": 0.933,
+   "label": "B",
+   "delta_logp": -26.4,
+   "matched_corr_to_best": 0.924
+  },
+  {
+   "chains": [
+    11
+   ],
+   "mean_logp": -23223.956544321816,
+   "min_matched_corr": 1.0,
+   "label": "C",
+   "delta_logp": -40.5,
+   "matched_corr_to_best": 0.787
+  },
+  {
+   "chains": [
+    34
+   ],
+   "mean_logp": -23245.388139915493,
+   "min_matched_corr": 1.0,
+   "label": "D",
+   "delta_logp": -61.9,
+   "matched_corr_to_best": 0.187
+  },
+  {
+   "chains": [
+    30,
+    42,
+    49
+   ],
+   "mean_logp": -23268.796700421375,
+   "min_matched_corr": 0.93,
+   "label": "E",
+   "delta_logp": -85.3,
+   "matched_corr_to_best": 0.01
+  },
+  {
+   "chains": [
+    10
+   ],
+   "mean_logp": -23275.06685068679,
+   "min_matched_corr": 1.0,
+   "label": "F",
+   "delta_logp": -91.6,
+   "matched_corr_to_best": 0.249
+  },
+  {
+   "chains": [
+    36
+   ],
+   "mean_logp": -23290.84565574037,
+   "min_matched_corr": 1.0,
+   "label": "G",
+   "delta_logp": -107.4,
+   "matched_corr_to_best": 0.036
+  },
+  {
+   "chains": [
+    2,
+    4,
+    9,
+    18,
+    19,
+    22,
+    26,
+    29,
+    35,
+    37,
+    40,
+    43,
+    46
+   ],
+   "mean_logp": -23294.93394150343,
+   "min_matched_corr": 0.868,
+   "label": "H",
+   "delta_logp": -111.5,
+   "matched_corr_to_best": 0.024
+  },
+  {
+   "chains": [
+    27,
+    48
+   ],
+   "mean_logp": -23302.60581378822,
+   "min_matched_corr": 0.917,
+   "label": "I",
+   "delta_logp": -119.1,
+   "matched_corr_to_best": 0.1
+  },
+  {
+   "chains": [
+    12,
+    14,
+    15
+   ],
+   "mean_logp": -23319.28481229053,
+   "min_matched_corr": 0.971,
+   "label": "J",
+   "delta_logp": -135.8,
+   "matched_corr_to_best": 0.097
+  },
+  {
+   "chains": [
+    3
+   ],
+   "mean_logp": -23322.320340337494,
+   "min_matched_corr": 1.0,
+   "label": "K",
+   "delta_logp": -138.9,
+   "matched_corr_to_best": 0.029
+  },
+  {
+   "chains": [
+    39
+   ],
+   "mean_logp": -23332.384855262255,
+   "min_matched_corr": 1.0,
+   "label": "L",
+   "delta_logp": -148.9,
+   "matched_corr_to_best": 0.145
+  },
+  {
+   "chains": [
+    1,
+    6,
+    8,
+    23,
+    24,
+    33,
+    41,
+    44
+   ],
+   "mean_logp": -23346.253334894445,
+   "min_matched_corr": 0.89
+  },
+  {
+   "chains": [
+    7,
+    16,
+    20,
+    25,
+    28,
+    45,
+    47
+   ],
+   "mean_logp": -23374.262134774064,
+   "min_matched_corr": 0.919
+  },
+  {
+   "chains": [
+    13,
+    21,
+    38
+   ],
+   "mean_logp": -23375.043151189046,
+   "min_matched_corr": 0.967
+  },
+  {
+   "chains": [
+    5
+   ],
+   "mean_logp": -23385.559737604566,
+   "min_matched_corr": 1.0
+  }
+ ]
+}
