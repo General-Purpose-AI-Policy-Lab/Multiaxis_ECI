@@ -21,9 +21,12 @@ The latent block of a score is
   * human tiers (ordered prior) are not integrated: their scores keep plain PSIS.
 Under the skew-normal theta block (the K-axis default since 2026-10-20) the founders' bases and the
 models outside the chains have a skew-normal prior per axis, SkewNormal(xi_k, omega_k, alpha_k) at
-the draw's alpha: it enters the Laplace fit with its exact gradient and curvature, the conditional
-posterior staying close to Gaussian wherever the scores pin the block. Under --ceiling-noise the
-curve stops at the draw's ceilings, mu = c + (d - c) sigmoid(eta).
+the draw's alpha, and a founder no incoming step (until 2026-10-26 it took a spurious one, from the
+last node of the map: about 2,900 nats on a chain of the 2026-10-19 flagship). Under the
+higher-order prior (--theta-general) the steps are correlated across axes and a cell is
+lambda g + sqrt(1 - lambda^2) s, integrated as (s, g) (`block_priors`). Under --ceiling-noise the
+curve stops at the draw's ceilings, mu = c + (d - c) sigmoid(eta). Each block's prior is checked
+against the PyMC model's own (tests/test_integrated_loo.py).
 For each draw, the block's conditional posterior (prior times every score of the block) is
 approximated by a Laplace fit; removing score i gives its cavity Gaussian in closed form, and
 since score i sees the block only through eta_i = A_i . (psi + offset) - D_i, the predictive
@@ -134,6 +137,15 @@ def eta_jac(f, A_o, xo, D_o):
     return -s * lse / b - D_o, s[..., None] * pi
 
 
+def _gauss_natural(m0, p0, K):
+    """The block's Gaussian prior factor as (P0 (S, K, K), h (S, K)), log factor -x'P0x/2 + h'x:
+    from a mean and a diagonal precision (S, K), or from p0 = (P0, h) already full, the form the
+    higher-order prior gives (`general_blocks`), whose precision can be singular in the block."""
+    if isinstance(p0, tuple):
+        return p0
+    return p0[:, :, None] * np.eye(K), p0 * m0
+
+
 def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10, skew=None):
     """log p(y_i | y_-i, phi_s) for every score i of one latent block and every draw s.
 
@@ -142,21 +154,25 @@ def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10, skew=N
     difficulties, args the per-score likelihood inputs broadcast to (S, J), m0 / p0 (S, K) the
     block's Gaussian prior mean and precision (diagonal), x0 (S, K) a starting value (the draw's
     own block value), skew None or (xi, omega, alpha) (S, K) of a skew-normal prior factor on
-    top of the Gaussian one (`skew_terms`). Returns (S, J). On a softmin link eta is not linear in the block: the
+    top of the Gaussian one (`skew_terms`). p0 may instead be (P0, h), a full precision and its
+    natural mean term (`_gauss_natural`; m0 is then unused). Returns (S, J). On a softmin link eta is not linear in the block: the
     Laplace fit is Gauss-Newton on its gradient J (`eta_jac`) and serves as the proposal of
     `softmin_block_is`; on the linear link J = A_o and the cavity is exact as before.
     """
+    K = x0.shape[1]
+    P0, h = _gauss_natural(m0, p0, K)
+    eye = np.eye(K)
     x = x0.copy()
     for _ in range(iters):
         eta, J = eta_jac(f, A_o, x[:, None, :] + off, D_o)
         _, d1, d2 = eta_derivatives(eta, args)
         w = np.maximum(-d2, 1e-8)                                 # curvature, kept positive
-        grad = np.einsum("sj,sjk->sk", d1, J) - p0 * (x - m0)
-        pp = p0
+        grad = np.einsum("sj,sjk->sk", d1, J) + h - np.einsum("skl,sl->sk", P0, x)
+        pp = P0
         if skew is not None:
             _, g1, g2 = skew_terms(x, skew)
-            grad, pp = grad + g1, p0 + np.maximum(-g2, 1e-8)
-        P = np.einsum("sj,sjk,sjl->skl", w, J, J) + pp[:, :, None] * np.eye(x.shape[1])
+            grad, pp = grad + g1, P0 + np.maximum(-g2, 1e-8)[:, :, None] * eye
+        P = np.einsum("sj,sjk,sjl->skl", w, J, J) + pp
         step = np.clip(np.linalg.solve(P, grad[..., None])[..., 0], -1.0, 1.0)   # damped
         x = x + step
         if np.abs(step).max() < 1e-6:
@@ -164,13 +180,13 @@ def block_predictive(f, A_o, off, D_o, args, m0, p0, x0, iters: int = 10, skew=N
     eta, J = eta_jac(f, A_o, x[:, None, :] + off, D_o)
     _, d1, d2 = eta_derivatives(eta, args)
     w = np.maximum(-d2, 1e-8)
-    pp = p0 if skew is None else p0 + np.maximum(-skew_terms(x, skew)[2], 1e-8)
-    P = np.einsum("sj,sjk,sjl->skl", w, J, J) + pp[:, :, None] * np.eye(x.shape[1])
+    pp = P0 if skew is None else P0 + np.maximum(-skew_terms(x, skew)[2], 1e-8)[:, :, None] * eye
+    P = np.einsum("sj,sjk,sjl->skl", w, J, J) + pp
     Sigma = np.linalg.inv(P)
     if f["beta"] is not None or skew is not None:
         # a softmin link, or a skew-normal prior: the conditional posterior is skewed, and the
         # Laplace cavity misses the exact integral by up to 0.1 nats a score (tests)
-        return softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma, skew=skew)
+        return softmin_block_is(f, A_o, off, D_o, args, P0, h, x, Sigma, skew=skew)
     v_full = np.einsum("sjk,skl,sjl->sj", J, Sigma, J)            # J_i' Sigma J_i
     # Cavity of score i (Sherman-Morrison): drop its curvature and its pull on the mode.
     v_cav = v_full / (1.0 - w * v_full)
@@ -190,13 +206,14 @@ IS_CHUNK = 16         # posterior draws per chunk (memory: chunk x IS_DRAWS x J 
 _IS_Z = np.random.default_rng(20261007).standard_t(5, size=(IS_DRAWS, 8))
 
 
-def softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma, skew=None):
+def softmin_block_is(f, A_o, off, D_o, args, P0, h, x, Sigma, skew=None):
     """The integrated predictive of a softmin-link block by importance sampling: the block's
     conditional posterior is far from Gaussian there (the minimum switches axes away from the
     mode, so a Laplace or cubature cavity misses it by 0.1 to 0.4 nats a score), so the exact
     integral is estimated instead, with a proposal of independent t(5) coordinates on the Laplace fit (covariance
     inflated by IS_INFLATE**2) and every score of the block scored on the same draws:
-    log p(y_i | y_-i) = LSE(log w) - LSE(log w - ll_i), w = prior * prod_j p(y_j | x) / q(x)."""
+    log p(y_i | y_-i) = LSE(log w) - LSE(log w - ll_i), w = prior * prod_j p(y_j | x) / q(x).
+    The Gaussian prior factor comes in natural form, P0 (S, K, K) and h (S, K)."""
     from multiaxis_eci.models.mirt import softmin_eta
     S, J, K = A_o.shape
     z = _IS_Z[:, :K]
@@ -208,7 +225,8 @@ def softmin_block_is(f, A_o, off, D_o, args, m0, p0, x, Sigma, skew=None):
         # log q: independent t(5) coordinates through L, up to a constant shared by every draw
         logdet = np.log(np.diagonal(L, axis1=-2, axis2=-1)).sum(-1)          # (s,)
         logq = -logdet[:, None] - 3.0 * np.log1p(z ** 2 / 5).sum(-1)[None, :]
-        logprior = -0.5 * (p0[sl, None, :] * (xs - m0[sl, None, :]) ** 2).sum(-1)
+        logprior = (-0.5 * np.einsum("smk,skl,sml->sm", xs, P0[sl], xs)
+                    + np.einsum("smk,sk->sm", xs, h[sl]))
         if skew is not None:
             logprior = logprior + skew_terms(xs, tuple(s_[sl, None, :] for s_ in skew))[0].sum(-1)
         if f["beta"] is None:                                                 # linear link
@@ -247,6 +265,10 @@ def lineage_graph(lin):
     return parent, d_in, children
 
 
+def soft_link(spec) -> bool:
+    return spec.link in ("semicomp", "noncomp", "semicomp0")
+
+
 def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = None):
     from multiaxis_eci.analysis.fitspec import FitSpec, sampled_human_order
     from multiaxis_eci.models.mirt import trace_softmin
@@ -257,7 +279,9 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
     spec = FitSpec.from_trace(az.InferenceData(posterior=post_all), trace_path)
     if spec.time_prior or spec.theta_pos or spec.theta_t \
             or spec.link not in ("linear", "semicomp", "noncomp", "semicomp0") \
-            or spec.known_se or spec.censor_bounds or not spec.lineage_bm:
+            or spec.known_se or spec.censor_bounds or not spec.lineage_bm or spec.private_bases:
+        # private_bases: the founders' bases are private Normal(0, 1), not the exchangeable
+        # block's cells `block_priors` gives them
         raise SystemExit("integrated_loo covers the flagship's specification only")
     data, floor_c, _ = spec.load_data(az.InferenceData(posterior=post_all))
     # the map the trace was sampled with (frozen beside it), its chains checked against the trace
@@ -268,29 +292,51 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
     p = post_all.isel(chain=chains)
     S = p.sizes["chain"] * p.sizes["draw"]
 
-    def flat(v):
-        return p[v].values.reshape(S, *p[v].shape[2:])
+    def get(v):
+        return p[v].values.reshape(S, *p[v].shape[2:]) if v in p else None
 
-    A, theta, D, phi = flat("A"), flat("theta"), flat("D"), flat("phi_b")
-    ceil = flat("ceiling_d") if "ceiling_d" in p else np.ones_like(D)
+    soft = trace_softmin(p)
+    return assemble_fit(get, S, data, lin, human_rows, floor_c, spec.binomial_n(data),
+                        general=spec.theta_general, soft=soft)
+
+
+def assemble_fit(get, S: int, data, lin, human_rows, floor_c, binomial_n, general: bool = False,
+                 soft=None) -> dict:
+    """The arrays the integrated LOO reads, from `get(name)` -> (S, ...) draws of a model
+    variable (None when absent): the trace's posterior in `load_fit`, a point of the PyMC model
+    in the tests. The release levels psi are rebuilt from the lineage variables as
+    models/mirt._lineage_block builds them."""
+    A, theta, D, phi = get("A"), get("theta"), get("D"), get("phi_b")
+    ceil = get("ceiling_d")
+    ceil = np.ones_like(D) if ceil is None else ceil
     skew = None
-    if "theta_skew_alpha" in p:
-        alpha = flat("theta_skew_alpha")
+    if get("theta_skew_alpha") is not None:
+        alpha = get("theta_skew_alpha")
         xi, omega = skew_params(alpha)
         skew = (xi, omega, alpha)
-    base, z = flat("lin_base"), flat("lin_delta_z")
-    drift, spread = flat("lin_drift"), flat("lin_spread")
+    base, z = get("lin_base"), get("lin_delta_z")
+    drift, spread = get("lin_drift"), get("lin_spread")
     dt = lin.delta_dt
+    lam = R_inv = None
+    if general:
+        # Higher-order prior (models/mirt._general_mix): the steps' standard-normal cells are
+        # mixed by chol(R), R = lam lam' + diag(1 - lam^2), before the drift and spread apply.
+        if soft is not None:
+            raise SystemExit("integrated_loo: --theta-general on a softmin link is not covered")
+        if skew is None:
+            raise SystemExit("integrated_loo: --theta-general is built on the skew-normal block")
+        lam = get("theta_general_lambda")
+        R = lam[:, :, None] * lam[:, None, :] + (1.0 - lam ** 2)[:, :, None] * np.eye(lam.shape[1])
+        z = np.einsum("skl,sdl->sdk", np.linalg.cholesky(R), z)
+        R_inv = np.linalg.inv(R)
     delta = drift[:, None, :] * dt[None, :, None] + spread[:, None, :] * np.sqrt(dt)[None, :, None] * z
     psi = np.einsum("nc,sck->snk", lin.B, base) + np.einsum("nd,sdk->snk", lin.C, delta)
 
-    binomial_n = spec.binomial_n(data)
     n_items = np.where(np.isfinite(binomial_n) & (binomial_n > 0), binomial_n, 0.0) \
         if binomial_n is not None else np.zeros(data.n_obs)
     k = np.clip(data.scores, 0.0, 1.0) * n_items
     y = np.clip(data.scores, config.CONTINUOUS_EPS, 1.0 - config.CONTINUOUS_EPS)
     c = floor_c[data.bench_idx] if floor_c is not None else np.zeros(data.n_obs)
-    soft = trace_softmin(p)
     beta = offset = None
     if soft is not None:
         beta, offset = soft
@@ -299,7 +345,7 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
         beta = np.asarray(beta).reshape(S) if np.ndim(beta) else np.full(S, float(beta))
         offset = offset.reshape(S, -1)
     return dict(data=data, lin=lin, human_rows=human_rows, A=A, theta=theta, D=D, phi=phi,
-                beta=beta, offset=offset, ceil=ceil, skew=skew,
+                beta=beta, offset=offset, ceil=ceil, skew=skew, lam=lam, R_inv=R_inv,
                 psi=psi, drift=drift, spread=spread, n_items=n_items, k=k, y=y, c=c, S=S)
 
 
@@ -311,67 +357,120 @@ def conditional_loglik(f) -> np.ndarray:
                       f["ceil"][:, d.bench_idx])
 
 
-def integrated_loglik(f) -> tuple[np.ndarray, np.ndarray]:
-    """log p(y_n | y_-n, phi_s), (S, n_obs), and a mask of the observations it integrates
-    (False: human tiers, left at the conditional log-likelihood)."""
+def block_priors(f):
+    """Every latent block the integrated LOO integrates out, with its conditional prior given phi:
+    one dict per block with `obs` (the block's scores), `x0` (S, K') a start (the draw's value),
+    `off` (S, J, K) the per-score offset added to the abilities, `prior` = (P0, h) the Gaussian
+    factor in natural form (S, K', K') and (S, K'), `skew` None or the (xi, omega, alpha) (S, K')
+    of a skew-normal factor per coordinate, `M` None (the block is the abilities, K' = K) or
+    (S, K, K') with abilities M x (the higher-order prior's (s, g), K' = K + 1), and `iters` the
+    Newton budget. tests/test_integrated_loo.py checks each prior against the PyMC model's own.
+
+    A release level psi_n: its parent's level plus a Brownian step N(drift dt, spread^2 dt), and
+    one such factor per child; under the higher-order prior the step's cells are mixed by
+    chol(R), R = lambda lambda' + diag(1 - lambda^2), so a step factor has the full precision
+    D^-1 R^-1 D^-1, D = diag(spread sqrt(dt)). A chain founder has no incoming step: its own base
+    is the exchangeable block's cell, N(0, 1) (the ZeroSumNormal entry) under the Gaussian
+    block, the skew-normal cell under the skew-normal one. A model outside the chains: that cell
+    alone. Under the higher-order prior a cell is lambda g + c s, c = sqrt(1 - lambda^2), g ~ N(0, 1)
+    and s skew-normal; its prior has no closed form in theta, so the block integrated is
+    x = (s, g), whose prior is exact (g as a skew-normal of shape 0), seen through theta = M x,
+    M = [diag(c) | lambda], a founder's children factors pulled back by M. Human tiers are not
+    integrated."""
     d, lin, S = f["data"], f["lin"], f["S"]
     K = f["A"].shape[2]
+    parent, d_in, children = lineage_graph(lin)
+    lam, skew = f["lam"], f["skew"]
+    eye = np.eye(K)
+    if lam is not None:
+        c = np.sqrt(1.0 - lam ** 2)
+        M = np.concatenate([c[:, :, None] * eye, lam[:, :, None]], axis=2)
+        xi, omega, alpha = skew
+        cell_skew = (np.concatenate([xi, np.zeros((S, 1))], 1),
+                     np.concatenate([omega, np.ones((S, 1))], 1),
+                     np.concatenate([alpha, np.zeros((S, 1))], 1))
+
+        def cell_start(theta_value):
+            """(s, g) with g = 0 giving theta_value"""
+            return np.concatenate([theta_value / c, np.zeros((S, 1))], 1)
+
+        def step_precision(col):
+            sd = f["spread"] * np.sqrt(lin.delta_dt[col])
+            return f["R_inv"] / (sd[:, :, None] * sd[:, None, :])
+    else:
+        def step_precision(col):
+            return eye / (f["spread"] ** 2 * lin.delta_dt[col])[:, :, None]
+
+    def cell_block(obs, theta_value, off, P0, h):
+        """the exchangeable cell (a founder's base, a model outside the chains), with the
+        Gaussian factor (P0, h) of a founder's children in theta"""
+        if lam is not None:
+            return dict(obs=obs, x0=cell_start(theta_value), off=off, skew=cell_skew, M=M,
+                        prior=(np.einsum("skl,skm,smn->sln", M, P0, M),
+                               np.einsum("skl,sk->sl", M, h)), iters=25)
+        if skew is None:                                              # the ZeroSumNormal entry
+            P0, h = P0 + eye, h
+        return dict(obs=obs, x0=theta_value, off=off, skew=skew, M=None, prior=(P0, h),
+                    iters=10)
+
+    rows_of_node = [lin.row_idx[lin.node_idx == n] for n in range(lin.n_nodes)]
+    for n in range(lin.n_nodes):
+        obs = np.flatnonzero(np.isin(d.model_idx, rows_of_node[n]))
+        if obs.size == 0:
+            continue
+        P0, h = np.zeros((S, K, K)), np.zeros((S, K))
+        steps = [(parent[n], d_in[n], +1)] if parent[n] >= 0 else []
+        steps += [(ch, d_in[ch], -1) for ch in children[n]]
+        for other, col, sign in steps:
+            # the parent's step into n (sign +1), or n's step into a child (sign -1)
+            Q = step_precision(col)
+            mean = f["psi"][:, other] + sign * f["drift"] * lin.delta_dt[col]
+            P0 = P0 + Q
+            h = h + np.einsum("skl,sl->sk", Q, mean)
+        off = f["theta"][:, d.model_idx[obs]] - f["psi"][:, n][:, None, :]
+        if parent[n] >= 0:
+            yield dict(obs=obs, x0=f["psi"][:, n], off=off, skew=None, M=None, prior=(P0, h),
+                       iters=10)
+        else:
+            yield cell_block(obs, f["psi"][:, n], off, P0, h)
+
+    claimed = np.concatenate([f["human_rows"], lin.row_idx])
+    for m in np.setdiff1d(np.arange(d.n_models), claimed):
+        obs = np.flatnonzero(d.model_idx == m)
+        if obs.size == 0:
+            continue
+        yield cell_block(obs, f["theta"][:, m], np.zeros((S, obs.size, K)),
+                         np.zeros((S, K, K)), np.zeros((S, K)))
+
+
+def integrated_loglik(f) -> tuple[np.ndarray, np.ndarray]:
+    """log p(y_n | y_-n, phi_s), (S, n_obs), and a mask of the observations it integrates
+    (False: human tiers, left at the conditional log-likelihood). Each block of `block_priors`
+    is integrated by `block_predictive`; where the block is x with abilities M x, its scores see
+    it through the loadings A M, the offsets moved into the difficulty (exact on the linear link)."""
+    d, S = f["data"], f["S"]
     out = conditional_loglik(f)
     done = np.zeros(d.n_obs, dtype=bool)
-    parent, d_in, children = lineage_graph(lin)
-    spread2 = f["spread"] ** 2                                        # (S, K)
-
-    def run(obs, block_value, off, m0, p0, skew=None):
+    for blk in block_priors(f):
+        obs, off = blk["obs"], blk["off"]
         b = d.bench_idx[obs]
         args = (f["c"][obs][None, :], f["phi"][:, b], f["n_items"][obs][None, :],
                 f["k"][obs][None, :], f["y"][obs][None, :], f["ceil"][:, b])
         args = tuple(np.broadcast_to(a, (S, len(obs))) for a in args)
+        A_o, D_o = f["A"][:, b], f["D"][:, b]
+        if blk["M"] is not None:
+            D_o = D_o - np.einsum("sjk,sjk->sj", A_o, off)
+            A_o = np.einsum("sjk,skl->sjl", A_o, blk["M"])
+            off = np.zeros(A_o.shape)
         with np.errstate(all="ignore"):
-            res = block_predictive(f, f["A"][:, b], off, f["D"][:, b], args, m0, p0, block_value,
-                                   skew=skew)
+            res = block_predictive(f, A_o, off, D_o, args, None, blk["prior"], blk["x0"],
+                                   skew=blk["skew"], iters=blk["iters"])
         bad = ~np.isfinite(res)
         # A rare draw whose Newton fit runs off (extreme eta) keeps its conditional value.
         res[bad] = out[:, obs][bad]
         f["n_fallback"] = f.get("n_fallback", 0) + int(bad.sum())
         out[:, obs] = res
         done[obs] = True
-
-    # Release levels: every score of every model of the node.
-    rows_of_node = [lin.row_idx[lin.node_idx == n] for n in range(lin.n_nodes)]
-    for n in range(lin.n_nodes):
-        obs = np.flatnonzero(np.isin(d.model_idx, rows_of_node[n]))
-        if obs.size == 0:
-            continue
-        p0 = np.zeros((S, K))
-        num = np.zeros((S, K))
-        if parent[n] < 0 and f["skew"] is None:
-            p0 += 1.0                                                 # founder: ZSN entry
-        else:
-            v = spread2 * lin.delta_dt[d_in[n]]
-            p0 += 1.0 / v
-            num += (f["psi"][:, parent[n]] + f["drift"] * lin.delta_dt[d_in[n]]) / v
-        for ch in children[n]:
-            v = spread2 * lin.delta_dt[d_in[ch]]
-            p0 += 1.0 / v
-            num += (f["psi"][:, ch] - f["drift"] * lin.delta_dt[d_in[ch]]) / v
-        m0 = np.divide(num, p0, out=np.zeros_like(num), where=p0 > 0)
-        off = f["theta"][:, d.model_idx[obs]] - f["psi"][:, n][:, None, :]
-        # a founder's base under the skew-normal block: its prior is that cell's skew-normal
-        run(obs, f["psi"][:, n], off, m0, p0, skew=f["skew"] if parent[n] < 0 else None)
-
-    # Models outside the chains and the human tiers: their own theta, prior N(0, I), or the
-    # skew-normal cell under the skew-normal block.
-    claimed = np.concatenate([f["human_rows"], lin.row_idx])
-    for m in np.setdiff1d(np.arange(d.n_models), claimed):
-        obs = np.flatnonzero(d.model_idx == m)
-        if obs.size == 0:
-            continue
-        if f["skew"] is None:
-            run(obs, f["theta"][:, m], np.zeros((S, obs.size, K)), np.zeros((S, K)),
-                np.ones((S, K)))
-        else:
-            run(obs, f["theta"][:, m], np.zeros((S, obs.size, K)), np.zeros((S, K)),
-                np.zeros((S, K)), skew=f["skew"])
     return out, done
 
 
