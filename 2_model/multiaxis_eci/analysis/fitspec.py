@@ -25,6 +25,7 @@ import arviz as az
 import numpy as np
 
 from multiaxis_eci.config import (
+    DEFAULT_PIN_OFFSET,
     FIGURES_DIRNAME,
     HUMAN_ORDER,
     HUMAN_ORDER_MERGED,
@@ -39,6 +40,18 @@ from multiaxis_eci.config import (
 # Loading priors, longest first: "_signed" is a prefix of "_signedhs".
 # "signedhs" is parse-only — the prior is gone, its historical folder names are not.
 _PRIOR_TOKENS = ("signedhs", "signed", "pt1", "bifactor")
+
+
+def pin_label(path) -> str | None:
+    """The tag label of an --axis-pin file: its stem's letters and digits, lower-case, without
+    a leading "q" or "Q_" (`Q_geomin.csv` -> "geomin"). None without a file."""
+    if not path:
+        return None
+    stem = re.sub(r"^q_?", "", Path(path).stem.lower())
+    label = re.sub(r"[^a-z0-9]", "", stem)
+    if not label:
+        raise ValueError(f"--axis-pin file {path!r} leaves no letters or digits for the tag")
+    return label
 
 
 # The K whose results folder carries no K token: every K-axis fit published so far is K=4.
@@ -98,6 +111,11 @@ class FitSpec:
     simple_structure: bool = False
     # Fixed concentration of those shares (None: learned); the tag token carries it, `_simplestruct5`.
     share_conc: float | None = None
+    # Main axis per benchmark leaned on a priori (models/mirt.py axis_pin), exploration: the
+    # label of the pin file and the logit offset, `_pin<label>-<offset>`; the mapping itself
+    # sits in the trace attrs (mirt_axis_pin).
+    axis_pin: str | None = None
+    pin_offset: float | None = None
     theta_pos: bool = False
     no_sg: bool = False
     apply_exclusions: bool = False
@@ -177,6 +195,11 @@ class FitSpec:
             object.__setattr__(self, "theta_skew", False)
         if not self.simple_structure:                 # a concentration of shares nothing uses
             object.__setattr__(self, "share_conc", None)
+            object.__setattr__(self, "axis_pin", None)
+        if self.axis_pin is None:
+            object.__setattr__(self, "pin_offset", None)
+        elif self.pin_offset is None:
+            object.__setattr__(self, "pin_offset", DEFAULT_PIN_OFFSET)
 
     # ── identity ────────────────────────────────────────────────────────────
     @property
@@ -198,6 +221,8 @@ class FitSpec:
         if self.simple_structure:
             tag += "_simplestruct" + ("" if self.share_conc is None
                                       else f"{self.share_conc:g}".replace(".", "p"))
+            if self.axis_pin:
+                tag += f"_pin{self.axis_pin}-" + f"{self.pin_offset:g}".replace(".", "p")
         if self.theta_pos: tag += "_thetapos"
         if self.no_sg: tag += "_noSG"
         if self.apply_exclusions: tag += "_excluded"
@@ -276,6 +301,8 @@ class FitSpec:
                 theta_general=getattr(args, "theta_general", False),
                 simple_structure=getattr(args, "simple_structure", False),
                 share_conc=getattr(args, "share_conc", None),
+                axis_pin=pin_label(getattr(args, "axis_pin", None)),
+                pin_offset=getattr(args, "pin_offset", None),
                 theta_pos=args.theta_pos,
                 no_sg=args.no_sg,
                 apply_exclusions=args.apply_exclusions,
@@ -598,6 +625,9 @@ def _attr_flags(post) -> dict:
         out["simple_structure"] = True
     if a.get("mirt_share_conc"):
         out["share_conc"] = float(json.loads(a["mirt_share_conc"]))
+    if a.get("mirt_axis_pin_label"):
+        out["axis_pin"] = a["mirt_axis_pin_label"]
+        out["pin_offset"] = float(json.loads(a["mirt_pin_offset"]))
     if a.get("mirt_theta_pos"):
         out["theta_pos"] = True
     if "mirt_shared_base_zsn" in a and not json.loads(a["mirt_shared_base_zsn"]):
@@ -694,6 +724,13 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         if conc:
             take(conc.group(0))
             out["share_conc"] = float(conc.group(0).replace("p", "."))
+        if take("_pin"):
+            pin = re.match(r"([a-z0-9]+)-(\d+(p\d+)?)", rest)
+            if not pin:
+                raise ValueError(f"unreadable axis-pin token in tag {tag!r}")
+            take(pin.group(0))
+            out["axis_pin"] = pin.group(1)
+            out["pin_offset"] = float(pin.group(2).replace("p", "."))
     if take("_thetapos"):
         out["theta_pos"] = True
     for tok, fl in (("_noSG", "no_sg"), ("_excluded", "apply_exclusions"),
@@ -769,7 +806,7 @@ _BASELINE_OFF = dict(loading_prior="normal", link="linear",
                      lineage_prior=False, lineage_bm=False, effort_means=False,
                      time_prior=False,
                      theta_t=False, theta_skew=False, theta_general=False, simple_structure=False,
-                     share_conc=None, theta_pos=False,
+                     share_conc=None, axis_pin=None, pin_offset=None, theta_pos=False,
                      private_bases=False,
                      pooled_noise=False)
 

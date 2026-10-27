@@ -324,6 +324,9 @@ PRIOR_THETA_GENERAL = (2.0, 2.0)
 # r_b ~ Gamma(shape, shape / (K sqrt(2/pi))): the mean L1 norm of the K HalfNormal(1) cells it replaces.
 PRIOR_SHARE_CONC = dict(mu=math.log(2.0), sigma=0.5)
 PRIOR_SHARE_SIZE_SHAPE = 4.0
+# --axis-pin: logit offset leaning a benchmark's shares toward its pinned axis (at concentration
+# 2.5, top share 0.93 a priori; 1: 0.80, 2: 0.98).
+DEFAULT_PIN_OFFSET = 1.5
 
 # Regularized-horseshoe scales, used by the "bifactor" loading prior
 # (models/mirt.py) and the sparse-gate model's gate horseshoe (models/mirt_sparse.py).

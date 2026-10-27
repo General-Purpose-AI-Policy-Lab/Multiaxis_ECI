@@ -95,3 +95,35 @@ Dans les variantes à structure simple, le meilleur mode n'est atteint que par 2
 Conclusion : comme les méthodes de l'étude d'octobre, ni l'une ni l'autre ne bat NUTS seul. Rien dans les données ne fixe l'orientation des axes. La piste standard qui reste serait de l'ancrer par le contenu : BSEM de Muthén & Asparouhov (2012), avec un axe principal par benchmark fixé par jugement et des chargements croisés à prior de petite variance.
 
 **Décision (27 octobre, utilisateur) :** la piste est arrêtée et le flagship actuel est conservé. L'option expérimentale `axis_mixture` n'a pas été gardée dans le code ; `--theta-general`, `--simple-structure` et `--share-conc` restent comme options d'exploration.
+
+## Réouverture : fixer l'orientation au lieu de la laisser au sampler (27 octobre)
+
+Rouverte le jour même, avec la consigne de changer plus fondamentalement la géométrie ou la procédure d'exploration. Le diagnostic précédent dit où est la barrière : l'orientation des axes, que rien dans les données ne fixe. Deux façons standard de la fixer sans la demander au sampler, testées dans l'ordre du coût :
+
+1. **Rotation a posteriori des tirages du flagship** (la logique de l'analyse factorielle exploratoire : on estime dans une base quelconque, on identifie après coup par un critère de structure simple ; Poworoznek, Ferrari & Dunson 2021, Papastamoulis & Ntzoufras 2022). Une rotation (A, θ) → (A T, θ T⁻ᵀ) laisse η = Aθᵀ, donc l'ajustement et la LOO, strictement inchangés : zéro coût, zéro problème de convergence. L'outillage existait déjà dans `analysis/rotation.py` (`geomin_rotate`, `promax_rotate`, `_varimax`), écrit pour le prior `signed`.
+2. **Fit à structure simple avec l'orientation donnée a priori** : l'axe principal de chaque benchmark est fourni au modèle, qui penche ses parts vers cet axe (décalage sur le logit avant le softmax) tout en laissant chaque chargement croisé libre. C'est la cible douce du BSEM de Muthén & Asparouhov (2012). L'affectation vient de l'extérieur du fit échantillonné : soit de la rotation geomin du flagship (EFA puis ESEM, Asparouhov & Muthén 2009), soit du contenu (les catégories des benchmarks). Nouvelle option `--axis-pin FICHIER --pin-offset O` (tag `_pin<label>-<offset>`, tests dans `tests/test_axis_pin.py`), fichiers dans `pins/`.
+
+### 1. Rotation du mode A du flagship
+
+Une seule transformation globale par critère, calculée sur les chargements moyens du mode A (21 chaînes) et appliquée à chaque tirage ; scripts `rot.py`, `compare.py`, `qcheck.py` dans `../traces_backup/pin_scripts/`.
+
+| | flagship | varimax (orthogonale) | geomin (oblique) | promax (oblique) | fit s = 2,5, mode A |
+|---|---|---|---|---|---|
+| part maximale médiane des lignes | 0,39 | 0,48 | 0,50 | 0,53 | 0,63 |
+| cellules < −0,05 | 0 | 11 % | 14 % | 27 % | 0 |
+| anti-corrélation intra-modèle, paire 1-2 | −0,46 | +0,18 | −0,03 | −0,06 | +0,04 |
+| astra, rangs axes 1/2/3/4 | 1/135/7/294 | 2/794/17/430 | 1/238/3/**5** | 1/572/1/1 | 2/32/1/40 |
+| glm-5.3-flash, agentique | 1ᵉʳ | 4ᵉ | **2ᵉ** | 4ᵉ | 69ᵉ |
+| accord de l'argmax des lignes avec le mode A à s = 2,5 | 65 % | | 75 % | | 100 % |
+
+Geomin est la bonne rotation (promax rend trop de chargements négatifs, varimax vide l'axe 2). Elle supprime les anti-corrélations intra-modèle et répare l'axe 4 (SimpleQA Verified devient pur, 1,51 sur l'axe 4 et moins de 0,3 ailleurs ; astra 5ᵉ), et ses axes restent ceux du flagship (cosinus 0,83 à 0,95). Mais elle ne répare pas l'axe agentique : OSWorld reste chargé 1,23 sur l'axe 2 et 0,92 sur l'axe cyber (contre 1,94 / 0,24 dans le fit s = 2,5), et ARC-AGI / ARC-AGI-2 gardent 1,0 à 1,5 sur l'axe 2, ce qui maintient glm-5.3-flash et deep-think en tête. Le sous-espace de chargements du flagship (de dimension 4) ne contient pas de direction agentique propre ; le fit s = 2,5 change ce sous-espace, et c'est ce que coûtent ses 60 nats de vraisemblance. La rotation est donc la moitié bon marché de la réponse : elle ne peut pas remplacer un fit à structure simple, mais elle en fournit l'orientation (75 % des affectations du meilleur mode, les désaccords portant sur les lignes minces ou étalées).
+
+### 2. Fits épinglés (lancés le 27 octobre à 12 h 34, `../traces_backup/run_pin.sh`, journal `pin_20261027.log`)
+
+Sur `--theta-general --simple-structure --share-conc 2.5`, graine 44, 10 chaînes, 2000 + 1000 itérations, environ 3 h 30 chacun :
+
+1. `_pingeomin-1p5` : affectation = argmax des chargements du flagship après geomin (107 benchmarks), décalage 1,5 (part maximale 0,93 a priori) ;
+2. `_pincategory-1p5` : affectation par le contenu, 72 benchmarks sur 107 (Mathematics, Chemistry, Biology → 1 ; Autonomous SWE, Agentic Computer Use → 2 ; Cyber → 3 ; Trivia & Commonsense QA → 4 ; les catégories General Reasoning, Multimodal, Domain Specific, Core AGI et Writing restent libres) ;
+3. `_pingeomin-1` : décalage 1 (0,80 a priori), pour mesurer ce que le prior impose.
+
+À lire dans `diagnostics/` de chaque dossier : `modes.log` et `mode_chains.txt` (une seule organisation ?), `chain_loglik.txt` (log-vraisemblance par chaîne, à comparer aux ≈ −15 285 du mode A à s = 2,5 et aux ≈ −15 226 du flagship), `frontier_compare.txt` (rangs, frontières, anti-corrélations, face au flagship et au mode A à s = 2,5). Le critère de succès : les chaînes d'un fit épinglé se retrouvent dans un seul mode, au niveau de vraisemblance du mode A que NUTS seul n'atteignait que 2 fois sur 30, avec les mêmes frontières ; et les deux épinglages, données et contenu, s'accordent.

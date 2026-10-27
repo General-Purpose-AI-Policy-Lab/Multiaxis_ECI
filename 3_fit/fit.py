@@ -58,7 +58,7 @@ from multiaxis_eci.analysis import (
     timeline_stats_df,
     trace_loading_prior,
 )
-from multiaxis_eci.config import SAMPLE_KW
+from multiaxis_eci.config import DEFAULT_PIN_OFFSET, SAMPLE_KW
 from multiaxis_eci.data import (
     ACCESS_SCOPES,
     PROCESSED_FILE,
@@ -142,6 +142,18 @@ TIMELINE_BENCH_LABELS = {"MMLU": ("2020-11-15", 72), "GSM8K": ("2021-10-15", 128
 TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-06-15", 61, "Claude 3.5 Sonnet (Oct 2024)"),
                          config.ANCHOR_HIGH[0]: ("2025-09-20", 72, "GPT-5 (medium)")}
 
+def load_axis_pin(path) -> dict:
+    """--axis-pin FILE: a CSV with `benchmark` and `axis` (1-based) columns, as
+    {benchmark: 0-based axis} for build_mirt_model(axis_pin=)."""
+    df = pd.read_csv(path)
+    missing = {"benchmark", "axis"} - set(df.columns)
+    if missing:
+        raise ValueError(f"--axis-pin {path}: missing column(s) {sorted(missing)}")
+    if df["benchmark"].duplicated().any():
+        raise ValueError(f"--axis-pin {path}: a benchmark is listed twice")
+    return {str(b): int(a) - 1 for b, a in zip(df["benchmark"], df["axis"])}
+
+
 def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                 human_delta_sd: float = config.PRIOR_DELTA_HUMAN,
                 human_root_sd: float = config.PRIOR_HUMAN_ROOT, lineage=None,
@@ -151,7 +163,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                 binomial_n=None, pooled_noise=False, sigma_b_floor=0.0, shared_base_zsn=True,
                 time_t=None,
                 theta_t_cells=False, theta_skew=False, theta_general=False, simple_structure=False,
-                share_conc=None,
+                share_conc=None, axis_pin=None, pin_offset=None,
                 theta_pos=False,
                 link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None,
@@ -189,6 +201,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
         tag += ", higher-order general level"
     if simple_structure:
         tag += ", soft simple structure"
+        if axis_pin:
+            tag += f", {len(axis_pin)} benchmarks pinned to an axis (offset {pin_offset})"
     if theta_pos:
         tag += ", positive theta (softplus link)"
     if link != "linear":
@@ -215,6 +229,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                              time_t=time_t, theta_t_cells=theta_t_cells, theta_skew=theta_skew,
                              theta_general=theta_general, simple_structure=simple_structure,
                              share_conc=share_conc,
+                             **({"axis_pin": axis_pin, "pin_offset": pin_offset} if axis_pin
+                                else {}),
                              theta_pos=theta_pos, link=link)
     # PyMC sampler uses the heartbeat callback below (so its bar stays off);
     # nutpie/numpyro have no heartbeat, so let their own live progress bar show.
@@ -795,6 +811,12 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_simple_structure"] = json.dumps(True)
     if spec.share_conc is not None:
         attrs["mirt_share_conc"] = json.dumps(spec.share_conc)
+    axis_pin = load_axis_pin(args.axis_pin) if spec.axis_pin else None
+    if axis_pin:
+        # The mapping travels with the trace: the tag only carries the file's label.
+        attrs["mirt_axis_pin"] = json.dumps(axis_pin)
+        attrs["mirt_axis_pin_label"] = spec.axis_pin
+        attrs["mirt_pin_offset"] = json.dumps(spec.pin_offset)
     if args.theta_pos:
         attrs["mirt_theta_pos"] = json.dumps(True)
     if floor_c is not None:
@@ -858,6 +880,7 @@ def run_exploration(args, parser) -> None:
                                   theta_general=spec.theta_general,
                                   simple_structure=spec.simple_structure,
                                   share_conc=spec.share_conc,
+                                  axis_pin=axis_pin, pin_offset=spec.pin_offset,
                                   theta_pos=spec.theta_pos,
                                   link=spec.link,
                                   checkpoint_path=spec.trace_path,
@@ -1201,6 +1224,19 @@ def main():
                         help="[exploration] with --simple-structure: fix the shares' "
                              "concentration s at this value instead of learning it (5: rows near "
                              "one axis, median top share 0.94 a priori; 2.5: about 0.75)")
+    parser.add_argument("--axis-pin", default=None, metavar="FILE",
+                        help="[exploration] with --simple-structure: CSV (benchmark,axis; axes "
+                             "1-based) naming each benchmark's main axis a priori. Its share "
+                             "logit gets --pin-offset before the softmax, so the prior leans the "
+                             "row that way and the data keep every cross-loading free (a soft "
+                             "target structure, BSEM). Fixes the orientation of the axes, which "
+                             "the data leave to each chain's discrete choice; take it from outside "
+                             "the sampled fit, e.g. the flagship's loadings after a geomin rotation. "
+                             "Emits `_pin<label>-<offset>` with the file's stem as label")
+    parser.add_argument("--pin-offset", type=float, default=None,
+                        help="[exploration] with --axis-pin: the logit offset (default "
+                             f"{DEFAULT_PIN_OFFSET}; at concentration 2.5, 1: top share 0.80 a "
+                             "priori, 1.5: 0.93, 2: 0.98)")
     parser.add_argument("--theta-pos", action="store_true",
                         help="[exploration] positive likelihood-side ability, the "
                              "semi-compensatory convention: eta reads "

@@ -35,6 +35,7 @@ from multiaxis_eci.config import (
     PRIOR_SIGMA_B_POOLED,
     PRIOR_TAU_ALPHA,
     PRIOR_TAU_CD,
+    DEFAULT_PIN_OFFSET,
     PRIOR_SHARE_CONC,
     PRIOR_SHARE_SIZE_SHAPE,
     PRIOR_THETA_GENERAL,
@@ -695,6 +696,8 @@ def build_mirt_model(data: ECIData, K: int,
                       theta_general: bool = False,
                       simple_structure: bool = False,
                       share_conc: float | None = None,
+                      axis_pin: dict | None = None,
+                      pin_offset: float = DEFAULT_PIN_OFFSET,
                       theta_pos: bool = False,
                       link: str = "linear") -> pm.Model:
     """Build the K-factor compensatory Beta-MIRT model.
@@ -830,6 +833,16 @@ def build_mirt_model(data: ECIData, K: int,
     simplex shares with a learned concentration (soft between-item structure, see the branch);
     share_conc fixes that concentration instead (left free, the 2026-10-19 data keep the rows
     as spread as the flagship's, median top share 0.40).
+    axis_pin: with simple_structure, {benchmark: axis index} naming each benchmark's main
+    axis a priori: its share logit gets +pin_offset before the softmax, so the prior leans
+    the row toward that axis (offset 1.5 at concentration 2.5: top share 0.93 a priori) while
+    the data keep every cross-loading free, a soft target structure in the sense of BSEM
+    (Muthén & Asparouhov 2012). The point is the orientation: left free, the assignment of
+    benchmarks to axes is a discrete choice the sampler makes per chain (the 2026-10-23
+    weekend fits reached their best organisation in 2 chains of 30), and nothing in the data
+    picks one. The pin is taken from outside the sampled fit, e.g. the argmax of the flagship's
+    loadings after an oblique rotation to simple structure (analysis.rotation.geomin_rotate).
+    Benchmarks missing from the dict are left unpinned.
     theta_general: a higher-order general level under the axes, which correlates every
     per-axis innovation of a test-taker (see _assemble_theta, config.PRIOR_THETA_GENERAL).
     theta_skew: the same block (unstructured rows plus human-root/chain-founder
@@ -997,6 +1010,17 @@ def build_mirt_model(data: ECIData, K: int,
     if simple_structure and loading_prior != "normal":
         raise ValueError("simple_structure reshapes the 'normal' loading prior's rows; "
                          f"not {loading_prior!r}")
+    if axis_pin and not simple_structure:
+        raise ValueError("axis_pin leans the simple-structure shares; it needs simple_structure")
+    pin_onehot = np.zeros((data.n_benchmarks, K))
+    if axis_pin:
+        bench_pos = {b: i for i, b in enumerate(data.blookup["benchmark"].tolist())}
+        for bench_name, axis_k in axis_pin.items():
+            if bench_name not in bench_pos:
+                raise ValueError(f"axis_pin benchmark not in data: '{bench_name}'")
+            if not (0 <= int(axis_k) < K):
+                raise ValueError(f"axis_pin axis {axis_k} out of range for K={K}")
+            pin_onehot[bench_pos[bench_name], int(axis_k)] = 1.0
     if loading_prior not in ("normal", "pt1", "signed", "bifactor"):
         raise ValueError(
             f"loading_prior must be 'normal', 'pt1', 'signed', or "
@@ -1327,7 +1351,10 @@ def build_mirt_model(data: ECIData, K: int,
             share_conc = (pm.LogNormal("A_share_conc", **PRIOR_SHARE_CONC) if share_conc is None
                           else pt.as_tensor(float(share_conc)))
             u = pm.Normal("A_share_z", 0.0, 1.0, dims=("bench", "latent"))
-            shares = pm.Deterministic("A_share", pt.special.softmax(share_conc * u, axis=1),
+            # axis_pin: a fixed offset on the pinned axis's logit (zero rows elsewhere), so
+            # the prior leans the row that way and the data can still move it.
+            logits = share_conc * (u + pt.as_tensor(float(pin_offset) * pin_onehot))
+            shares = pm.Deterministic("A_share", pt.special.softmax(logits, axis=1),
                                       dims=("bench", "latent"))
             size_mean = K * np.sqrt(2 / np.pi)
             r = pm.Gamma("A_size", alpha=PRIOR_SHARE_SIZE_SHAPE,

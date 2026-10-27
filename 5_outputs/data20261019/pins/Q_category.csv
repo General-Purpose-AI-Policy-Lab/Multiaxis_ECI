@@ -1,0 +1,73 @@
+benchmark,axis
+OTIS Mock AIME 2024-2025,1
+MATH Level 5,1
+FrontierMath Tier 4 v2,1
+GPQA Main Chemistry,1
+MMLU Pro Chemistry,1
+GSM8K,1
+WMDP Biology,1
+InterCode-CTF,3
+GPQA Diamond Chemistry,1
+MMLU Pro Biology,1
+WMDP Chemistry,1
+FrontierMath Tiers 1-3 v2,1
+CAISI SEC-Bench Pro,3
+BioLP-bench,1
+CyScenarioBench (Anthropic),3
+Aider Polyglot,2
+CAISI CTF-Archive,3
+GPQA Main Biology,1
+SpireClimb,2
+DeepSWE,2
+CAISI Cybench,3
+CAISI ExploitGym Userspace,3
+LAB-Bench Protocol,1
+MMLU Chemistry,1
+Terminal Bench 2.0,2
+Cybench,3
+SWE-Bench Pro V2,2
+CAISI CTF-Archive-Diamond,3
+CAISI OSS-Fuzz,3
+GPQA Diamond Biology,1
+LAB-Bench Cloning,1
+CyberGym,3
+LAB-Bench SeqQA,1
+WeirdML v2,2
+AISI CTF Suites - Practitioner,3
+WeirdML v3,2
+AISI Cyber Ranges - Cooling Tower,3
+AISI CTF Suites - Apprentice,3
+AISI CTF Suites - Technical Non-Expert,3
+MCP Atlas,2
+CAISI CVE-Bench,3
+The Agent Company,2
+MMLU Biology,1
+ProofBench,1
+AISI CTF Suites - Expert,3
+AISI Cyber Ranges - The Last Ones,3
+METR Time Horizons,2
+OSWorld 2.0,2
+ExploitBench,3
+LAB-Bench LitQA2,1
+SEAL Tool Use (Enterprise),2
+NL2Bash,3
+CyScenarioBench,3
+OEIS Open Lite,1
+Surface Evolver Bench,2
+OpenBookQA,4
+DrugDiscoveryBench,1
+FrontierMath Erdos,1
+TriviaQA,4
+WinoGrande,4
+GBAEval,2
+GSO-Bench,2
+MirrorCode,2
+FrontierCode,2
+CTI-REALM,3
+PostTrainBench v1.1,2
+FrontierSWE v2,2
+OSWorld,2
+SWE Atlas,2
+PIQA,4
+HellaSwag,4
+DeepResearch Bench,2

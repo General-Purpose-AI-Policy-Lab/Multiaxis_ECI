@@ -1,0 +1,108 @@
+benchmark,axis
+AISI CTF Suites - Apprentice,2
+AISI CTF Suites - Expert,3
+AISI CTF Suites - Practitioner,3
+AISI CTF Suites - Technical Non-Expert,3
+AISI Cyber Ranges - Cooling Tower,3
+AISI Cyber Ranges - The Last Ones,3
+APEX-Agents,2
+ARC AI2,4
+ARC-AGI,1
+ARC-AGI-2,1
+Aider Polyglot,2
+AudioMultiChallenge,1
+Balrog,4
+BioLP-bench,1
+BlueprintBench 2,3
+CAISI CTF-Archive,1
+CAISI CTF-Archive-Diamond,3
+CAISI CVE-Bench,3
+CAISI Cybench,1
+CAISI ExploitGym Userspace,1
+CAISI OSS-Fuzz,4
+CAISI SEC-Bench Pro,1
+CL-bench,3
+CL-bench Life,3
+CTI-REALM,4
+CadEval,2
+CritPt,1
+CyScenarioBench,3
+CyScenarioBench (Anthropic),3
+Cybench,3
+CyberGym,3
+DTBench,1
+DeepResearch Bench,2
+DeepSWE,2
+DrugDiscoveryBench,4
+EBR-bench,3
+EnigmaEval,1
+ExploitBench,3
+Fiction.LiveBench,1
+FrontierCode,2
+FrontierMath Erdos,3
+FrontierMath Tier 4 v2,1
+FrontierMath Tiers 1-3 v2,1
+FrontierSWE v2,3
+Furniture Assembly,3
+GBAEval,3
+GDP.pdf,1
+GDPval,3
+GPQA Diamond,1
+GPQA Diamond Biology,1
+GPQA Diamond Chemistry,1
+GPQA Main Biology,1
+GPQA Main Chemistry,1
+GSM8K,4
+GSO-Bench,3
+GeoBench,3
+HLE Diamond,4
+HellaSwag,4
+InterCode-CTF,4
+LAB-Bench Cloning,4
+LAB-Bench LitQA2,1
+LAB-Bench Protocol,4
+LAB-Bench SeqQA,1
+LMCA,3
+Lech Mazur Writing,3
+MATH Level 5,1
+MCP Atlas,2
+METR Time Horizons,3
+MMLU,4
+MMLU Biology,1
+MMLU Chemistry,1
+MMLU Pro Biology,1
+MMLU Pro Chemistry,1
+MMLU-Pro,4
+MirrorCode,3
+MultiChallenge,1
+MultiNRC,4
+Mystery Game Puzzles,4
+NL2Bash,3
+OEIS Open Lite,3
+OSWorld,2
+OSWorld 2.0,2
+OTIS Mock AIME 2024-2025,1
+OpenBookQA,4
+PIQA,4
+PostTrainBench v1.1,2
+ProofBench,3
+Remote Labor Index,3
+SEAL Tool Use (Enterprise),3
+SWE Atlas,2
+SWE-Bench Pro V2,1
+SimpleBench,4
+SimpleQA Verified,4
+SpireClimb,1
+Surface Evolver Bench,3
+Terminal Bench 2.0,3
+The Agent Company,3
+TriviaQA,4
+TutorBench,1
+VPCT,1
+Visual Task Assessment (VISTA),1
+VisualToolBench,1
+WMDP Biology,1
+WMDP Chemistry,1
+WeirdML v2,3
+WeirdML v3,3
+WinoGrande,4
