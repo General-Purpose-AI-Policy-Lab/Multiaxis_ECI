@@ -82,3 +82,16 @@ Mode A de la variante s = 2,5 (2 chaînes × 200 tirages) contre le mode A du fl
 - Sur les scores où l'estimation est fiable, la variante prédit moins bien, de 44 nats, soit environ 0,012 nat par score. La perte se concentre sur l'axe scientifique : OTIS AIME, CritPt, MATH Level 5, MMLU, ARC-AGI.
 - Sur tous les scores, c'est l'égalité. Mais ce total mêle les 1 797 scores non fiables du flagship, contre 671 seulement pour la variante, dont la structure plus simple rend la LOO bien mieux estimée.
 - Supprimer la compensation a donc un coût prédictif réel, mais modeste. C'est un choix d'interprétation des axes, pas un gain d'ajustement.
+
+## Explorer les postérieurs multimodaux (26–27 octobre)
+
+Dans les variantes à structure simple, le meilleur mode n'est atteint que par 2 chaînes sur 30 (s = 2,5) ou sur 50 (s = 5). Les modes diffèrent par l'axe dominant de 33 à 40 benchmarks sur 107 : ce sont des organisations entières des axes. Deux pistes justifiées, absentes de l'étude d'octobre, ont été testées. Les scripts sont dans `../traces_backup/less_comp_scripts/` (`cont*.py`, `mix*.py`).
+
+| piste | idée | résultat |
+|---|---|---|
+| Continuation sur la concentration, s = 0,9 → 1,2 → 1,5 → 1,9 → 2,5 (10 chaînes, environ 2 700 itérations) | Homotopie dans l'espace des modèles : on part du postérieur mou, proche du flagship, et la vraisemblance reste entière à chaque palier. | 0/10 chaînes à moins de 10 nats du meilleur mode, contre 2/30 pour NUTS seul ; meilleure chaîne à −71. Les chaînes réorganisent leurs axes à chaque palier (31 à 54 benchmarks changent d'axe) : c'est une transition de phase, comme pour le recuit. |
+| Axe de chaque benchmark marginalisé (option expérimentale `axis_mixture`, 10 chaînes, 1 500 + 300 itérations) | Between-item strict à matrice Q inconnue, l'affectation sommée dans la vraisemblance (Rao-Blackwell). | Log-densités étalées sur 330 nats ; 21 à 49 affectations diffèrent entre chaînes, chacune sûre des siennes (probabilité médiane de l'axe le plus probable : 0,92 à 1,00). L'ajustement est bien moins bon que s = 2,5. L'affectation suit la configuration des abilities de chaque chaîne : la barrière est dans l'orientation des axes. |
+
+Conclusion : comme les méthodes de l'étude d'octobre, ni l'une ni l'autre ne bat NUTS seul. Rien dans les données ne fixe l'orientation des axes. La piste standard qui reste serait de l'ancrer par le contenu : BSEM de Muthén & Asparouhov (2012), avec un axe principal par benchmark fixé par jugement et des chargements croisés à prior de petite variance.
+
+**Décision (27 octobre, utilisateur) :** la piste est arrêtée et le flagship actuel est conservé. L'option expérimentale `axis_mixture` n'a pas été gardée dans le code ; `--theta-general`, `--simple-structure` et `--share-conc` restent comme options d'exploration.
