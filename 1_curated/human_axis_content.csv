@@ -115,3 +115,12 @@ Commonsense & Factual Knowledge,InterCode-CTF,no,2026-10-21 user,security captur
 Scientific Knowledge & Reasoning,SpireClimb,no,2026-10-21 user,card game played through screenshots
 Visual & Commonsense,PIQA,yes,2026-10-21 user,physical commonsense
 Visual & Commonsense,WinoGrande,yes,2026-10-21 user,commonsense pronoun resolution
+Cyber & Expert-Level Tasks,Cybench,yes,2026-10-27 claude (validated by the user),capture-the-flag tasks
+Cyber & Expert-Level Tasks,LMCA,yes,2026-10-27 claude (validated by the user),"grading arguments against expert ratings: expert-level judgment"
+Cyber & Expert-Level Tasks,METR Time Horizons,yes,2026-10-27 claude (validated by the user),"long autonomous software tasks: long-horizon expert work"
+Cyber & Expert-Level Tasks,FrontierMath Erdos,yes,2026-10-27 claude (validated by the user),"open research problems, the archetype of an expert-level task (expert score 0.00, consistent with LMCA's 0.87: placed at 4.6 on the rotated mode A, the expert is predicted 0.03 on Erdos)"
+Cyber & Expert-Level Tasks,EBR-bench,yes,2026-10-27 claude (validated by the user),"a plausible link (long-horizon agentic game play), as under Agentic & Cyber Capabilities"
+Cyber & Expert-Level Tasks,BlueprintBench 2,no,2026-10-27 claude (validated by the user),floor plans from photos (spatial reasoning)
+Cyber & Expert-Level Tasks,Furniture Assembly,no,2026-10-27 claude (validated by the user),"assembly from photos of IKEA builds; the axis's purest row, but not expert-level work by content"
+Cyber & Expert-Level Tasks,GeoBench,no,2026-10-27 claude (validated by the user),geolocating photos
+Cyber & Expert-Level Tasks,TriviaQA,no,2026-10-27 claude (validated by the user),trivia recall

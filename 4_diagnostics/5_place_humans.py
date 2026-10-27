@@ -45,6 +45,9 @@ from multiaxis_eci.analysis.human_placement import SECONDARY_DIR  # noqa: E402
 # Axis titles of exploration fits that borrow the flagship axes' content judgments
 # (1_curated/human_axis_content.csv): semicomp0 mode A, named by the user on 2026-10-08.
 RULE_TITLES = {
+    # The geomin-rotated / pinned frame's axis 2 (named by the user on 2026-10-27) is the
+    # flagship's agentic axis under another name; its axis 3 has judgments of its own.
+    "Agentic Programming & Computer Use": "Agentic Capabilities & Programming",
     "Cyber Capabilities & Reasoning": "Cyber Capabilities",
     "Fluid Intelligence & Mathematics": "Fluid Intelligence & Formal Sciences",
     "Scientific Knowledge": "Scientific Knowledge & Reasoning",
