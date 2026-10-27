@@ -2760,7 +2760,8 @@ class TestFitSpec:
     ])
     def test_tag_round_trips_through_parse_tag(self, kwargs):
         from multiaxis_eci.analysis.fitspec import _parse_tag
-        prereq = {"lineage_bm": {"lineage_prior": True}, "effort_means": {"lineage_prior": True}}
+        prereq = {"lineage_bm": {"lineage_prior": True}, "effort_means": {"lineage_prior": True},
+                  "general_sums": {"loading_prior": "bifactor"}}
         for f in list(kwargs):
             kwargs.update(prereq.get(f, {}))
         spec = analysis.FitSpec(K=2, **kwargs)

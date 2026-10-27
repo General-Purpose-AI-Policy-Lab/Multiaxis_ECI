@@ -38,6 +38,7 @@ from multiaxis_eci.config import (
     DEFAULT_PIN_OFFSET,
     PRIOR_SHARE_CONC,
     PRIOR_SHARE_SIZE_SHAPE,
+    PRIOR_GENERAL_SUMS_SD,
     PRIOR_THETA_GENERAL,
     PRIOR_THETA_SKEW_ALPHA,
     PRIOR_THETA_T_NU,
@@ -130,7 +131,8 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
                     theta_skew: bool = False,
                     lineage_links: bool = True,
                     effort_means: bool = False,
-                    theta_general: bool = False):
+                    theta_general: bool = False,
+                    general_sums: bool = False):
     """Stitch the structured theta blocks and the unstructured rows into ONE
     ZeroSumNormal.
 
@@ -207,6 +209,18 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
     the expectation of the others instead. In the skew-normal block g is Gaussian and u the
     skew-normal cells; in the Gaussian blocks the mix is a Cholesky factor (`_general_mix`).
     The marginals keep unit variance.
+
+    general_sums: every block above is built in (g, z) coordinates, column 0 being a general
+    level g and columns 1..K-1 deviations z_k, and the reported (likelihood-side) ability is
+
+        theta[:, 0] = g,    theta[:, k] = g + sigma_k * z_k
+
+    with sigma_k learned (`theta_dev_sd`, config.PRIOR_GENERAL_SUMS_SD). Each block keeps its own
+    prior in those coordinates: the lineage drift is HalfNormal on g and on every z_k, so axis k
+    climbs at mu_0 + sigma_k mu_k >= mu_0 along a chain, and a HalfNormal human step stays a
+    non-negative step on every axis. Under the bifactor loadings (g dense, the deviations' axes
+    sparse) this is the bifactor whose general loading is never negative once written on the
+    reported axes; see build_mirt_model.
     """
     if theta_t_cells and theta_skew:
         raise ValueError("theta_t_cells and theta_skew both replace the exchangeable "
@@ -229,6 +243,10 @@ def _assemble_theta(n_models: int, K: int, human_struct=None,
 
     def finish(theta_mk):
         """Both assembly paths end here so the trend is added exactly once."""
+        if general_sums:
+            sd = pm.LogNormal("theta_dev_sd", **PRIOR_GENERAL_SUMS_SD, shape=K - 1)
+            g = theta_mk[:, :1]
+            theta_mk = pt.concatenate([g, g + theta_mk[:, 1:] * sd[None, :]], axis=1)
         return pm.Deterministic("theta",
                                 theta_mk if shift is None else theta_mk + shift,
                                 dims=("model", "latent"))
@@ -694,6 +712,7 @@ def build_mirt_model(data: ECIData, K: int,
                       theta_t_cells: bool = False,
                       theta_skew: bool = False,
                       theta_general: bool = False,
+                      general_sums: bool = False,
                       simple_structure: bool = False,
                       share_conc: float | None = None,
                       axis_pin: dict | None = None,
@@ -845,6 +864,14 @@ def build_mirt_model(data: ECIData, K: int,
     Benchmarks missing from the dict are left unpinned.
     theta_general: a higher-order general level under the axes, which correlates every
     per-axis innovation of a test-taker (see _assemble_theta, config.PRIOR_THETA_GENERAL).
+    general_sums: with the "bifactor" loadings, the reported axes are g and g + sigma_k z_k
+    (see _assemble_theta), so a benchmark reads eta = a_0 g + sum_k a_k (g + sigma_k z_k) - D
+    with every a >= 0. Written back on (g, z) this is a bifactor with general loading
+    a_0 + sum_k a_k >= sum_k B_k / sigma_k, B_k = sigma_k a_k its loading on z_k: the bifactor
+    restricted to benchmarks that are positive mixes of the reported axes, where the free
+    bifactor lets a benchmark rise less with g than its axes do (a contrast against g). A
+    benchmark on axis k alone sees g + sigma_k z_k, so the reported axis needs no post-hoc
+    unit for the deviation, and it climbs with g (the lineage drift is HalfNormal on both).
     theta_skew: the same block (unstructured rows plus human-root/chain-founder
     slices) independent skew-normal per axis, standardised, with a learned shape
     alpha_k ~ Normal(0, config.PRIOR_THETA_SKEW_ALPHA) (see _theta_skew_cells).
@@ -1042,6 +1069,12 @@ def build_mirt_model(data: ECIData, K: int,
                 f"loading_prior='bifactor' needs K >= 2 (one general column "
                 f"plus at least one specific); got K={K}. For a single general "
                 f"column use loading_prior='normal'.")
+    if general_sums and loading_prior != "bifactor":
+        raise ValueError("general_sums writes the axes as g plus deviations under the bifactor "
+                         f"loadings (g dense, deviations sparse); not {loading_prior!r}")
+    if general_sums and theta_general:
+        raise ValueError("general_sums and theta_general both put a general level under the "
+                         "axes; pick one")
     if loading_prior == "signed" and anchors:
         raise ValueError(
             "loading_prior='signed' relies on the loadings being EXACTLY "
@@ -1247,7 +1280,8 @@ def build_mirt_model(data: ECIData, K: int,
             variant_offsets=variant_offsets,
             shared_base_zsn=shared_base_zsn, time_t=time_t,
             theta_t_cells=theta_t_cells, theta_skew=theta_skew, lineage_links=lineage_links,
-            effort_means=effort_means, theta_general=theta_general)
+            effort_means=effort_means, theta_general=theta_general,
+            general_sums=general_sums)
         # Likelihood-side ability. Raw theta stays the reported ability (it
         # carries the location pin and the order structure); the positive copy
         # is what eta reads, so with A >= 0 an axis can only add to a score,

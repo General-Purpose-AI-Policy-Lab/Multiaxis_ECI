@@ -279,9 +279,11 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
     spec = FitSpec.from_trace(az.InferenceData(posterior=post_all), trace_path)
     if spec.time_prior or spec.theta_pos or spec.theta_t \
             or spec.link not in ("linear", "semicomp", "noncomp", "semicomp0") \
-            or spec.known_se or spec.censor_bounds or not spec.lineage_bm or spec.private_bases:
+            or spec.known_se or spec.censor_bounds or not spec.lineage_bm or spec.private_bases \
+            or spec.general_sums:
         # private_bases: the founders' bases are private Normal(0, 1), not the exchangeable
-        # block's cells `block_priors` gives them
+        # block's cells `block_priors` gives them; general_sums: the blocks live in (g, z)
+        # coordinates, theta is their image (not covered yet)
         raise SystemExit("integrated_loo covers the flagship's specification only")
     data, floor_c, _ = spec.load_data(az.InferenceData(posterior=post_all))
     # the map the trace was sampled with (frozen beside it), its chains checked against the trace

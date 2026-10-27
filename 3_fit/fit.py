@@ -162,8 +162,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                 ceiling_noise=False, known_se=False, censor_eps=None,
                 binomial_n=None, pooled_noise=False, sigma_b_floor=0.0, shared_base_zsn=True,
                 time_t=None,
-                theta_t_cells=False, theta_skew=False, theta_general=False, simple_structure=False,
-                share_conc=None, axis_pin=None, pin_offset=None,
+                theta_t_cells=False, theta_skew=False, theta_general=False, general_sums=False,
+                simple_structure=False, share_conc=None, axis_pin=None, pin_offset=None,
                 theta_pos=False,
                 link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None,
@@ -199,6 +199,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
         tag += ", skew-normal theta"
     if theta_general:
         tag += ", higher-order general level"
+    if general_sums:
+        tag += ", axes = g + deviations"
     if simple_structure:
         tag += ", soft simple structure"
         if axis_pin:
@@ -227,7 +229,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                              pooled_noise=pooled_noise, sigma_b_floor=sigma_b_floor,
                              shared_base_zsn=shared_base_zsn,
                              time_t=time_t, theta_t_cells=theta_t_cells, theta_skew=theta_skew,
-                             theta_general=theta_general, simple_structure=simple_structure,
+                             theta_general=theta_general, general_sums=general_sums,
+                             simple_structure=simple_structure,
                              share_conc=share_conc,
                              **({"axis_pin": axis_pin, "pin_offset": pin_offset} if axis_pin
                                 else {}),
@@ -798,7 +801,8 @@ def run_exploration(args, parser) -> None:
         # Axis identity is structural here (axis1 IS the general column), so
         # name the axes on the trace and let every plot label them.
         attrs["mirt_axis_names"] = json.dumps(
-            ["g"] + [f"specific{k}" for k in range(1, args.K)])
+            ["g"] + [f"g+specific{k}" if spec.general_sums else f"specific{k}"
+                     for k in range(1, args.K)])
     if args.private_bases:
         attrs["mirt_shared_base_zsn"] = json.dumps(False)
     if args.theta_t:
@@ -807,6 +811,8 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_theta_skew"] = json.dumps(True)
     if spec.theta_general:
         attrs["mirt_theta_general"] = json.dumps(True)
+    if spec.general_sums:
+        attrs["mirt_general_sums"] = json.dumps(True)
     if spec.simple_structure:
         attrs["mirt_simple_structure"] = json.dumps(True)
     if spec.share_conc is not None:
@@ -878,6 +884,7 @@ def run_exploration(args, parser) -> None:
                                   theta_t_cells=spec.theta_t,
                                   theta_skew=spec.theta_skew,
                                   theta_general=spec.theta_general,
+                                  general_sums=spec.general_sums,
                                   simple_structure=spec.simple_structure,
                                   share_conc=spec.share_conc,
                                   axis_pin=axis_pin, pin_offset=spec.pin_offset,
@@ -1213,6 +1220,12 @@ def main():
                              "learned). A model strong on one axis is then expected strong on "
                              "the others, instead of being pulled down there by the "
                              "compensatory sum (explaining away). Emits `_general`")
+    parser.add_argument("--general-sums", action="store_true",
+                        help="[exploration] with --loading-prior bifactor: the reported axes are "
+                             "g and g + sigma_k z_k (sigma_k learned, "
+                             "config.PRIOR_GENERAL_SUMS_SD), so every benchmark is a positive mix "
+                             "of axes that all climb with g; the bifactor whose general loading "
+                             "is never negative on those axes. Emits `_gsum`")
     parser.add_argument("--simple-structure", action="store_true",
                         help="[exploration] soft between-item structure of the loadings: each "
                              "benchmark's row is a size times simplex shares softmax(s * u_b) "

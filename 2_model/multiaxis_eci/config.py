@@ -317,6 +317,13 @@ PRIOR_THETA_SKEW_ALPHA = 4.0
 # independent axes of the flagship; 1, a single axis), mean 0.5.
 PRIOR_THETA_GENERAL = (2.0, 2.0)
 
+# Axes as sums of a general level and deviations (models/mirt.py, build_mirt_model(...,
+# general_sums=True); `--general-sums`, exploration, on the bifactor loadings): axis 1 IS g and axis
+# k >= 2 is g + sigma_k * z_k. sigma_k ~ LogNormal(mu, sigma), median 1: two axes then correlate at
+# 1 / (1 + sigma^2) = 0.5 a priori, inside the flagship's 0.23-0.64 between its axes; no mass at 0,
+# where the axes would collapse onto g and the loadings lose their identification.
+PRIOR_GENERAL_SUMS_SD = dict(mu=0.0, sigma=0.5)
+
 # Soft simple structure of the loadings (models/mirt.py, build_mirt_model(..., simple_structure=True);
 # `--simple-structure`, exploration): A_b = tau_A * r_b * softmax(s * u_b). The concentration s is
 # LogNormal, median 2 (a typical row then gives about two thirds of its weight to one axis at K=4),
