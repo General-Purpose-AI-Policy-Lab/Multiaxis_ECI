@@ -29,7 +29,7 @@ def test_content_file_parses_and_names_known_axes():
                    "Scientific Knowledge",
                    # the geomin-rotated / pinned frame (2026-10-27) and the K=4 bifactor (10-28)
                    "Cyber & Expert-Level Tasks", "General Capabilities (g)",
-                   "Mixed (Visual, Trivia, Cyber)"}
+                   "Mixed (Visual, Trivia, Cyber)", "Reasoning & Programming"}
     assert flagship <= set(rules) <= flagship | exploration
 
 
