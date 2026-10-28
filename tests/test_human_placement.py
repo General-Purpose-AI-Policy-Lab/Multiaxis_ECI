@@ -26,7 +26,10 @@ def test_content_file_parses_and_names_known_axes():
     # an exploration fit's own titles (semicomp0 mode A, 2026-10-08) borrow the flagship's
     # judgments through 5_place_humans.RULE_TITLES
     exploration = {"Cyber Capabilities & Reasoning", "Fluid Intelligence & Mathematics",
-                   "Scientific Knowledge"}
+                   "Scientific Knowledge",
+                   # the geomin-rotated / pinned frame (2026-10-27) and the K=4 bifactor (10-28)
+                   "Cyber & Expert-Level Tasks", "General Capabilities (g)",
+                   "Mixed (Visual, Trivia, Cyber)"}
     assert flagship <= set(rules) <= flagship | exploration
 
 

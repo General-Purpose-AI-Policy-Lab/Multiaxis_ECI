@@ -124,3 +124,17 @@ Cyber & Expert-Level Tasks,BlueprintBench 2,no,2026-10-27 claude (validated by t
 Cyber & Expert-Level Tasks,Furniture Assembly,no,2026-10-27 claude (validated by the user),"assembly from photos of IKEA builds; the axis's purest row, but not expert-level work by content"
 Cyber & Expert-Level Tasks,GeoBench,no,2026-10-27 claude (validated by the user),geolocating photos
 Cyber & Expert-Level Tasks,TriviaQA,no,2026-10-27 claude (validated by the user),trivia recall
+General Capabilities (g),BlueprintBench 2,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),Cybench,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),EBR-bench,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),FrontierMath Erdos,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),FrontierMath Tiers 1-3 v2,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),Furniture Assembly,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),LMCA,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),METR Time Horizons,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),OSWorld,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),The Agent Company,yes,2026-10-28 user,a general-capability axis links to every task by content
+General Capabilities (g),VPCT,yes,2026-10-28 user,a general-capability axis links to every task by content
+"Mixed (Visual, Trivia, Cyber)",GeoBench,yes,2026-10-28 claude (from the user's axis name),geolocating photos: the axis's visual part
+"Mixed (Visual, Trivia, Cyber)",SpireClimb,yes,2026-10-28 claude (from the user's axis name),game played through screenshots: the axis's visual part
+"Mixed (Visual, Trivia, Cyber)",TriviaQA,yes,2026-10-28 claude (from the user's axis name),trivia recall: the axis's trivia part
