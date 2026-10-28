@@ -168,7 +168,7 @@ def test_block_predictive_general_prior_matches_grid(n_scores, child):
     np.testing.assert_allclose(approx, exact, atol=0.08)
 
 
-def _toy_lineage_fit(general: bool, rng):
+def _toy_lineage_fit(general: bool, rng, general_sums: bool = False):
     """A K=2 Brownian-lineage MIRT on seven test-takers: chain c0 founder -> n1 -> n2, chain c1
     founder -> n4, and two models outside the chains, every one scored on three benchmarks.
     Returns the PyMC model, the data and the lineage structure."""
@@ -200,25 +200,30 @@ def _toy_lineage_fit(general: bool, rng):
         founder_date=np.array(["2024-01-01", "2024-06-01"], dtype="datetime64[D]"),
         n_chains=2, n_nodes=5, n_deltas=3, n_groups=5, chain_names=["c0", "c1"])
     model = build_mirt_model(data, 2, lineage=lin, lineage_bm=True, theta_skew=True,
-                             theta_general=general)
+                             theta_general=general, general_sums=general_sums,
+                             **({"loading_prior": "bifactor"} if general_sums else {}))
     return model, data, lin
 
 
-@pytest.mark.parametrize("general", [False, True], ids=["skew-normal", "higher-order"])
-def test_block_priors_match_the_model(general):
+@pytest.mark.parametrize("general, general_sums", [(False, False), (True, False), (False, True)],
+                         ids=["skew-normal", "higher-order", "general-sums"])
+def test_block_priors_match_the_model(general, general_sums):
     """Each block's conditional prior in `block_priors` is the PyMC model's own: moving a block
     while every other parameter stays put (the release levels of its parent and children
     included) changes the model's prior log-density exactly as the block's Gaussian and
     skew-normal factors say, and changes the abilities of the block's scores only. Under the
     skew-normal block a chain founder has no incoming step (it took a spurious one from the last
-    node of the map until 2026-10-26, which this test would have caught)."""
+    node of the map until 2026-10-26, which this test would have caught). Under --general-sums
+    the blocks are moved in their (g, z) coordinates, and the numpy likelihood, read through
+    A T, is the model's own."""
     rng = np.random.default_rng(3)
-    model, data, lin = _toy_lineage_fit(general, rng)
+    model, data, lin = _toy_lineage_fit(general, rng, general_sums)
     point = {k: v + rng.normal(0, 0.7, np.shape(v)) for k, v in model.initial_point().items()}
     if "theta_skew_alpha" in point:
         point["theta_skew_alpha"] = np.array([-4.0, 2.5])
     names = ["A", "theta", "D", "phi_b", "theta_skew_alpha", "lin_base", "lin_delta_z",
-             "lin_drift", "lin_spread"] + (["theta_general_lambda"] if general else [])
+             "lin_drift", "lin_spread"] + (["theta_general_lambda"] if general else []) \
+        + (["theta_dev_sd"] if general_sums else [])
     # the variables as functions of the point (left as random variables they would be drawn)
     evaluate = model.compile_fn(model.replace_rvs_by_values([model[v] for v in names]),
                                 inputs=model.value_vars, on_unused_input="ignore")
@@ -233,7 +238,9 @@ def test_block_priors_match_the_model(general):
 
     v0 = values(point)
     f = _il.assemble_fit(lambda v: None if v not in v0 else np.asarray(v0[v])[None], 1, data,
-                         lin, np.array([], dtype=int), None, None, general=general)
+                         lin, np.array([], dtype=int), None, None, general=general,
+                         general_sums=general_sums)
+    np.testing.assert_allclose(_il.conditional_loglik(f).sum(), logp_obs(point), atol=1e-6)
     parent, d_in, children = _il.lineage_graph(lin)
     lam = v0["theta_general_lambda"] if general else np.zeros(2)
     L = np.linalg.cholesky(np.outer(lam, lam) + np.diag(1 - lam ** 2))

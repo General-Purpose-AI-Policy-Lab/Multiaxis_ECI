@@ -25,7 +25,10 @@ the draw's alpha, and a founder no incoming step (until 2026-10-26 it took a spu
 last node of the map: about 2,900 nats on a chain of the 2026-10-19 flagship). Under the
 higher-order prior (--theta-general) the steps are correlated across axes and a cell is
 lambda g + sqrt(1 - lambda^2) s, integrated as (s, g) (`block_priors`). Under --ceiling-noise the
-curve stops at the draw's ceilings, mu = c + (d - c) sigmoid(eta). Each block's prior is checked
+curve stops at the draw's ceilings, mu = c + (d - c) sigmoid(eta). Under --general-sums every block
+is built in (g, z) and the reported ability is its image theta = T x (theta_0 = g, theta_k =
+g + sigma_k z_k): the blocks are integrated in x, where their priors are the ones above, and
+the scores see them through the loadings A T. Each block's prior is checked
 against the PyMC model's own (tests/test_integrated_loo.py).
 For each draw, the block's conditional posterior (prior times every score of the block) is
 approximated by a Laplace fit; removing score i gives its cavity Gaussian in closed form, and
@@ -279,11 +282,9 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
     spec = FitSpec.from_trace(az.InferenceData(posterior=post_all), trace_path)
     if spec.time_prior or spec.theta_pos or spec.theta_t \
             or spec.link not in ("linear", "semicomp", "noncomp", "semicomp0") \
-            or spec.known_se or spec.censor_bounds or not spec.lineage_bm or spec.private_bases \
-            or spec.general_sums:
+            or spec.known_se or spec.censor_bounds or not spec.lineage_bm or spec.private_bases:
         # private_bases: the founders' bases are private Normal(0, 1), not the exchangeable
-        # block's cells `block_priors` gives them; general_sums: the blocks live in (g, z)
-        # coordinates, theta is their image (not covered yet)
+        # block's cells `block_priors` gives them
         raise SystemExit("integrated_loo covers the flagship's specification only")
     data, floor_c, _ = spec.load_data(az.InferenceData(posterior=post_all))
     # the map the trace was sampled with (frozen beside it), its chains checked against the trace
@@ -299,16 +300,27 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
 
     soft = trace_softmin(p)
     return assemble_fit(get, S, data, lin, human_rows, floor_c, spec.binomial_n(data),
-                        general=spec.theta_general, soft=soft)
+                        general=spec.theta_general, soft=soft, general_sums=spec.general_sums)
 
 
 def assemble_fit(get, S: int, data, lin, human_rows, floor_c, binomial_n, general: bool = False,
-                 soft=None) -> dict:
+                 soft=None, general_sums: bool = False) -> dict:
     """The arrays the integrated LOO reads, from `get(name)` -> (S, ...) draws of a model
     variable (None when absent): the trace's posterior in `load_fit`, a point of the PyMC model
     in the tests. The release levels psi are rebuilt from the lineage variables as
-    models/mirt._lineage_block builds them."""
+    models/mirt._lineage_block builds them. Under general_sums `theta` and `A` are returned in
+    the blocks' (g, z) coordinates: x = T^-1 theta and A T, so eta = A theta - D is unchanged."""
     A, theta, D, phi = get("A"), get("theta"), get("D"), get("phi_b")
+    if general_sums:
+        # theta = T x, T = [[1, 0], [1, diag(sigma)]] (models/mirt._assemble_theta)
+        if soft is not None:
+            raise SystemExit("integrated_loo: --general-sums on a softmin link is not covered")
+        K = A.shape[2]
+        T = np.zeros((S, K, K))
+        T[:, :, 0] = 1.0
+        T[:, 1:, 1:] = get("theta_dev_sd")[:, :, None] * np.eye(K - 1)
+        A = np.einsum("sbk,skl->sbl", A, T)
+        theta = np.einsum("skl,snl->snk", np.linalg.inv(T), theta)
     ceil = get("ceiling_d")
     ceil = np.ones_like(D) if ceil is None else ceil
     skew = None
