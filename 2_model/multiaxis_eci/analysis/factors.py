@@ -60,15 +60,16 @@ def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     None = auto: rank-track unless the trace carries an anchor map (anchored
     fits have pre-identified axes — see `trace_anchors` / `canonicalize_factors`),
     is a signed-free fit (align_rotations owns the permutation there; the
-    energy ranking would scramble axes before alignment sees them), or is a
-    bifactor fit (axis1 is the general column BY CONSTRUCTION — ranking by
-    energy could demote it, and the specifics are near-tied by design, so
-    per-draw ranking would shuffle them).
+    energy ranking would scramble axes before alignment sees them). A bifactor
+    fit keeps axis1, the general column BY CONSTRUCTION (ranking by energy could
+    demote it), and tracks only its specifics, which are exchangeable and land
+    in a different order in each chain (until 2026-10-28 they were pooled
+    untracked, so two displayed specifics could average the same pair of real
+    ones and correlate at 1.00).
     """
     if rank_track is None:
         rank_track = (not trace_anchors(trace)
-                      and trace_loading_prior(trace)
-                      not in ("signed", "bifactor"))
+                      and trace_loading_prior(trace) != "signed")
     A = trace.posterior["A"].values
     theta = trace.posterior["theta"].values
     tau = trace.posterior["tau_A"].values
@@ -76,7 +77,8 @@ def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     A = A.reshape(S, A.shape[2], A.shape[3])
     theta = theta.reshape(S, theta.shape[2], theta.shape[3])
     tau = tau.reshape(S, tau.shape[2])
-    return canonicalize_factors(A, theta, tau, rank_track=rank_track)
+    return canonicalize_factors(A, theta, tau, rank_track=rank_track,
+                                fixed_first=trace_loading_prior(trace) == "bifactor")
 
 
 def tau_spectrum_df(tau_canon: np.ndarray) -> pd.DataFrame:

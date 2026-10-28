@@ -51,7 +51,8 @@ def _collinearity_permutations(A: np.ndarray, iters: int = 5) -> np.ndarray:
 def canonicalize_factors(A_draws: np.ndarray,
                          theta_draws: np.ndarray,
                          tau_draws: np.ndarray,
-                         rank_track: bool = True):
+                         rank_track: bool = True,
+                         fixed_first: bool = False):
     """Track the axes of a non-negative MIRT factor posterior across draws (permutation fix).
 
     Parameters
@@ -62,6 +63,8 @@ def canonicalize_factors(A_draws: np.ndarray,
     rank_track  : if True (default), give each axis one identity across draws, then number
         the axes from the strongest. Set False for ANCHORED fits, where axis identity is
         already pinned by the anchors.
+    fixed_first : keep axis 1 where it is and track only axes 2..K (the bifactor: g is
+        column 1 by construction, the specifics are exchangeable and permute across chains).
 
     Identity is collinearity: each draw's axes are permuted so that its loading columns line up
     with a common reference (`_collinearity_permutations`), and the aligned axes are then
@@ -80,6 +83,11 @@ def canonicalize_factors(A_draws: np.ndarray,
 
     if not rank_track or A.shape[2] < 2:
         return A, theta, tau
+    if fixed_first:
+        A_s, theta_s, tau_s = canonicalize_factors(A[:, :, 1:], theta[:, :, 1:], tau[:, 1:])
+        return (np.concatenate([A[:, :, :1], A_s], axis=2),
+                np.concatenate([theta[:, :, :1], theta_s], axis=2),
+                np.concatenate([tau[:, :1], tau_s], axis=1))
 
     perm = _collinearity_permutations(A)                       # (S, K)
     A = np.take_along_axis(A, perm[:, None, :], axis=2)

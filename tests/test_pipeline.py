@@ -1487,6 +1487,31 @@ class TestMIRT:
         assert (groups == groups[0]).all(), "every draw files each group on the same axis"
         assert list(groups[0]) == [3, 2, 1, 0], "axes numbered from the strongest"
 
+    def test_fixed_first_tracks_the_bifactor_specifics_and_keeps_g(self):
+        """A bifactor's g is column 1 and stays there even when it is the weakest column; its
+        specifics land in a different order per chain and are tracked like the normal prior's
+        axes (until 2026-10-28 they were pooled untracked)."""
+        rng = np.random.default_rng(11)
+        S, M, K, per = 30, 5, 4, 6
+        base = np.zeros((K * per, K))
+        base[:, 0] = 0.3                                   # g: dense, weak
+        for k in range(1, K):                              # one benchmark group per specific
+            base[k * per:(k + 1) * per, k] = 1.0 + 0.1 * k
+        A = np.empty((S, K * per, K))
+        th = rng.normal(size=(S, M, K))
+        for s_ in range(S):
+            p = np.r_[0, 1 + rng.permutation(K - 1)]
+            A[s_] = (base + np.abs(rng.normal(0, 0.05, base.shape)))[:, p]
+            th[s_] = th[s_][:, p]
+        tau = np.full((S, K), 0.8)
+        A2, th2, _ = canonicalize_factors(A, th, tau, fixed_first=True)
+        assert np.allclose(_eta(A2, th2), _eta(A, th))
+        assert np.array_equal(A2[:, :, 0], A[:, :, 0]), "g never moves"
+        groups = np.array([[int(np.argmax(A2[s_, k * per:(k + 1) * per, 1:].sum(0)))
+                            for k in range(1, K)] for s_ in range(S)])
+        assert (groups == groups[0]).all(), "every draw files each group on the same specific"
+        assert list(groups[0]) == [2, 1, 0], "specifics numbered from the strongest"
+
     def test_rank_track_false_is_identity(self):
         rng = np.random.default_rng(0)
         A = np.abs(rng.normal(size=(3, 4, 2)))
