@@ -28,17 +28,21 @@ def test_content_file_parses_and_names_known_axes():
     exploration = {"Cyber Capabilities & Reasoning", "Fluid Intelligence & Mathematics",
                    "Scientific Knowledge",
                    # the geomin-rotated / pinned frame (2026-10-27) and the K=4 bifactor (10-28)
-                   "Cyber & Expert-Level Tasks", "General Capabilities (g)",
+                   "Cyber & Expert-Level Tasks",
                    "Mixed (Visual, Trivia, Cyber)", "Reasoning & Programming",
-                   # the K=4 variant renamed from collinearity (2026-10-29)
-                   "Desk Research, Trivia & Commonsense"}
+                   # the K=4 bifactor fits renamed from collinearity (2026-10-29), g kept as General
+                   # Capabilities with its notable parts
+                   "Desk Research, Trivia & Commonsense",
+                   "General Capabilities (Agentic, Cyber & SWE)",
+                   "General Capabilities (Math, Science & Cyber)"}
     assert flagship <= set(rules) <= flagship | exploration
 
 
 def test_a_tier_row_takes_one_tier_off_and_leaves_the_pair_judged():
     rules, off = hp.content_rules(), hp.tier_exclusions()
-    assert rules["General Capabilities (g)"]["MMLU"] is True
-    assert ("MMLU", "Average Human") in off["General Capabilities (g)"]
+    assert rules["General Capabilities (Math, Science & Cyber)"]["MMLU"] is True
+    assert ("MMLU", "Average Human") in off["General Capabilities (Math, Science & Cyber)"]
+    assert "General Capabilities (Agentic, Cyber & SWE)" not in off
 
 
 def test_drawn_tiers_own_score_or_sandwich():
