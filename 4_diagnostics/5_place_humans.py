@@ -51,6 +51,11 @@ RULE_TITLES = {
     "Cyber Capabilities & Reasoning": "Cyber Capabilities",
     "Fluid Intelligence & Mathematics": "Fluid Intelligence & Formal Sciences",
     "Scientific Knowledge": "Scientific Knowledge & Reasoning",
+    # The K=4 --general-sums variant's displayed axes are g plus a specific (user, 2026-10-29):
+    # each keeps the judgments of its specific's own title.
+    "General Capabilities + Desk Research, Trivia & Commonsense": "Desk Research, Trivia & Commonsense",
+    "General Capabilities + Agentic & Cyber Capabilities": "Agentic & Cyber Capabilities",
+    "General Capabilities + Commonsense & Factual Knowledge": "Commonsense & Factual Knowledge",
 }
 
 
