@@ -163,8 +163,8 @@ General Capabilities (g),Visual Task Assessment (VISTA),yes,2026-10-28 user,a ge
 General Capabilities (g),WMDP Biology,yes,2026-10-28 user,a general-capability axis links to every task by content
 General Capabilities (g),WMDP Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content
 General Capabilities (g),WinoGrande,yes,2026-10-28 user,a general-capability axis links to every task by content
-Reasoning & Programming,PIQA,yes,2026-10-28 claude (to validate),physical commonsense reasoning
-Reasoning & Programming,SimpleBench,yes,2026-10-28 claude (to validate),trick reasoning questions
+Reasoning & Programming,PIQA,no,2026-10-29 user,physical commonsense reasoning
+Reasoning & Programming,SimpleBench,no,2026-10-29 user,trick reasoning questions
 Reasoning & Programming,TriviaQA,no,2026-10-28 claude (to validate),trivia recall: neither reasoning nor programming
 Agentic & Cyber Capabilities,HellaSwag,no,2026-10-28 claude (to validate),commonsense sentence completion: no agentic or cyber content
-Commonsense & Factual Knowledge,GeoBench,yes,2026-10-28 claude (to validate),geolocating photos draws on world knowledge
+Commonsense & Factual Knowledge,GeoBench,no,2026-10-29 user,geolocating photos
