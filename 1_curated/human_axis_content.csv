@@ -169,3 +169,6 @@ Reasoning & Programming,TriviaQA,no,2026-10-28 claude (to validate),trivia recal
 Agentic & Cyber Capabilities,HellaSwag,no,2026-10-28 claude (to validate),commonsense sentence completion: no agentic or cyber content,
 Commonsense & Factual Knowledge,GeoBench,no,2026-10-29 user,geolocating photos,
 General Capabilities (g),MMLU,no,2026-10-29 user,"the Average Human's 0.34 (non-expert crowd workers) splits the g placement in two against ARC-AGI and ARC-AGI-2 (r-hat 1.74, 1.00 without it); the other tiers keep MMLU",Average Human
+"Desk Research, Trivia & Commonsense",TriviaQA,yes,2026-10-29 user,trivia recall,
+"Desk Research, Trivia & Commonsense",SimpleBench,yes,2026-10-29 user,commonsense trick questions,
+"Desk Research, Trivia & Commonsense",PIQA,yes,2026-10-29 user,physical commonsense,

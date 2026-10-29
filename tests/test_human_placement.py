@@ -29,7 +29,9 @@ def test_content_file_parses_and_names_known_axes():
                    "Scientific Knowledge",
                    # the geomin-rotated / pinned frame (2026-10-27) and the K=4 bifactor (10-28)
                    "Cyber & Expert-Level Tasks", "General Capabilities (g)",
-                   "Mixed (Visual, Trivia, Cyber)", "Reasoning & Programming"}
+                   "Mixed (Visual, Trivia, Cyber)", "Reasoning & Programming",
+                   # the K=4 variant renamed from collinearity (2026-10-29)
+                   "Desk Research, Trivia & Commonsense"}
     assert flagship <= set(rules) <= flagship | exploration
 
 
