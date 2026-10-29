@@ -593,16 +593,13 @@
    "axis": "axis4",
    "title": "Commonsense & Factual Knowledge",
    "benchmarks_with_human_scores": [
-    "GeoBench",
     "HellaSwag",
     "OpenBookQA",
     "PIQA",
     "SimpleBench",
     "WinoGrande"
    ],
-   "unjudged_benchmarks": [
-    "GeoBench"
-   ],
+   "unjudged_benchmarks": [],
    "drawn": [
     "Average Human",
     "Skilled Generalist",
@@ -613,68 +610,59 @@
    ],
    "tiers": {
     "Average Human": [
-     1.82,
-     1.998,
-     2.208
+     1.813,
+     1.994,
+     2.212
     ],
     "Skilled Generalist": [
-     2.178,
-     2.929,
-     4.12
+     2.179,
+     2.957,
+     4.182
     ],
     "Domain Expert": [
-     2.949,
-     4.521,
-     6.986
+     3.023,
+     4.689,
+     7.123
     ],
     "Committee of Domain Experts": [
-     4.601,
-     6.585,
-     9.333
+     4.69,
+     6.63,
+     9.353
     ],
     "Top Performer": [
-     3.862,
-     6.24,
-     9.28
+     4.092,
+     6.43,
+     9.56
     ],
     "Committee of Average Humans": [
-     2.044,
-     2.487,
-     3.463
+     2.035,
+     2.486,
+     3.519
     ],
     "Committee of Skilled Generalists": [
-     3.218,
-     4.107,
-     5.519
+     3.197,
+     4.129,
+     5.584
     ],
     "High School Qualifier": [
-     -3.754,
-     -0.077,
-     3.521
+     -3.803,
+     0.056,
+     3.923
     ],
     "High School Top Performer": [
-     -2.439,
-     1.458,
-     5.481
+     -2.561,
+     1.608,
+     5.723
     ]
    },
    "convergence": {
     "rhat": 1.0,
-    "ess_bulk": 2720.0,
-    "ess_tail": 2188.0,
+    "ess_bulk": 2416.0,
+    "ess_tail": 1665.0,
     "divergences": 0,
-    "n_scores": 7
+    "n_scores": 6
    },
    "consistency": [
-    {
-     "tier": "Top Performer",
-     "benchmark": "GeoBench",
-     "observed": 0.9,
-     "predicted": 0.948,
-     "predicted_q10": 0.933,
-     "predicted_q90": 0.949,
-     "first_model_at_score": null
-    },
     {
      "tier": "Committee of Average Humans",
      "benchmark": "HellaSwag",
@@ -706,9 +694,9 @@
      "tier": "Average Human",
      "benchmark": "SimpleBench",
      "observed": 0.837,
-     "predicted": 0.823,
-     "predicted_q10": 0.776,
-     "predicted_q90": 0.867,
+     "predicted": 0.822,
+     "predicted_q10": 0.774,
+     "predicted_q90": 0.868,
      "first_model_at_score": null
     },
     {
@@ -716,7 +704,7 @@
      "benchmark": "SimpleBench",
      "observed": 0.954,
      "predicted": 0.969,
-     "predicted_q10": 0.965,
+     "predicted_q10": 0.967,
      "predicted_q90": 0.969,
      "first_model_at_score": null
     },
@@ -725,7 +713,7 @@
      "benchmark": "WinoGrande",
      "observed": 0.94,
      "predicted": 0.956,
-     "predicted_q10": 0.948,
+     "predicted_q10": 0.947,
      "predicted_q90": 0.965,
      "first_model_at_score": null
     }

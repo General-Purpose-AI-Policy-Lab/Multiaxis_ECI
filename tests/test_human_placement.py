@@ -33,6 +33,12 @@ def test_content_file_parses_and_names_known_axes():
     assert flagship <= set(rules) <= flagship | exploration
 
 
+def test_a_tier_row_takes_one_tier_off_and_leaves_the_pair_judged():
+    rules, off = hp.content_rules(), hp.tier_exclusions()
+    assert rules["General Capabilities (g)"]["MMLU"] is True
+    assert ("MMLU", "Average Human") in off["General Capabilities (g)"]
+
+
 def test_drawn_tiers_own_score_or_sandwich():
     tiers = list(HUMAN_ORDER_MERGED)
     sc = pd.DataFrame({"tier": ["Skilled Generalist", "Committee of Domain Experts"],

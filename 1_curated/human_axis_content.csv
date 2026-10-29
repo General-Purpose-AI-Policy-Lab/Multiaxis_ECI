@@ -1,170 +1,171 @@
-axis_title,benchmark,keep,decided,reason
-Fluid Intelligence & Formal Sciences,ARC-AGI,yes,2026-10-07 user,abstract visual reasoning puzzles
-Fluid Intelligence & Formal Sciences,ARC-AGI-2,yes,2026-10-07 user,abstract visual reasoning puzzles
-Fluid Intelligence & Formal Sciences,FrontierMath Tiers 1-3 v2,yes,2026-10-07 user,research mathematics
-Fluid Intelligence & Formal Sciences,MATH Level 5,yes,2026-10-07 user,competition mathematics
-Fluid Intelligence & Formal Sciences,OTIS Mock AIME 2024-2025,yes,2026-10-07 user,competition mathematics
-Fluid Intelligence & Formal Sciences,VPCT,yes,2026-10-07 user,predicting a physical trajectory from a picture
-Fluid Intelligence & Formal Sciences,BioLP-bench,no,2026-10-07 user,troubleshooting biology lab protocols
-Fluid Intelligence & Formal Sciences,GPQA Diamond,no,2026-10-07 user,graduate science knowledge
-Fluid Intelligence & Formal Sciences,GPQA Diamond Chemistry,no,2026-10-07 user,graduate chemistry knowledge
-Fluid Intelligence & Formal Sciences,GPQA Main Chemistry,no,2026-10-08 claude (validated by the user),graduate chemistry knowledge
-Fluid Intelligence & Formal Sciences,MMLU Chemistry,no,2026-10-08 claude (validated by the user),chemistry knowledge
-Fluid Intelligence & Formal Sciences,LAB-Bench SeqQA,no,2026-10-08 claude (validated by the user),biology sequence questions
-Fluid Intelligence & Formal Sciences,DTBench,yes,2026-10-08 claude (validated by the user),decision-theory (Newcomb-like) questions
-Fluid Intelligence & Formal Sciences,METR Time Horizons,yes,2026-10-08 user,"a plausible link; kept unless its score is far off (observed 0.83, predicted 0.87 on the reference)"
-Scientific Knowledge & Reasoning,GPQA Diamond Biology,yes,2026-10-07 user,graduate biology knowledge
-Scientific Knowledge & Reasoning,GPQA Diamond Chemistry,yes,2026-10-07 user,graduate chemistry knowledge
-Scientific Knowledge & Reasoning,GPQA Main Biology,yes,2026-10-07 user,graduate biology knowledge
-Scientific Knowledge & Reasoning,GPQA Main Chemistry,yes,2026-10-07 user,graduate chemistry knowledge
-Scientific Knowledge & Reasoning,GSM8K,yes,2026-10-07 user,grade-school mathematics word problems
-Scientific Knowledge & Reasoning,InterCode-CTF,yes,2026-10-07 user,a plausible link (security knowledge)
-Scientific Knowledge & Reasoning,LAB-Bench Cloning,yes,2026-10-07 user,biology lab knowledge
-Scientific Knowledge & Reasoning,LAB-Bench LitQA2,yes,2026-10-07 user,biology literature questions
-Scientific Knowledge & Reasoning,LAB-Bench Protocol,yes,2026-10-07 user,biology lab protocols
-Scientific Knowledge & Reasoning,MMLU,yes,2026-10-07 user,academic knowledge
-Scientific Knowledge & Reasoning,MMLU Biology,yes,2026-10-07 user,biology knowledge
-Scientific Knowledge & Reasoning,MMLU Chemistry,yes,2026-10-07 user,chemistry knowledge
-Scientific Knowledge & Reasoning,OpenBookQA,yes,2026-10-07 user,elementary science questions
-Scientific Knowledge & Reasoning,WMDP Biology,yes,2026-10-07 user,hazardous biology knowledge
-Scientific Knowledge & Reasoning,WMDP Chemistry,yes,2026-10-07 user,hazardous chemistry knowledge
-Scientific Knowledge & Reasoning,GeoBench,no,2026-10-07 user,geolocating photos
-Scientific Knowledge & Reasoning,Visual Task Assessment (VISTA),no,2026-10-07 user,visual tasks
-Scientific Knowledge & Reasoning,SimpleBench,no,2026-10-07 claude (validated with the batch),commonsense trick questions
-Scientific Knowledge & Reasoning,SimpleQA Verified,no,2026-10-07 user,trivia facts
-Scientific Knowledge & Reasoning,FrontierMath Erdos,yes,2026-10-08 user,"scientific reasoning: open mathematics problems"
-Scientific Knowledge & Reasoning,PIQA,no,2026-10-08 claude (validated by the user),"physical commonsense (dominant on this axis in the secondary mode only)"
-Scientific Knowledge & Reasoning,WinoGrande,no,2026-10-08 claude (validated by the user),"commonsense pronoun resolution (dominant on this axis in the secondary mode only)"
-Cyber Capabilities,Cybench,yes,2026-10-07 user,capture-the-flag tasks
-Cyber Capabilities,OSWorld,yes,2026-10-07 user,a plausible link (computer use)
-Cyber Capabilities,Furniture Assembly,no,2026-10-07 user,visual and spatial reasoning
-Cyber Capabilities,EBR-bench,no,2026-10-07 claude (validated with the batch),game play
-Cyber Capabilities,TriviaQA,no,2026-10-07 claude (validated with the batch),trivia
-Cyber Capabilities,HellaSwag,no,2026-10-08 claude (validated by the user),commonsense completion
-Cyber Capabilities,MMLU Biology,no,2026-10-08 claude (validated by the user),biology knowledge
-Cyber Capabilities,PIQA,no,2026-10-08 claude (validated by the user),physical commonsense
-Cyber Capabilities,WMDP Biology,no,2026-10-08 claude (validated by the user),hazardous biology knowledge
-Cyber Capabilities,WMDP Chemistry,no,2026-10-08 claude (validated by the user),hazardous chemistry knowledge
-Cyber Capabilities,WinoGrande,no,2026-10-08 claude (validated by the user),commonsense pronoun resolution
-Cyber Capabilities,OpenBookQA,no,2026-10-08 claude (validated by the user),elementary science questions
-Agentic Capabilities & Programming,EBR-bench,yes,2026-10-07 user,a plausible link (long-horizon agentic game play)
-Agentic Capabilities & Programming,OSWorld,yes,2026-10-07 claude (validated with the batch),computer use
-Agentic Capabilities & Programming,The Agent Company,yes,2026-10-07 user,workplace agentic tasks
-Agentic Capabilities & Programming,BlueprintBench 2,no,2026-10-07 user,floor plans from photos (spatial reasoning)
-Agentic Capabilities & Programming,OpenBookQA,no,2026-10-07 claude (validated with the batch),elementary science questions
-Agentic Capabilities & Programming,TriviaQA,no,2026-10-08 claude (validated by the user),trivia
-Agentic Capabilities & Programming,LMCA,no,2026-10-08 claude (validated by the user),grading arguments against expert ratings
-Cyber Capabilities & Reasoning,FrontierMath Tiers 1-3 v2,yes,2026-10-08 claude (validated by the user),"research mathematics: the reasoning in the title (semicomp0 mode A only)"
-Cyber Capabilities & Reasoning,GPQA Diamond Biology,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)"
-Cyber Capabilities & Reasoning,GPQA Diamond Chemistry,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)"
-Cyber Capabilities & Reasoning,GPQA Main Biology,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)"
-Cyber Capabilities & Reasoning,LAB-Bench LitQA2,no,2026-10-08 claude (validated by the user),"biology literature questions (semicomp0 mode A only)"
-Cyber Capabilities & Reasoning,LAB-Bench SeqQA,no,2026-10-08 claude (validated by the user),"biology sequence questions (semicomp0 mode A only)"
-Fluid Intelligence & Mathematics,HellaSwag,no,2026-10-08 claude (validated by the user),"commonsense completion (semicomp0 mode A only)"
-Fluid Intelligence & Mathematics,OpenBookQA,no,2026-10-08 claude (validated by the user),"elementary science questions (semicomp0 mode A only)"
-Fluid Intelligence & Mathematics,PIQA,no,2026-10-08 claude (validated by the user),"physical commonsense (semicomp0 mode A only)"
-Fluid Intelligence & Mathematics,WinoGrande,no,2026-10-08 claude (validated by the user),"commonsense pronoun resolution (semicomp0 mode A only)"
-Fluid Intelligence & Mathematics,Visual Task Assessment (VISTA),yes,2026-10-08 claude (validated by the user),"visual reasoning, a plausible link like VPCT (semicomp0 mode A only)"
-Agentic Capabilities & Programming,LAB-Bench Cloning,no,2026-10-08 claude (validated by the user),"biology lab knowledge (semicomp0 mode A only)"
-Agentic Capabilities & Programming,METR Time Horizons,yes,2026-10-08 claude (validated by the user),"long autonomous software tasks (semicomp0 mode A only)"
-Agentic & Cyber Capabilities,Cybench,yes,2026-10-20 user,CTF challenges
-Agentic & Cyber Capabilities,OSWorld,yes,2026-10-20 user,computer-use tasks
-Agentic & Cyber Capabilities,The Agent Company,yes,2026-10-20 user,simulated workplace agent tasks
-Agentic & Cyber Capabilities,EBR-bench,yes,2026-10-20 user,a plausible link (long-horizon agentic game play)
-Agentic & Cyber Capabilities,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)"
-Agentic & Cyber Capabilities,BlueprintBench 2,no,2026-10-20 user,floor plans from photos (spatial reasoning)
-Agentic & Cyber Capabilities,Furniture Assembly,no,2026-10-20 user,assembly from photos of IKEA builds
-Agentic & Cyber Capabilities,TriviaQA,no,2026-10-20 user,trivia recall
-Visual & Commonsense,GeoBench,yes,2026-10-20 user,geolocation from photos
-Visual & Commonsense,VPCT,yes,2026-10-20 user,visual physics comprehension
-Visual & Commonsense,SpireClimb,yes,2026-10-20 user,game played through screenshots
-Visual & Commonsense,HellaSwag,yes,2026-10-20 user,commonsense sentence completion
-Visual & Commonsense,OpenBookQA,yes,2026-10-20 user,elementary science and commonsense questions
-Visual & Commonsense,SimpleQA Verified,no,2026-10-20 user,"recall of obscure facts, neither visual nor commonsense"
-Scientific Knowledge & Reasoning,DTBench,yes,2026-10-20 user,a plausible link through reasoning (decision-theory questions)
-Scientific Knowledge & Reasoning,LMCA,yes,2026-10-20 user,a plausible link through reasoning (grading arguments against expert ratings)
-Cyber Capabilities,BlueprintBench 2,no,2026-10-20 user,floor plans from photos (spatial reasoning)
-Cyber Capabilities,SpireClimb,no,2026-10-20 user,card game played through screenshots
-Cyber Capabilities,The Agent Company,no,2026-10-20 user,simulated office tasks
-Cyber Capabilities,VPCT,no,2026-10-20 user,visual physics comprehension
-Agentic Capabilities & Programming,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)"
-Agentic Capabilities & Programming,HellaSwag,no,2026-10-20 user,commonsense sentence completion
-Scientific Knowledge & Reasoning,OTIS Mock AIME 2024-2025,yes,2026-10-21 user (validated with the batch),"competition mathematics"
-Scientific Knowledge & Reasoning,MATH Level 5,yes,2026-10-21 user (validated with the batch),"competition mathematics"
-Scientific Knowledge & Reasoning,VPCT,yes,2026-10-21 user (validated with the batch),"predicting a physical trajectory from a picture"
-Scientific Knowledge & Reasoning,ARC-AGI,no,2026-10-28 user,"abstract visual reasoning puzzles, not scientific knowledge (excluded by the user; its human panel row is 1.0 by construction on ARC-AGI-2)"
-Scientific Knowledge & Reasoning,ARC-AGI-2,no,2026-10-28 user,"abstract visual reasoning puzzles, not scientific knowledge (excluded by the user; its human panel row is 1.0 by construction on ARC-AGI-2)"
-Scientific Knowledge & Reasoning,GPQA Diamond,yes,2026-10-21 user (validated with the batch),"graduate science questions"
-Scientific Knowledge & Reasoning,LAB-Bench SeqQA,yes,2026-10-21 user (validated with the batch),"biology sequence questions"
-Scientific Knowledge & Reasoning,BioLP-bench,yes,2026-10-21 user (validated with the batch),"troubleshooting biology lab protocols"
-Scientific Knowledge & Reasoning,FrontierMath Tiers 1-3 v2,yes,2026-10-21 user (validated with the batch),"research mathematics"
-Commonsense & Factual Knowledge,OpenBookQA,yes,2026-10-21 user (validated with the batch),"elementary science and commonsense questions"
-Commonsense & Factual Knowledge,SimpleQA Verified,yes,2026-10-21 user (validated with the batch),"recall of obscure facts"
-Commonsense & Factual Knowledge,HellaSwag,yes,2026-10-21 user (validated with the batch),"commonsense sentence completion"
-Commonsense & Factual Knowledge,PIQA,yes,2026-10-21 user (validated with the batch),"physical commonsense"
-Commonsense & Factual Knowledge,SimpleBench,yes,2026-10-21 user (validated with the batch),"commonsense trick questions"
-Commonsense & Factual Knowledge,WinoGrande,yes,2026-10-21 user (validated with the batch),"commonsense pronoun resolution"
-Commonsense & Factual Knowledge,MMLU,no,2026-10-21 user,"academic exam knowledge, not commonsense or everyday facts"
-Cyber Capabilities,FrontierMath Erdos,no,2026-10-21 user (validated with the batch),"open mathematics problems, no security content"
-Cyber Capabilities,GeoBench,no,2026-10-21 user (validated with the batch),"geolocating photos"
-Commonsense & Factual Knowledge,LAB-Bench Cloning,no,2026-10-21 user (validated with the batch),"specialised biology lab procedures"
-Commonsense & Factual Knowledge,TriviaQA,yes,2026-10-21 user,trivia recall
-Commonsense & Factual Knowledge,GSM8K,yes,2026-10-21 user,grade-school mathematics word problems
-Commonsense & Factual Knowledge,LAB-Bench Protocol,no,2026-10-21 user,biology lab protocols
-Commonsense & Factual Knowledge,InterCode-CTF,no,2026-10-21 user,security capture-the-flag in a shell
-Scientific Knowledge & Reasoning,SpireClimb,no,2026-10-21 user,card game played through screenshots
-Visual & Commonsense,PIQA,yes,2026-10-21 user,physical commonsense
-Visual & Commonsense,WinoGrande,yes,2026-10-21 user,commonsense pronoun resolution
-Cyber & Expert-Level Tasks,Cybench,yes,2026-10-27 claude (validated by the user),capture-the-flag tasks
-Cyber & Expert-Level Tasks,LMCA,yes,2026-10-27 claude (validated by the user),"grading arguments against expert ratings: expert-level judgment"
-Cyber & Expert-Level Tasks,METR Time Horizons,yes,2026-10-27 claude (validated by the user),"long autonomous software tasks: long-horizon expert work"
-Cyber & Expert-Level Tasks,FrontierMath Erdos,yes,2026-10-27 claude (validated by the user),"open research problems, the archetype of an expert-level task (expert score 0.00, consistent with LMCA's 0.87: placed at 4.6 on the rotated mode A, the expert is predicted 0.03 on Erdos)"
-Cyber & Expert-Level Tasks,EBR-bench,yes,2026-10-27 claude (validated by the user),"a plausible link (long-horizon agentic game play), as under Agentic & Cyber Capabilities"
-Cyber & Expert-Level Tasks,BlueprintBench 2,no,2026-10-27 claude (validated by the user),floor plans from photos (spatial reasoning)
-Cyber & Expert-Level Tasks,Furniture Assembly,no,2026-10-27 claude (validated by the user),"assembly from photos of IKEA builds; the axis's purest row, but not expert-level work by content"
-Cyber & Expert-Level Tasks,GeoBench,no,2026-10-27 claude (validated by the user),geolocating photos
-Cyber & Expert-Level Tasks,TriviaQA,no,2026-10-27 claude (validated by the user),trivia recall
-General Capabilities (g),BlueprintBench 2,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),Cybench,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),EBR-bench,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),FrontierMath Erdos,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),FrontierMath Tiers 1-3 v2,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),Furniture Assembly,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),LMCA,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),METR Time Horizons,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),OSWorld,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),The Agent Company,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),VPCT,yes,2026-10-28 user,a general-capability axis links to every task by content
-"Mixed (Visual, Trivia, Cyber)",GeoBench,yes,2026-10-28 claude (from the user's axis name),geolocating photos: the axis's visual part
-"Mixed (Visual, Trivia, Cyber)",SpireClimb,yes,2026-10-28 claude (from the user's axis name),game played through screenshots: the axis's visual part
-"Mixed (Visual, Trivia, Cyber)",TriviaQA,yes,2026-10-28 claude (from the user's axis name),trivia recall: the axis's trivia part
-General Capabilities (g),ARC-AGI,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),ARC-AGI-2,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),BioLP-bench,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),DTBench,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),GPQA Diamond,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),GPQA Diamond Biology,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),GPQA Diamond Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),GPQA Main Biology,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),GPQA Main Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),GSM8K,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),InterCode-CTF,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),LAB-Bench Cloning,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),LAB-Bench LitQA2,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),LAB-Bench Protocol,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),LAB-Bench SeqQA,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),MATH Level 5,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),MMLU,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),MMLU Biology,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),MMLU Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),OTIS Mock AIME 2024-2025,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),SpireClimb,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),Visual Task Assessment (VISTA),yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),WMDP Biology,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),WMDP Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content
-General Capabilities (g),WinoGrande,yes,2026-10-28 user,a general-capability axis links to every task by content
-Reasoning & Programming,PIQA,no,2026-10-29 user,physical commonsense reasoning
-Reasoning & Programming,SimpleBench,no,2026-10-29 user,trick reasoning questions
-Reasoning & Programming,TriviaQA,no,2026-10-28 claude (to validate),trivia recall: neither reasoning nor programming
-Agentic & Cyber Capabilities,HellaSwag,no,2026-10-28 claude (to validate),commonsense sentence completion: no agentic or cyber content
-Commonsense & Factual Knowledge,GeoBench,no,2026-10-29 user,geolocating photos
+axis_title,benchmark,keep,decided,reason,tier
+Fluid Intelligence & Formal Sciences,ARC-AGI,yes,2026-10-07 user,abstract visual reasoning puzzles,
+Fluid Intelligence & Formal Sciences,ARC-AGI-2,yes,2026-10-07 user,abstract visual reasoning puzzles,
+Fluid Intelligence & Formal Sciences,FrontierMath Tiers 1-3 v2,yes,2026-10-07 user,research mathematics,
+Fluid Intelligence & Formal Sciences,MATH Level 5,yes,2026-10-07 user,competition mathematics,
+Fluid Intelligence & Formal Sciences,OTIS Mock AIME 2024-2025,yes,2026-10-07 user,competition mathematics,
+Fluid Intelligence & Formal Sciences,VPCT,yes,2026-10-07 user,predicting a physical trajectory from a picture,
+Fluid Intelligence & Formal Sciences,BioLP-bench,no,2026-10-07 user,troubleshooting biology lab protocols,
+Fluid Intelligence & Formal Sciences,GPQA Diamond,no,2026-10-07 user,graduate science knowledge,
+Fluid Intelligence & Formal Sciences,GPQA Diamond Chemistry,no,2026-10-07 user,graduate chemistry knowledge,
+Fluid Intelligence & Formal Sciences,GPQA Main Chemistry,no,2026-10-08 claude (validated by the user),graduate chemistry knowledge,
+Fluid Intelligence & Formal Sciences,MMLU Chemistry,no,2026-10-08 claude (validated by the user),chemistry knowledge,
+Fluid Intelligence & Formal Sciences,LAB-Bench SeqQA,no,2026-10-08 claude (validated by the user),biology sequence questions,
+Fluid Intelligence & Formal Sciences,DTBench,yes,2026-10-08 claude (validated by the user),decision-theory (Newcomb-like) questions,
+Fluid Intelligence & Formal Sciences,METR Time Horizons,yes,2026-10-08 user,"a plausible link; kept unless its score is far off (observed 0.83, predicted 0.87 on the reference)",
+Scientific Knowledge & Reasoning,GPQA Diamond Biology,yes,2026-10-07 user,graduate biology knowledge,
+Scientific Knowledge & Reasoning,GPQA Diamond Chemistry,yes,2026-10-07 user,graduate chemistry knowledge,
+Scientific Knowledge & Reasoning,GPQA Main Biology,yes,2026-10-07 user,graduate biology knowledge,
+Scientific Knowledge & Reasoning,GPQA Main Chemistry,yes,2026-10-07 user,graduate chemistry knowledge,
+Scientific Knowledge & Reasoning,GSM8K,yes,2026-10-07 user,grade-school mathematics word problems,
+Scientific Knowledge & Reasoning,InterCode-CTF,yes,2026-10-07 user,a plausible link (security knowledge),
+Scientific Knowledge & Reasoning,LAB-Bench Cloning,yes,2026-10-07 user,biology lab knowledge,
+Scientific Knowledge & Reasoning,LAB-Bench LitQA2,yes,2026-10-07 user,biology literature questions,
+Scientific Knowledge & Reasoning,LAB-Bench Protocol,yes,2026-10-07 user,biology lab protocols,
+Scientific Knowledge & Reasoning,MMLU,yes,2026-10-07 user,academic knowledge,
+Scientific Knowledge & Reasoning,MMLU Biology,yes,2026-10-07 user,biology knowledge,
+Scientific Knowledge & Reasoning,MMLU Chemistry,yes,2026-10-07 user,chemistry knowledge,
+Scientific Knowledge & Reasoning,OpenBookQA,yes,2026-10-07 user,elementary science questions,
+Scientific Knowledge & Reasoning,WMDP Biology,yes,2026-10-07 user,hazardous biology knowledge,
+Scientific Knowledge & Reasoning,WMDP Chemistry,yes,2026-10-07 user,hazardous chemistry knowledge,
+Scientific Knowledge & Reasoning,GeoBench,no,2026-10-07 user,geolocating photos,
+Scientific Knowledge & Reasoning,Visual Task Assessment (VISTA),no,2026-10-07 user,visual tasks,
+Scientific Knowledge & Reasoning,SimpleBench,no,2026-10-07 claude (validated with the batch),commonsense trick questions,
+Scientific Knowledge & Reasoning,SimpleQA Verified,no,2026-10-07 user,trivia facts,
+Scientific Knowledge & Reasoning,FrontierMath Erdos,yes,2026-10-08 user,"scientific reasoning: open mathematics problems",
+Scientific Knowledge & Reasoning,PIQA,no,2026-10-08 claude (validated by the user),"physical commonsense (dominant on this axis in the secondary mode only)",
+Scientific Knowledge & Reasoning,WinoGrande,no,2026-10-08 claude (validated by the user),"commonsense pronoun resolution (dominant on this axis in the secondary mode only)",
+Cyber Capabilities,Cybench,yes,2026-10-07 user,capture-the-flag tasks,
+Cyber Capabilities,OSWorld,yes,2026-10-07 user,a plausible link (computer use),
+Cyber Capabilities,Furniture Assembly,no,2026-10-07 user,visual and spatial reasoning,
+Cyber Capabilities,EBR-bench,no,2026-10-07 claude (validated with the batch),game play,
+Cyber Capabilities,TriviaQA,no,2026-10-07 claude (validated with the batch),trivia,
+Cyber Capabilities,HellaSwag,no,2026-10-08 claude (validated by the user),commonsense completion,
+Cyber Capabilities,MMLU Biology,no,2026-10-08 claude (validated by the user),biology knowledge,
+Cyber Capabilities,PIQA,no,2026-10-08 claude (validated by the user),physical commonsense,
+Cyber Capabilities,WMDP Biology,no,2026-10-08 claude (validated by the user),hazardous biology knowledge,
+Cyber Capabilities,WMDP Chemistry,no,2026-10-08 claude (validated by the user),hazardous chemistry knowledge,
+Cyber Capabilities,WinoGrande,no,2026-10-08 claude (validated by the user),commonsense pronoun resolution,
+Cyber Capabilities,OpenBookQA,no,2026-10-08 claude (validated by the user),elementary science questions,
+Agentic Capabilities & Programming,EBR-bench,yes,2026-10-07 user,a plausible link (long-horizon agentic game play),
+Agentic Capabilities & Programming,OSWorld,yes,2026-10-07 claude (validated with the batch),computer use,
+Agentic Capabilities & Programming,The Agent Company,yes,2026-10-07 user,workplace agentic tasks,
+Agentic Capabilities & Programming,BlueprintBench 2,no,2026-10-07 user,floor plans from photos (spatial reasoning),
+Agentic Capabilities & Programming,OpenBookQA,no,2026-10-07 claude (validated with the batch),elementary science questions,
+Agentic Capabilities & Programming,TriviaQA,no,2026-10-08 claude (validated by the user),trivia,
+Agentic Capabilities & Programming,LMCA,no,2026-10-08 claude (validated by the user),grading arguments against expert ratings,
+Cyber Capabilities & Reasoning,FrontierMath Tiers 1-3 v2,yes,2026-10-08 claude (validated by the user),"research mathematics: the reasoning in the title (semicomp0 mode A only)",
+Cyber Capabilities & Reasoning,GPQA Diamond Biology,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)",
+Cyber Capabilities & Reasoning,GPQA Diamond Chemistry,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)",
+Cyber Capabilities & Reasoning,GPQA Main Biology,yes,2026-10-08 user,"Google-proof questions that need reasoning, not only knowledge (semicomp0 mode A only)",
+Cyber Capabilities & Reasoning,LAB-Bench LitQA2,no,2026-10-08 claude (validated by the user),"biology literature questions (semicomp0 mode A only)",
+Cyber Capabilities & Reasoning,LAB-Bench SeqQA,no,2026-10-08 claude (validated by the user),"biology sequence questions (semicomp0 mode A only)",
+Fluid Intelligence & Mathematics,HellaSwag,no,2026-10-08 claude (validated by the user),"commonsense completion (semicomp0 mode A only)",
+Fluid Intelligence & Mathematics,OpenBookQA,no,2026-10-08 claude (validated by the user),"elementary science questions (semicomp0 mode A only)",
+Fluid Intelligence & Mathematics,PIQA,no,2026-10-08 claude (validated by the user),"physical commonsense (semicomp0 mode A only)",
+Fluid Intelligence & Mathematics,WinoGrande,no,2026-10-08 claude (validated by the user),"commonsense pronoun resolution (semicomp0 mode A only)",
+Fluid Intelligence & Mathematics,Visual Task Assessment (VISTA),yes,2026-10-08 claude (validated by the user),"visual reasoning, a plausible link like VPCT (semicomp0 mode A only)",
+Agentic Capabilities & Programming,LAB-Bench Cloning,no,2026-10-08 claude (validated by the user),"biology lab knowledge (semicomp0 mode A only)",
+Agentic Capabilities & Programming,METR Time Horizons,yes,2026-10-08 claude (validated by the user),"long autonomous software tasks (semicomp0 mode A only)",
+Agentic & Cyber Capabilities,Cybench,yes,2026-10-20 user,CTF challenges,
+Agentic & Cyber Capabilities,OSWorld,yes,2026-10-20 user,computer-use tasks,
+Agentic & Cyber Capabilities,The Agent Company,yes,2026-10-20 user,simulated workplace agent tasks,
+Agentic & Cyber Capabilities,EBR-bench,yes,2026-10-20 user,a plausible link (long-horizon agentic game play),
+Agentic & Cyber Capabilities,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)",
+Agentic & Cyber Capabilities,BlueprintBench 2,no,2026-10-20 user,floor plans from photos (spatial reasoning),
+Agentic & Cyber Capabilities,Furniture Assembly,no,2026-10-20 user,assembly from photos of IKEA builds,
+Agentic & Cyber Capabilities,TriviaQA,no,2026-10-20 user,trivia recall,
+Visual & Commonsense,GeoBench,yes,2026-10-20 user,geolocation from photos,
+Visual & Commonsense,VPCT,yes,2026-10-20 user,visual physics comprehension,
+Visual & Commonsense,SpireClimb,yes,2026-10-20 user,game played through screenshots,
+Visual & Commonsense,HellaSwag,yes,2026-10-20 user,commonsense sentence completion,
+Visual & Commonsense,OpenBookQA,yes,2026-10-20 user,elementary science and commonsense questions,
+Visual & Commonsense,SimpleQA Verified,no,2026-10-20 user,"recall of obscure facts, neither visual nor commonsense",
+Scientific Knowledge & Reasoning,DTBench,yes,2026-10-20 user,a plausible link through reasoning (decision-theory questions),
+Scientific Knowledge & Reasoning,LMCA,yes,2026-10-20 user,a plausible link through reasoning (grading arguments against expert ratings),
+Cyber Capabilities,BlueprintBench 2,no,2026-10-20 user,floor plans from photos (spatial reasoning),
+Cyber Capabilities,SpireClimb,no,2026-10-20 user,card game played through screenshots,
+Cyber Capabilities,The Agent Company,no,2026-10-20 user,simulated office tasks,
+Cyber Capabilities,VPCT,no,2026-10-20 user,visual physics comprehension,
+Agentic Capabilities & Programming,FrontierMath Erdos,yes,2026-10-20 user,"kept by the user (open research problems, long multi-step work)",
+Agentic Capabilities & Programming,HellaSwag,no,2026-10-20 user,commonsense sentence completion,
+Scientific Knowledge & Reasoning,OTIS Mock AIME 2024-2025,yes,2026-10-21 user (validated with the batch),"competition mathematics",
+Scientific Knowledge & Reasoning,MATH Level 5,yes,2026-10-21 user (validated with the batch),"competition mathematics",
+Scientific Knowledge & Reasoning,VPCT,yes,2026-10-21 user (validated with the batch),"predicting a physical trajectory from a picture",
+Scientific Knowledge & Reasoning,ARC-AGI,no,2026-10-28 user,"abstract visual reasoning puzzles, not scientific knowledge (excluded by the user; its human panel row is 1.0 by construction on ARC-AGI-2)",
+Scientific Knowledge & Reasoning,ARC-AGI-2,no,2026-10-28 user,"abstract visual reasoning puzzles, not scientific knowledge (excluded by the user; its human panel row is 1.0 by construction on ARC-AGI-2)",
+Scientific Knowledge & Reasoning,GPQA Diamond,yes,2026-10-21 user (validated with the batch),"graduate science questions",
+Scientific Knowledge & Reasoning,LAB-Bench SeqQA,yes,2026-10-21 user (validated with the batch),"biology sequence questions",
+Scientific Knowledge & Reasoning,BioLP-bench,yes,2026-10-21 user (validated with the batch),"troubleshooting biology lab protocols",
+Scientific Knowledge & Reasoning,FrontierMath Tiers 1-3 v2,yes,2026-10-21 user (validated with the batch),"research mathematics",
+Commonsense & Factual Knowledge,OpenBookQA,yes,2026-10-21 user (validated with the batch),"elementary science and commonsense questions",
+Commonsense & Factual Knowledge,SimpleQA Verified,yes,2026-10-21 user (validated with the batch),"recall of obscure facts",
+Commonsense & Factual Knowledge,HellaSwag,yes,2026-10-21 user (validated with the batch),"commonsense sentence completion",
+Commonsense & Factual Knowledge,PIQA,yes,2026-10-21 user (validated with the batch),"physical commonsense",
+Commonsense & Factual Knowledge,SimpleBench,yes,2026-10-21 user (validated with the batch),"commonsense trick questions",
+Commonsense & Factual Knowledge,WinoGrande,yes,2026-10-21 user (validated with the batch),"commonsense pronoun resolution",
+Commonsense & Factual Knowledge,MMLU,no,2026-10-21 user,"academic exam knowledge, not commonsense or everyday facts",
+Cyber Capabilities,FrontierMath Erdos,no,2026-10-21 user (validated with the batch),"open mathematics problems, no security content",
+Cyber Capabilities,GeoBench,no,2026-10-21 user (validated with the batch),"geolocating photos",
+Commonsense & Factual Knowledge,LAB-Bench Cloning,no,2026-10-21 user (validated with the batch),"specialised biology lab procedures",
+Commonsense & Factual Knowledge,TriviaQA,yes,2026-10-21 user,trivia recall,
+Commonsense & Factual Knowledge,GSM8K,yes,2026-10-21 user,grade-school mathematics word problems,
+Commonsense & Factual Knowledge,LAB-Bench Protocol,no,2026-10-21 user,biology lab protocols,
+Commonsense & Factual Knowledge,InterCode-CTF,no,2026-10-21 user,security capture-the-flag in a shell,
+Scientific Knowledge & Reasoning,SpireClimb,no,2026-10-21 user,card game played through screenshots,
+Visual & Commonsense,PIQA,yes,2026-10-21 user,physical commonsense,
+Visual & Commonsense,WinoGrande,yes,2026-10-21 user,commonsense pronoun resolution,
+Cyber & Expert-Level Tasks,Cybench,yes,2026-10-27 claude (validated by the user),capture-the-flag tasks,
+Cyber & Expert-Level Tasks,LMCA,yes,2026-10-27 claude (validated by the user),"grading arguments against expert ratings: expert-level judgment",
+Cyber & Expert-Level Tasks,METR Time Horizons,yes,2026-10-27 claude (validated by the user),"long autonomous software tasks: long-horizon expert work",
+Cyber & Expert-Level Tasks,FrontierMath Erdos,yes,2026-10-27 claude (validated by the user),"open research problems, the archetype of an expert-level task (expert score 0.00, consistent with LMCA's 0.87: placed at 4.6 on the rotated mode A, the expert is predicted 0.03 on Erdos)",
+Cyber & Expert-Level Tasks,EBR-bench,yes,2026-10-27 claude (validated by the user),"a plausible link (long-horizon agentic game play), as under Agentic & Cyber Capabilities",
+Cyber & Expert-Level Tasks,BlueprintBench 2,no,2026-10-27 claude (validated by the user),floor plans from photos (spatial reasoning),
+Cyber & Expert-Level Tasks,Furniture Assembly,no,2026-10-27 claude (validated by the user),"assembly from photos of IKEA builds; the axis's purest row, but not expert-level work by content",
+Cyber & Expert-Level Tasks,GeoBench,no,2026-10-27 claude (validated by the user),geolocating photos,
+Cyber & Expert-Level Tasks,TriviaQA,no,2026-10-27 claude (validated by the user),trivia recall,
+General Capabilities (g),BlueprintBench 2,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),Cybench,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),EBR-bench,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),FrontierMath Erdos,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),FrontierMath Tiers 1-3 v2,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),Furniture Assembly,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),LMCA,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),METR Time Horizons,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),OSWorld,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),The Agent Company,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),VPCT,yes,2026-10-28 user,a general-capability axis links to every task by content,
+"Mixed (Visual, Trivia, Cyber)",GeoBench,yes,2026-10-28 claude (from the user's axis name),geolocating photos: the axis's visual part,
+"Mixed (Visual, Trivia, Cyber)",SpireClimb,yes,2026-10-28 claude (from the user's axis name),game played through screenshots: the axis's visual part,
+"Mixed (Visual, Trivia, Cyber)",TriviaQA,yes,2026-10-28 claude (from the user's axis name),trivia recall: the axis's trivia part,
+General Capabilities (g),ARC-AGI,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),ARC-AGI-2,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),BioLP-bench,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),DTBench,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),GPQA Diamond,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),GPQA Diamond Biology,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),GPQA Diamond Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),GPQA Main Biology,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),GPQA Main Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),GSM8K,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),InterCode-CTF,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),LAB-Bench Cloning,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),LAB-Bench LitQA2,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),LAB-Bench Protocol,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),LAB-Bench SeqQA,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),MATH Level 5,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),MMLU,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),MMLU Biology,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),MMLU Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),OTIS Mock AIME 2024-2025,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),SpireClimb,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),Visual Task Assessment (VISTA),yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),WMDP Biology,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),WMDP Chemistry,yes,2026-10-28 user,a general-capability axis links to every task by content,
+General Capabilities (g),WinoGrande,yes,2026-10-28 user,a general-capability axis links to every task by content,
+Reasoning & Programming,PIQA,no,2026-10-29 user,physical commonsense reasoning,
+Reasoning & Programming,SimpleBench,no,2026-10-29 user,trick reasoning questions,
+Reasoning & Programming,TriviaQA,no,2026-10-28 claude (to validate),trivia recall: neither reasoning nor programming,
+Agentic & Cyber Capabilities,HellaSwag,no,2026-10-28 claude (to validate),commonsense sentence completion: no agentic or cyber content,
+Commonsense & Factual Knowledge,GeoBench,no,2026-10-29 user,geolocating photos,
+General Capabilities (g),MMLU,no,2026-10-29 user,"the Average Human's 0.34 (non-expert crowd workers) splits the g placement in two against ARC-AGI and ARC-AGI-2 (r-hat 1.74, 1.00 without it); the other tiers keep MMLU",Average Human

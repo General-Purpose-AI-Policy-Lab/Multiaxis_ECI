@@ -8,6 +8,8 @@ tiers are placed afterwards, one axis at a time, with the benchmark side frozen:
 * the benchmarks of axis k are those whose largest share of loading variance is on k
   (`dominant_axis`), minus those whose content has nothing to do with the axis title
   (`1_curated/human_axis_content.csv`, judged pair by pair; a plausible link keeps a pair);
+  a row of that file naming a tier takes that tier's score alone off the axis, the last resort
+  when it splits the placement in two (`tier_exclusions`);
 * on those benchmarks a tier's score follows the fit's own likelihood at the medians of the
   loadings, difficulties and noise, with its other axes set to the profile of a typical model at
   the same ability on k (a linear regression of the other axes on axis k over the models);
@@ -53,12 +55,26 @@ SECONDARY_DIR = "secondary_mode"
 
 # ── inputs ───────────────────────────────────────────────────────────────────────────────────
 
+def _content_table(path: Path) -> pd.DataFrame:
+    df = pd.read_csv(path, keep_default_na=False)
+    df["keep"] = df["keep"].str.strip().str.lower() == "yes"
+    return df
+
+
 def content_rules(path: Path = CONTENT_FILE) -> dict[str, dict[str, bool]]:
-    """{axis title: {benchmark: keep}} from the curated content file."""
-    df = pd.read_csv(path)
+    """{axis title: {benchmark: keep}} from the curated content file's whole-pair rows (no tier)."""
     out: dict[str, dict[str, bool]] = {}
-    for r in df.itertuples():
-        out.setdefault(r.axis_title, {})[r.benchmark] = str(r.keep).strip().lower() == "yes"
+    for r in _content_table(path).query("tier == ''").itertuples():
+        out.setdefault(r.axis_title, {})[r.benchmark] = r.keep
+    return out
+
+
+def tier_exclusions(path: Path = CONTENT_FILE) -> dict[str, set[tuple[str, str]]]:
+    """{axis title: {(benchmark, tier)}}: the scores of one tier the content file takes off an axis
+    whose placement they stopped converging (a last resort, the pair stays judged as a whole)."""
+    out: dict[str, set[tuple[str, str]]] = {}
+    for r in _content_table(path).query("tier != '' and not keep").itertuples():
+        out.setdefault(r.axis_title, set()).add((r.benchmark, r.tier))
     return out
 
 
@@ -206,7 +222,7 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
     otherwise). `ceiling_d`: a --ceiling-noise fit's median ceilings, per benchmark."""
     if np.asarray(data.is_human).any():
         raise ValueError("the 2b placement reads a fit without human baselines (--no-humans)")
-    rules = content_rules()
+    rules, dropped = content_rules(), tier_exclusions()
     hs = human_scores(spec)
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
     missing = sorted(set(hs.benchmark) - set(bench))
@@ -236,7 +252,10 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
         used = sorted(b for b in on_axis if judged.get(b, True)) if title else []
         unjudged = sorted(b for b in on_axis if b not in judged and b in set(hs.benchmark)) \
             if title else []
-        sc = hs[hs.benchmark.isin(used)]
+        off = ({*dropped.get((rule_titles or {}).get(title, title), ()), *dropped.get(title, ())}
+               if title else set())
+        sc = hs[hs.benchmark.isin(used) & ~pd.Series(list(zip(hs.benchmark, hs.tier)),
+                                                      index=hs.index).isin(off)]
         ax = {"axis": name, "title": title, "benchmarks_with_human_scores": sorted(set(sc.benchmark)),
               "unjudged_benchmarks": unjudged, "drawn": [], "tiers": {}, "convergence": None,
               "consistency": []}
