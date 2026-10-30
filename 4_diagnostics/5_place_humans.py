@@ -56,6 +56,10 @@ RULE_TITLES = {
     "General Capabilities + Desk Research, Trivia & Commonsense": "Desk Research, Trivia & Commonsense",
     "General Capabilities + Agentic & Cyber Capabilities": "Agentic & Cyber Capabilities",
     "General Capabilities + Commonsense & Factual Knowledge": "Commonsense & Factual Knowledge",
+    # Its 20-chain mode A (seeds 44 + 45, 2026-10-30) has a g and a specific of its own: g keeps
+    # the whole-pair judgments of the other g, the specific those of the flagship's formal axis.
+    "General Capabilities (Scientific & Factual Knowledge)": "General Capabilities (Agentic, Cyber & SWE)",
+    "General Capabilities + Fluid Intelligence, Math & Coding": "Fluid Intelligence & Formal Sciences",
 }
 
 
