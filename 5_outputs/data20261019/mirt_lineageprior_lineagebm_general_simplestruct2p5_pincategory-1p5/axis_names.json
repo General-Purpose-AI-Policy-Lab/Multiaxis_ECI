@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "AudioMultiChallenge",
+        "MMLU Biology",
+        "MATH Level 5",
+        "GPQA Main Chemistry",
+        "MMLU Chemistry",
+        "GPQA Diamond Chemistry",
+        "GPQA Diamond Biology"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "CyScenarioBench",
+        "CyberGym",
+        "AISI CTF Suites - Practitioner",
+        "ExploitBench",
+        "AISI Cyber Ranges - Cooling Tower",
+        "AISI Cyber Ranges - The Last Ones",
+        "Furniture Assembly",
+        "GDPval"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "PostTrainBench v1.1",
+        "OSWorld",
+        "APEX-Agents",
+        "FrontierCode",
+        "SWE Atlas",
+        "MirrorCode",
+        "CTI-REALM"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GeoBench",
+        "OpenBookQA",
+        "ARC AI2",
+        "SimpleQA Verified",
+        "SpireClimb",
+        "MMLU",
+        "InterCode-CTF",
+        "GSM8K"
+      ]
+    }
+  }
+}

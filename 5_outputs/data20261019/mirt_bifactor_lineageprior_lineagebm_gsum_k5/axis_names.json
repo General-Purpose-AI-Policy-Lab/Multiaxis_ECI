@@ -1,0 +1,81 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "g": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "LAB-Bench SeqQA",
+        "GPQA Diamond Chemistry",
+        "GPQA Main Biology",
+        "CAISI CTF-Archive",
+        "MMLU Biology",
+        "GPQA Main Chemistry"
+      ]
+    },
+    "g+specific1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GDPval",
+        "MCP Atlas",
+        "GSO-Bench",
+        "MirrorCode",
+        "ARC AI2",
+        "OpenBookQA",
+        "ProofBench",
+        "Cybench"
+      ]
+    },
+    "g+specific2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OpenBookQA",
+        "ARC AI2",
+        "CyScenarioBench (Anthropic)",
+        "Lech Mazur Writing",
+        "AISI Cyber Ranges - The Last Ones",
+        "SimpleQA Verified",
+        "CyScenarioBench",
+        "GSO-Bench"
+      ]
+    },
+    "g+specific3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "MCP Atlas",
+        "MirrorCode",
+        "OSWorld",
+        "BlueprintBench 2",
+        "GDPval",
+        "Lech Mazur Writing",
+        "SWE Atlas",
+        "GSO-Bench"
+      ]
+    },
+    "g+specific4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "HellaSwag",
+        "SimpleQA Verified",
+        "PIQA",
+        "WinoGrande",
+        "VPCT",
+        "GeoBench",
+        "Fiction.LiveBench",
+        "Balrog"
+      ]
+    }
+  }
+}

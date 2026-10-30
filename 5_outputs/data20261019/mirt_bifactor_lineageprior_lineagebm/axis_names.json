@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "g": {
+      "title": "General Capabilities (Agentic, Cyber & SWE)",
+      "title_fr": "Capacités générales (agentique, cyber & SWE)",
+      "signature": [
+        "CyberGym",
+        "GDPval",
+        "OSWorld"
+      ],
+      "top_benchmarks": [
+        "ProofBench",
+        "Furniture Assembly",
+        "CyberGym",
+        "AISI CTF Suites - Practitioner",
+        "FrontierMath Tier 4 v2",
+        "VPCT",
+        "GBAEval",
+        "Aider Polyglot"
+      ]
+    },
+    "specific1": {
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "GPQA Diamond Chemistry"
+      ],
+      "top_benchmarks": [
+        "ARC-AGI-2",
+        "ARC-AGI",
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "GPQA Main Chemistry",
+        "DeepSWE",
+        "MMLU Pro Chemistry",
+        "GPQA Diamond Chemistry"
+      ]
+    },
+    "specific2": {
+      "title": "Mixed (Visual, Trivia, Cyber)",
+      "title_fr": "Mixte (visuel, trivia, cyber)",
+      "signature": [
+        "GeoBench",
+        "TriviaQA",
+        "CyScenarioBench (Anthropic)"
+      ],
+      "top_benchmarks": [
+        "VPCT",
+        "CyScenarioBench (Anthropic)",
+        "SpireClimb",
+        "Aider Polyglot",
+        "CAISI SEC-Bench Pro",
+        "SimpleQA Verified",
+        "VisualToolBench",
+        "CAISI ExploitGym Userspace"
+      ]
+    },
+    "specific3": {
+      "title": "Commonsense & Factual Knowledge",
+      "title_fr": "Sens commun & connaissances factuelles",
+      "signature": [
+        "OpenBookQA",
+        "ARC AI2",
+        "PIQA"
+      ],
+      "top_benchmarks": [
+        "ARC AI2",
+        "InterCode-CTF",
+        "SimpleBench",
+        "OpenBookQA",
+        "GSM8K",
+        "MMLU",
+        "SimpleQA Verified",
+        "Mystery Game Puzzles"
+      ]
+    }
+  }
+}

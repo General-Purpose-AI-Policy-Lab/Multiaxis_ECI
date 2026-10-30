@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "g": {
+      "title": "General Capabilities (Agentic, Cyber & SWE)",
+      "title_fr": "Capacités générales (agentique, cyber & SWE)",
+      "signature": [
+        "CyberGym",
+        "GDPval",
+        "Cybench"
+      ],
+      "top_benchmarks": [
+        "CyberGym",
+        "GDPval",
+        "CyScenarioBench",
+        "AISI CTF Suites - Practitioner",
+        "ExploitBench",
+        "Cybench",
+        "MirrorCode",
+        "PostTrainBench v1.1"
+      ]
+    },
+    "specific1": {
+      "title": "Fluid Intelligence & Formal Sciences",
+      "title_fr": "Intelligence fluide & Sciences formelles",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI",
+        "MATH Level 5"
+      ],
+      "top_benchmarks": [
+        "AudioMultiChallenge",
+        "OTIS Mock AIME 2024-2025",
+        "VPCT",
+        "MATH Level 5",
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "MCP Atlas",
+        "CritPt"
+      ]
+    },
+    "specific2": {
+      "title": "Factual & Scientific Knowledge",
+      "title_fr": "Connaissances factuelles & scientifiques",
+      "signature": [
+        "GeoBench",
+        "SimpleQA Verified",
+        "MMLU Biology"
+      ],
+      "top_benchmarks": [
+        "GeoBench",
+        "SimpleQA Verified",
+        "GSM8K",
+        "MMLU Biology",
+        "WMDP Chemistry",
+        "WMDP Biology",
+        "LAB-Bench Protocol",
+        "MMLU"
+      ]
+    },
+    "specific3": {
+      "title": "Commonsense, Desk Research & Language",
+      "title_fr": "Sens commun, recherche documentaire & langage",
+      "signature": [
+        "DeepResearch Bench",
+        "Lech Mazur Writing",
+        "OpenBookQA"
+      ],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "Lech Mazur Writing",
+        "OpenBookQA",
+        "CTI-REALM",
+        "HellaSwag",
+        "ARC AI2",
+        "SimpleBench",
+        "PIQA"
+      ]
+    }
+  }
+}

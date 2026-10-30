@@ -1,0 +1,81 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "g": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "DeepSWE",
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "CritPt",
+        "GPQA Diamond Chemistry",
+        "AudioMultiChallenge"
+      ]
+    },
+    "specific1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "ARC AI2",
+        "OpenBookQA",
+        "CyScenarioBench (Anthropic)",
+        "SpireClimb",
+        "HLE Diamond",
+        "WeirdML v3",
+        "CL-bench Life",
+        "CAISI SEC-Bench Pro"
+      ]
+    },
+    "specific2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "TriviaQA",
+        "HellaSwag",
+        "PIQA",
+        "WinoGrande",
+        "BlueprintBench 2",
+        "SimpleQA Verified",
+        "DrugDiscoveryBench",
+        "DeepResearch Bench"
+      ]
+    },
+    "specific3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OpenBookQA",
+        "MCP Atlas",
+        "DrugDiscoveryBench",
+        "BlueprintBench 2",
+        "HellaSwag",
+        "Lech Mazur Writing",
+        "PIQA",
+        "CTI-REALM"
+      ]
+    },
+    "specific4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "CyScenarioBench",
+        "CyberGym",
+        "Furniture Assembly",
+        "ExploitBench",
+        "GBAEval",
+        "GDPval",
+        "AISI Cyber Ranges - The Last Ones",
+        "FrontierSWE v2"
+      ]
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "trace": "trace_mirt_k4_bifactor_lineageprior_lineagebm_gsum.nc",
+  "n_chains": 10,
+  "K": 4,
+  "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+  "chain_delta_logp": [
+    -7.2,
+    -59.1,
+    -2.9,
+    -59.2,
+    -69.1,
+    -15.6,
+    0.0,
+    -9.8,
+    -16.9,
+    -37.4
+  ],
+  "modes": [
+    {
+      "chains": [
+        0,
+        2,
+        6
+      ],
+      "mean_logp": -23408.64248501735,
+      "min_matched_corr": 0.809,
+      "label": "A",
+      "delta_logp": 0.0,
+      "matched_corr_to_best": null
+    },
+    {
+      "chains": [
+        5,
+        7,
+        8
+      ],
+      "mean_logp": -23419.407354764306,
+      "min_matched_corr": 0.992,
+      "label": "B",
+      "delta_logp": -10.8,
+      "matched_corr_to_best": 0.794
+    },
+    {
+      "chains": [
+        9
+      ],
+      "mean_logp": -23442.67831410443,
+      "min_matched_corr": 1.0,
+      "label": "C",
+      "delta_logp": -34.0,
+      "matched_corr_to_best": 0.655
+    },
+    {
+      "chains": [
+        1,
+        3
+      ],
+      "mean_logp": -23464.433198458548,
+      "min_matched_corr": 0.958,
+      "label": "D",
+      "delta_logp": -55.8,
+      "matched_corr_to_best": 0.729
+    },
+    {
+      "chains": [
+        4
+      ],
+      "mean_logp": -23474.37039120389,
+      "min_matched_corr": 1.0,
+      "label": "E",
+      "delta_logp": -65.7,
+      "matched_corr_to_best": 0.775
+    }
+  ],
+  "selected_chains": {
+    "chains": [
+      0,
+      2
+    ],
+    "why": "mode A without chain 6: 55 of its 200 saved draws diverge (chain 4, mode E, 162 of 200, is stuck at tree depth 3); 2026-10-28"
+  }
+}

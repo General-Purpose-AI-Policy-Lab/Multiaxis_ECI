@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "g": {
+      "title": "General Capabilities (Agentic, Cyber & SWE)",
+      "title_fr": "Capacités générales (agentique, cyber & SWE)",
+      "signature": [
+        "CyberGym",
+        "ExploitBench",
+        "GDPval"
+      ],
+      "top_benchmarks": [
+        "CyberGym",
+        "ExploitBench",
+        "CL-bench",
+        "CyScenarioBench",
+        "SEAL Tool Use (Enterprise)",
+        "Cybench",
+        "CL-bench Life",
+        "GDPval"
+      ]
+    },
+    "g+specific1": {
+      "title": "General Capabilities + Multimodal Perception & Science QA",
+      "title_fr": "Capacités générales + perception multimodale & QCM scientifiques",
+      "signature": [
+        "VPCT",
+        "AudioMultiChallenge",
+        "OpenBookQA"
+      ],
+      "top_benchmarks": [
+        "VPCT",
+        "AudioMultiChallenge",
+        "OpenBookQA",
+        "LAB-Bench LitQA2",
+        "ARC AI2",
+        "ARC-AGI",
+        "Visual Task Assessment (VISTA)",
+        "ARC-AGI-2"
+      ]
+    },
+    "g+specific2": {
+      "title": "General Capabilities + Desk Research & Agentic Coding",
+      "title_fr": "Capacités générales + recherche documentaire & code agentique",
+      "signature": [
+        "DeepResearch Bench",
+        "APEX-Agents",
+        "DeepSWE"
+      ],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "APEX-Agents",
+        "DeepSWE",
+        "SimpleBench",
+        "CadEval",
+        "Balrog",
+        "CTI-REALM",
+        "SWE Atlas"
+      ]
+    },
+    "g+specific3": {
+      "title": "General Capabilities + Factual & Scientific Knowledge",
+      "title_fr": "Capacités générales + connaissances factuelles & scientifiques",
+      "signature": [
+        "SimpleQA Verified",
+        "GSM8K",
+        "MMLU Biology"
+      ],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "GSM8K",
+        "MMLU Biology",
+        "LAB-Bench Protocol",
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "MMLU Chemistry",
+        "SimpleBench"
+      ]
+    }
+  }
+}

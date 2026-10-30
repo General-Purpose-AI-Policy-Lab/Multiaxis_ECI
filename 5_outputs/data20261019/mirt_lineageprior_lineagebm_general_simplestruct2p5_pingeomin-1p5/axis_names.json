@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "User, 2026-10-27, for the geomin-rotated frame of the flagship's mode A; the pinned fit (--axis-pin pins/Q_geomin.csv, offset 1.5) takes its orientation from that frame, so the same names and signatures apply to its mode A (checked: every signature meets the top 5). The display frame ranks the axes by loading energy, which puts the pinned axis 3 (cyber & expert) second and the pinned axis 2 (agentic) third: the entries follow the display order.",
+  "axes": {
+    "axis1": {
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "GPQA Diamond Chemistry"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "GPQA Diamond Chemistry",
+        "AudioMultiChallenge",
+        "GPQA Main Chemistry",
+        "GPQA Main Biology",
+        "MMLU Pro Chemistry",
+        "ARC-AGI"
+      ]
+    },
+    "axis2": {
+      "title": "Cyber & Expert-Level Tasks",
+      "title_fr": "Cyber & Tâches de niveau expert",
+      "signature": [
+        "CyScenarioBench",
+        "Cybench",
+        "GBAEval"
+      ],
+      "top_benchmarks": [
+        "GBAEval",
+        "EBR-bench",
+        "Furniture Assembly",
+        "CyScenarioBench",
+        "Cybench",
+        "CyberGym",
+        "GDPval",
+        "ProofBench"
+      ]
+    },
+    "axis3": {
+      "title": "Agentic Programming & Computer Use",
+      "title_fr": "Programmation agentique & Usage de l'ordinateur",
+      "signature": [
+        "MCP Atlas",
+        "APEX-Agents",
+        "DeepSWE"
+      ],
+      "top_benchmarks": [
+        "MCP Atlas",
+        "APEX-Agents",
+        "DeepSWE",
+        "OSWorld",
+        "SWE Atlas",
+        "PostTrainBench v1.1",
+        "FrontierCode",
+        "The Agent Company"
+      ]
+    },
+    "axis4": {
+      "title": "Commonsense & Factual Knowledge",
+      "title_fr": "Sens commun & connaissances factuelles",
+      "signature": [
+        "SimpleQA Verified",
+        "ARC AI2",
+        "OpenBookQA"
+      ],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "ARC AI2",
+        "OpenBookQA",
+        "PIQA",
+        "MMLU",
+        "Balrog",
+        "SimpleBench",
+        "WinoGrande"
+      ]
+    }
+  }
+}

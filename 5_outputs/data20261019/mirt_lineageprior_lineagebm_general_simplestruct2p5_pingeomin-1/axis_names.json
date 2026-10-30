@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "AudioMultiChallenge",
+        "MMLU Biology",
+        "CAISI CTF-Archive",
+        "CAISI Cybench",
+        "GPQA Main Biology",
+        "GPQA Diamond Biology",
+        "MMLU Chemistry"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GDPval",
+        "GBAEval",
+        "CyScenarioBench",
+        "AISI CTF Suites - Practitioner",
+        "Furniture Assembly",
+        "CyberGym",
+        "AISI Cyber Ranges - Cooling Tower",
+        "EBR-bench"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "CadEval",
+        "OSWorld",
+        "APEX-Agents",
+        "CTI-REALM",
+        "LAB-Bench Cloning",
+        "PostTrainBench v1.1",
+        "InterCode-CTF"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GeoBench",
+        "OpenBookQA",
+        "CAISI OSS-Fuzz",
+        "SpireClimb",
+        "ARC AI2",
+        "CAISI ExploitGym Userspace",
+        "CAISI SEC-Bench Pro",
+        "SimpleQA Verified"
+      ]
+    }
+  }
+}

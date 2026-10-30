@@ -1,0 +1,111 @@
+{
+ "trace": "trace_mirt_k5_bifactor_lineageprior_lineagebm.nc",
+ "n_chains": 10,
+ "K": 5,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -59.8,
+  -56.1,
+  -83.8,
+  -54.4,
+  -101.0,
+  -165.2,
+  0.0,
+  -108.9,
+  -22.4,
+  -83.6
+ ],
+ "modes": [
+  {
+   "chains": [
+    6
+   ],
+   "mean_logp": -24744.99991534218,
+   "min_matched_corr": 1.0,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    8
+   ],
+   "mean_logp": -24767.369337660537,
+   "min_matched_corr": 1.0,
+   "label": "B",
+   "delta_logp": -22.4,
+   "matched_corr_to_best": 0.779
+  },
+  {
+   "chains": [
+    3
+   ],
+   "mean_logp": -24799.425071813268,
+   "min_matched_corr": 1.0,
+   "label": "C",
+   "delta_logp": -54.4,
+   "matched_corr_to_best": 0.169
+  },
+  {
+   "chains": [
+    1
+   ],
+   "mean_logp": -24801.110612569413,
+   "min_matched_corr": 1.0,
+   "label": "D",
+   "delta_logp": -56.1,
+   "matched_corr_to_best": 0.411
+  },
+  {
+   "chains": [
+    0
+   ],
+   "mean_logp": -24804.790908090697,
+   "min_matched_corr": 1.0,
+   "label": "E",
+   "delta_logp": -59.8,
+   "matched_corr_to_best": 0.397
+  },
+  {
+   "chains": [
+    2,
+    9
+   ],
+   "mean_logp": -24828.724500918186,
+   "min_matched_corr": 0.961,
+   "label": "F",
+   "delta_logp": -83.7,
+   "matched_corr_to_best": 0.74
+  },
+  {
+   "chains": [
+    4
+   ],
+   "mean_logp": -24846.048172629005,
+   "min_matched_corr": 1.0,
+   "label": "G",
+   "delta_logp": -101.0,
+   "matched_corr_to_best": 0.311
+  },
+  {
+   "chains": [
+    7
+   ],
+   "mean_logp": -24853.851562703567,
+   "min_matched_corr": 1.0,
+   "label": "H",
+   "delta_logp": -108.9,
+   "matched_corr_to_best": 0.406
+  },
+  {
+   "chains": [
+    5
+   ],
+   "mean_logp": -24910.20920533832,
+   "min_matched_corr": 1.0,
+   "label": "I",
+   "delta_logp": -165.2,
+   "matched_corr_to_best": 0.354
+  }
+ ]
+}
