@@ -849,9 +849,15 @@ def run_exploration(args, parser) -> None:
             earlier, saved = dict(post.attrs), int(post.sizes["draw"])
         thin = int(earlier.get("mirt_save_thin", 1))
         # The tier order is config's, not the spec's: a change to it leaves mirt_spec equal.
+        # The specs compare as parsed, so an option added since the earlier run (absent from
+        # its mirt_spec, off) does not set the two apart.
         wrong = [f"{key} ({earlier.get(key)!r} there, {attrs.get(key)!r} here)"
-                 for key in ("mirt_spec", "mirt_data_fingerprint", "mirt_human_order")
+                 for key in ("mirt_data_fingerprint", "mirt_human_order")
                  if earlier.get(key) != attrs.get(key)]
+        if not earlier.get("mirt_spec") or (FitSpec.from_spec_json(earlier["mirt_spec"])
+                                            != FitSpec.from_spec_json(attrs["mirt_spec"])):
+            wrong.insert(0, f"mirt_spec ({earlier.get('mirt_spec')!r} there, "
+                            f"{attrs.get('mirt_spec')!r} here)")
         if thin != args.save_thin:
             wrong.append(f"save thinning ({thin} there, {args.save_thin} here)")
         if saved != -(-sample_kw["draws"] // args.save_thin):

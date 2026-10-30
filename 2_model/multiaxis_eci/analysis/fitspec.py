@@ -330,6 +330,30 @@ class FitSpec:
             parser.error(str(e))
 
     @staticmethod
+    def from_spec_json(text: str, name: str = "trace") -> FitSpec:
+        """The spec a `mirt_spec` attr stands for. A field the attr lacks (written before that
+        field existed) takes the value that reproduces the model it was fit with: the legacy
+        values below, else the field's default (every option added since is off by default)."""
+        d = json.loads(text)
+        d["drop_benchmarks"] = tuple(d.get("drop_benchmarks") or ())
+        # A spec written before the Beta-binomial existed was fit with the Beta, one written
+        # before the effort means became the default (2026-10-03) without them.
+        d.setdefault("beta_binomial", False)
+        d.setdefault("effort_means", False)
+        d.setdefault("theta_skew", False)     # a spec from before the skew-normal block
+        d.setdefault("no_humans", False)      # ... from before the models-only fits
+        d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
+        d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
+        d.setdefault("sigma_b_floor", 0.0)
+        for field, off in _RETIRED_FIELDS.items():
+            if field in d:
+                if d[field] != off:
+                    raise ValueError(f"{name} was fit with {field}={d[field]!r}, "
+                                     "an option since removed (see _RETIRED_FIELDS)")
+                del d[field]
+        return FitSpec(**d)
+
+    @staticmethod
     def from_trace(idata, trace_path) -> FitSpec:
         """The spec of an existing trace, from its attrs and its folder name.
 
@@ -354,24 +378,7 @@ class FitSpec:
         # spec. The folder it was parsed from IS the check there.
         is_baseline = trace_path.name == "trace_mirt_k1.nc"
         if post.attrs.get("mirt_spec"):
-            d = json.loads(post.attrs["mirt_spec"])
-            d["drop_benchmarks"] = tuple(d.get("drop_benchmarks") or ())
-            # A spec written before the Beta-binomial existed was fit with the Beta, one written
-            # before the effort means became the default (2026-10-03) without them.
-            d.setdefault("beta_binomial", False)
-            d.setdefault("effort_means", False)
-            d.setdefault("theta_skew", False)     # a spec from before the skew-normal block
-            d.setdefault("no_humans", False)      # ... from before the models-only fits
-            d.setdefault("human_delta_sd", LEGACY_HUMAN_DELTA_SD)
-            d.setdefault("human_root_sd", LEGACY_HUMAN_ROOT_SD)
-            d.setdefault("sigma_b_floor", 0.0)
-            for field, off in _RETIRED_FIELDS.items():
-                if field in d:
-                    if d[field] != off:
-                        raise ValueError(f"{trace_path.name} was fit with {field}={d[field]!r}, "
-                                         "an option since removed (see _RETIRED_FIELDS)")
-                    del d[field]
-            spec = FitSpec(**d)
+            spec = FitSpec.from_spec_json(post.attrs["mirt_spec"], trace_path.name)
         else:
             attr = _attr_flags(post)
             if not any(k.startswith("mirt_") for k in post.attrs):

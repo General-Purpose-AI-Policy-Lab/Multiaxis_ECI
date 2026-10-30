@@ -54,3 +54,16 @@ def test_general_sums_round_trips_through_tag_and_attrs():
     parsed = _parse_tag(spec.tag)
     assert parsed["general_sums"] is True and parsed["loading_prior"] == "bifactor"
     assert "general_sums" not in _parse_tag(FitSpec(K=5, loading_prior="bifactor").tag)
+
+
+def test_a_spec_written_before_general_sums_reads_as_the_same_fit():
+    """--merge-chains compares the specs as parsed: a trace whose mirt_spec predates the option
+    (no general_sums key) is the same fit as today's run with it off, and a real change is not."""
+    import dataclasses
+    import json
+    from multiaxis_eci.analysis.fitspec import FitSpec
+    today = FitSpec(K=4, lineage_prior=True, lineage_bm=True, theta_skew=True, no_humans=True)
+    old = {k: (list(v) if isinstance(v, tuple) else v)
+           for k, v in dataclasses.asdict(today).items() if k != "general_sums"}
+    assert FitSpec.from_spec_json(json.dumps(old)) == today
+    assert FitSpec.from_spec_json(json.dumps({**old, "lineage_bm": False})) != today
