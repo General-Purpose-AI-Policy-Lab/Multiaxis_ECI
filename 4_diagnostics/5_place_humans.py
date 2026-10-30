@@ -59,7 +59,8 @@ RULE_TITLES = {
     # Its 20-chain mode A (seeds 44 + 45, 2026-10-30) has a g and a specific of its own: g keeps
     # the whole-pair judgments of the other g, the specific those of the flagship's formal axis.
     "General Capabilities (Scientific & Factual Knowledge)": "General Capabilities (Agentic, Cyber & SWE)",
-    "General Capabilities + Fluid Intelligence, Math & Coding": "Fluid Intelligence & Formal Sciences",
+    "General Capabilities + Fluid Intelligence, Formal Sciences & Coding":
+        "Fluid Intelligence & Formal Sciences",
 }
 
 
