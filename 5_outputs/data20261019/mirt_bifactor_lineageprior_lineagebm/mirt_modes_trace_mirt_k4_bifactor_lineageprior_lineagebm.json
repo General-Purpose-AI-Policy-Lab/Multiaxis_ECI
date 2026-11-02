@@ -1,37 +1,68 @@
 {
  "trace": "trace_mirt_k4_bifactor_lineageprior_lineagebm.nc",
- "n_chains": 20,
+ "n_chains": 50,
  "K": 4,
  "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
  "chain_delta_logp": [
-  -32.3,
-  -74.7,
-  -46.9,
-  -71.1,
-  -6.5,
-  -26.5,
-  -15.1,
-  -55.1,
-  -78.8,
-  -23.1,
-  -1.2,
-  -53.2,
-  -81.4,
+  -45.5,
+  -87.9,
+  -60.1,
+  -84.3,
+  -19.7,
+  -39.8,
+  -28.3,
+  -68.3,
+  -92.1,
+  -36.3,
+  -14.4,
+  -66.5,
+  -94.6,
+  -13.2,
+  -118.0,
+  -64.5,
+  -67.5,
+  -86.2,
+  -54.1,
+  -78.2,
+  -61.3,
+  -52.0,
+  -108.4,
+  -66.7,
+  -124.4,
+  -24.0,
+  -100.1,
+  -59.2,
+  -146.9,
+  -64.7,
+  -59.9,
+  -79.8,
+  -55.8,
+  -56.5,
+  -16.4,
+  -24.6,
+  -81.3,
+  -57.8,
+  -98.2,
+  -147.6,
+  -142.2,
+  -124.0,
+  -94.8,
+  -127.0,
+  -89.6,
+  -23.2,
+  -36.5,
   0.0,
-  -104.8,
-  -51.3,
-  -54.3,
-  -73.0,
-  -40.9,
-  -64.9
+  -95.3,
+  -54.4
  ],
  "modes": [
   {
    "chains": [
     10,
-    13
+    13,
+    34
    ],
-   "mean_logp": -23241.02402478941,
+   "mean_logp": -23241.888785227424,
    "min_matched_corr": 0.959,
    "label": "A",
    "delta_logp": 0.0,
@@ -39,28 +70,42 @@
   },
   {
    "chains": [
-    0,
-    4,
-    6,
-    9,
-    18
+    46
    ],
-   "mean_logp": -23264.007630047454,
-   "min_matched_corr": 0.874,
+   "mean_logp": -23263.703199209514,
+   "min_matched_corr": 1.0,
    "label": "B",
-   "delta_logp": -23.0,
-   "matched_corr_to_best": 0.018
+   "delta_logp": -21.8,
+   "matched_corr_to_best": 0.191
   },
   {
    "chains": [
     5,
-    15
+    15,
+    20,
+    30,
+    49
    ],
-   "mean_logp": -23279.361252854727,
-   "min_matched_corr": 0.908,
+   "mean_logp": -23283.21884247772,
+   "min_matched_corr": 0.834,
    "label": "C",
-   "delta_logp": -38.3,
-   "matched_corr_to_best": 0.135
+   "delta_logp": -41.3,
+   "matched_corr_to_best": 0.086
+  },
+  {
+   "chains": [
+    0,
+    18,
+    23,
+    27,
+    32,
+    37
+   ],
+   "mean_logp": -23283.754913105764,
+   "min_matched_corr": 0.964,
+   "label": "D",
+   "delta_logp": -41.9,
+   "matched_corr_to_best": 0.011
   },
   {
    "chains": [
@@ -70,45 +115,79 @@
     7,
     11,
     16,
-    19
+    19,
+    21,
+    29,
+    31,
+    33,
+    36,
+    38
    ],
-   "mean_logp": -23300.48794757177,
-   "min_matched_corr": 0.924,
-   "label": "D",
-   "delta_logp": -59.5,
-   "matched_corr_to_best": 0.031
+   "mean_logp": -23299.94811434934,
+   "min_matched_corr": 0.884,
+   "label": "E",
+   "delta_logp": -58.1,
+   "matched_corr_to_best": 0.008
+  },
+  {
+   "chains": [
+    4,
+    6,
+    9,
+    24,
+    25,
+    28,
+    35,
+    39,
+    40,
+    41,
+    43,
+    45,
+    47
+   ],
+   "mean_logp": -23301.707416802194,
+   "min_matched_corr": 0.807,
+   "label": "F",
+   "delta_logp": -59.8,
+   "matched_corr_to_best": 0.155
   },
   {
    "chains": [
     8,
     12,
-    17
+    14,
+    17,
+    22,
+    42,
+    44,
+    48
    ],
-   "mean_logp": -23318.173899194982,
-   "min_matched_corr": 0.995,
-   "label": "E",
-   "delta_logp": -77.1,
-   "matched_corr_to_best": 0.727
+   "mean_logp": -23324.60586564627,
+   "min_matched_corr": 0.98,
+   "label": "G",
+   "delta_logp": -82.7,
+   "matched_corr_to_best": 0.668
   },
   {
    "chains": [
-    14
+    26
    ],
-   "mean_logp": -23345.236073568525,
+   "mean_logp": -23327.380712297094,
    "min_matched_corr": 1.0,
-   "label": "F",
-   "delta_logp": -104.2,
-   "matched_corr_to_best": 0.668
+   "label": "H",
+   "delta_logp": -85.5,
+   "matched_corr_to_best": 0.324
   }
  ],
  "selected_chains": {
   "chains": [
    0,
-   4,
-   6,
-   9,
-   18
+   18,
+   23,
+   27,
+   32,
+   37
   ],
-  "why": "mode B, the seed-44 mode A (chains 0, 4, 6, 9) plus seed-45 chain 18: the best-log-density mode A (chains 10, 13) empties g (3 dominant benchmarks) and predicts worse (integrated LOO chain 13 vs chain 4: -37.7 +- 20.9, -26.9 +- 15.1 on reliable scores); user, 2026-10-30"
+  "why": "mode D at 50 chains: best integrated LOO of the modes (diagnostics/integrated_loo.log), and its g is not empty, unlike the best-logp mode A (user, 2026-11-02)"
  }
 }

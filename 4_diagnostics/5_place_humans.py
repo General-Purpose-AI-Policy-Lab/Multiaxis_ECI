@@ -61,6 +61,11 @@ RULE_TITLES = {
     "General Capabilities (Scientific & Factual Knowledge)": "General Capabilities (Agentic, Cyber & SWE)",
     "General Capabilities + Fluid Intelligence, Formal Sciences & Coding":
         "Fluid Intelligence & Formal Sciences",
+    # The free bifactor K = 4 at 50 chains, mode D (user, 2026-11-02): its g is nearly empty (only
+    # GeoBench and TriviaQA lean on it most), its agentic content sits on a specific.
+    "Geolocation, Trivia & Commonsense": "Mixed (Visual, Trivia, Cyber)",
+    "Fluid Intelligence, Scientific Knowledge & Coding": "Scientific Knowledge & Reasoning",
+    "Agentic, Cyber & SWE": "General Capabilities (Agentic, Cyber & SWE)",
 }
 
 

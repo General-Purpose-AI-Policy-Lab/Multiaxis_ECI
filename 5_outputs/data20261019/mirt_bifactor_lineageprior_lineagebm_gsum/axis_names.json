@@ -3,41 +3,41 @@
   "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
   "axes": {
     "g": {
-      "title": "General Capabilities (Scientific & Factual Knowledge)",
-      "title_fr": "Capacités générales (connaissances scientifiques & factuelles)",
+      "title": "General Capabilities (Math, Science & Cyber)",
+      "title_fr": "Capacités générales (maths, sciences & cyber)",
       "signature": [
-        "GSM8K",
-        "WMDP Chemistry",
-        "SimpleQA Verified"
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "GPQA Main Chemistry"
       ],
       "top_benchmarks": [
-        "GeoBench",
-        "GSM8K",
-        "WMDP Chemistry",
-        "MMLU Biology",
-        "SimpleQA Verified",
-        "SpireClimb",
-        "LAB-Bench LitQA2",
-        "WMDP Biology"
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "AudioMultiChallenge",
+        "CAISI CTF-Archive",
+        "GPQA Main Chemistry",
+        "CritPt",
+        "CAISI Cybench",
+        "TutorBench"
       ]
     },
     "g+specific1": {
-      "title": "General Capabilities + Fluid Intelligence, Formal Sciences & Coding",
-      "title_fr": "Capacités générales + intelligence fluide, sciences formelles & code",
+      "title": "General Capabilities + Desk Research, Trivia & Commonsense",
+      "title_fr": "Capacités générales + recherche documentaire, trivia & sens commun",
       "signature": [
-        "ARC-AGI-2",
-        "CritPt",
-        "DeepSWE"
+        "DeepResearch Bench",
+        "TriviaQA",
+        "SimpleBench"
       ],
       "top_benchmarks": [
-        "CritPt",
-        "DeepSWE",
-        "MCP Atlas",
-        "ARC-AGI-2",
-        "CAISI CTF-Archive",
-        "OTIS Mock AIME 2024-2025",
-        "ARC-AGI",
-        "MATH Level 5"
+        "DeepResearch Bench",
+        "TriviaQA",
+        "SimpleBench",
+        "CTI-REALM",
+        "APEX-Agents",
+        "HellaSwag",
+        "PIQA",
+        "PostTrainBench v1.1"
       ]
     },
     "g+specific2": {
@@ -45,37 +45,37 @@
       "title_fr": "Capacités générales + capacités agentiques & cyber",
       "signature": [
         "GBAEval",
-        "GDPval",
-        "CyberGym"
+        "MirrorCode",
+        "FrontierSWE v2"
       ],
       "top_benchmarks": [
+        "Lech Mazur Writing",
         "GBAEval",
-        "GDPval",
-        "CyberGym",
         "CyScenarioBench",
-        "OSWorld",
-        "Furniture Assembly",
+        "MirrorCode",
+        "GDPval",
+        "AISI Cyber Ranges - Cooling Tower",
         "FrontierSWE v2",
-        "EBR-bench"
+        "HellaSwag"
       ]
     },
     "g+specific3": {
-      "title": "General Capabilities + Desk Research, Trivia & Commonsense",
-      "title_fr": "Capacités générales + recherche documentaire, trivia & sens commun",
+      "title": "General Capabilities + Commonsense & Factual Knowledge",
+      "title_fr": "Capacités générales + sens commun & connaissances factuelles",
       "signature": [
-        "TriviaQA",
-        "DeepResearch Bench",
-        "HellaSwag"
+        "SimpleQA Verified",
+        "OpenBookQA",
+        "ARC AI2"
       ],
       "top_benchmarks": [
-        "TriviaQA",
-        "DeepResearch Bench",
-        "HellaSwag",
-        "PIQA",
-        "WinoGrande",
-        "CTI-REALM",
-        "APEX-Agents",
-        "CadEval"
+        "SimpleQA Verified",
+        "GeoBench",
+        "OpenBookQA",
+        "ARC AI2",
+        "Balrog",
+        "LAB-Bench Protocol",
+        "SimpleBench",
+        "GSM8K"
       ]
     }
   }

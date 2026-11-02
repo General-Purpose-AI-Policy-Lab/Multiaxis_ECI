@@ -3,79 +3,79 @@
   "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
   "axes": {
     "g": {
-      "title": "General Capabilities (Agentic, Cyber & SWE)",
-      "title_fr": "Capacités générales (agentique, cyber & SWE)",
-      "signature": [
-        "CyberGym",
-        "GDPval",
-        "OSWorld"
-      ],
-      "top_benchmarks": [
-        "ProofBench",
-        "Furniture Assembly",
-        "CyberGym",
-        "AISI CTF Suites - Practitioner",
-        "FrontierMath Tier 4 v2",
-        "VPCT",
-        "GBAEval",
-        "Aider Polyglot"
-      ]
-    },
-    "specific1": {
-      "title": "Scientific Knowledge & Reasoning",
-      "title_fr": "Connaissances et raisonnements scientifiques",
-      "signature": [
-        "OTIS Mock AIME 2024-2025",
-        "MATH Level 5",
-        "GPQA Diamond Chemistry"
-      ],
-      "top_benchmarks": [
-        "ARC-AGI-2",
-        "ARC-AGI",
-        "OTIS Mock AIME 2024-2025",
-        "MATH Level 5",
-        "GPQA Main Chemistry",
-        "DeepSWE",
-        "MMLU Pro Chemistry",
-        "GPQA Diamond Chemistry"
-      ]
-    },
-    "specific2": {
-      "title": "Mixed (Visual, Trivia, Cyber)",
-      "title_fr": "Mixte (visuel, trivia, cyber)",
+      "title": "Geolocation, Trivia & Commonsense",
+      "title_fr": "Géolocalisation, trivia & sens commun",
       "signature": [
         "GeoBench",
         "TriviaQA",
-        "CyScenarioBench (Anthropic)"
+        "HellaSwag"
       ],
       "top_benchmarks": [
-        "VPCT",
-        "CyScenarioBench (Anthropic)",
+        "GeoBench",
+        "TriviaQA",
+        "HellaSwag",
+        "PIQA",
         "SpireClimb",
-        "Aider Polyglot",
-        "CAISI SEC-Bench Pro",
+        "WinoGrande",
         "SimpleQA Verified",
-        "VisualToolBench",
-        "CAISI ExploitGym Userspace"
+        "VisualToolBench"
+      ]
+    },
+    "specific1": {
+      "title": "Fluid Intelligence, Scientific Knowledge & Coding",
+      "title_fr": "Intelligence fluide, connaissances scientifiques & code",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI-2",
+        "CritPt"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "AudioMultiChallenge",
+        "MCP Atlas",
+        "DeepSWE",
+        "CritPt",
+        "ARC-AGI",
+        "ARC-AGI-2"
+      ]
+    },
+    "specific2": {
+      "title": "Agentic, Cyber & SWE",
+      "title_fr": "Agentique, cyber & SWE",
+      "signature": [
+        "GDPval",
+        "CyberGym",
+        "GBAEval"
+      ],
+      "top_benchmarks": [
+        "GDPval",
+        "CyScenarioBench",
+        "GBAEval",
+        "CyberGym",
+        "Furniture Assembly",
+        "AISI CTF Suites - Practitioner",
+        "Cybench",
+        "AISI Cyber Ranges - The Last Ones"
       ]
     },
     "specific3": {
       "title": "Commonsense & Factual Knowledge",
       "title_fr": "Sens commun & connaissances factuelles",
       "signature": [
-        "OpenBookQA",
         "ARC AI2",
-        "PIQA"
+        "OpenBookQA",
+        "SimpleQA Verified"
       ],
       "top_benchmarks": [
         "ARC AI2",
-        "InterCode-CTF",
-        "SimpleBench",
         "OpenBookQA",
-        "GSM8K",
-        "MMLU",
+        "DeepResearch Bench",
+        "SimpleBench",
         "SimpleQA Verified",
-        "Mystery Game Puzzles"
+        "WinoGrande",
+        "MMLU",
+        "GSM8K"
       ]
     }
   }
