@@ -110,6 +110,9 @@ class FitSpec:
     # Axes as g plus deviations on the bifactor loadings (models/mirt._assemble_theta),
     # exploration: `_gsum`.
     general_sums: bool = False
+    # g and the specifics held orthogonal on the bifactor loadings, axes reported as
+    # g + sigma_k s_k after sampling (models/mirt.py, analysis.factors), exploration: `_orth`.
+    orthogonal: bool = False
     # Soft simple structure of the loadings (models/mirt.py), exploration: `_simplestruct`.
     simple_structure: bool = False
     # Fixed concentration of those shares (None: learned); the tag token carries it, `_simplestruct5`.
@@ -195,6 +198,10 @@ class FitSpec:
         if self.general_sums and self.loading_prior != "bifactor":
             raise ValueError("--general-sums writes the bifactor's axes as g plus deviations; "
                              "it needs --loading-prior bifactor.")
+        if self.orthogonal and (self.loading_prior != "bifactor" or self.general_sums
+                                or self.theta_general):
+            raise ValueError("--orthogonal holds the bifactor's g and specifics apart; it needs "
+                             "--loading-prior bifactor, without --general-sums or --theta-general.")
         if self.censor_bounds and self.beta_binomial:
             object.__setattr__(self, "beta_binomial", False)
         if self.theta_t and self.theta_skew:
@@ -225,6 +232,7 @@ class FitSpec:
         elif not self.theta_skew: tag += "_normaltheta"
         if self.theta_general: tag += "_general"
         if self.general_sums: tag += "_gsum"
+        if self.orthogonal: tag += "_orth"
         if self.simple_structure:
             tag += "_simplestruct" + ("" if self.share_conc is None
                                       else f"{self.share_conc:g}".replace(".", "p"))
@@ -307,6 +315,7 @@ class FitSpec:
                 theta_skew=getattr(args, "theta_skew", True),
                 theta_general=getattr(args, "theta_general", False),
                 general_sums=getattr(args, "general_sums", False),
+                orthogonal=getattr(args, "orthogonal", False),
                 simple_structure=getattr(args, "simple_structure", False),
                 share_conc=getattr(args, "share_conc", None),
                 axis_pin=pin_label(getattr(args, "axis_pin", None)),
@@ -638,6 +647,8 @@ def _attr_flags(post) -> dict:
         out["theta_general"] = True
     if a.get("mirt_general_sums"):
         out["general_sums"] = True
+    if a.get("mirt_orthogonal"):
+        out["orthogonal"] = True
     if a.get("mirt_simple_structure"):
         out["simple_structure"] = True
     if a.get("mirt_share_conc"):
@@ -737,6 +748,8 @@ def _parse_tag(tag: str, drop_benchmarks: tuple = ()) -> dict:
         out["theta_general"] = True
     if take("_gsum"):
         out["general_sums"] = True
+    if take("_orth"):
+        out["orthogonal"] = True
     if take("_simplestruct"):
         out["simple_structure"] = True
         conc = re.match(r"\d+(p\d+)?", rest)
@@ -825,7 +838,7 @@ _BASELINE_OFF = dict(loading_prior="normal", link="linear",
                      lineage_prior=False, lineage_bm=False, effort_means=False,
                      time_prior=False,
                      theta_t=False, theta_skew=False, theta_general=False, general_sums=False,
-                     simple_structure=False, share_conc=None, axis_pin=None, pin_offset=None, theta_pos=False,
+                     orthogonal=False, simple_structure=False, share_conc=None, axis_pin=None, pin_offset=None, theta_pos=False,
                      private_bases=False,
                      pooled_noise=False)
 

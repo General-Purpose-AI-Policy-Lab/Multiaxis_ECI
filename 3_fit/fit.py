@@ -163,7 +163,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                 binomial_n=None, pooled_noise=False, sigma_b_floor=0.0, shared_base_zsn=True,
                 time_t=None,
                 theta_t_cells=False, theta_skew=False, theta_general=False, general_sums=False,
-                simple_structure=False, share_conc=None, axis_pin=None, pin_offset=None,
+                orthogonal=False, simple_structure=False, share_conc=None, axis_pin=None, pin_offset=None,
                 theta_pos=False,
                 link="linear",
                 checkpoint_path=None, stream_path=None, spec_attrs=None,
@@ -201,6 +201,8 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
         tag += ", higher-order general level"
     if general_sums:
         tag += ", axes = g + deviations"
+    if orthogonal:
+        tag += ", orthogonal g and specifics"
     if simple_structure:
         tag += ", soft simple structure"
         if axis_pin:
@@ -230,6 +232,7 @@ def sample_mirt(data, K: int, sample_kw: dict, human_order=None,
                              shared_base_zsn=shared_base_zsn,
                              time_t=time_t, theta_t_cells=theta_t_cells, theta_skew=theta_skew,
                              theta_general=theta_general, general_sums=general_sums,
+                             orthogonal=orthogonal,
                              simple_structure=simple_structure,
                              share_conc=share_conc,
                              **({"axis_pin": axis_pin, "pin_offset": pin_offset} if axis_pin
@@ -801,7 +804,7 @@ def run_exploration(args, parser) -> None:
         # Axis identity is structural here (axis1 IS the general column), so
         # name the axes on the trace and let every plot label them.
         attrs["mirt_axis_names"] = json.dumps(
-            ["g"] + [f"g+specific{k}" if spec.general_sums else f"specific{k}"
+            ["g"] + [f"g+specific{k}" if spec.general_sums or spec.orthogonal else f"specific{k}"
                      for k in range(1, args.K)])
     if args.private_bases:
         attrs["mirt_shared_base_zsn"] = json.dumps(False)
@@ -813,6 +816,8 @@ def run_exploration(args, parser) -> None:
         attrs["mirt_theta_general"] = json.dumps(True)
     if spec.general_sums:
         attrs["mirt_general_sums"] = json.dumps(True)
+    if spec.orthogonal:
+        attrs["mirt_orthogonal"] = json.dumps(True)
     if spec.simple_structure:
         attrs["mirt_simple_structure"] = json.dumps(True)
     if spec.share_conc is not None:
@@ -891,6 +896,7 @@ def run_exploration(args, parser) -> None:
                                   theta_skew=spec.theta_skew,
                                   theta_general=spec.theta_general,
                                   general_sums=spec.general_sums,
+                                  orthogonal=spec.orthogonal,
                                   simple_structure=spec.simple_structure,
                                   share_conc=spec.share_conc,
                                   axis_pin=axis_pin, pin_offset=spec.pin_offset,
@@ -1232,6 +1238,12 @@ def main():
                              "config.PRIOR_GENERAL_SUMS_SD), so every benchmark is a positive mix "
                              "of axes that all climb with g; the bifactor whose general loading "
                              "is never negative on those axes. Emits `_gsum`")
+    parser.add_argument("--orthogonal", action="store_true",
+                        help="[exploration] with --loading-prior bifactor: g and the specifics "
+                             "held orthogonal over the test-takers (a Potential on their "
+                             "in-sample correlations, config.ORTHOGONAL_CORR_SD), the classical "
+                             "bifactor; the axes are reported as g and g + sigma_k s_k "
+                             "(analysis.factors.orthogonal_composite). Emits `_orth`")
     parser.add_argument("--simple-structure", action="store_true",
                         help="[exploration] soft between-item structure of the loadings: each "
                              "benchmark's row is a size times simplex shares softmax(s * u_b) "

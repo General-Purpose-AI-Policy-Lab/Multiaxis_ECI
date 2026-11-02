@@ -39,6 +39,7 @@ from multiaxis_eci.config import (
     PRIOR_SHARE_CONC,
     PRIOR_SHARE_SIZE_SHAPE,
     PRIOR_GENERAL_SUMS_SD,
+    ORTHOGONAL_CORR_SD,
     PRIOR_THETA_GENERAL,
     PRIOR_THETA_SKEW_ALPHA,
     PRIOR_THETA_T_NU,
@@ -713,6 +714,7 @@ def build_mirt_model(data: ECIData, K: int,
                       theta_skew: bool = False,
                       theta_general: bool = False,
                       general_sums: bool = False,
+                      orthogonal: bool = False,
                       simple_structure: bool = False,
                       share_conc: float | None = None,
                       axis_pin: dict | None = None,
@@ -872,6 +874,14 @@ def build_mirt_model(data: ECIData, K: int,
     bifactor lets a benchmark rise less with g than its axes do (a contrast against g). A
     benchmark on axis k alone sees g + sigma_k z_k, so the reported axis needs no post-hoc
     unit for the deviation, and it climbs with g (the lineage drift is HalfNormal on both).
+    orthogonal: with the "bifactor" loadings, g and the specifics are held orthogonal over the
+    test-takers, the classical bifactor's assumption: a Potential on the in-sample correlation of
+    every pair of theta columns (config.ORTHOGONAL_CORR_SD). Each block keeps its own prior; the
+    common part of the scores can then sit in one column only, never in correlated specifics.
+    That column is not forced to be g: in a 250-draw smoke run (2026-11-02) one chain of two shrank
+    tau_g and let a specific grow dense in its place (the horseshoe's global scale rising). The
+    axes are reported as g and g + sigma_k s_k after sampling
+    (analysis.factors.orthogonal_composite), not here.
     theta_skew: the same block (unstructured rows plus human-root/chain-founder
     slices) independent skew-normal per axis, standardised, with a learned shape
     alpha_k ~ Normal(0, config.PRIOR_THETA_SKEW_ALPHA) (see _theta_skew_cells).
@@ -1075,6 +1085,9 @@ def build_mirt_model(data: ECIData, K: int,
     if general_sums and theta_general:
         raise ValueError("general_sums and theta_general both put a general level under the "
                          "axes; pick one")
+    if orthogonal and (loading_prior != "bifactor" or general_sums or theta_general):
+        raise ValueError("orthogonal holds the bifactor's g and specifics apart: it needs "
+                         "loading_prior='bifactor', without general_sums or theta_general")
     if loading_prior == "signed" and anchors:
         raise ValueError(
             "loading_prior='signed' relies on the loadings being EXACTLY "
@@ -1282,6 +1295,16 @@ def build_mirt_model(data: ECIData, K: int,
             theta_t_cells=theta_t_cells, theta_skew=theta_skew, lineage_links=lineage_links,
             effort_means=effort_means, theta_general=theta_general,
             general_sums=general_sums)
+        if orthogonal:
+            # In-sample correlation of every pair of columns, over all test-takers
+            n = data.n_models
+            tc = theta - theta.mean(axis=0, keepdims=True)
+            cov = pt.dot(tc.T, tc) / n
+            sd = pt.sqrt(pt.diag(cov))
+            iu = np.triu_indices(K, 1)
+            r = (cov / (sd[:, None] * sd[None, :]))[iu]
+            pm.Potential("theta_orthogonal",
+                         -0.5 * n / ORTHOGONAL_CORR_SD ** 2 * pt.sum(r ** 2))
         # Likelihood-side ability. Raw theta stays the reported ability (it
         # carries the location pin and the order structure); the positive copy
         # is what eta reads, so with A >= 0 an axis can only add to a score,

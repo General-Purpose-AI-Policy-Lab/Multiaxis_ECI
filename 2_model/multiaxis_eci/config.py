@@ -324,6 +324,15 @@ PRIOR_THETA_GENERAL = (2.0, 2.0)
 # where the axes would collapse onto g and the loadings lose their identification.
 PRIOR_GENERAL_SUMS_SD = dict(mu=0.0, sigma=0.5)
 
+# Orthogonal bifactor (models/mirt.py, build_mirt_model(..., orthogonal=True); `--orthogonal`,
+# exploration, on the bifactor loadings): the in-sample correlation r_jk of every pair of theta
+# columns over the N test-takers is held near 0 by a Potential, log p += -sum r_jk^2 / (2 s^2),
+# s = ORTHOGONAL_CORR_SD / sqrt(N), i.e. the spread of r between two truly independent columns
+# (scale 1, user 2026-11-02): orthogonal up to sampling noise. Independent priors alone do not do
+# it: their density on sampled abilities only sees sum theta^2, never the cross-products, and the
+# free bifactor's 50 chains (2026-11-02) correlate its columns at 0.1 to 0.6.
+ORTHOGONAL_CORR_SD = 1.0
+
 # Soft simple structure of the loadings (models/mirt.py, build_mirt_model(..., simple_structure=True);
 # `--simple-structure`, exploration): A_b = tau_A * r_b * softmax(s * u_b). The concentration s is
 # LogNormal, median 2 (a typical row then gives about two thirds of its weight to one axis at K=4),

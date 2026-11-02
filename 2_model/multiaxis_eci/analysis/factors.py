@@ -65,7 +65,8 @@ def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     demote it), and tracks only its specifics, which are exchangeable and land
     in a different order in each chain (until 2026-10-28 they were pooled
     untracked, so two displayed specifics could average the same pair of real
-    ones and correlate at 1.00).
+    ones and correlate at 1.00). An `--orthogonal` fit (attr mirt_orthogonal) is
+    returned on its displayed axes g and g + sigma_k s_k (`orthogonal_composite`).
     """
     if rank_track is None:
         rank_track = (not trace_anchors(trace)
@@ -77,8 +78,46 @@ def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     A = A.reshape(S, A.shape[2], A.shape[3])
     theta = theta.reshape(S, theta.shape[2], theta.shape[3])
     tau = tau.reshape(S, tau.shape[2])
-    return canonicalize_factors(A, theta, tau, rank_track=rank_track,
-                                fixed_first=trace_loading_prior(trace) == "bifactor")
+    A, theta, tau = canonicalize_factors(A, theta, tau, rank_track=rank_track,
+                                         fixed_first=trace_loading_prior(trace) == "bifactor")
+    if trace.posterior.attrs.get("mirt_orthogonal"):
+        A, theta, _ = orthogonal_composite(A, theta)
+    return A, theta, tau
+
+
+def orthogonal_composite(A: np.ndarray, theta: np.ndarray):
+    """An orthogonal bifactor's axes as g and g + sigma_k s_k: the display of `--orthogonal`.
+
+    A (S, B, K) and theta (S, N, K) on (g, s_1..s_{K-1}), g first. Axis k >= 1 becomes the
+    direction its own benchmarks load along, on g's unit:
+
+        theta'_0 = g,    theta'_k = g + sigma_k s_k,    sigma_k = mean a_bk / mean a_b0
+
+    the means over the benchmarks whose largest share of the posterior-median loading row is on
+    s_k (all benchmarks weighted by that share when none is), per draw, so sigma_k carries its
+    uncertainty. sigma_k measures how far the domain stands from g; two displayed axes correlate
+    at 1 / sqrt((1 + sigma_j^2)(1 + sigma_k^2)), all of it through g. The loadings follow so that
+    every eta is unchanged: a'_bk = a_bk / sigma_k and a'_b0 = a_b0 - sum_k a_bk / sigma_k, which
+    is negative for a benchmark that rises less with g than its domain's axis does.
+
+    Returns (A', theta', sigma (S, K-1)).
+    """
+    med = np.median(A, axis=0)
+    share = med ** 2 / np.maximum((med ** 2).sum(axis=1, keepdims=True), 1e-12)
+    dom = share.argmax(axis=1)
+    K = A.shape[2]
+    sigma = np.empty((A.shape[0], K - 1))
+    for k in range(1, K):
+        w = (dom == k).astype(float) if (dom == k).any() else share[:, k]
+        sigma[:, k - 1] = ((A[:, :, k] * w).sum(1)
+                           / np.maximum((A[:, :, 0] * w).sum(1), 1e-9))
+    sigma = np.maximum(sigma, 1e-9)
+    theta_c = theta.copy()
+    theta_c[:, :, 1:] = theta[:, :, :1] + theta[:, :, 1:] * sigma[:, None, :]
+    A_c = A.copy()
+    A_c[:, :, 1:] = A[:, :, 1:] / sigma[:, None, :]
+    A_c[:, :, 0] = A[:, :, 0] - A_c[:, :, 1:].sum(axis=2)
+    return A_c, theta_c, sigma
 
 
 def tau_spectrum_df(tau_canon: np.ndarray) -> pd.DataFrame:
