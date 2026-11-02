@@ -60,3 +60,20 @@ def test_merge_chains_refuses_two_different_fits():
         merge_chains(a, thin_trace(_trace(), 4))
     with pytest.raises(ValueError, match="draws per chain"):
         merge_chains(a, thin_trace(_trace(200), 5))
+
+
+def test_merge_chains_reads_an_older_spec_as_the_same_fit():
+    """A trace whose mirt_spec predates an option (no key for it) merges with today's run of the
+    same fit, as fit.py's own check does (FitSpec.from_spec_json); a real change still refuses."""
+    import dataclasses
+    import json
+    from multiaxis_eci.analysis.fitspec import FitSpec
+    today = FitSpec(K=4, lineage_prior=True, lineage_bm=True, theta_skew=True, no_humans=True)
+    new = {k: (list(v) if isinstance(v, tuple) else v) for k, v in dataclasses.asdict(today).items()}
+    old = {k: v for k, v in new.items() if k not in ("general_sums", "axis_pin", "pin_offset")}
+    a, b = thin_trace(_trace(), 5), thin_trace(_trace(), 5)
+    a.posterior.attrs["mirt_spec"], b.posterior.attrs["mirt_spec"] = json.dumps(old), json.dumps(new)
+    assert merge_chains(a, b).posterior.sizes["chain"] == 4
+    b.posterior.attrs["mirt_spec"] = json.dumps({**new, "lineage_bm": False})
+    with pytest.raises(ValueError, match="mirt_spec"):
+        merge_chains(a, b)
