@@ -111,3 +111,11 @@ def test_merge_chains_reads_an_older_spec_as_the_same_fit():
     b.posterior.attrs["mirt_spec"] = json.dumps({**new, "lineage_bm": False})
     with pytest.raises(ValueError, match="mirt_spec"):
         merge_chains(a, b)
+
+
+def test_reproduction_tol_allows_float32_rounding_only():
+    """integrated_loo / robust_loo check their recomputed log-likelihood against the trace's:
+    a float32 trace (gaps up to 3e-5 on 2026-11-03) passes, a model mismatch (0.1) does not."""
+    from multiaxis_eci.persistence import reproduction_tol
+    assert reproduction_tol(np.float64) == 1e-6
+    assert 3e-5 < reproduction_tol(np.float32) < 0.1

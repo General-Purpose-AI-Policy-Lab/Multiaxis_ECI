@@ -12,6 +12,13 @@ from multiaxis_eci.data import ECIData
 
 
 FLOAT32_GROUPS = ("posterior", "log_likelihood")
+
+
+def reproduction_tol(dtype) -> float:
+    """How closely a log-likelihood recomputed from a saved trace's draws must match the one it
+    stores: float32 draws and log-likelihoods (`save_trace` since 2026-11-03) leave gaps up to
+    3e-5 nats per observation, a model mismatch leaves gaps of order 0.1 and more."""
+    return 1e-6 if np.dtype(dtype) == np.float64 else 1e-3
 # nutpie sample stats with one value per unconstrained parameter: nothing in this repository
 # reads them (diagnostics use logp, diverging, energy, step size and tree depth).
 NUTPIE_PARAMETER_STATS = ("gradient", "unconstrained_draw", "divergence_start",

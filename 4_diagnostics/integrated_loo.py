@@ -71,6 +71,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
+from multiaxis_eci.persistence import reproduction_tol  # noqa: E402
 
 GH_X, GH_W = np.polynomial.hermite_e.hermegauss(40)   # probabilists' Hermite: weight exp(-x^2/2)
 LOG_GH_W = np.log(GH_W / np.sqrt(2 * np.pi))
@@ -286,6 +287,11 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
         # private_bases: the founders' bases are private Normal(0, 1), not the exchangeable
         # block's cells `block_priors` gives them
         raise SystemExit("integrated_loo covers the flagship's specification only")
+    if spec.orthogonal:
+        # The Potential's gradient on a held-out block is about -r theta, r ~ 1/sqrt(N), and its
+        # curvature O(1/N): its effect on each predictive is far below the Monte Carlo error.
+        print("  note: --orthogonal fit: the integrated predictive leaves out the orthogonality "
+              "Potential (an O(1/N) term per test-taker)", flush=True)
     data, floor_c, _ = spec.load_data(az.InferenceData(posterior=post_all))
     # the map the trace was sampled with (frozen beside it), its chains checked against the trace
     lin = trace_lineage_structure(data.mlookup, trace_path, post_all, csv_path=lineage_map)
@@ -499,7 +505,7 @@ def score_chain(trace_path: Path, chain: int, stored, lineage_map: Path | None =
     f = load_fit(trace_path, [chain], lineage_map)
     cond = conditional_loglik(f)
     gap = float(np.abs(cond - stored.isel(chain=[chain]).values.reshape(f["S"], -1)).max())
-    if gap > 1e-6:
+    if gap > reproduction_tol(stored.dtype):
         raise SystemExit(f"chain {chain}: the numpy likelihood does not reproduce the fit ({gap})")
     integ, done = integrated_loglik(f)
     e_int, k_int = psis_elpd(integ)

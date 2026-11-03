@@ -62,6 +62,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
+from multiaxis_eci.persistence import reproduction_tol  # noqa: E402
 
 
 def mixture_loo(loglik: np.ndarray, log_c: np.ndarray | None = None
@@ -178,7 +179,9 @@ def run_mode(trace_path: Path, label: str, chain: int, chains: int, draws: int, 
     model, data, post = build_model(trace_path)
     gap = check_rebuild(model, post, trace_path, chain)
     print(f"rebuilt model reproduces the trace's log-likelihood to {gap:.2e}", flush=True)
-    if gap > 1e-6:
+    with xr.open_dataset(trace_path, group="log_likelihood") as ll:
+        tol = reproduction_tol(ll["obs"].dtype)
+    if gap > tol:
         raise SystemExit("the rebuilt model does not match the fit; stopping")
 
     # The starting chain's PSIS-LOO: reported beside the result, and the component weights
