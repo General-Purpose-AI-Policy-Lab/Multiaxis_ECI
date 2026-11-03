@@ -46,7 +46,10 @@ compared at equal draws. Output in `diagnostics/` beside the trace:
 `integrated_loo_<group>.csv` (elpd_i, the largest Pareto k over its chains, and the conditional
 PSIS elpd_i and k) and `integrated_loo.json` (totals, per-chain totals and the Monte Carlo error
 they imply, paired differences to the first group on every observation and on those with k < 0.7
-in every group).
+in every group). A stuck chain (more than half its draws divergent) is not a posterior sample and
+is left out of its group, a group of stuck chains only is left out (`_stuck_chains`): the pinned
+fit's chain 35 (2026-11-03, step 5e-4, every draw divergent) sat where the numpy likelihood
+overflows.
 
 Checked on the flagship (2026-10-06): the numpy likelihood reproduces the trace's to 1e-9; on 721
 real (score, draw) pairs the Laplace-cavity predictive matches a 200,000-sample importance
@@ -75,6 +78,7 @@ from multiaxis_eci.persistence import reproduction_tol  # noqa: E402
 
 GH_X, GH_W = np.polynomial.hermite_e.hermegauss(40)   # probabilists' Hermite: weight exp(-x^2/2)
 LOG_GH_W = np.log(GH_W / np.sqrt(2 * np.pi))
+STUCK_DIV_FRAC = 0.5
 
 
 # ── likelihood, in numpy, as models/mirt.py writes it ───────────────────────────────────────
@@ -514,6 +518,19 @@ def score_chain(trace_path: Path, chain: int, stored, lineage_map: Path | None =
                 fallback=int(f.get("n_fallback", 0)))
 
 
+def stuck_chains(diverging) -> list[int]:
+    """Chains with more than STUCK_DIV_FRAC of their draws divergent, from a (chain, draw)
+    array: a sampler stuck at one point, not a posterior sample."""
+    frac = np.asarray(diverging, dtype=float).mean(axis=1)
+    return [int(c) for c in np.where(frac > STUCK_DIV_FRAC)[0]]
+
+
+def drop_stuck(groups: dict, stuck: list[int]) -> dict:
+    """The groups without their stuck chains; a group left empty is dropped."""
+    out = {name: [c for c in chains if c not in stuck] for name, chains in groups.items()}
+    return {name: chains for name, chains in out.items() if chains}
+
+
 def _flagship_trace() -> Path:
     from multiaxis_eci.analysis.fitspec import FLAGSHIP_TRACE
     return FLAGSHIP_TRACE
@@ -540,6 +557,13 @@ def main() -> None:
     out_dir = args.out_dir or args.trace.parent / "diagnostics"
     out_dir.mkdir(parents=True, exist_ok=True)
     stored = xr.open_dataset(args.trace, group="log_likelihood")["obs"]
+    stats = xr.open_dataset(args.trace, group="sample_stats")
+    stuck = stuck_chains(stats["diverging"].values) if "diverging" in stats else []
+    if stuck:
+        dropped = [n for n, ch in groups.items() if set(ch) <= set(stuck)]
+        print(f"stuck chains left out (> {STUCK_DIV_FRAC:.0%} of draws divergent): {stuck}"
+              + (f"; groups dropped: {dropped}" if dropped else ""), flush=True)
+        groups = drop_stuck(groups, stuck)
 
     # One chain at a time: PSIS is optimistic with few draws where k is high, so groups of
     # different sizes are compared on the AVERAGE of their chains' estimates, at equal draws
@@ -588,6 +612,7 @@ def main() -> None:
         results[g][f"diff_to_{ref}_k_lt_0.7"] = float(dr.sum())
         results[g][f"se_diff_to_{ref}_k_lt_0.7"] = float(np.sqrt(len(dr)) * dr.std())
     results["_n_reliable_everywhere"] = int(reliable.sum())
+    results["_stuck_chains"] = stuck
     (out_dir / "integrated_loo.json").write_text(json.dumps(results, indent=2))
     print(pd.DataFrame({k: v for k, v in results.items() if not k.startswith("_")}).T
           .drop(columns=["chains", "elpd_int_per_chain"]).round(1).to_string())
