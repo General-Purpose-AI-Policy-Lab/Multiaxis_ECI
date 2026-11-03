@@ -36,6 +36,17 @@ def test_thin_trace_keeps_every_nth_draw_and_stamps_the_step():
     assert thin_trace(idata, 1) is idata
 
 
+def test_thin_trace_drops_nutpies_per_parameter_stats():
+    idata = _trace()
+    rng = np.random.default_rng(1)
+    idata.sample_stats["gradient"] = (("chain", "draw", "unconstrained_parameter"),
+                                      rng.normal(size=(2, 100, 4)))
+    idata.sample_stats["logp"] = (("chain", "draw"), rng.normal(size=(2, 100)))
+    out = thin_trace(idata, 5)
+    assert "gradient" not in out.sample_stats
+    assert {"logp", "diverging"} <= set(out.sample_stats.data_vars)
+
+
 def test_merge_chains_appends_the_later_runs_chains():
     """Two thinned runs of one fit become one trace whose later chains follow the earlier ones;
     the data groups are kept once."""

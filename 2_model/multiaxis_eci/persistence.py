@@ -23,6 +23,13 @@ def save_trace(trace, path: Path) -> None:
     trace.to_netcdf(str(path))
 
 
+# nutpie sample stats with one value per unconstrained parameter: nothing in this repository
+# reads them (diagnostics use logp, diverging, energy, step size and tree depth).
+NUTPIE_PARAMETER_STATS = ("gradient", "unconstrained_draw", "divergence_start",
+                          "divergence_start_gradient", "divergence_end", "divergence_momentum",
+                          "mass_matrix_stds", "mass_matrix_eigvals")
+
+
 def thin_trace(trace, step: int, drop_transformed: bool = True):
     """The trace with every `step`-th draw kept, for saving.
 
@@ -31,8 +38,11 @@ def thin_trace(trace, step: int, drop_transformed: bool = True):
     fit writes about 11 GB unthinned). Thinning happens at save time only: convergence
     (r-hat, ESS, divergences) and the deliverable tables are computed on the full run first.
     `drop_transformed` also removes PyMC's unconstrained duplicates (`*__` variables such as
-    `A_z_log__`), which nothing downstream reads. The step is stamped as `mirt_save_thin` so
-    a reader knows the file's draws are a subsample. `step` 1 returns the trace unchanged.
+    `A_z_log__`), which nothing downstream reads, and nutpie's per-parameter sample stats
+    (`NUTPIE_PARAMETER_STATS`, one value per unconstrained parameter and draw), which nutpie's
+    zarr store writes whatever its `store_*` settings say and which were 40 % of a K=4 trace.
+    The step is stamped as `mirt_save_thin` so a reader knows the file's draws are a
+    subsample. `step` 1 returns the trace unchanged.
     """
     if step is None or step <= 1:
         return trace
@@ -43,6 +53,8 @@ def thin_trace(trace, step: int, drop_transformed: bool = True):
             ds = ds.isel(draw=slice(None, None, step))
         if name == "posterior" and drop_transformed:
             ds = ds.drop_vars([v for v in ds.data_vars if v.endswith("__")])
+        if name == "sample_stats" and drop_transformed:
+            ds = ds.drop_vars([v for v in NUTPIE_PARAMETER_STATS if v in ds.data_vars])
         groups[name] = ds
     out = az.InferenceData(**groups)
     out.posterior.attrs.update(trace.posterior.attrs)
