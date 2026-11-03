@@ -64,6 +64,26 @@ def test_a_ceiling_score_places_nothing_alone():
     assert drawn == ["Average Human"]
 
 
+def test_a_score_within_noise_of_the_fitted_ceiling_bounds_from_below_only():
+    """Top Performer's SimpleBench 0.954 against d_b 0.970 placed it at 6.4 [4.0, 9.5] on the
+    flagship's axis 4: near d_b the curve is flat. Such a score is a ceiling score, draws no tier,
+    and its likelihood is P(score >= observed), which never falls as ability rises."""
+    flags = hp.at_ceiling([0.954, 0.80, 1.0], [213, 213, 0], [0.970, 0.970, 1.0], [300, 300, 300])
+    assert flags.tolist() == [True, False, True]
+    sc = pd.DataFrame({"tier": ["Average Human", "Top Performer"], "benchmark": ["b", "b"],
+                       "score": [0.80, 0.954], "at_ceiling": [False, True]})
+    assert hp.drawn_tiers(sc, list(HUMAN_ORDER_MERGED)) == ["Average Human"]
+
+    import pytensor.tensor as pt
+    mu = np.array([0.90, 0.95, 0.969])                        # rising ability, same score
+    a, b = pt.as_tensor(mu * 300), pt.as_tensor((1 - mu) * 300)
+    y, n = np.full(3, 0.954), np.full(3, 213.0)
+    lp = hp._at_least_logp(y, a, b, n, y * n).eval()
+    assert np.all(np.diff(lp) > 0) and lp[-1] < 0
+    beta_rows = hp._at_least_logp(y, a, b, np.zeros(3), np.zeros(3)).eval()
+    assert np.all(np.diff(beta_rows) > 0)
+
+
 def test_flagship_is_fitted_without_humans_and_says_so_only_when_they_are_in():
     """Models only is the untagged default since 2026-10-21; humans in emit `_humans`, an order
     token implies them, and the legacy `_nohumans` still parses."""

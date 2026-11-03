@@ -112,10 +112,11 @@ def main() -> None:
         if ax["convergence"]:
             print(f"  convergence {ax['convergence']}")
         for t in ax.get("order", []):
-            flag = "*" if t in ax["drawn"] else " "
+            flag = "*" if t in ax["drawn"] else ">" if t in ax.get("lower_bounds", {}) else " "
             print(f"   {flag} {t:34s} {ax['tiers'][t]}")
         for r in ax["consistency"]:
-            print(f"     {r['tier']:30s} {r['benchmark']:28s} observed {r['observed']:.2f} "
+            at = "at least" if r.get("at_ceiling") else "observed"
+            print(f"     {r['tier']:30s} {r['benchmark']:28s} {at} {r['observed']:.2f} "
                   f"predicted {r['predicted']:.2f} [{r['predicted_q10']:.2f}, {r['predicted_q90']:.2f}]"
                   f"  first model at the score: {r['first_model_at_score'] or 'none yet'}")
     print(f"\nwrote {out_dir.relative_to(trace.parent.parent)}/human_placement.json and "

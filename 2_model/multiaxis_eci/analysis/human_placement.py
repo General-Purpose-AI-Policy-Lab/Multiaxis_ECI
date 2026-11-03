@@ -17,8 +17,9 @@ tiers are placed afterwards, one axis at a time, with the benchmark side frozen:
   included) with the flagship's human priors, so one tier's scores inform its neighbours.
 
 A tier is drawn when it has a score of its own below the ceiling on one of those benchmarks, or
-sits between two such tiers in the order (any ancestor and any descendant); a ceiling score stays
-in the likelihood but only bounds a tier from below. `consistency` checks each placement against
+sits between two such tiers in the order (any ancestor and any descendant). A ceiling score (at
+least 0.99, or within 2 noise SDs of the fitted ceiling d_b) enters the likelihood as "at least
+this score", so it only bounds a tier from below. `consistency` checks each placement against
 the scores it rests on and against the first model that beat each score.
 
     python 4_diagnostics/5_place_humans.py [--trace T]      # writes the placement beside the trace
@@ -43,9 +44,12 @@ from multiaxis_eci.config import (
 )
 
 CONTENT_FILE = CURATED_DIR / "human_axis_content.csv"
-# A score at or above this only bounds a tier from below (the benchmark's own ceiling, 1 for
-# every benchmark with a human score at the ceiling today).
-CEILING_SCORE = 0.99
+# A score at the ceiling only bounds a tier from below: it is at least CEILING_SCORE, or within
+# CEILING_SD noise SDs of the benchmark's fitted ceiling d_b (`at_ceiling`). Near d_b the curve is
+# flat, so such a score cannot say how far above it a tier sits (user, 2026-11-03: Top Performer
+# placed at 6.4 [4.0, 9.5] on the flagship's axis 4 from SimpleBench 0.954 against d_b 0.970).
+CEILING_SCORE = 0.99      # covers d_b = 1, where the noise SD at the ceiling is 0
+CEILING_SD = 2.0
 PLACEMENT_JSON = "human_placement.json"
 PLACEMENT_DRAWS = "human_placement_draws.npz"
 # The secondary mode's placement (the modes file's `secondary_chains`), in its own folder beside
@@ -111,9 +115,22 @@ def _ancestors(tier: str, order=HUMAN_ORDER_MERGED) -> set[str]:
     return out
 
 
+def at_ceiling(score, n_items, d, phi) -> np.ndarray:
+    """True where a score is at its benchmark's ceiling: at least CEILING_SCORE, or within
+    CEILING_SD noise SDs below the fitted ceiling d. The SD is the fit's own at mu = d: the
+    Beta-binomial's d(1-d)(N+phi)/(N(1+phi)) on N items, the Beta's d(1-d)/(1+phi) (n_items 0)."""
+    score, n, d, phi = (np.asarray(x, dtype=float) for x in (score, n_items, d, phi))
+    item = n > 0
+    var = d * (1 - d) * np.where(item, (n + phi) / (np.where(item, n, 1.0) * (1 + phi)),
+                                 1 / (1 + phi))
+    return (score >= CEILING_SCORE) | (d - score < CEILING_SD * np.sqrt(var))
+
+
 def drawn_tiers(scores: pd.DataFrame, tiers: list[str]) -> list[str]:
-    """The display rule: an own score below the ceiling, or between two tiers that have one."""
-    own = set(scores.loc[scores.score < CEILING_SCORE, "tier"])
+    """The display rule: an own score below the ceiling, or between two tiers that have one.
+    `scores.at_ceiling` (from `at_ceiling`) marks the ceiling scores; without it, CEILING_SCORE."""
+    ceil = scores.at_ceiling if "at_ceiling" in scores else scores.score >= CEILING_SCORE
+    own = set(scores.loc[~ceil, "tier"])
     return [t for t in tiers if t in own
             or (_ancestors(t) & own and any(t in _ancestors(d) for d in own))]
 
@@ -138,13 +155,39 @@ def _tier_theta(th, k, K, profile, xp):
     return xp.stack([cols[i] for i in range(K)], axis=-1)
 
 
+def _at_least_logp(y, a, b, n, k):
+    """log P(score >= observed) under the fit's likelihood, one value per row: the Beta-binomial's
+    upper tail sum_{j >= ceil(k)}^{N} on item rows (n > 0), the Beta's log survival elsewhere.
+    Increasing in mu, so a ceiling score bounds a tier from below and nothing more. Numpy inputs
+    except a, b (pytensor), which carry the tier's ability."""
+    import pymc as pm
+    import pytensor.tensor as pt
+
+    from multiaxis_eci.models.mirt import _beta_binomial_logp
+
+    n = np.asarray(n, dtype=float)
+    item = n > 0
+    lo = np.ceil(np.asarray(k, dtype=float) - 1e-9)
+    L = int(np.max(np.where(item, n - lo, 0.0))) + 1
+    j = lo[:, None] + np.arange(L)[None, :]                       # (rows, L) candidate counts
+    ok = item[:, None] & (j <= n[:, None])
+    j = np.where(ok, j, 0.0)
+    nn = np.where(item, n, 1.0)[:, None] * np.ones((1, L))
+    lp = _beta_binomial_logp(0.5, a[:, None], b[:, None], nn, j)
+    tail = pt.logsumexp(pt.switch(ok, lp, -np.inf), axis=1)
+    surv = pm.logccdf(pm.Beta.dist(alpha=a, beta=b), np.asarray(y, dtype=float))
+    return pt.switch(item, tail, surv)
+
+
 def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=81, beta=None,
                ceiling_d=None):
     """Posterior draws (S, n_tiers) of the tiers on axis k from `scores` (rows of
     `human_scores` restricted to the axis's benchmarks), and the sampler's convergence. `beta`
     (the softmin links' sharpness, fixed at the fit's median) swaps the compensatory eta for the
     softmin one (`models.mirt.softmin_eta`, no offset: semicomp0). `ceiling_d` (per benchmark, the
-    fit's median d_b under --ceiling-noise) caps the curve as the fit does: mu = c + (d - c) sigmoid."""
+    fit's median d_b under --ceiling-noise) caps the curve as the fit does: mu = c + (d - c) sigmoid.
+    A row with `at_ceiling` True enters as log P(score >= observed) (`_at_least_logp`), the
+    others as the fit's point likelihood."""
     import arviz as az
     import pymc as pm
     import pytensor.tensor as pt
@@ -177,7 +220,14 @@ def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=8
             eta = softmin_eta(A[b], _tier_theta(th[t], k, A.shape[1], (others, coef), pt), D[b],
                               beta, lse=pt.logsumexp, log=pt.log)
         mu = c + (d - c) * pm.math.sigmoid(eta)
-        pm.Potential("lik", _beta_binomial_logp(yc, mu * phi[b], (1 - mu) * phi[b], n, kk).sum())
+        a_, b_ = mu * phi[b], (1 - mu) * phi[b]
+        cens = (scores.at_ceiling.to_numpy(bool) if "at_ceiling" in scores
+                else np.zeros(len(scores), bool))
+        point = _beta_binomial_logp(yc, a_, b_, n, kk)
+        if cens.any():
+            i = np.where(cens)[0]
+            point = pt.set_subtensor(point[i], _at_least_logp(yc[i], a_[i], b_[i], n[i], kk[i]))
+        pm.Potential("lik", point.sum())
         tr = pm.sample(1000, tune=1000, chains=4, nuts_sampler="nutpie", random_seed=seed,
                        progressbar=False, target_accept=0.95)
     s = az.summary(tr, var_names=["th"])
@@ -208,6 +258,7 @@ def consistency(k, scores, bench, A, D, floor_c, order, draws, profile, data, da
         sel = data.bench_idx == b
         hit = dates.iloc[data.model_idx[sel][data.scores[sel] >= r.score]].dropna()
         rows.append({"tier": r.tier, "benchmark": r.benchmark, "observed": round(float(r.score), 3),
+                     "at_ceiling": bool(getattr(r, "at_ceiling", False)),
                      "predicted": round(float(np.median(pred)), 3),
                      "predicted_q10": round(float(np.quantile(pred, 0.1)), 3),
                      "predicted_q90": round(float(np.quantile(pred, 0.9)), 3),
@@ -242,8 +293,9 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
     dates = pd.to_datetime(pd.Series([first.get(n) for n in names_m]))
     out = {"trace": trace.name, "rule": "dominant axis (largest loading-variance share), "
            "content filter 1_curated/human_axis_content.csv, ordered tiers (HUMAN_ORDER_MERGED), "
-           "other axes at the typical-model profile; drawn: own score below the ceiling or "
-           "between two such tiers", "softmin_beta": beta,
+           "other axes at the typical-model profile; a score at the ceiling (>= 0.99 or within "
+           "2 noise SD of the fitted d_b) enters as 'at least this score'; drawn: own score below "
+           "the ceiling or between two such tiers", "softmin_beta": beta,
            "ceiling_d": ceiling_d is not None, "axes": []}
     draws_out = {}
     for k, name in enumerate(view.names):
@@ -259,6 +311,10 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
                if title else set())
         sc = hs[hs.benchmark.isin(used) & ~pd.Series(list(zip(hs.benchmark, hs.tier)),
                                                       index=hs.index).isin(off)]
+        bi = np.array([bench.index(x) for x in sc.benchmark], dtype=int)
+        sc = sc.assign(at_ceiling=at_ceiling(sc.score, sc.n_items,
+                                             ceiling_d[bi] if ceiling_d is not None else 1.0,
+                                             phi[bi]))
         ax = {"axis": name, "title": title, "benchmarks_with_human_scores": sorted(set(sc.benchmark)),
               "unjudged_benchmarks": unjudged, "drawn": [], "tiers": {}, "convergence": None,
               "consistency": []}
@@ -268,6 +324,11 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
             ax["drawn"] = drawn_tiers(sc, order)
             ax["tiers"] = {t: [round(float(q), 3) for q in np.quantile(draws[:, i], [0.1, 0.5, 0.9])]
                            for i, t in enumerate(order)}
+            # undrawn tiers whose only scores on the axis are at the ceiling: a lower bound (10%
+            # quantile). A drawn one sits between two scored tiers, which bound it on both sides.
+            only = set(sc.tier[sc.at_ceiling]) - set(sc.tier[~sc.at_ceiling])
+            ax["lower_bounds"] = {t: ax["tiers"][t][0] for t in order
+                                  if t in only and t not in ax["drawn"]}
             ax["convergence"] = conv
             ax["consistency"] = consistency(k, sc, bench, A, D, floor_c, order, draws, prof,
                                             data, dates, beta=beta, ceiling_d=ceiling_d)
