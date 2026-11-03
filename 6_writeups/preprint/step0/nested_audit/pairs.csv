@@ -1,0 +1,41 @@
+a,b,cls,relation,K1_n,K1_rho,K1_q3,K1_pct,K4A_n,K4A_rho,K4A_q3,K4A_pct,K4B_n,K4B_rho,K4B_q3,K4B_pct,K4C_n,K4C_rho,K4C_q3,K4C_pct,K4A_axes,K4B_axes,K4C_axes
+GPQA Diamond,GPQA Diamond Biology,A,subset: 19 Bio questions of Diamond's 198,32,0.677,-0.157,37.544,32,0.677,-0.146,33.488,32,0.677,-0.169,30.698,32,0.677,-0.161,31.744,axis1/axis1,axis1/axis1,axis1/axis1
+GPQA Diamond,GPQA Diamond Chemistry,A,subset: 93 Chem questions of Diamond's 198,34,0.856,0.171,77.018,34,0.856,-0.019,54.884,34,0.856,-0.059,48.14,34,0.856,-0.044,51.163,axis1/axis1,axis1/axis1,axis1/axis1
+GPQA Main Biology,GPQA Diamond Biology,A,subset: Diamond Bio 19 inside Main Bio 78,52,0.825,0.337,88.947,52,0.825,0.348,93.023,52,0.825,0.347,92.791,52,0.825,0.331,92.442,axis1/axis1,axis1/axis1,axis1/axis1
+GPQA Main Chemistry,GPQA Diamond Chemistry,A,subset: Diamond Chem 93 inside Main Chem 183,56,0.927,0.544,97.368,56,0.922,0.375,93.721,56,0.922,0.4,94.767,56,0.922,0.445,96.628,axis1/axis1,axis1/axis1,axis1/axis1
+GPQA Diamond,GPQA Main Biology,A,overlap: 19 of Main Bio's 78 are in Diamond,32,0.865,-0.056,51.579,32,0.865,0.082,70.698,32,0.865,0.094,72.442,32,0.865,0.103,73.023,axis1/axis1,axis1/axis1,axis1/axis1
+GPQA Diamond,GPQA Main Chemistry,A,overlap: 93 of Main Chem's 183 are in Diamond,34,0.917,0.194,78.947,34,0.914,0.072,69.302,34,0.914,0.102,73.837,34,0.914,0.127,76.047,axis1/axis1,axis1/axis1,axis1/axis1
+MMLU,MMLU Biology,A,"subset: 536 of 14,042",22,0.704,-0.484,7.193,22,0.704,-0.203,25.581,22,0.704,-0.207,25.93,22,0.704,-0.179,28.953,axis4/axis1,axis3/axis3,axis2/axis2
+MMLU,MMLU Chemistry,A,"subset: 230 of 14,042",24,0.854,-0.138,39.123,24,0.854,0.018,60.93,24,0.854,-0.006,58.14,24,0.854,0.013,61.395,axis4/axis1,axis3/axis3,axis2/axis2
+MMLU-Pro,MMLU Pro Biology,A,"subset: 717 of 12,032",3,-1.0,0.866,100.0,3,-1.0,0.57,98.837,3,-1.0,0.316,91.512,3,-1.0,0.393,95.116,axis1/axis1,axis3/axis1,axis2/axis1
+MMLU-Pro,MMLU Pro Chemistry,A,"subset: 1,132 of 12,032",3,-0.5,0.088,70.351,3,-0.5,-0.984,0.0,3,-0.5,-0.892,0.0,3,-0.5,-0.983,0.0,axis1/axis1,axis3/axis1,axis2/axis1
+Cybench,CAISI Cybench,A,"same 40 tasks, other harness",1,,,,1,,,,1,,,,1,,,,axis3/axis2,axis2/axis1,axis3/axis1
+CyScenarioBench,CyScenarioBench (Anthropic),A,"same challenge set, 9-11 vs 9-10 challenges",0,,,,0,,,,0,,,,0,,,,axis3/axis3,axis2/axis3,axis3/axis3
+CAISI CTF-Archive,CAISI CTF-Archive-Diamond,A,same CAISI CTF archive; overlap not documented,0,,,,0,,,,0,,,,0,,,,axis2/axis1,axis1/axis2,axis1/axis3
+GPQA Diamond Biology,GPQA Diamond Chemistry,B,sibling subsets,52,0.722,-0.087,47.018,52,0.722,-0.016,55.465,52,0.722,-0.02,55.116,52,0.722,-0.018,56.163,axis1/axis1,axis1/axis1,axis1/axis1
+GPQA Main Biology,GPQA Main Chemistry,B,sibling subsets,52,0.882,0.03,62.982,52,0.882,0.147,78.837,52,0.882,0.154,79.419,52,0.882,0.172,80.698,axis1/axis1,axis1/axis1,axis1/axis1
+MMLU Biology,MMLU Chemistry,B,sibling subsets,37,0.801,0.029,62.807,37,0.801,-0.208,25.233,37,0.801,-0.2,26.744,37,0.801,-0.204,25.349,axis1/axis1,axis3/axis3,axis2/axis2
+MMLU Pro Biology,MMLU Pro Chemistry,B,sibling subsets,42,0.954,0.488,96.14,42,0.954,0.057,66.977,42,0.954,0.14,77.907,42,0.954,0.118,74.767,axis1/axis1,axis1/axis1,axis1/axis1
+WMDP Biology,WMDP Chemistry,B,sibling subsets,38,0.877,0.48,95.088,38,0.877,-0.076,44.419,38,0.877,-0.135,35.698,38,0.877,-0.165,31.395,axis1/axis1,axis3/axis3,axis2/axis2
+MMLU,MMLU-Pro,B,"MMLU-Pro reuses filtered MMLU questions, 10 options",55,0.973,0.483,95.439,55,0.973,0.234,86.395,55,0.973,0.303,90.814,55,0.973,0.336,92.791,axis4/axis1,axis3/axis3,axis2/axis2
+LAB-Bench Cloning,LAB-Bench LitQA2,B,sibling subsets,40,0.666,0.084,69.649,40,0.666,0.064,67.791,40,0.666,0.066,69.302,40,0.666,0.065,68.14,axis4/axis1,axis4/axis3,axis2/axis2
+LAB-Bench Cloning,LAB-Bench Protocol,B,sibling subsets,41,0.784,0.199,79.649,41,0.784,-0.082,42.791,41,0.784,-0.08,44.302,41,0.784,-0.102,39.302,axis4/axis4,axis4/axis3,axis2/axis2
+LAB-Bench Cloning,LAB-Bench SeqQA,B,sibling subsets,41,0.774,-0.255,25.614,41,0.772,-0.15,32.442,41,0.772,-0.148,34.302,41,0.772,-0.114,37.907,axis4/axis1,axis4/axis1,axis2/axis1
+LAB-Bench LitQA2,LAB-Bench Protocol,B,sibling subsets,42,0.728,0.279,85.789,42,0.728,0.134,76.977,42,0.728,0.148,78.953,42,0.728,0.128,76.163,axis1/axis4,axis3/axis3,axis2/axis2
+LAB-Bench LitQA2,LAB-Bench SeqQA,B,sibling subsets,42,0.756,0.082,69.474,42,0.756,0.211,84.186,42,0.756,0.208,83.605,42,0.756,0.221,85.233,axis1/axis1,axis3/axis1,axis2/axis1
+LAB-Bench Protocol,LAB-Bench SeqQA,B,sibling subsets,43,0.767,-0.281,22.982,43,0.767,-0.015,55.581,43,0.767,0.025,64.419,43,0.767,0.0,58.953,axis4/axis1,axis3/axis1,axis2/axis1
+AISI CTF Suites - Technical Non-Expert,AISI CTF Suites - Apprentice,B,tiers,17,0.854,0.529,97.193,17,0.854,0.267,88.372,17,0.854,0.254,87.442,17,0.854,0.299,90.233,axis2/axis2,axis4/axis4,axis4/axis4
+AISI CTF Suites - Technical Non-Expert,AISI CTF Suites - Practitioner,B,tiers,7,-0.127,-0.815,0.0,7,-0.127,-0.85,0.116,7,-0.127,-0.881,0.0,7,-0.127,-0.88,0.0,axis2/axis3,axis4/axis2,axis4/axis3
+AISI CTF Suites - Technical Non-Expert,AISI CTF Suites - Expert,B,tiers,7,0.055,-0.572,3.86,7,0.055,-0.488,5.0,7,0.055,-0.52,3.953,7,0.055,-0.549,3.256,axis2/axis3,axis4/axis2,axis4/axis3
+AISI CTF Suites - Apprentice,AISI CTF Suites - Practitioner,B,tiers,7,0.786,0.147,75.614,7,0.786,0.267,88.372,7,0.786,0.24,86.744,7,0.786,0.297,90.233,axis2/axis3,axis4/axis2,axis4/axis3
+AISI CTF Suites - Apprentice,AISI CTF Suites - Expert,B,tiers,7,0.883,-0.026,56.14,7,0.883,0.457,97.209,7,0.883,0.373,93.605,7,0.883,0.307,91.395,axis2/axis3,axis4/axis2,axis4/axis3
+AISI CTF Suites - Practitioner,AISI CTF Suites - Expert,B,tiers,10,0.921,0.601,98.421,10,0.921,0.67,99.767,10,0.921,0.648,99.535,10,0.921,0.628,99.302,axis3/axis3,axis2/axis2,axis3/axis3
+AISI Cyber Ranges - Cooling Tower,AISI Cyber Ranges - The Last Ones,B,"two ranges, same harness",3,0.866,0.357,89.298,6,0.924,-0.538,3.721,6,0.924,-0.519,3.953,6,0.924,-0.556,3.256,axis3/axis3,axis2/axis2,axis3/axis3
+FrontierMath Tiers 1-3 v2,FrontierMath Tier 4 v2,B,tiers,65,0.979,0.631,98.772,69,0.981,0.441,96.628,69,0.981,0.431,96.395,69,0.981,0.457,97.093,axis2/axis1,axis1/axis1,axis1/axis1
+FrontierMath Tiers 1-3 v2,FrontierMath Erdos,B,same programme,3,1.0,-0.487,7.193,7,0.709,-0.437,7.209,7,0.709,-0.367,10.349,7,0.709,-0.424,6.512,axis2/axis3,axis1/axis2,axis1/axis3
+FrontierMath Tier 4 v2,FrontierMath Erdos,B,same programme,3,1.0,-0.999,0.0,7,0.611,-0.466,6.047,7,0.611,-0.353,11.163,7,0.611,-0.432,6.163,axis1/axis3,axis1/axis2,axis1/axis3
+ARC-AGI,ARC-AGI-2,B,versions,0,,,,241,0.979,-0.278,18.023,241,0.979,-0.295,15.698,241,0.979,-0.305,15.233,axis1/axis2,axis1/axis1,axis1/axis1
+OSWorld,OSWorld 2.0,B,versions,0,,,,0,,,,0,,,,0,,,,axis2/axis2,axis4/axis4,axis4/axis4
+WeirdML v2,WeirdML v3,B,versions,1,,,,1,,,,1,,,,1,,,,axis1/axis3,axis1/axis2,axis1/axis3
+CL-bench,CL-bench Life,B,same authors; overlap not documented,8,1.0,0.876,100.0,8,1.0,0.924,100.0,8,1.0,0.927,100.0,8,1.0,0.924,100.0,axis3/axis3,axis2/axis1,axis3/axis3
+InterCode-CTF,NL2Bash,B,same source (Lyptus task horizons),12,0.937,-0.371,15.263,16,0.928,-0.36,10.93,16,0.928,-0.324,13.023,16,0.928,-0.401,8.721,axis4/axis3,axis3/axis2,axis2/axis3

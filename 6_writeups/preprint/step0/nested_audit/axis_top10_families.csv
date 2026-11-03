@@ -1,0 +1,13 @@
+mode,axis,RAND bio/chem,AISI CTF tiers,FrontierMath,top10
+A,axis1,6,0,0,MMLU Chemistry; OTIS Mock AIME 2024-2025; GPQA Main Chemistry; MMLU Biology; MATH Level 5; WMDP Chemistry; MMLU Pro Chemistry; AudioMultiChallenge; GPQA Main Biology; SpireClimb
+A,axis2,0,1,0,OSWorld; SWE Atlas; DeepSWE; MCP Atlas; FrontierCode; PostTrainBench v1.1; APEX-Agents; CAISI CTF-Archive; CritPt; AISI CTF Suites - Apprentice
+A,axis3,0,0,0,CyScenarioBench; Furniture Assembly; CyberGym; GBAEval; Lech Mazur Writing; AISI Cyber Ranges - Cooling Tower; EBR-bench; AISI Cyber Ranges - The Last Ones; Cybench; GDPval
+A,axis4,0,0,0,OpenBookQA; ARC AI2; DeepResearch Bench; SimpleBench; SimpleQA Verified; HellaSwag; PIQA; WinoGrande; MMLU; Balrog
+B,axis1,3,0,0,OTIS Mock AIME 2024-2025; MATH Level 5; CritPt; AudioMultiChallenge; ARC-AGI; ARC-AGI-2; LAB-Bench SeqQA; GPQA Diamond Chemistry; CAISI CTF-Archive; GPQA Main Chemistry
+B,axis2,0,0,0,CyScenarioBench; CyberGym; Furniture Assembly; GBAEval; GDPval; ExploitBench; AISI Cyber Ranges - Cooling Tower; EBR-bench; Lech Mazur Writing; Cybench
+B,axis3,3,0,0,GSM8K; GeoBench; SimpleQA Verified; WMDP Chemistry; SpireClimb; MMLU; LAB-Bench Protocol; ARC AI2; MMLU Biology; OpenBookQA
+B,axis4,0,0,0,DeepResearch Bench; APEX-Agents; TriviaQA; CTI-REALM; SWE Atlas; PostTrainBench v1.1; CadEval; OSWorld; SimpleBench; OSWorld 2.0
+C,axis1,3,0,0,OTIS Mock AIME 2024-2025; MATH Level 5; AudioMultiChallenge; CritPt; ARC-AGI; GPQA Diamond Chemistry; ARC-AGI-2; LAB-Bench SeqQA; CAISI CTF-Archive; GPQA Main Chemistry
+C,axis2,4,0,0,SimpleQA Verified; GSM8K; GeoBench; LAB-Bench Protocol; MMLU; WMDP Chemistry; MMLU Biology; ARC AI2; PIQA; WMDP Biology
+C,axis3,0,0,0,CyberGym; CyScenarioBench; Furniture Assembly; GBAEval; ExploitBench; AISI Cyber Ranges - Cooling Tower; GDPval; Cybench; EBR-bench; Lech Mazur Writing
+C,axis4,0,0,0,DeepResearch Bench; APEX-Agents; SWE Atlas; PostTrainBench v1.1; OSWorld; TriviaQA; FrontierCode; MirrorCode; CTI-REALM; HellaSwag

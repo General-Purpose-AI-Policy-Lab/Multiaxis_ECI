@@ -1,0 +1,102 @@
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+  display axis -> subset column: 1->1 (r +1.00), 2->2 (r +1.00), 3->3 (r +1.00), 4->4 (r +1.00)
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 75 below-floor scores up to their benchmark chance floor
+
+== before (CEILING_SD 0.0) ==
+Scientific Knowledge & Mathematics: drawn ['Skilled Generalist', 'Domain Expert', 'High School Qualifier', 'High School Top Performer']; lower bounds {'Average Human': -3.046}
+     Average Human                      [-3.046, -1.362, -0.51]
+   * Skilled Generalist                 [-0.45, -0.357, -0.273]
+   * Domain Expert                      [0.877, 0.952, 1.029]
+     Committee of Domain Experts        [1.63, 3.545, 6.362]
+     Top Performer                      [2.244, 3.345, 5.394]
+     Committee of Average Humans        [-1.923, -0.056, 2.099]
+     Committee of Skilled Generalists   [0.174, 1.801, 4.24]
+   * High School Qualifier              [0.542, 0.658, 0.774]
+   * High School Top Performer          [1.719, 1.997, 2.356]
+   at ceiling: [('Average Human', 'VPCT', 1.0)]
+Agentic Capabilities & Programming: drawn ['Average Human', 'Skilled Generalist', 'Domain Expert', 'Committee of Domain Experts', 'Committee of Average Humans', 'Committee of Skilled Generalists']; lower bounds {}
+   * Average Human                      [1.718, 1.772, 1.827]
+   * Skilled Generalist                 [1.75, 1.811, 1.887]
+   * Domain Expert                      [1.782, 1.855, 1.961]
+   * Committee of Domain Experts        [2.23, 2.338, 2.462]
+     Top Performer                      [2.171, 3.466, 5.861]
+   * Committee of Average Humans        [2.191, 2.288, 2.397]
+   * Committee of Skilled Generalists   [2.211, 2.313, 2.426]
+     High School Qualifier              [-4.365, -1.141, 1.207]
+     High School Top Performer          [-3.118, 0.42, 3.288]
+   at ceiling: [('Committee of Average Humans', 'ARC-AGI-2', 1.0)]
+Cyber Capabilities: drawn ['Committee of Domain Experts']; lower bounds {}
+     Average Human                      [-6.254, -3.692, -1.865]
+     Skilled Generalist                 [-4.896, -2.437, -0.775]
+     Domain Expert                      [-1.825, -0.291, 0.561]
+   * Committee of Domain Experts        [0.551, 0.738, 0.951]
+     Top Performer                      [-0.418, 1.532, 4.093]
+     Committee of Average Humans        [-4.904, -2.383, -0.553]
+     Committee of Skilled Generalists   [-2.963, -0.651, 0.475]
+     High School Qualifier              [-4.741, -2.009, -0.294]
+     High School Top Performer          [-3.531, -0.604, 1.877]
+   at ceiling: []
+General Knowledge & Commonsense: drawn ['Average Human', 'Skilled Generalist', 'Domain Expert', 'Top Performer', 'Committee of Average Humans', 'Committee of Skilled Generalists']; lower bounds {}
+   * Average Human                      [1.598, 1.749, 1.93]
+   * Skilled Generalist                 [1.964, 2.902, 4.298]
+   * Domain Expert                      [2.926, 4.665, 7.112]
+     Committee of Domain Experts        [4.815, 6.748, 9.39]
+   * Top Performer                      [4.102, 6.413, 9.333]
+   * Committee of Average Humans        [1.889, 2.354, 3.353]
+   * Committee of Skilled Generalists   [3.466, 4.435, 5.825]
+     High School Qualifier              [-3.85, 0.009, 3.72]
+     High School Top Performer          [-2.581, 1.52, 5.495]
+   at ceiling: []
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 75 below-floor scores up to their benchmark chance floor
+
+== after (CEILING_SD 2.0) ==
+Scientific Knowledge & Mathematics: drawn ['Skilled Generalist', 'Domain Expert', 'High School Qualifier', 'High School Top Performer']; lower bounds {'Average Human': -2.692}
+     Average Human                      [-2.692, -1.33, -0.541]
+   * Skilled Generalist                 [-0.451, -0.359, -0.269]
+   * Domain Expert                      [0.875, 0.952, 1.032]
+     Committee of Domain Experts        [1.594, 3.534, 6.431]
+     Top Performer                      [2.286, 3.37, 5.442]
+     Committee of Average Humans        [-1.686, 0.015, 2.042]
+     Committee of Skilled Generalists   [0.188, 1.822, 4.348]
+   * High School Qualifier              [0.54, 0.656, 0.77]
+   * High School Top Performer          [1.746, 2.042, 2.427]
+   at ceiling: [('High School Top Performer', 'MMLU Biology', 0.898), ('Average Human', 'VPCT', 1.0)]
+Agentic Capabilities & Programming: drawn ['Average Human', 'Skilled Generalist', 'Domain Expert', 'Committee of Domain Experts', 'Committee of Average Humans', 'Committee of Skilled Generalists']; lower bounds {}
+   * Average Human                      [1.718, 1.772, 1.827]
+   * Skilled Generalist                 [1.75, 1.811, 1.887]
+   * Domain Expert                      [1.782, 1.855, 1.961]
+   * Committee of Domain Experts        [2.23, 2.338, 2.462]
+     Top Performer                      [2.171, 3.466, 5.861]
+   * Committee of Average Humans        [2.191, 2.288, 2.397]
+   * Committee of Skilled Generalists   [2.211, 2.313, 2.426]
+     High School Qualifier              [-4.365, -1.141, 1.207]
+     High School Top Performer          [-3.118, 0.42, 3.288]
+   at ceiling: [('Committee of Average Humans', 'ARC-AGI-2', 1.0)]
+Cyber Capabilities: drawn ['Committee of Domain Experts']; lower bounds {}
+     Average Human                      [-6.254, -3.692, -1.865]
+     Skilled Generalist                 [-4.896, -2.437, -0.775]
+     Domain Expert                      [-1.825, -0.291, 0.561]
+   * Committee of Domain Experts        [0.551, 0.738, 0.951]
+     Top Performer                      [-0.418, 1.532, 4.093]
+     Committee of Average Humans        [-4.904, -2.383, -0.553]
+     Committee of Skilled Generalists   [-2.963, -0.651, 0.475]
+     High School Qualifier              [-4.741, -2.009, -0.294]
+     High School Top Performer          [-3.531, -0.604, 1.877]
+   at ceiling: []
+General Knowledge & Commonsense: drawn ['Average Human', 'Skilled Generalist', 'Committee of Average Humans', 'Committee of Skilled Generalists']; lower bounds {'Top Performer': 4.315}
+   * Average Human                      [1.602, 1.761, 1.946]
+   * Skilled Generalist                 [1.974, 2.967, 4.355]
+     Domain Expert                      [3.039, 4.796, 7.202]
+     Committee of Domain Experts        [4.86, 6.798, 9.506]
+     Top Performer                      [4.315, 6.534, 9.543]
+   * Committee of Average Humans        [2.015, 2.668, 3.794]
+   * Committee of Skilled Generalists   [3.523, 4.488, 5.842]
+     High School Qualifier              [-3.743, -0.066, 3.801]
+     High School Top Performer          [-2.465, 1.459, 5.688]
+   at ceiling: [('Skilled Generalist', 'GSM8K', 0.968), ('Top Performer', 'SimpleBench', 0.954), ('Committee of Average Humans', 'WinoGrande', 0.94)]

@@ -1,0 +1,47 @@
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+Initializing NUTS using adapt_diag...
+Multiprocess sampling (10 chains in 10 jobs)
+NUTS: [sigma_b_mu, sigma_b_tau, sigma_b_z, tau_CD, tau_A_normal, theta_skew_alpha, theta_skew, lin_delta_z, lin_drift, lin_spread, lin_offset_sd, lin_offset_z, variant_base_mu, effort_m, effort_dir_z, effort_token_slope, A_z, D_z, ceiling_gap_raw]
+                                                                                
+                             Step      Grad                                     
+  Progre…   Draw   Diverg…   size      evals      Speed     Elapsed   Remaini…  
+ ────────────────────────────────────────────────────────────────────────────── 
+  ━━━━━━━   2100   1         0.007     1023       1.40      0:49:08   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   5         0.007     1023       1.33      0:46:36   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   0         0.006     1023       1.25      0:43:38   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   3         0.006     1023       1.32      0:46:22   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   0         0.006     1023       1.34      0:46:55   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   5         0.006     1023       1.35      0:47:06   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   2         0.007     1023       1.38      0:48:20   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   1         0.007     511        1.21      0:42:24   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   1         0.006     1023       1.35      0:47:05   0:00:00   
+                                                  s/draw                        
+  ━━━━━━━   2100   2         0.007     1023       1.38      0:48:16   0:00:00   
+                                                  s/draw                        
+                                                                                
+Sampling 10 chains for 1_800 tune and 300 draw iterations (18_000 + 3_000 draws total) took 3236 seconds.
+There were 20 divergences after tuning. Increase `target_accept` or reparameterize.
+Chain 7 reached the maximum tree depth. Increase `max_treedepth`, increase `target_accept` or reparameterize.
+The rhat statistic is larger than 1.01 for some parameters. This indicates problems during sampling. See https://arxiv.org/abs/1903.08008 for details
+The effective sample size per chain is smaller than 100 for some parameters.  A higher number is needed for reliable rhat and ess computation. See https://arxiv.org/abs/1903.08008 for details
+ chain  map_start_logp  logp_median  loglik_median  sigma_b_mu_median  sigma_b_tau_median  min_sigma_b  n_bench_median_within_20pct_of_floor  divergences
+     0      -16076.676   -22672.466     -15224.797             -3.438               0.791        0.006                                     0            1
+     1      -16104.399   -22716.188     -15256.111             -3.432               0.774        0.006                                     0            5
+     2      -16105.251   -22685.127     -15218.862             -3.465               0.795        0.006                                     0            0
+     3      -16138.420   -22672.214     -15221.802             -3.447               0.814        0.006                                     0            3
+     4      -16158.681   -22715.185     -15248.244             -3.425               0.769        0.006                                     0            0
+     5      -16206.361   -22697.983     -15235.887             -3.438               0.811        0.006                                     0            5
+     6      -16207.880   -22727.059     -15262.612             -3.406               0.780        0.006                                     0            2
+     7      -16215.068   -22686.899     -15228.331             -3.446               0.781        0.006                                     0            1
+     8      -16215.622   -22724.545     -15278.464             -3.413               0.780        0.006                                     0            1
+     9      -16218.421   -22664.665     -15214.960             -3.455               0.788        0.006                                     0            2

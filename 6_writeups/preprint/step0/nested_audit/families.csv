@@ -1,0 +1,17 @@
+fit,family,pairs_read,mean_q3,baseline_mean_q3,n_above_p95
+K1,RAND bio/chem,105,0.044,-0.057,4
+K1,AISI CTF tiers,2,0.565,-0.057,2
+K1,FrontierMath,1,0.631,-0.057,1
+K1,RAND vs GPQA Diamond/MMLU/MMLU-Pro,30,-0.057,-0.057,0
+K4A,RAND bio/chem,105,0.005,-0.047,1
+K4A,AISI CTF tiers,2,0.469,-0.047,1
+K4A,FrontierMath,1,0.441,-0.047,1
+K4A,RAND vs GPQA Diamond/MMLU/MMLU-Pro,30,0.008,-0.047,0
+K4B,RAND bio/chem,105,0.009,-0.047,1
+K4B,AISI CTF tiers,2,0.451,-0.047,1
+K4B,FrontierMath,1,0.431,-0.047,1
+K4B,RAND vs GPQA Diamond/MMLU/MMLU-Pro,30,-0.003,-0.047,0
+K4C,RAND bio/chem,105,0.013,-0.047,3
+K4C,AISI CTF tiers,2,0.463,-0.047,1
+K4C,FrontierMath,1,0.457,-0.047,1
+K4C,RAND vs GPQA Diamond/MMLU/MMLU-Pro,30,0.001,-0.047,0
