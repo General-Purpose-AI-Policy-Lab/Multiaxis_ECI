@@ -15,7 +15,7 @@ Sections 1, 4, 9 and 10 below were written on 2026-10-29 against a checkout
 
 | fit | folder under `5_outputs/data20261019/` | chains | modes | status for the paper |
 |---|---|---|---|---|
-| ceiling flagship, models only | `mirt_lineageprior_lineagebm/` | 50 (seeds 44-48) | 5: A 21, B 5 (−10 nats), C 19 (−17), D 4 (−26), E 1 (−54) | R1 in spec. Mode A: 8,400 draws, min / median ESS 276 / 7,699, 110 divergences; eta r-hat 1.048 on the whole fit (mode-inflated). Fixed integrated LOO favours A on 3,116 reliable scores (C −9.0 ± 4.0, D −14.4 ± 6.9). |
+| ceiling flagship, models only | `mirt_lineageprior_lineagebm/` | 50 (seeds 44-48) | 5: A 21, B 5 (−10 nats), C 19 (−17), D 4 (−26), E 1 (−54) | R1 in spec. The only diagnostics on disk are mode A's alone (21 / 50 chains, 8,400 saved draws, `comparisons/mode_eval_table.csv`): eta r-hat 1.048, min / median ESS 276 / 7,699, 110 divergences on saved draws. Mode A by itself misses the 1.01 target; no whole-fit numbers exist on this machine. Fixed integrated LOO favours A on 3,116 reliable scores (C −9.0 ± 4.0, D −14.4 ± 6.9). |
 | no ceilings | `..._noceiling/` | 20 (seeds 42, 43) | 2: A 17, B 3 (−8.7) | R2 in spec, but 20 chains against 50 and other seeds. Robust LOO: ceilings +55.8 ± 12.1 nats on 4,967 / 5,487 scores. |
 | joint, humans inside | `..._noceiling_humanmerge/` | 10 | 1 | the unimodal negative result (tiers trade axes) |
 | bifactor free / gsum / k5 / orthogonal, axis-pin, semicomp0, simple-structure 2.5 / 5 | own folders, `LESS_COMPENSATION.md` | 10-50 | 4-16 | the "less compensation" study, closed: every variant fragments (9-16 modes) or biases the frontier; feeds §4 ladder and limitations |
