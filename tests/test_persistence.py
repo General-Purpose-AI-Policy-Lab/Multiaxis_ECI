@@ -36,6 +36,23 @@ def test_thin_trace_keeps_every_nth_draw_and_stamps_the_step():
     assert thin_trace(idata, 1) is idata
 
 
+def test_save_trace_writes_draws_in_float32_and_keeps_the_rest(tmp_path):
+    from multiaxis_eci.persistence import load_trace, save_trace
+    idata = _trace()
+    idata.sample_stats["logp"] = (("chain", "draw"), np.full((2, 100), -15000.123456))
+    idata.sample_stats.attrs["sampler_settings"] = {"target_accept": 0.95}
+    save_trace(idata, tmp_path / "t.nc")
+    back = load_trace(tmp_path / "t.nc")
+    assert back.posterior["theta"].dtype == np.float32
+    assert back.log_likelihood["obs"].dtype == np.float32
+    assert back.sample_stats["logp"].dtype == np.float64          # logp sums stay exact
+    np.testing.assert_allclose(back.posterior["theta"].values, idata.posterior["theta"].values,
+                               rtol=1e-6)
+    assert back.posterior.attrs["mirt_spec"] == "{}"
+    assert idata.posterior["theta"].dtype == np.float64           # the caller's trace untouched
+    assert set(back.groups()) == set(idata.groups())
+
+
 def test_thin_trace_drops_nutpies_per_parameter_stats():
     idata = _trace()
     rng = np.random.default_rng(1)
