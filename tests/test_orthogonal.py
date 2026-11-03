@@ -44,7 +44,8 @@ def test_orthogonal_is_refused_off_the_free_bifactor():
 
 def test_the_composite_keeps_every_eta_and_reads_sigma_off_each_domain():
     """eta = theta A^T is the same on the displayed axes; sigma_k is the ratio of the mean
-    specific to the mean general loading over the benchmarks dominated by s_k."""
+    specific to the mean general posterior-median loading over the benchmarks dominated by s_k,
+    one value per axis."""
     from multiaxis_eci.analysis import orthogonal_composite
     rng = np.random.default_rng(1)
     S, N = 5, 20
@@ -56,7 +57,23 @@ def test_the_composite_keeps_every_eta_and_reads_sigma_off_each_domain():
     A_c, theta_c, sigma = orthogonal_composite(A, theta)
     np.testing.assert_allclose(np.einsum("snk,sbk->snb", theta_c, A_c),
                                np.einsum("snk,sbk->snb", theta, A), atol=1e-10)
-    np.testing.assert_allclose(sigma[:, 0], A[:, 2:4, 1].mean(1) / A[:, 2:4, 0].mean(1))
-    np.testing.assert_allclose(sigma[:, 1], A[:, 4:6, 2].mean(1) / A[:, 4:6, 0].mean(1))
+    med = np.median(A, 0)
+    assert sigma.shape == (2,)
+    np.testing.assert_allclose(sigma[0], med[2:4, 1].mean() / med[2:4, 0].mean())
+    np.testing.assert_allclose(sigma[1], med[4:6, 2].mean() / med[4:6, 0].mean())
     np.testing.assert_allclose(theta_c[:, :, 0], theta[:, :, 0])
-    np.testing.assert_allclose(theta_c[:, :, 1], theta[:, :, 0] + sigma[:, :1] * theta[:, :, 1])
+    np.testing.assert_allclose(theta_c[:, :, 1], theta[:, :, 0] + sigma[0] * theta[:, :, 1])
+
+
+def test_the_composite_warns_when_a_domain_barely_loads_on_g():
+    from multiaxis_eci.analysis import orthogonal_composite
+    rng = np.random.default_rng(2)
+    A = np.array([[1.5, 0.0], [0.01, 1.0], [0.02, 1.2]])[None] * rng.uniform(0.9, 1.1, (4, 3, 2))
+    with pytest.warns(UserWarning, match="almost none"):
+        orthogonal_composite(A, rng.normal(size=(4, 5, 2)))
+
+
+def test_a_negative_loading_does_not_make_an_axis_dominant():
+    from multiaxis_eci.analysis.human_placement import dominant_axis
+    A = np.array([[1.0, 0.2], [-1.5, 0.9], [0.1, 0.8]])
+    assert dominant_axis(A).tolist() == [0, 1, 1]

@@ -79,8 +79,11 @@ def tier_exclusions(path: Path = CONTENT_FILE) -> dict[str, set[tuple[str, str]]
 
 
 def dominant_axis(A_med: np.ndarray) -> np.ndarray:
-    """(B,) index of the axis carrying the largest share of each benchmark's loading variance."""
-    return np.argmax(A_med ** 2, axis=1)
+    """(B,) index of the axis carrying the largest share of each benchmark's loading variance,
+    among the axes it rises with: a negative loading (an --orthogonal fit's displayed g, where a
+    benchmark rises less with g than its domain's axis does) does not make an axis the
+    benchmark's own. No fit before 2026-11-03 had a negative median loading, so none changes."""
+    return np.argmax(np.maximum(A_med, 0) ** 2, axis=1)
 
 
 def human_scores(spec) -> pd.DataFrame:

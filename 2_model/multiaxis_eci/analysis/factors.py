@@ -3,6 +3,7 @@ canonicalized loadings and abilities, loading and score tables."""
 from __future__ import annotations
 
 import json
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -85,6 +86,10 @@ def mirt_factors_from_trace(trace, rank_track: bool | None = None):
     return A, theta, tau
 
 
+# Above this sigma_k a domain's benchmarks load on g ten times less than on their specific.
+SIGMA_THIN_G = 10.0
+
+
 def orthogonal_composite(A: np.ndarray, theta: np.ndarray):
     """An orthogonal bifactor's axes as g and g + sigma_k s_k: the display of `--orthogonal`.
 
@@ -94,28 +99,36 @@ def orthogonal_composite(A: np.ndarray, theta: np.ndarray):
         theta'_0 = g,    theta'_k = g + sigma_k s_k,    sigma_k = mean a_bk / mean a_b0
 
     the means over the benchmarks whose largest share of the posterior-median loading row is on
-    s_k (all benchmarks weighted by that share when none is), per draw, so sigma_k carries its
-    uncertainty. sigma_k measures how far the domain stands from g; two displayed axes correlate
-    at 1 / sqrt((1 + sigma_j^2)(1 + sigma_k^2)), all of it through g. The loadings follow so that
-    every eta is unchanged: a'_bk = a_bk / sigma_k and a'_b0 = a_b0 - sum_k a_bk / sigma_k, which
-    is negative for a benchmark that rises less with g than its domain's axis does.
+    s_k (all benchmarks weighted by that share when none is), taken on the posterior-median
+    loadings: one sigma_k per axis, so every draw displays the same direction g + sigma_k s_k and
+    the axis keeps one unit (a per-draw sigma, until 2026-11-03, rescaled the axis draw by draw,
+    without bound where g ran thin in a draw). sigma_k measures how far the domain stands from g;
+    two displayed axes correlate at 1 / sqrt((1 + sigma_j^2)(1 + sigma_k^2)), all of it through
+    g. The loadings follow so that every eta is unchanged: a'_bk = a_bk / sigma_k and
+    a'_b0 = a_b0 - sum_k a_bk / sigma_k, which is negative for a benchmark that rises less with g
+    than its domain's axis does. A domain whose benchmarks barely load on g (sigma_k above
+    SIGMA_THIN_G) is warned about: its axis is then its specific, magnified.
 
-    Returns (A', theta', sigma (S, K-1)).
+    Returns (A', theta', sigma (K-1,)).
     """
     med = np.median(A, axis=0)
     share = med ** 2 / np.maximum((med ** 2).sum(axis=1, keepdims=True), 1e-12)
     dom = share.argmax(axis=1)
     K = A.shape[2]
-    sigma = np.empty((A.shape[0], K - 1))
+    sigma = np.empty(K - 1)
     for k in range(1, K):
         w = (dom == k).astype(float) if (dom == k).any() else share[:, k]
-        sigma[:, k - 1] = ((A[:, :, k] * w).sum(1)
-                           / np.maximum((A[:, :, 0] * w).sum(1), 1e-9))
+        sigma[k - 1] = (med[:, k] * w).sum() / max((med[:, 0] * w).sum(), 1e-9)
     sigma = np.maximum(sigma, 1e-9)
+    if (sigma > SIGMA_THIN_G).any():
+        warnings.warn(f"orthogonal_composite: g carries almost none of the domain of axes "
+                      f"{[k + 1 for k in np.where(sigma > SIGMA_THIN_G)[0]]} (sigma "
+                      f"{np.round(sigma, 1).tolist()}): their displayed axis is the specific, "
+                      f"magnified", stacklevel=2)
     theta_c = theta.copy()
-    theta_c[:, :, 1:] = theta[:, :, :1] + theta[:, :, 1:] * sigma[:, None, :]
+    theta_c[:, :, 1:] = theta[:, :, :1] + theta[:, :, 1:] * sigma
     A_c = A.copy()
-    A_c[:, :, 1:] = A[:, :, 1:] / sigma[:, None, :]
+    A_c[:, :, 1:] = A[:, :, 1:] / sigma
     A_c[:, :, 0] = A[:, :, 0] - A_c[:, :, 1:].sum(axis=2)
     return A_c, theta_c, sigma
 

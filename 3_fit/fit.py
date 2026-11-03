@@ -75,6 +75,7 @@ from multiaxis_eci.data import (
 from multiaxis_eci.lineage import build_lineage_structure
 from multiaxis_eci.models.mirt import align_effort_sign, build_mirt_model
 from multiaxis_eci.persistence import (
+    _same_spec,
     load_trace,
     merge_chains,
     save_df,
@@ -859,8 +860,9 @@ def run_exploration(args, parser) -> None:
         wrong = [f"{key} ({earlier.get(key)!r} there, {attrs.get(key)!r} here)"
                  for key in ("mirt_data_fingerprint", "mirt_human_order")
                  if earlier.get(key) != attrs.get(key)]
-        if not earlier.get("mirt_spec") or (FitSpec.from_spec_json(earlier["mirt_spec"])
-                                            != FitSpec.from_spec_json(attrs["mirt_spec"])):
+        # An earlier spec that no longer parses (a retired option set) is a different fit too,
+        # reported as one instead of a traceback: persistence._same_spec reads specs the same way.
+        if not earlier.get("mirt_spec") or not _same_spec(earlier["mirt_spec"], attrs["mirt_spec"]):
             wrong.insert(0, f"mirt_spec ({earlier.get('mirt_spec')!r} there, "
                             f"{attrs.get('mirt_spec')!r} here)")
         if thin != args.save_thin:
