@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci.config import DIAGNOSTICS_DIR, ECI_EPS  # noqa: E402
+from multiaxis_eci.persistence import save_trace  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
 
 MIN_BENCH_OBS = 3
@@ -289,7 +290,7 @@ def main():
         with build_ppca(prep, K=args.K):
             idata = pm.sample(draws=args.draws, tune=args.tune, chains=args.chains,
                               target_accept=0.9, random_seed=42, progressbar=False)
-        idata.to_netcdf(trace_path)
+        save_trace(idata, trace_path)
     ndiv = int(idata.sample_stats["diverging"].sum())
     print(f"divergences: {ndiv} / {args.chains*args.draws}")
 

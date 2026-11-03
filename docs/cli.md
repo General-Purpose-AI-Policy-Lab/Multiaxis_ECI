@@ -22,7 +22,7 @@ unmarked to both.
 | `--target-accept X` | `[expl]` default 0.95. Raise toward 0.99 if divergences appear |
 | `--seed N` | `[expl]` override seed 42. Nutpie is deterministic given seed + data + model, so a multi-run recipe must vary this |
 | `--merge-chains TRACE` | `[expl]` add this run's chains to TRACE, an earlier run of the same fit copied out of the fit folder (the run overwrites the folder's trace): the saved trace and every table cover both runs' chains. Needs its own `--seed`. The flagship's 15 chains are 8 (seed 42) + 7 (seed 43) |
-| `--save-thin N` | write every n-th draw to the trace file (default `config.SAVE_THIN` = 5); convergence and the tables use the full run, 1 keeps everything |
+| `--save-thin N` | write every n-th draw to the trace file (default `config.SAVE_THIN` = 2; 5 before 2026-11-03); convergence is checked on the full run, 1 keeps everything. Every trace is written in float32 (posterior, log-likelihood) without nutpie's per-parameter sample stats (`persistence.save_trace`) |
 | `--stream-draws` / `--no-stream-draws` | on by default: nutpie writes every draw to `<fit>/live_draws.zarr` as it lands instead of holding the run in RAM (a 10,000 x 8 K=4 run sat at 13 GB in memory on 2026-09-11; streamed, it needs a few hundred MB while sampling and about 8 GB of free disk, warmup included). A killed run keeps what it had (`persistence.load_live_draws` reads a partial store); the store is deleted once the thinned trace is saved. `--no-stream-draws` keeps the old in-RAM behaviour |
 
 **Model**
@@ -209,7 +209,7 @@ python 4_diagnostics/3_plot_mirt.py --folder 5_outputs/data20261019/            
 Folder mode globs `DIR/*/*.nc` plus `DIR/*.nc`, so pointing at one fit folder
 also works. It auto-thins by file size, one kept draw per 2 GB, and `--thin`
 overrides. Fits write their traces already thinned (`--save-thin`, default
-`config.SAVE_THIN` = 5, the flagship's is under 1 GB), so it rarely exceeds 1. One child process per trace, so a single failure does not end the sweep.
+`config.SAVE_THIN` = 2 in float32, the flagship's is about 1 GB), so it rarely exceeds 1. One child process per trace, so a single failure does not end the sweep.
 
 ## Diagnose a fit
 

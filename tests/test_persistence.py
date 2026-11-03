@@ -53,15 +53,21 @@ def test_save_trace_writes_draws_in_float32_and_keeps_the_rest(tmp_path):
     assert set(back.groups()) == set(idata.groups())
 
 
-def test_thin_trace_drops_nutpies_per_parameter_stats():
+def test_save_trace_drops_nutpies_per_parameter_stats_whatever_the_thinning(tmp_path):
+    """--save-thin 1 and a merge of chains (saved without thin_trace) get the same format."""
+    from multiaxis_eci.persistence import load_trace, save_trace
     idata = _trace()
     rng = np.random.default_rng(1)
     idata.sample_stats["gradient"] = (("chain", "draw", "unconstrained_parameter"),
                                       rng.normal(size=(2, 100, 4)))
     idata.sample_stats["logp"] = (("chain", "draw"), rng.normal(size=(2, 100)))
-    out = thin_trace(idata, 5)
-    assert "gradient" not in out.sample_stats
-    assert {"logp", "diverging"} <= set(out.sample_stats.data_vars)
+    save_trace(thin_trace(idata, 1), tmp_path / "t.nc")
+    back = load_trace(tmp_path / "t.nc")
+    assert "gradient" not in back.sample_stats
+    assert "unconstrained_parameter" not in back.sample_stats.dims
+    assert {"logp", "diverging"} <= set(back.sample_stats.data_vars)
+    assert back.posterior.sizes["draw"] == 100
+    assert "gradient" in idata.sample_stats                    # the caller's trace untouched
 
 
 def test_merge_chains_appends_the_later_runs_chains():

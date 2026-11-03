@@ -12,9 +12,18 @@ from multiaxis_eci.data import ECIData
 
 
 FLOAT32_GROUPS = ("posterior", "log_likelihood")
+# nutpie sample stats with one value per unconstrained parameter: nothing in this repository
+# reads them (diagnostics use logp, diverging, energy, step size and tree depth).
+NUTPIE_PARAMETER_STATS = ("gradient", "unconstrained_draw", "divergence_start",
+                          "divergence_start_gradient", "divergence_end", "divergence_momentum",
+                          "mass_matrix_stds", "mass_matrix_eigvals")
 
 
 def save_trace(trace, path: Path) -> None:
+    """Write a trace in the one on-disk format every trace of this repository shares, whatever
+    wrote it (a fit, a checkpoint, a merge of chains): the draws as given (thin them first with
+    `thin_trace`), the posterior and pointwise log-likelihoods in float32, without nutpie's
+    per-parameter sample stats. The caller's trace is not modified."""
     path.parent.mkdir(parents=True, exist_ok=True)
     # netCDF attributes hold flat scalars and arrays only. nutpie's zarr-store
     # path stamps a NESTED sampler_settings dict on the trace, which raises
@@ -22,28 +31,26 @@ def save_trace(trace, path: Path) -> None:
     # provenance (it records target_accept, max tree depth and the seed).
     def flat(attrs):
         return {k: json.dumps(v) if isinstance(v, dict) else v for k, v in attrs.items()}
-    # The draws and pointwise log-likelihoods in float32, half the file: on the gsum K = 4
-    # trace (2026-11-03) every 5 / 50 / 95 % quantile of theta and A moved by 1e-5 of its
-    # Monte Carlo error at most, and the PSIS elpd by 1e-5 nats. sample_stats keeps float64
-    # (logp sums of 1e4 nats). The caller's trace is not modified.
     groups = {}
     for name in trace.groups():
         ds = getattr(trace, name).copy()
         ds.attrs = flat(ds.attrs)
         if name in FLOAT32_GROUPS:
+            # Half the file: on the gsum K = 4 trace (2026-11-03) every 5 / 50 / 95 % quantile
+            # of theta and A moved by 1e-5 of its Monte Carlo error at most, and the PSIS elpd
+            # by 1e-5 nats. sample_stats keeps float64 (logp sums of 1e4 nats).
             for v in ds.data_vars:
                 if ds[v].dtype == np.float64:
                     ds[v] = ds[v].astype(np.float32)
+        if name == "sample_stats":
+            # nutpie's zarr store writes them whatever its store_* settings say; they were 40 %
+            # of a K = 4 trace.
+            ds = ds.drop_vars([v for v in NUTPIE_PARAMETER_STATS if v in ds.data_vars])
+            ds = ds.drop_dims([d for d in ds.dims
+                               if not any(d in ds[v].dims for v in ds.data_vars)])
         groups[name] = ds
     out = az.InferenceData(**groups, attrs=flat(trace.attrs))
     out.to_netcdf(str(path))
-
-
-# nutpie sample stats with one value per unconstrained parameter: nothing in this repository
-# reads them (diagnostics use logp, diverging, energy, step size and tree depth).
-NUTPIE_PARAMETER_STATS = ("gradient", "unconstrained_draw", "divergence_start",
-                          "divergence_start_gradient", "divergence_end", "divergence_momentum",
-                          "mass_matrix_stds", "mass_matrix_eigvals")
 
 
 def thin_trace(trace, step: int, drop_transformed: bool = True):
@@ -54,10 +61,8 @@ def thin_trace(trace, step: int, drop_transformed: bool = True):
     fit writes about 11 GB unthinned). Thinning happens at save time only: convergence
     (r-hat, ESS, divergences) and the deliverable tables are computed on the full run first.
     `drop_transformed` also removes PyMC's unconstrained duplicates (`*__` variables such as
-    `A_z_log__`), which nothing downstream reads, and nutpie's per-parameter sample stats
-    (`NUTPIE_PARAMETER_STATS`, one value per unconstrained parameter and draw), which nutpie's
-    zarr store writes whatever its `store_*` settings say and which were 40 % of a K=4 trace.
-    The step is stamped as `mirt_save_thin` so a reader knows the file's draws are a
+    `A_z_log__`), which nothing downstream reads (`save_trace` drops nutpie's per-parameter
+    sample stats and writes float32 whatever the step). The step is stamped as `mirt_save_thin` so a reader knows the file's draws are a
     subsample. `step` 1 returns the trace unchanged.
     """
     if step is None or step <= 1:
@@ -69,8 +74,6 @@ def thin_trace(trace, step: int, drop_transformed: bool = True):
             ds = ds.isel(draw=slice(None, None, step))
         if name == "posterior" and drop_transformed:
             ds = ds.drop_vars([v for v in ds.data_vars if v.endswith("__")])
-        if name == "sample_stats" and drop_transformed:
-            ds = ds.drop_vars([v for v in NUTPIE_PARAMETER_STATS if v in ds.data_vars])
         groups[name] = ds
     out = az.InferenceData(**groups)
     out.posterior.attrs.update(trace.posterior.attrs)

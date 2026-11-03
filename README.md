@@ -79,7 +79,7 @@ python 3_fit/fit.py --K 4 --lineage-prior --lineage-bm --chains 10 --seed 45 \
     --merge-chains <copy of the trace so far>     # then seeds 46, 47, 48 the same way
 ```
 
-Traces on disk keep every fifth draw (`--save-thin`): convergence and the tables are computed on the full run. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default), so the machine stays usable during a ten-hour fit.
+Traces on disk keep every second draw (`--save-thin`, `config.SAVE_THIN` = 2), with the posterior and the pointwise log-likelihoods in float32 and without nutpie's per-parameter sample stats (`persistence.save_trace`, whatever wrote the trace): one in five lost up to 60 % of a loading's effective sample size, float32 moves no quantile by more than 1e-5 of its Monte Carlo error (2026-11-03). Convergence is checked on the full run. While a nutpie fit runs, its draws stream to a zarr store beside the trace instead of accumulating in RAM (`--stream-draws`, on by default), so the machine stays usable during a ten-hour fit.
 
 Then find the posterior modes, write the axis tables on the chains the deliverables read, place the human tiers, render the fit's figures (French versions under `fr/`) and rebuild the dashboard. The deliverables read the best mode by log-density, or the `selected_chains` of the modes file; a refit sets the old modes file aside, so a selection never outlives its chains:
 

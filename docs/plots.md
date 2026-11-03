@@ -191,8 +191,8 @@ top benchmarks still contain one of its signature benchmarks (`axis_names.json`)
 
 ## Memory
 
-**Traces are written thinned** (`config.SAVE_THIN` = 5; the flagship's is
-under 1 GB), and the readers can thin further. Every figure in this catalogue is a median or an interval, and 20,000
+**Traces are written thinned** (`config.SAVE_THIN` = 2, in float32; the flagship's is
+about 1 GB), and the readers can thin further. Every figure in this catalogue is a median or an interval, and 20,000
 draws pin those as well as 200,000, so thinning costs nothing that a figure
 shows.
 
