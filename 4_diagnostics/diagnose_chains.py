@@ -217,7 +217,11 @@ def detect_modes(post, logp, match_thresh: float = MATCH_THRESH) -> list:
                                  if len(ch) > 1 else 1.0)})
     modes.sort(key=lambda m: -(m["mean_logp"] if m["mean_logp"] is not None else 0.0))
     best = modes[0]
-    for label, m in zip("ABCDEFGHIJKL", modes):
+    # A..Z, then AA, AB...: 50 chains can split into more than twelve modes (the pinned fit
+    # had 14 on 2026-11-03, and its last two went unlabelled).
+    letters = [chr(65 + i) for i in range(26)]
+    labels = letters + [a + b for a in letters for b in letters]
+    for label, m in zip(labels, modes):
         m["label"] = label
         m["delta_logp"] = (None if best["mean_logp"] is None
                            else round(m["mean_logp"] - best["mean_logp"], 1))
