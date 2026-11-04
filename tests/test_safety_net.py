@@ -1423,3 +1423,16 @@ class TestCLISurface:
             [sys.executable, str(ROOT / "3_fit/fit.py"), "--nonsense"],
             capture_output=True, text=True, timeout=120)
         assert result.returncode != 0
+
+
+class TestFloat32Trace:
+    def test_pull_flat_upcasts_so_a_saturated_mu_stays_below_one(self):
+        """Traces are float32 since 2026-11-03: expit of a float32 eta of 17.5 is exactly 1, and
+        the Beta draw then fails on b = 0. _pull_flat hands the predictive float64 arrays."""
+        import xarray as xr
+        from scipy.special import expit
+        from multiaxis_eci.ppc import _pull_flat
+        post = xr.Dataset({"D": (("chain", "draw", "b"), np.full((2, 3, 1), -17.5, np.float32))})
+        (D,) = _pull_flat(post, ["D"], max_draws=10)
+        assert D.dtype == np.float64 and D.shape == (6, 1)
+        assert (expit(-D) < 1.0).all()

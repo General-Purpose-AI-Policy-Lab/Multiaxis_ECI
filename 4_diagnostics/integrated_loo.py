@@ -305,8 +305,9 @@ def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = Non
     p = post_all.isel(chain=chains)
     S = p.sizes["chain"] * p.sizes["draw"]
 
-    def get(v):
-        return p[v].values.reshape(S, *p[v].shape[2:]) if v in p else None
+    def get(v):   # float64: a float32 trace's expit(eta) is exactly 1 from eta ~ 17 (b = 0, NaN)
+        return (p[v].values.reshape(S, *p[v].shape[2:]).astype(np.float64, copy=False)
+                if v in p else None)
 
     soft = trace_softmin(p)
     return assemble_fit(get, S, data, lin, human_rows, floor_c, spec.binomial_n(data),
@@ -509,7 +510,7 @@ def score_chain(trace_path: Path, chain: int, stored, lineage_map: Path | None =
     f = load_fit(trace_path, [chain], lineage_map)
     cond = conditional_loglik(f)
     gap = float(np.abs(cond - stored.isel(chain=[chain]).values.reshape(f["S"], -1)).max())
-    if gap > reproduction_tol(stored.dtype):
+    if not gap <= reproduction_tol(stored.dtype):   # a NaN gap fails too
         raise SystemExit(f"chain {chain}: the numpy likelihood does not reproduce the fit ({gap})")
     integ, done = integrated_loglik(f)
     e_int, k_int = psis_elpd(integ)

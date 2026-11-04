@@ -51,8 +51,12 @@ def _thin_sel(n_samples: int, max_draws: int):
 def _pull_flat(post, names: list[str], max_draws: int) -> list[np.ndarray]:
     """Flatten (chain, draw, ...) → (S, ...) for each named posterior variable
     and thin them all with one shared even subsample — the common head of
-    every posterior predictive below."""
-    arrs = [_flatten_over_chains(post[n].values) for n in names]
+    every posterior predictive below.
+
+    Cast to float64: traces are float32 since 2026-11-03, and in float32 expit(eta) rounds
+    to exactly 1 from eta ~ 17, so a Beta draw gets b = (1 - mu) * phi = 0 and fails.
+    """
+    arrs = [_flatten_over_chains(post[n].values).astype(np.float64, copy=False) for n in names]
     sel = _thin_sel(arrs[0].shape[0], max_draws)
     if sel is not None:
         arrs = [a[sel] for a in arrs]
