@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "User, 2026-11-05, from the dominant benchmarks by axis_share of the primary mode (chain 16; mirt_loadings.csv). Not a reference fit: the human tiers compensate across axes.",
+  "axes": {
+    "g": {
+      "title": "General Capabilities (Commonsense, Cyber & SWE)",
+      "title_fr": "Capacités générales (sens commun, cyber & SWE)",
+      "signature": [
+        "ARC AI2",
+        "OpenBookQA",
+        "CyberGym"
+      ],
+      "top_benchmarks": [
+        "ExploitBench",
+        "AudioMultiChallenge",
+        "FrontierMath Erdos",
+        "CyScenarioBench",
+        "CAISI ExploitGym Userspace",
+        "CAISI OSS-Fuzz",
+        "CyScenarioBench (Anthropic)",
+        "MCP Atlas"
+      ]
+    },
+    "g+specific1": {
+      "title": "General Capabilities + Scientific Knowledge & Reasoning",
+      "title_fr": "Capacités générales + connaissances et raisonnements scientifiques",
+      "signature": [
+        "WMDP Biology",
+        "WMDP Chemistry",
+        "GPQA Diamond Biology"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "CAISI CTF-Archive",
+        "CAISI Cybench",
+        "BioLP-bench",
+        "LAB-Bench SeqQA",
+        "CritPt",
+        "ARC-AGI-2"
+      ]
+    },
+    "g+specific2": {
+      "title": "General Capabilities + Expert Cyber & Open Problems",
+      "title_fr": "Capacités générales + cyber expert & problèmes ouverts",
+      "signature": [
+        "CAISI OSS-Fuzz",
+        "CyScenarioBench",
+        "FrontierMath Erdos"
+      ],
+      "top_benchmarks": [
+        "SWE Atlas",
+        "Furniture Assembly",
+        "FrontierSWE v2",
+        "APEX-Agents",
+        "EBR-bench",
+        "FrontierCode",
+        "OSWorld",
+        "GDPval"
+      ]
+    },
+    "g+specific3": {
+      "title": "General Capabilities + Desk Research & Tool Use",
+      "title_fr": "Capacités générales + recherche documentaire & usage d'outils",
+      "signature": [
+        "DeepResearch Bench",
+        "MCP Atlas",
+        "APEX-Agents"
+      ],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "PIQA",
+        "LAB-Bench Protocol",
+        "WinoGrande",
+        "HellaSwag",
+        "ARC AI2",
+        "SpireClimb",
+        "TriviaQA"
+      ]
+    }
+  }
+}
