@@ -87,7 +87,9 @@ def obs_loglik(eta, c, phi, n_items, k, y, d=1.0):
     """log p(y | eta) of the fixed-c 3PL Beta-binomial (n_items > 0) / Beta (n_items == 0)
     likelihood, capped at the ceiling d (1 without --ceiling-noise); every argument broadcasts."""
     mu = c + (d - c) * expit(eta)
-    a, b = mu * phi, (1.0 - mu) * phi
+    # 1 - mu written through expit(-eta): 1 - expit(eta) is exactly 0 from eta ~ 37 in float64, and
+    # human tiers inside a fit reach eta ~ 100 (pinned human-merge fit, 2026-11-05)
+    a, b = mu * phi, ((1.0 - d) + (d - c) * expit(-eta)) * phi
     is_b = n_items > 0
     n = np.where(is_b, n_items, 1.0)
     kk = np.where(is_b, k, 0.5)

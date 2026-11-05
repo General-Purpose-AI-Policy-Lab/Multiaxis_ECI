@@ -1436,3 +1436,22 @@ class TestFloat32Trace:
         (D,) = _pull_flat(post, ["D"], max_draws=10)
         assert D.dtype == np.float64 and D.shape == (6, 1)
         assert (expit(-D) < 1.0).all()
+
+    def test_beta_draw_survives_a_saturated_mean(self):
+        """A human tier inside a fit reaches eta ~ 100: mu is exactly 1 even in float64."""
+        from types import SimpleNamespace
+        from multiaxis_eci.ppc import _beta_draw
+        data = SimpleNamespace(bench_idx=np.array([0, 0]))
+        y = _beta_draw(np.array([[1.0, 0.0]]), np.array([[50.0]]), data, seed=0)
+        assert np.isfinite(y).all() and (0.0 <= y).all() and (y <= 1.0).all()
+
+
+def test_obs_loglik_is_finite_at_a_saturated_mean():
+    """integrated_loo writes 1 - mu through expit(-eta): a perfect score at eta = 100 stays finite
+    and near 0 (Beta-binomial k = n), as does a Beta score."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_il_sat", ROOT / "4_diagnostics/integrated_loo.py")
+    il = importlib.util.module_from_spec(spec); spec.loader.exec_module(il)
+    ll = il.obs_loglik(np.array([100.0, 100.0]), 0.0, 50.0, np.array([21.0, 0.0]),
+                       np.array([21.0, 0.0]), np.array([1.0, 0.99]))
+    assert np.isfinite(ll).all() and abs(ll[0]) < 1e-6
