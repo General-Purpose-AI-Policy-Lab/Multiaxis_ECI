@@ -1,11 +1,15 @@
 {
-  "confirmed": false,
-  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "confirmed": true,
+  "how": "User, 2026-11-05, from the dominant benchmarks by axis_share of the primary mode (chains 1, 3, 18; mirt_loadings.csv). Not a reference fit: the human tiers compensate across axes.",
   "axes": {
     "axis1": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Fluid Intelligence, Mathematics & Science",
+      "title_fr": "Intelligence fluide, mathématiques et sciences",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "ARC-AGI-2",
+        "GPQA Main Chemistry"
+      ],
       "top_benchmarks": [
         "OTIS Mock AIME 2024-2025",
         "AudioMultiChallenge",
@@ -18,9 +22,13 @@
       ]
     },
     "axis2": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Cyber Capabilities & Software Engineering",
+      "title_fr": "Capacités cyber et génie logiciel",
+      "signature": [
+        "CyberGym",
+        "AISI CTF Suites - Practitioner",
+        "GBAEval"
+      ],
       "top_benchmarks": [
         "GDPval",
         "AISI CTF Suites - Practitioner",
@@ -33,9 +41,13 @@
       ]
     },
     "axis3": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Agentic Computer Use & Autonomous SWE",
+      "title_fr": "Usage agentique de l'ordinateur et SWE autonome",
+      "signature": [
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents"
+      ],
       "top_benchmarks": [
         "DeepResearch Bench",
         "CadEval",
@@ -48,9 +60,13 @@
       ]
     },
     "axis4": {
-      "title": null,
-      "title_fr": null,
-      "signature": [],
+      "title": "Commonsense, Factual Knowledge & Vulnerability Discovery",
+      "title_fr": "Sens commun, connaissances factuelles et recherche de vulnérabilités",
+      "signature": [
+        "CAISI OSS-Fuzz",
+        "GeoBench",
+        "OpenBookQA"
+      ],
       "top_benchmarks": [
         "GeoBench",
         "SimpleQA Verified",
