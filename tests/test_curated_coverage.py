@@ -53,8 +53,9 @@ def test_sync_audit_has_no_blocking_finding(tmp_path):
 
 
 def test_human_axis_content_is_well_formed():
-    """One judgement per (axis title, benchmark, tier), keep in yes / no, every row six fields (an
-    unquoted comma in a reason shifts the columns and stops the placement); a tier row is an
+    """One judgement per (axis title, benchmark, tier), keep in yes / no / force (force: a whole
+    pair kept on the axis whatever the benchmark's share there, 2026-11-06), every row six fields
+    (an unquoted comma in a reason shifts the columns and stops the placement); a tier row is an
     exclusion of a pair that stays judged as a whole."""
     import csv
     with open(ROOT / "1_curated" / "human_axis_content.csv", newline="") as f:
@@ -62,7 +63,7 @@ def test_human_axis_content_is_well_formed():
     bad = [i + 1 for i, r in enumerate(rows) if len(r) != 6]
     assert not bad, f"human_axis_content.csv lines with a field count other than 6: {bad}"
     df = pd.read_csv(ROOT / "1_curated" / "human_axis_content.csv", keep_default_na=False)
-    assert set(df["keep"]) <= {"yes", "no"}
+    assert set(df["keep"]) <= {"yes", "no", "force"}
     tiered = df[df.tier != ""]
     assert (tiered.keep == "no").all(), "a tier row only takes a tier's score off"
     whole = set(zip(df.axis_title[df.tier == ""], df.benchmark[df.tier == ""]))

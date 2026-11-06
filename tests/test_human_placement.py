@@ -13,6 +13,27 @@ def test_dominant_axis_is_the_largest_variance_share():
     assert hp.dominant_axis(A).tolist() == [0, 2, 2]
 
 
+def test_secondary_axes_count_only_when_judged_yes_or_forced():
+    """A benchmark counts for its dominant axis (unjudged kept), for another axis carrying at
+    least SECONDARY_SHARE_MIN of its loading variance only when judged yes there, and for a
+    forced axis whatever its share (2026-11-06)."""
+    bench = ["dom", "sec_yes", "sec_unjudged", "sec_no", "low_forced", "low"]
+    A = np.array([[0.1, 1.0],     # dominant on axis 1
+                  [0.6, 0.8],     # share 0.36 on axis 0, judged yes
+                  [0.6, 0.8],     # same share, not judged: listed, left out
+                  [0.6, 0.8],     # same share, judged no
+                  [0.2, 1.0],     # share 0.04 on axis 0, forced
+                  [0.2, 1.0]])    # share 0.04, judged yes but under the threshold
+    judged = {"sec_yes": True, "sec_no": False, "low": True}
+    scored = set(bench)
+    sel = hp.axis_benchmarks(0, A, bench, judged, {"low_forced"}, scored)
+    assert sel["used"] == ["low_forced", "sec_yes"]
+    assert sel["secondary"] == ["low_forced", "sec_yes"]
+    assert sel["unjudged_secondary"] == ["sec_unjudged"]
+    sel1 = hp.axis_benchmarks(1, A, bench, {}, set(), scored)
+    assert sel1["used"] == sorted(bench) == sel1["unjudged"]   # all dominant on axis 1
+
+
 def test_content_file_parses_and_names_known_axes():
     rules = hp.content_rules()
     assert rules["Cyber Capabilities"]["Furniture Assembly"] is False
@@ -33,6 +54,8 @@ def test_content_file_parses_and_names_known_axes():
                    # the K=4 bifactor fits renamed from collinearity (2026-10-29), g kept as General
                    # Capabilities with its notable parts
                    "Desk Research, Trivia & Commonsense",
+                   # ... renamed 2026-11-06 (user) to cover its secondary benchmarks
+                   "Desk Research, Agentic Work & Commonsense",
                    "General Capabilities (Agentic, Cyber & SWE)",
                    "General Capabilities (Math, Science & Cyber)"}
     assert flagship <= set(rules) <= flagship | exploration
