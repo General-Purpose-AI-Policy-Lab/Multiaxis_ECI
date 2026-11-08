@@ -97,6 +97,112 @@ Source `origin/main:5_outputs/data20261019/comparisons/variants_report.html` (Cl
 - Report verdict: keep the flagship, gsum as the alternative, ss25 and pin as an axis check. Jérémy prefers gsum for its g + deviations display: decision 9.
 - No variant trace is on this machine; the LOO logs are gitignored, so the LOO numbers exist only in the report.
 
+## 0c. Plan redrawn for two structures (2026-11-08)
+
+Decision 9, taken 2026-11-08: the preprint presents BOTH the compensatory
+K = 4 ceiling fit and the bifactor gsum fit, as two readings of the same data.
+The backbone (data, likelihood, lineage prior, mode finding, structure ladder,
+ECI-H, frontier gaps) is written once. Placement, forecast and axis names are
+written per reading. Where this section conflicts with sections 3, 4, 9 and
+10, this section wins.
+
+**The two readings.** Same likelihood, same priors on everything but the
+ability block. Compensatory: $\eta_{mb} = \sum_{k} A_{bk}\theta_{mk} - D_b$,
+four free non-negative columns, four bundle abilities per model. gsum: the
+likelihood reads $\theta_{m1} = g_m$ and $\theta_{mk} = g_m + \sigma_k z_{mk}$
+for $k = 2..4$, with a dense general loading column and horseshoe specifics,
+so displayed axis $k$ is one general level plus that model's deviation. The
+first reading asks "which bundles"; the second asks "how far from the general
+level". The data cannot rank them (integrated LOO gsum $-5 \pm 7$ nats against
+the flagship's mode A), which is why both go in.
+
+**What is on this machine.**
+
+| object | local | origin / Jérémy |
+|---|---|---|
+| flagship 50-chain trace (seeds 44-48) | yes, modes A 24 / B 4 / C 18 / D 4 | yes, A 21 / B 5 / C 19 / D 4 / E 1 |
+| flagship 2b placement, forecast, modes file | upstream versions; local re-run owed | yes |
+| gsum 50-chain trace | no | yes (Jérémy's machine) |
+| gsum placement JSON, forecast panels, modes file | yes (tracked outputs) | yes |
+| gsum and variant LOO logs | no (gitignored) | report numbers only |
+| other four variants (free, orth, ss25, pin) traces | no | yes |
+
+**Structure (replaces section 3).**
+
+1. Introduction. Contributions, each with its number.
+2. Data. Unchanged from section 3.
+3. Model. 3.1 one-axis Beta-MIRT and ECI-H anchors. 3.2 K-axis compensatory
+   extension and identification. 3.3 the gsum ability parameterisation as the
+   second reading, with the equation above and why it is a restricted
+   bifactor. 3.4 likelihood: floors, ceilings, Beta-binomial, noise floor.
+   3.5 ability priors: skew-normal block, Brownian lineage, effort means,
+   drift on g and on each deviation. 3.6 human tiers placed after a
+   models-only fit, with the humans-in result as the reason (73 to 120 nats
+   worse on AI scores, expert trading axes, on all six structures).
+   3.7 computation, mode detection, identified convergence, the gsum
+   mode-selection rule stated.
+4. Model evidence. Ladder on one scope: K = 1, bare K = 4, + lineage,
+   + ceilings; then the six K = 4 structures scored against the flagship's
+   mode A (digest table); humans-in against placed; modes per structure
+   (5 to 14); LOO-PIT, recovery, prior predictive.
+5. Results, invariant to mode and to structure. ECI-H timeline against
+   Epoch's ECI; fitted-score agreement; the stable benchmark bundles
+   (local trace: 59 / 107 benchmarks in bundles that hold in at least 90 % of
+   chains; to be redone on the gsum trace before the claim is made across
+   structures).
+6. Results, two readings. 6a four bundles: flagship modes A and C, loadings,
+   abilities, placements, crossings. 6b one level and three deviations: gsum
+   mode D under the stated rule, same tables. One overlap table between the
+   two (matched shares 4 %, 20 %, 35 % from the digest).
+7. Forecast. Specification curve of the expert crossing date across the
+   12 fits (about 2037 compensatory, about mid-2030 gsum), the commonsense
+   expert flagged as having no score of its own on every fit.
+8. Frontier gaps on ECI-H (decision 4 pending).
+9. Limitations. What depends on the structure (axis names, dates, which
+   tiers are placed) and what does not (bundles, ECI-H, mode finding).
+10. Appendices. Unchanged, plus per-structure convergence and mode tables.
+
+**Work list (replaces sections 4 and 10).**
+
+- **A. gsum trace on this machine.** The gating item for 6b at trace level.
+  Two ways: copy Jérémy's 50-chain trace into the gsum fit folder, or refit
+  with the R1 recipe (5 runs x 10 chains, seeds 44-48, about 2 h each, one
+  go per run). Until it exists, 6b reads only the tracked placement JSON and
+  forecast panels. Decision 10.
+- **B. Flagship trace work, can start now.** Mode-aware r-hat and ESS for
+  modes A (24 chains) and C (18); placement re-run with both rules
+  (secondary-axis and ceiling lower bound); placement on 100 to 200 draws;
+  pseudo-human and leave-one-benchmark-out validation; per-mode crossings;
+  the bundle analysis finalised from `r1_runs/`.
+- **C. gsum trace work, after A.** Mode detection with the rule written down
+  (decision 11); mode-aware convergence for the selected mode (12 chains
+  upstream); placement with both rules; draws; crossings; bundle analysis
+  matched against the flagship's bundles.
+- **D. Cross-structure, no fit.** Specification curve of crossing dates from
+  the 12 tracked placements; loading overlap matrix between the two readings;
+  shared-bundle table once C exists.
+- **E. Refits still open (decision 3).** R3 bare K = 4, R4 K = 3 and K = 5,
+  R5 backtest, R6 symmetric drift, R7 recovery, R8 no RAND. Default spec for
+  R5 to R8 is the compensatory flagship, one trace per sensitivity; a gsum
+  sensitivity only where a claim in 6b rests on it. Each run needs a go.
+- **F. Documentation (section 7, plus).** README human-score counts (40 to
+  35, 30 to 25), stale forecast figures, the secondary-axis placement rule,
+  gsum axis naming in `docs/model_math.md`.
+- **G. Writing.** After B, C and D exist. Not before.
+
+**Decisions open after this redraw.**
+
+- 2 ceilings: robust LOO +55.8 ± 12.1 for ceilings; R2 exists at 20 chains.
+  A 50-chain R2 is needed only for a like-for-like mode count.
+- 3 the refit queue E, and its order.
+- 4 frontier gaps in this paper or apart.
+- 6 prose authorship rule, arXiv categories.
+- 8 commit the runner's seven files; which remote to push (origin private,
+  personal public).
+- 10 gsum trace: copy or refit.
+- 11 gsum mode rule to state: LOO per mode plus non-empty g (the report's),
+  or density rank with the empty-g mode shown beside it.
+
 ## 1. Where things stand
 
 **Data generation.** The paper is on the 2026-10-19 pipeline run: 5,487 obs /
@@ -339,15 +445,16 @@ reappears.
    that converges better, the other is the sensitivity.
 3. Which refits to launch, and in what order (R1 first in every framing).
 4. Whether the frontier-gap analyses go in this paper or a separate one.
-5. Human tiers at K=4: placement with the validation checks, the joint fit
-   as the main line with the trade-off reported, or both.
+5. Human tiers at K=4: placement. Settled by the humans-in result in
+   section 0b (73 to 120 nats worse on AI scores on all six structures);
+   stands unless Yassine objects.
 6. Prose authorship rule and arXiv categories.
 7. DECIDED 2026-11-03: refit R1 locally, later, as 10 runs of 5 chains
    merged (section 0). Every trace-level step waits on it.
 8. Commit the step-0 placement fix and the preprint folder.
-9. Paper flagship: the ceiling K=4 compensatory fit (mode A, reproduced
-   locally 2026-11-04) or the bifactor gsum fit Jérémy prefers (g + specifics
-   display). Neutral layout, numbers from `jeremy_variants_digest.md`.
+9. DECIDED 2026-11-08: BOTH, as two readings of the same data (section 0c).
+   The layout below is kept as the record of the choice. Decisions 10 and 11
+   (gsum trace, gsum mode rule) are in section 0c.
    - **Compensatory flagship.** Gives the paper four capability bundles with
      free non-negative loadings, the structure the blog post and framing A
      already describe; the most reproducible posterior of the set (5 modes,
@@ -393,6 +500,8 @@ reappears.
    verdict ranks flagship first, gsum second. Yassine's call.
 
 ## 10. Order of work
+
+Superseded by the work list A to G in section 0c; kept as the 2026-10-29 record.
 
 1. Decisions 1 to 7 above.
 2. Documentation fixes (section 7), so the repo the paper cites is consistent.
