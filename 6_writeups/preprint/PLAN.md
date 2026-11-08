@@ -85,6 +85,18 @@ recipe, to be confirmed at launch:
    crossings; PIT by benchmark / year / source.
 6. Documentation fixes (section 7); then R3-R8 one at a time.
 
+## 0b. Jérémy's variants report (2026-11-08)
+
+Source `origin/main:5_outputs/data20261019/comparisons/variants_report.html` (Claude for Jérémy, 2026-11-06); every number with its source in `jeremy_variants_digest.md`. Merged into local `main` on 2026-11-08 (e50436b; the `human_placement.py` conflict keeps both the secondary-axis selection and the ceiling lower bound; 115 tests pass).
+- 12 K = 4 fits: flagship, free bifactor, bifactor g + deviations (gsum), orthogonal bifactor, simple structure 2.5 (ss25), pinned (pin); each models-only on 50 chains with 2b placement, and humans-in on 20 chains.
+- Integrated LOO vs flagship mode A on reliable scores: gsum −5 ± 7, free −12 ± 11, orth −13 ± 11, pin −34 ± 9, ss25 −44 ± 10 nats.
+- Modes, selected mode: flagship 5, A 21 / 50; gsum 11, D 12 / 50 (chosen on LOO and because the best-density mode's g is empty); free 8, D 6 / 50; orth 11, A 1 / 50; ss25 10, A 2 / 50; pin 14, A 12 / 50.
+- Humans-in: every structure predicts the AI scores 73 to 120 nats worse; the expert sits 3.8-7.0 model-SD below the frontier on one axis and 10.6-19.8 above on another. The report drops all six.
+- Axis sharpness (mean dominant share): flagship 0.55, gsum 0.78, ss25 0.80, pin 0.86; Science and Cyber recur at 71-92 % in free, ss25 and pin; gsum's three deviation axes overlap the flagship's at 4 %, 20 % and 35 %.
+- All-axes expert date ≈ 2037 (flagship) against ≈ mid-2030 (gsum), both from a commonsense expert with no score of its own; committee and Top Performer are bounds (3 and 4 benchmarks).
+- Report verdict: keep the flagship, gsum as the alternative, ss25 and pin as an axis check. Jérémy prefers gsum for its g + deviations display: decision 9.
+- No variant trace is on this machine; the LOO logs are gitignored, so the LOO numbers exist only in the report.
+
 ## 1. Where things stand
 
 **Data generation.** The paper is on the 2026-10-19 pipeline run: 5,487 obs /
@@ -333,6 +345,52 @@ reappears.
 7. DECIDED 2026-11-03: refit R1 locally, later, as 10 runs of 5 chains
    merged (section 0). Every trace-level step waits on it.
 8. Commit the step-0 placement fix and the preprint folder.
+9. Paper flagship: the ceiling K=4 compensatory fit (mode A, reproduced
+   locally 2026-11-04) or the bifactor gsum fit Jérémy prefers (g + specifics
+   display). Neutral layout, numbers from `jeremy_variants_digest.md`.
+   - **Compensatory flagship.** Gives the paper four capability bundles with
+     free non-negative loadings, the structure the blog post and framing A
+     already describe; the most reproducible posterior of the set (5 modes,
+     A 21 / 50 upstream and 24 / 50 locally); the LOO reference every variant
+     is scored against; Science and Cyber axes that recur at 71-92 % in the
+     simple-structure and pinned fits; a trace on this machine with the 2b
+     placement, the forecast and the mode files already run. Costs: the
+     blurriest axes of the set (dominant share 0.55); compensation inside a
+     model (within-model axis correlation −0.46 on axes 1-2, GPT-6 astra 1st
+     on axis 1 and 294th / 887 on axis 4, `LESS_COMPENSATION.md`); mode A
+     alone misses the r-hat 1.01 target (eta 1.048, section 0); the committee
+     placed on 3 axes and the Top Performer on 1; the all-axes expert date
+     (≈ 2037) rests on a commonsense expert with no score of its own. Nothing
+     new to run beyond the plan's R-list; mode-aware diagnostics still owed.
+   - **Bifactor gsum.** Gives the paper one general level g (dominant on
+     89 / 107 benchmarks, loading scale 14.1 against 3.2-3.6 for the
+     deviations) plus three displayed axes that each add a deviation to g,
+     a reading close to the one-number ECI with structure on top; sharper
+     axes (0.78); LOO tied with the flagship (−5 ± 7 nats on 3,057 scores);
+     tiers placed on all four axes (51 human scores on g), the Top Performer
+     on 3 axes; an earlier all-axes expert date (≈ mid-2030). Costs: 11 modes
+     on 50 chains, the selected mode D holds 12 / 50 and sits 25.5 nats
+     below a 2-chain mode whose g is empty, so the mode choice needs a
+     stated rule (LOO plus non-empty g); the displayed axes correlate at
+     0.45-0.86 by construction and three of them overlap the flagship's at
+     4 %, 20 % and 35 %, so framing A's "four bundles" becomes "one level and
+     three deviations" and the limitations section changes; the deviations
+     z_k are never shown on their own; the free bifactor and orthogonal
+     siblings (8 and 11 modes, g empty or thin) show the g column is not
+     stable across the bifactor family; the commonsense expert still has no
+     score of its own (2028 date by tier order). Code: `fit.py`, `fitspec`,
+     `integrated_loo.py`, the 2b placement and the forecast already handle
+     `--general-sums` on origin (the report's eight forecast panels and
+     `human_placement.json` exist for it); the local checkout lacks the
+     2026-11-04 to 11-06 commits (secondary-axis placement rule, LOO and PPC
+     fixes) and the merge conflicts in `human_placement.py`. To re-run: no
+     gsum trace is on this machine, so either Jérémy's 50-chain trace is
+     copied over or the fit is redone locally with the R1 recipe (5 runs of
+     10 chains, seeds 44-48, about 2 h each), then modes, LOO per mode, 2b
+     placement, forecast and mode-aware convergence; R2-R8 would be respecified
+     on the bifactor gsum spec.
+   Either choice keeps the other as a reported variant; the report's own
+   verdict ranks flagship first, gsum second. Yassine's call.
 
 ## 10. Order of work
 
