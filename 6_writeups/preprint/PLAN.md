@@ -165,10 +165,10 @@ the flagship's mode A), which is why both go in.
 **Work list (replaces sections 4 and 10).**
 
 - **A. gsum trace on this machine.** The gating item for 6b at trace level.
-  Two ways: copy Jérémy's 50-chain trace into the gsum fit folder, or refit
-  with the R1 recipe (5 runs x 10 chains, seeds 44-48, about 2 h each, one
-  go per run). Until it exists, 6b reads only the tracked placement JSON and
-  forecast panels. Decision 10.
+  Decision 10 (2026-11-08): refit with the R1 recipe (5 runs x 10 chains,
+  seeds 44-48, about 2 h each, one go per run), in the r1-runner session.
+  Until it exists, 6b reads only the tracked placement JSON and forecast
+  panels.
 - **B. Flagship trace work, can start now.** Mode-aware r-hat and ESS for
   modes A (24 chains) and C (18); placement re-run with both rules
   (secondary-axis and ceiling lower bound); placement on 100 to 200 draws;
@@ -199,7 +199,11 @@ the flagship's mode A), which is why both go in.
 - 6 prose authorship rule, arXiv categories.
 - 8 commit the runner's seven files; which remote to push (origin private,
   personal public).
-- 10 gsum trace: copy or refit.
+- 10 DECIDED 2026-11-08: refit locally, R1 recipe (5 runs x 10 chains,
+  seeds 44-48, `--merge-chains`, upstream gsum tables backed up first,
+  one go per run in the runner session). Upstream gsum seeds are not on
+  disk; the mode file says mode D was named "on the seed-44 frame", so seed
+  44 at least is shared. Run by the r1-runner session.
 - 11 gsum mode rule to state: LOO per mode plus non-empty g (the report's),
   or density rank with the empty-g mode shown beside it.
 
