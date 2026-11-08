@@ -10,6 +10,11 @@ tiers are placed afterwards, one axis at a time, with the benchmark side frozen:
   (`1_curated/human_axis_content.csv`, judged pair by pair; a plausible link keeps a pair);
   a row of that file naming a tier takes that tier's score alone off the axis, the last resort
   when it splits the placement in two (`tier_exclusions`);
+* since 2026-11-06 (user) a benchmark also counts for every other axis carrying at least
+  `SECONDARY_SHARE_MIN` of its loading variance, when the content file judges that pair `yes`
+  (an unjudged secondary pair is listed, never used), and for an axis the file marks `force`
+  whatever its share there (a pair the user kept below the threshold); 2b's argmax alone left a
+  --general-sums fit's g + deviation axes with only their few dominant benchmarks;
 * on those benchmarks a tier's score follows the fit's own likelihood at the medians of the
   loadings, difficulties and noise, with its other axes set to the profile of a typical model at
   the same ability on k (a linear regression of the other axes on axis k over the models);
@@ -55,14 +60,28 @@ PLACEMENT_DRAWS = "human_placement_draws.npz"
 # The secondary mode's placement (the modes file's `secondary_chains`), in its own folder beside
 # the trace so the primary one stays where every deliverable reads it.
 SECONDARY_DIR = "secondary_mode"
+# A benchmark judged `yes` for an axis other than its dominant one counts there from this share
+# of its loading variance on (user, 2026-11-06).
+SECONDARY_SHARE_MIN = 0.2
 
 
 # ── inputs ───────────────────────────────────────────────────────────────────────────────────
 
 def _content_table(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path, keep_default_na=False)
-    df["keep"] = df["keep"].str.strip().str.lower() == "yes"
+    keep = df["keep"].str.strip().str.lower()
+    df["keep"] = keep.isin(["yes", "force"])
+    df["force"] = keep == "force"
     return df
+
+
+def forced_pairs(path: Path = CONTENT_FILE) -> dict[str, set[str]]:
+    """{axis title: {benchmark}}: the whole-pair rows marked `force`, kept on the axis whatever
+    the benchmark's share there (a positive loading is still required)."""
+    out: dict[str, set[str]] = {}
+    for r in _content_table(path).query("tier == '' and force").itertuples():
+        out.setdefault(r.axis_title, set()).add(r.benchmark)
+    return out
 
 
 def content_rules(path: Path = CONTENT_FILE) -> dict[str, dict[str, bool]]:
@@ -88,6 +107,29 @@ def dominant_axis(A_med: np.ndarray) -> np.ndarray:
     benchmark rises less with g than its domain's axis does) does not make an axis the
     benchmark's own. No fit before 2026-11-03 had a negative median loading, so none changes."""
     return np.argmax(np.maximum(A_med, 0) ** 2, axis=1)
+
+
+def axis_benchmarks(k, A_med, bench, judged, forced, scored) -> dict[str, list[str]]:
+    """The benchmarks axis k places the tiers on. `judged` is {benchmark: keep} for the axis's
+    title, `forced` its `force` pairs, `scored` the benchmarks with a human score.
+
+    `used`: the dominant benchmarks the content file does not drop (an unjudged one is kept),
+    the secondary ones (share >= SECONDARY_SHARE_MIN on k) it judges `yes`, and the forced ones
+    with a positive loading on k. `unjudged`: dominant and kept without a judgment.
+    `unjudged_secondary`: secondary, with a human score, not judged (left out)."""
+    pos = np.maximum(A_med, 0) ** 2
+    share = pos / np.maximum(pos.sum(axis=1, keepdims=True), 1e-12)
+    dom = dominant_axis(A_med)
+    dominant = {bench[b] for b in np.where(dom == k)[0]}
+    secondary = {bench[b] for b in np.where((dom != k) & (share[:, k] >= SECONDARY_SHARE_MIN))[0]}
+    positive = {bench[b] for b in np.where(A_med[:, k] > 0)[0]}
+    used = ({b for b in dominant if judged.get(b, True)}
+            | {b for b in secondary if judged.get(b) is True}
+            | (set(forced) & positive))
+    return {"used": sorted(used),
+            "secondary": sorted(used - dominant),
+            "unjudged": sorted(b for b in dominant if b not in judged and b in scored),
+            "unjudged_secondary": sorted(b for b in secondary if b not in judged and b in scored)}
 
 
 def human_scores(spec) -> pd.DataFrame:
@@ -276,7 +318,7 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
     otherwise). `ceiling_d`: a --ceiling-noise fit's median ceilings, per benchmark."""
     if np.asarray(data.is_human).any():
         raise ValueError("the 2b placement reads a fit without human baselines (--no-humans)")
-    rules, dropped = content_rules(), tier_exclusions()
+    rules, dropped, forced = content_rules(), tier_exclusions(), forced_pairs()
     hs = human_scores(spec)
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
     missing = sorted(set(hs.benchmark) - set(bench))
@@ -285,13 +327,13 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
     A = np.median(view.require_A(), 0)
     D, phi = view.D_med, view.phi_med
     theta_models = np.median(view.theta, 0)
-    dom = dominant_axis(A)
     tiers = [t for t in HUMAN_ORDER_MERGED if t in set(hs.tier)]
     s = pd.read_csv(PROJECT_ROOT / "0_input" / "all_scores_flat.csv")
     first = s.groupby("model_version").release_date.min()
     names_m = data.mlookup.sort_values("model_idx")["model"].tolist()
     dates = pd.to_datetime(pd.Series([first.get(n) for n in names_m]))
-    out = {"trace": trace.name, "rule": "dominant axis (largest loading-variance share), "
+    out = {"trace": trace.name, "rule": "dominant axis (largest loading-variance share), plus "
+           f"secondary axes (share >= {SECONDARY_SHARE_MIN}) judged yes and forced pairs; "
            "content filter 1_curated/human_axis_content.csv, ordered tiers (HUMAN_ORDER_MERGED), "
            "other axes at the typical-model profile; a score at the ceiling (>= 0.99 or within "
            "2 noise SD of the fitted d_b) enters as 'at least this score'; drawn: own score below "
@@ -300,24 +342,24 @@ def run_placement(trace: Path, view, data, spec, titles: dict, floor_c,
     draws_out = {}
     for k, name in enumerate(view.names):
         title = titles.get(name, name).partition(": ")[2] or None
-        on_axis = {bench[b] for b in np.where(dom == k)[0]}
+        borrowed = (rule_titles or {}).get(title, title)
         # an axis's own judgments over those it borrows
-        judged = ({**rules.get((rule_titles or {}).get(title, title), {}), **rules.get(title, {})}
-                  if title else {})
-        used = sorted(b for b in on_axis if judged.get(b, True)) if title else []
-        unjudged = sorted(b for b in on_axis if b not in judged and b in set(hs.benchmark)) \
-            if title else []
-        off = ({*dropped.get((rule_titles or {}).get(title, title), ()), *dropped.get(title, ())}
-               if title else set())
-        sc = hs[hs.benchmark.isin(used) & ~pd.Series(list(zip(hs.benchmark, hs.tier)),
-                                                      index=hs.index).isin(off)]
+        judged = {**rules.get(borrowed, {}), **rules.get(title, {})} if title else {}
+        sel = (axis_benchmarks(k, A, bench, judged, forced.get(borrowed, set()) | forced.get(title, set()),
+                               set(hs.benchmark)) if title else
+               {"used": [], "secondary": [], "unjudged": [], "unjudged_secondary": []})
+        off = {*dropped.get(borrowed, ()), *dropped.get(title, ())} if title else set()
+        sc = hs[hs.benchmark.isin(sel["used"]) & ~pd.Series(list(zip(hs.benchmark, hs.tier)),
+                                                             index=hs.index).isin(off)]
         bi = np.array([bench.index(x) for x in sc.benchmark], dtype=int)
         sc = sc.assign(at_ceiling=at_ceiling(sc.score, sc.n_items,
                                              ceiling_d[bi] if ceiling_d is not None else 1.0,
                                              phi[bi]))
         ax = {"axis": name, "title": title, "benchmarks_with_human_scores": sorted(set(sc.benchmark)),
-              "unjudged_benchmarks": unjudged, "drawn": [], "tiers": {}, "convergence": None,
-              "consistency": []}
+              "secondary_benchmarks": [b for b in sel["secondary"] if b in set(sc.benchmark)],
+              "unjudged_benchmarks": sel["unjudged"],
+              "unjudged_secondary_benchmarks": sel["unjudged_secondary"],
+              "drawn": [], "tiers": {}, "convergence": None, "consistency": []}
         if title and len(sc):
             order, draws, conv, prof = place_axis(k, sc, bench, A, D, phi, floor_c, theta_models,
                                                   tiers, beta=beta, ceiling_d=ceiling_d)

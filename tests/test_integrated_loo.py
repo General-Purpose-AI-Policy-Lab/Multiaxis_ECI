@@ -306,3 +306,14 @@ def test_psis_elpd_matches_importance_sampling_on_light_tails():
     from scipy.special import logsumexp as lse
     np.testing.assert_allclose(elpd, -(lse(-ll, axis=0) - np.log(len(ll))), atol=1e-3)
     assert np.all(k < 0.5)
+
+
+def test_stuck_chains_are_left_out_of_their_groups():
+    """The pinned fit's chain 35 (2026-11-03): every draw divergent, scored nowhere; a mode made
+    of it alone is dropped, the others lose it only."""
+    il = _il
+    div = np.zeros((4, 100), bool)
+    div[2] = True                  # stuck
+    div[3, :30] = True             # a bad stretch, still a sample
+    assert il.stuck_chains(div) == [2]
+    assert il.drop_stuck({"A": [0, 2], "N": [2], "B": [1, 3]}, [2]) == {"A": [0], "B": [1, 3]}

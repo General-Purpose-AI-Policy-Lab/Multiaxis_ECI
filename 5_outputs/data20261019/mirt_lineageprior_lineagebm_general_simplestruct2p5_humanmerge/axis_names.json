@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "User, 2026-11-05, from the dominant benchmarks by axis_share of the primary mode (chain 18; mirt_loadings.csv). Not a reference fit: the human tiers compensate across axes.",
+  "axes": {
+    "axis1": {
+      "title": "Scientific Knowledge & Reasoning, Fluid Intelligence",
+      "title_fr": "Connaissances et raisonnements scientifiques, intelligence fluide",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "GPQA Main Chemistry",
+        "MMLU Biology"
+      ],
+      "top_benchmarks": [
+        "GDPval",
+        "CyScenarioBench",
+        "GBAEval",
+        "AISI CTF Suites - Practitioner",
+        "MirrorCode",
+        "AISI Cyber Ranges - Cooling Tower",
+        "GSO-Bench",
+        "CyberGym"
+      ]
+    },
+    "axis2": {
+      "title": "Agentic Capabilities, Cyber & Programming",
+      "title_fr": "Capacités agentiques, cyber & programmation",
+      "signature": [
+        "CyberGym",
+        "GDPval",
+        "The Agent Company"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "AudioMultiChallenge",
+        "MATH Level 5",
+        "CAISI CTF-Archive",
+        "TutorBench",
+        "CAISI Cybench",
+        "MCP Atlas",
+        "LAB-Bench SeqQA"
+      ]
+    },
+    "axis3": {
+      "title": "Commonsense & Factual Knowledge",
+      "title_fr": "Sens commun & connaissances factuelles",
+      "signature": [
+        "GeoBench",
+        "TriviaQA",
+        "HellaSwag"
+      ],
+      "top_benchmarks": [
+        "SpireClimb",
+        "GeoBench",
+        "MMLU Biology",
+        "CAISI ExploitGym Userspace",
+        "SimpleQA Verified",
+        "CAISI SEC-Bench Pro",
+        "CAISI OSS-Fuzz",
+        "WMDP Biology"
+      ]
+    },
+    "axis4": {
+      "title": "Desk Research & Agentic Work",
+      "title_fr": "Recherche documentaire & travail agentique",
+      "signature": [
+        "DeepResearch Bench",
+        "APEX-Agents",
+        "CadEval"
+      ],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "CadEval",
+        "OpenBookQA",
+        "ARC AI2",
+        "AISI CTF Suites - Technical Non-Expert",
+        "APEX-Agents",
+        "CTI-REALM",
+        "VPCT"
+      ]
+    }
+  }
+}

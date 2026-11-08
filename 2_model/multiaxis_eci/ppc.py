@@ -51,8 +51,12 @@ def _thin_sel(n_samples: int, max_draws: int):
 def _pull_flat(post, names: list[str], max_draws: int) -> list[np.ndarray]:
     """Flatten (chain, draw, ...) → (S, ...) for each named posterior variable
     and thin them all with one shared even subsample — the common head of
-    every posterior predictive below."""
-    arrs = [_flatten_over_chains(post[n].values) for n in names]
+    every posterior predictive below.
+
+    Cast to float64: traces are float32 since 2026-11-03, and in float32 expit(eta) rounds
+    to exactly 1 from eta ~ 17, so a Beta draw gets b = (1 - mu) * phi = 0 and fails.
+    """
+    arrs = [_flatten_over_chains(post[n].values).astype(np.float64, copy=False) for n in names]
     sel = _thin_sel(arrs[0].shape[0], max_draws)
     if sel is not None:
         arrs = [a[sel] for a in arrs]
@@ -80,6 +84,10 @@ def _beta_draw(mu: np.ndarray, phi_flat: np.ndarray, data: ECIData,
         phi_obs = 1.0 / (1.0 / np.asarray(n_eff, dtype=np.float64)
                          + 1.0 / (1.0 + phi_obs)) - 1.0
     rng = np.random.default_rng(seed)
+    # mu is exactly 1 (or 0) from |eta| ~ 37 even in float64, and human tiers inside a fit reach
+    # eta ~ 100 (pinned human-merge fit, 2026-11-05): a Beta needs a, b > 0, and at 1e-15 the draw
+    # is 1 (or 0) all the same
+    mu = np.clip(mu, 1e-15, 1.0 - 1e-15)
     y = rng.beta(mu * phi_obs, (1.0 - mu) * phi_obs)
     if binomial_n is not None:
         n = np.asarray(binomial_n, dtype=np.float64)

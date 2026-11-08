@@ -1,0 +1,77 @@
+{
+ "trace": "trace_mirt_k4_lineageprior_lineagebm_humanmerge.nc",
+ "n_chains": 20,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -59.0,
+  -43.6,
+  -41.2,
+  -60.5,
+  -61.4,
+  -41.3,
+  -34.9,
+  -52.9,
+  -46.0,
+  -45.5,
+  -14.4,
+  -35.2,
+  -39.9,
+  -36.5,
+  -43.8,
+  -54.4,
+  0.0,
+  -50.4,
+  -51.0,
+  -56.2
+ ],
+ "modes": [
+  {
+   "chains": [
+    10,
+    16
+   ],
+   "mean_logp": -23043.633477836367,
+   "min_matched_corr": 0.936,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    1,
+    11,
+    17
+   ],
+   "mean_logp": -23079.507730242727,
+   "min_matched_corr": 0.971,
+   "label": "B",
+   "delta_logp": -35.9,
+   "matched_corr_to_best": 0.298
+  },
+  {
+   "chains": [
+    0,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    12,
+    13,
+    14,
+    15,
+    18,
+    19
+   ],
+   "mean_logp": -23084.739382049964,
+   "min_matched_corr": 0.877,
+   "label": "C",
+   "delta_logp": -41.1,
+   "matched_corr_to_best": 0.886
+  }
+ ]
+}

@@ -54,6 +54,9 @@ RULE_TITLES = {
     # The K=4 --general-sums variant's displayed axes are g plus a specific (user, 2026-10-29):
     # each keeps the judgments of its specific's own title.
     "General Capabilities + Desk Research, Trivia & Commonsense": "Desk Research, Trivia & Commonsense",
+    # ... renamed 2026-11-06 (user) to cover OSWorld and LMCA as secondary benchmarks
+    "General Capabilities + Desk Research, Agentic Work & Commonsense":
+        "Desk Research, Agentic Work & Commonsense",
     "General Capabilities + Agentic & Cyber Capabilities": "Agentic & Cyber Capabilities",
     "General Capabilities + Commonsense & Factual Knowledge": "Commonsense & Factual Knowledge",
     # Its 20-chain mode A (seeds 44 + 45, 2026-10-30) has a g and a specific of its own: g keeps
@@ -109,6 +112,10 @@ def main() -> None:
         if ax["unjudged_benchmarks"]:
             print(f"  NOT YET JUDGED for this axis (kept): {ax['unjudged_benchmarks']} "
                   "-> add them to 1_curated/human_axis_content.csv")
+        if ax.get("secondary_benchmarks"):
+            print(f"  secondary (judged yes or forced, not dominant here): {ax['secondary_benchmarks']}")
+        if ax.get("unjudged_secondary_benchmarks"):
+            print(f"  secondary candidates NOT YET JUDGED (left out): {ax['unjudged_secondary_benchmarks']}")
         if ax["convergence"]:
             print(f"  convergence {ax['convergence']}")
         for t in ax.get("order", []):
