@@ -4,7 +4,8 @@ Each panel is built by the repo's own builder (viz.dashboard.forecast_figures: t
 the per-fit folders' panel, same frontier rule, same placement), on the mode's own frame and axis
 names, then restyled to ../PLOTLY_STYLE_GUIDE.md: no title, the "clean" template, the palette, the
 final size. Writes fig1_axis{k}_modeA and fig6_axis{k}_modeC (.pdf and .png) beside this file. Every
-panel carries its own x title and legend, so it reads alone.
+panel carries its own x title and legend, so it reads alone. The legend sits inside the plot, against
+an edge, where it covers no data (free_spot), and under the plot only when no such place exists.
 
     python 6_writeups/preprint/figures/fig1_fig6_frontier_panels.py
 """
@@ -28,12 +29,14 @@ from multiaxis_eci.analysis import (  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.viz.dashboard import forecast_figures  # noqa: E402
 from multiaxis_eci.viz.forecast import _spread_labels  # noqa: E402
-from style import BG, INK, LIGHT, MID, PALETTE, TINTS, ZOOM, save  # noqa: E402
+from style import BG, INK, LIGHT, MID, PALETTE, TINTS, W, ZOOM, save  # noqa: E402
 
 # The builder's colours, by role: both regimes' frontier points, trend and band take one palette
 # colour each (a trend takes the colour of the series it fits); the other models are a third series.
 ROLE = {(192, 80, 77): 0, (255, 149, 0): 0, (128, 100, 162): 1, (32, 163, 158): 2}
-PANEL_H, LEGEND_H, LABEL_PX = round(290 * ZOOM), 92, 10   # canvas px; the plot part prints 290 px tall
+PANEL_H, LEGEND_H, LABEL_PX = round(290 * ZOOM), 92, 10   # canvas px; a panel prints 290 px tall
+LEGEND_NAMES = {0: "Reasoning frontier", 1: "Non-reasoning frontier", 2: "Other models"}
+LEGEND_BOX = (160, 19)                                    # canvas px: legend width, height of one entry
 
 
 def role(color):
@@ -47,6 +50,44 @@ def role(color):
     return ROLE.get(rgb)
 
 
+def free_spot(fig, box, plot):
+    """Where a legend of `box` px fits inside a `plot` px plotting area without covering a point, a
+    whisker, a trend or a band: the paper coordinates of its top-left corner, or None. Tried in this
+    order: along the top edge from the left, along the bottom edge from the right, down the left
+    edge, up the right edge. The first free place wins, so the legend stays against an edge."""
+    x0, x1 = pd.to_datetime(list(fig.layout.xaxis.range))
+    y0, y1 = fig.layout.yaxis.range
+    fx, fy, below = [], [], None
+    for t in fig.data:
+        if t.x is None or len(t.x) == 0 or t.x[0] is None:
+            continue
+        x = np.asarray((pd.to_datetime(np.asarray(t.x)) - x0) / (x1 - x0), dtype=float)
+        y = np.asarray(t.y, dtype=float)
+        ends = [y]
+        if t.error_y.array is not None:
+            ends += [y + np.asarray(t.error_y.array, dtype=float), y - np.asarray(t.error_y.arrayminus, dtype=float)]
+        if t.fill == "tonexty" and below is not None:              # the inside of a band counts too
+            ends += [below + f * (y - below) for f in (0.2, 0.4, 0.6, 0.8)]
+        below = y
+        for e in ends:
+            fx.append(x)
+            fy.append((e - y0) / (y1 - y0))
+    fx, fy = np.concatenate(fx), np.concatenate(fy)
+    w, h, air = box[0] / plot[0], box[1] / plot[1], 0.025
+
+    def free(cx, cy):                                              # the box's top-left corner
+        return not ((fx > cx - air) & (fx < cx + w + air) & (fy < cy + air) & (fy > cy - h - air)).any()
+
+    # Flush with the plot's left or right edge at the ends, so the opaque ground leaves no stub of a
+    # grid line beside it.
+    xs, ys = np.append(np.arange(0.0, 1.0 - w, 0.02), 1.0 - w), np.arange(0.99, 0.01 + h, -0.02)
+    for cx, cy in ([(cx, 0.99) for cx in xs] + [(cx, 0.01 + h) for cx in xs[::-1]]
+                   + [(0.0, cy) for cy in ys] + [(1.0 - w, cy) for cy in ys[::-1]]):
+        if free(cx, cy):
+            return float(cx), float(cy)
+    return None
+
+
 # ponytail: the figure is recoloured after the build. If a second document needs this look, move
 # the palette into viz.style.FigureStyle and let the builder read it.
 def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
@@ -54,7 +95,7 @@ def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
     legend_lines = [t for t in fig.data if t.x is not None and len(t.x) == 1 and t.x[0] is None
                     and t.mode == "lines"]
     for n, t in enumerate(legend_lines):                      # one legend entry for both trends
-        t.update(name="Frontier trend (band: 80 % interval)", showlegend=n == 0)
+        t.update(name="Trend, 80 % band", showlegend=n == 0, legendrank=4)
     for t in fig.data:
         if t in legend_lines:
             t.line.update(color=INK, width=1.2)
@@ -70,6 +111,8 @@ def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
                             opacity=1, line=dict(width=0.5 if cloud else 1, color=BG))
             if t.error_y.array is not None:
                 t.error_y.update(color=PALETTE[i], thickness=0.8, width=0)
+            if t.x is not None and len(t.x) == 1 and t.x[0] is None:        # its legend entry
+                t.update(name=LEGEND_NAMES[i], legendrank=i + 1)
     tiers = [a for a in fig.layout.annotations if a.xref == "paper"]
     lines = [s for s in fig.layout.shapes if s.xref == "x domain"]          # the tier lines
     fig.layout.shapes = [s for s in fig.layout.shapes if s.xref != "paper"]  # drop the old leaders
@@ -77,7 +120,6 @@ def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
         s.update(opacity=1, layer="below", line=dict(color=MID, width=0.7, dash=s.line.dash))
     for a in fig.layout.annotations:
         a.font = dict(size=LABEL_PX if a.xref == "paper" else 9.5, color=MID)
-    height = panel_h + LEGEND_H
     if tiers:
         # Names respread for this panel's height and type size (the builder spread them for its own).
         assert len(tiers) == len(lines), "tier names and tier lines do not pair up"
@@ -92,16 +134,21 @@ def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
                               line=dict(color=MID, width=0.5))
     if tiers:                                                  # the grey lines, in the legend too
         fig.add_scatter(x=[None], y=[None], mode="lines", line=dict(color=MID, width=0.7),
-                        name="Human baseline (named at right)", hoverinfo="skip")
+                        name="Human baseline", legendrank=5, hoverinfo="skip")
     fig.add_annotation(text=f"<b>{label}</b>", xref="paper", yref="paper", x=0, y=1, xanchor="left",
                        yanchor="bottom", yshift=4, font=dict(size=12, color=INK))
-    longest = max((len(a.text) for a in tiers), default=0)
+    right = 14 + int(0.56 * LABEL_PX * max((len(a.text) for a in tiers), default=0))
+    box = (LEGEND_BOX[0], LEGEND_BOX[1] * (5 if tiers else 4) + 10)
+    spot = free_spot(fig, box, (W * ZOOM - 62 - right, panel_h - 70))
+    legend = (dict(x=spot[0], xanchor="left", y=spot[1], yanchor="top") if spot else
+              dict(orientation="h", x=0, xanchor="left", y=-62 / (panel_h - 50), yanchor="top"))
+    height = panel_h + (0 if spot else LEGEND_H)
     fig.update_layout(
         template="clean", title=None, font=dict(family="Arial, sans-serif", size=9.5, color=INK),
         width=None, height=None, showlegend=True,
-        legend=dict(orientation="h", x=0, xanchor="left", y=-62 / (panel_h - 50), yanchor="top", font=dict(size=10, color=INK),
-                    bgcolor="rgba(0,0,0,0)", borderwidth=0, traceorder="normal"),
-        margin=dict(l=4, r=14 + int(0.56 * LABEL_PX * longest), t=24, b=4))
+        # An opaque ground under the entries, no frame: a baseline line may pass behind them.
+        legend=dict(font=dict(size=10, color=INK), bgcolor=BG, borderwidth=0, **legend),
+        margin=dict(l=4, r=right, t=24, b=4))
     fig.update_xaxes(showline=True, linecolor=INK, linewidth=1, ticks="outside", tickcolor=INK, ticklen=4,
                      showgrid=False, tickfont=dict(size=12, color=INK),
                      title=dict(text="Release date", font=dict(size=12, weight=500)))

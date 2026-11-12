@@ -69,13 +69,14 @@ for row, (kind, label) in enumerate(PANELS, start=1):
         q = summary.loc[quantity]
         print(f"{label}: {GROUP_TITLES[kind][gap.follower.label]} behind by {q['median']:.1f} months "
               f"(80 %: {q['hdi80_low']:.1f} to {q['hdi80_high']:.1f}), {meaning}")
-for name, kw in (("Frontier point, with its interval", dict(mode="markers", marker=dict(color=INK, size=7))),
+for name, kw in (("Frontier point", dict(mode="markers", marker=dict(color=INK, size=7))),
                  ("Other models", dict(mode="markers", marker=dict(color=MID, size=4, opacity=0.5))),
-                 ("Frontier trend (band: 80 % interval)",
+                 ("Trend, 80 % band",
                   dict(mode="lines", line=dict(color=INK, width=1.2, dash="6px,4px")))):
     fig.add_scatter(x=[None], y=[None], name=name, **kw)
 fig.update_xaxes(range=[w.strftime("%Y-%m-%d") for w in WINDOW], dtick="M12", tickformat="%Y")
 fig.update_xaxes(title_text="Release date", row=len(PANELS), col=1)
-fig.update_layout(margin=dict(t=24, r=118), legend=dict(orientation="h", x=0, xanchor="left", y=-0.075,
-                                                        yanchor="top"))
-save(fig, HERE / "fig9_frontier_gaps", height=620)
+# The legend sits in the top panel's upper-left corner, which the rising frontiers leave empty.
+fig.update_layout(margin=dict(t=24, r=118), legend=dict(x=0, xanchor="left", y=0.995, yanchor="top", bgcolor=BG,
+                                                        traceorder="normal"))
+save(fig, HERE / "fig9_frontier_gaps", height=585)
