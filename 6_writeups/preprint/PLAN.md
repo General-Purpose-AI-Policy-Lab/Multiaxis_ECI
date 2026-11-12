@@ -228,8 +228,10 @@ this section conflicts with section 0c, this section wins.
   best integrated LOO among the modes whose g column is not empty. The
   best-density mode is shown beside it with its empty g.
 - **6, prose and category.** Fable drafts, Yassine revises. Drafting uses the
-  `yassine-voice` skill, with its check run on the actual draft. arXiv
-  primary stat.ML, cross-list cs.LG and cs.AI.
+  `yassine-voice` skill, with its check run on the actual draft. Section
+  names, figure and table titles and prose avoid the patterns listed in
+  `writing_tropes.md` (Yassine, 2026-11-12); every drafting agent gets that
+  file. arXiv primary stat.ML, cross-list cs.LG and cs.AI.
 - **4, frontier gaps: in this paper** (structure section 8).
 - **8, commit and push to origin** (private).
 
@@ -249,6 +251,54 @@ co-author), and Yassine's go for each of gsum runs 3 to 5.
 
 Who does what: Opus agents take F, the figures and the bib; Fable takes B, C,
 D, the draft and the referee pass; Yassine gives each go, revises and submits.
+
+## 0e. Outline adopted (2026-11-12)
+
+Shaped on the Rosetta Stone paper (Ho, Denain, Atanasov, Albanie, Shah): five
+sections, results as subsections with one figure or table each, model fit and
+sensitivity in appendices. Replaces the structure of section 0c and the figure
+list of section 5. Section names follow `writing_tropes.md`.
+
+The single-axis index is not a results section (Yassine, 2026-11-12). A
+Bayesian single-axis index exists already (Barry, R and Stan, 2026-02), and so
+do humans on that axis (Domenech and Andréoletti, 2026-03). The single-axis
+fit stays as the baseline of the model comparison, as the scale of the
+frontier gaps, and for one fact: it mispredicts the human scores. On the fit
+with humans inside, 19 / 38 human scores have a LOO-PIT below 0.05 or above
+0.95, against 360 / 4,286 AI scores; among the scores with Pareto k at most
+0.7, 7 / 22 against 309 / 4,139 (`single_axis/human_pit.py`). The comparison
+with Epoch's published index is a reproduction check and goes to the appendix.
+
+The gsum fit is called the bifactor model in the paper and the compensatory
+flagship the multi-axis model. Both names are proposals, not yet confirmed by
+Yassine.
+
+| section | name | figure or table |
+|---|---|---|
+| 1 | Introduction | Fig 1, frontier trend and human baselines per axis (multi-axis model, mode A) |
+| 2.1 | Data | Table 1, feeds and scope |
+| 2.2 | Single-axis model with human baselines | |
+| 2.3 | Multi-axis model | Fig 2, model schematic |
+| 2.4 | Bifactor model | |
+| 2.5 | Human baselines on the axes | |
+| 2.6 | Inference and posterior modes | |
+| 3.1 | Model comparison | Table 2 (single-axis, multi-axis, bifactor); Fig 3, human scores under the single-axis model |
+| 3.2 | Multi-axis model: loadings and posterior modes | Fig 4, loadings per axis; Fig 5, benchmark allocation in mode A against mode C |
+| 3.3 | Multi-axis model: frontier trends and human baselines | Fig 1; Fig 6, the same for mode C; Table 3, human baselines passed per axis and mode |
+| 3.4 | Bifactor model: loadings, frontier trends and human baselines | Fig 7, Fig 8; its columns in Table 3 |
+| 3.5 | Agreement between the two models | Table 4 |
+| 3.6 | Frontier gaps | Fig 9 |
+| 4 | Discussion: posterior mode and model structure, benchmark coverage, human baseline placement, forecasts, limits of the benchmarks | |
+| 5 | Conclusion | |
+| A to F | Related work; data and coverage matrix; priors; convergence per mode; model fit (LOO-PIT, comparison with Epoch's index); sensitivity | |
+
+Status. Builders exist for Fig 1, 2, 4, 6, 9 (re-render on the current fits;
+Fig 2 to update to the models-only model). Table 3's multi-axis columns are
+`flagship_analysis/crossings_mode{A,C}.csv`. New and small: Fig 3 (from
+`single_axis/human_pit.csv`), Fig 5 (the cross-table of
+`flagship_analysis/NOTE.md` section 4), the coverage matrix. Waiting on the
+bifactor refit and its analysis: section 3.4, section 3.5, Fig 7, Fig 8,
+Table 4, and the bifactor row of Table 2 on the local trace.
 
 ## 1. Where things stand
 
