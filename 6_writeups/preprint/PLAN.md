@@ -300,6 +300,27 @@ Fig 2 to update to the models-only model). Table 3's multi-axis columns are
 bifactor refit and its analysis: section 3.4, section 3.5, Fig 7, Fig 8,
 Table 4, and the bifactor row of Table 2 on the local trace.
 
+**Work plan (2026-11-12, replaces "Work left" of section 0d).** Done: scope,
+outline, multi-axis analysis (`flagship_analysis/`), documentation and
+bibliography. Three tracks feed the draft.
+
+| track | work | who | waits on |
+|---|---|---|---|
+| multi-axis figures | Fig 1, 3, 4, 5, 6; Table 3 | Opus agents render, Fable checks each render | nothing |
+| shared items | Table 1, Table 2, Fig 2, Fig 9, appendix figures (LOO-PIT, coverage matrix, comparison with Epoch's index) | Opus agents, Fable for Table 2 | nothing (Table 2's bifactor row waits on the bifactor analysis) |
+| bifactor | runs 4 and 5 (run 4, seed 47, started 2026-11-12 15:38); then mode choice by the stated rule, convergence inside the mode, human baselines, crossing dates; then Fig 7, Fig 8, Table 4 | runner session for the fit, Fable for the analysis, Opus for the figures | Yassine's go for run 5 |
+
+After the three tracks: Fable drafts (`yassine-voice` skill, `writing_tropes.md`);
+Yassine revises paragraph by paragraph; referee pass against
+`agent_reports/red_team.md` and a prose pass; Jérémy reads; submission
+(stat.ML, cross-list cs.LG and cs.AI).
+
+Owed by people: Yassine's go for run 5; Jérémy's agreement on the mode rule
+and on agent-drafted prose; the two model names; content judgments for five
+benchmarks on mode C (GPQA Diamond Biology, GPQA Main Biology, MMLU Biology,
+MMLU Chemistry, SpireClimb); which trace the README's mode numbers describe;
+`git push origin main`.
+
 ## 1. Where things stand
 
 **Data generation.** The paper is on the 2026-10-19 pipeline run: 5,487 obs /
