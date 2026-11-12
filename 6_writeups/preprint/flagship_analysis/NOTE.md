@@ -77,15 +77,48 @@ Reading: the cyber axis is the same in both modes (19 / 23). Mode A's science ax
 mode C: 22 / 38 benchmarks stay on a formal-reasoning axis (ARC-AGI, maths), 15 / 38 (the
 knowledge-recall ones: MMLU, WMDP) join commonsense and factual QA on axis 2. Mode A's agentic
 axis keeps 18 / 29 on mode C's axis 4 and gives 7 to the reasoning axis. Mean dominant share is
-the same, 0.56 (A) and 0.55 (C). No tier is placed on mode C: the placement needs its four axis
-names and the content judgments that go with them.
+the same, 0.56 (A) and 0.55 (C).
 
 What holds in both modes is already on disk: the benchmark bundles (59 / 107 benchmarks in cores
 co-assigned in at least 90 % of the 50 chains, `r1_runs/bundle_cores.txt`) and the fitted scores
 (modes differ by 0.13 to 0.21 posterior SD on eta, `r1_runs/NOTES.md`).
 
-## 5. Not done, by choice
+## 5. Human tiers and crossings on mode C
 
-- Tier placement and crossings on mode C. They need four axis names from Yassine.
+Axis names by Yassine, 2026-11-12 (`secondary_mode/axis_names.json`): 1 Fluid Intelligence &
+Mathematics, 2 Knowledge & Commonsense QA, 3 Cyber Capabilities, 4 Agentic Capabilities &
+Programming. Axis 2 borrows the content judgments of "Commonsense & Factual Knowledge"
+(`RULE_TITLES` in `5_place_humans.py`). `5_place_humans.py --secondary`, log `place_modeC.log`;
+`crossings_by_mode.py` -> `crossings_modeC.csv`. Placement sampler: r-hat 1.00 to 1.01,
+0 divergences. Human scores used: 18 / 11 / 2 / 4 on axes 1 to 4.
+
+Kept without a content judgment (to judge in `1_curated/human_axis_content.csv`): GPQA Diamond
+Biology and GPQA Main Biology on axis 1; MMLU Biology, MMLU Chemistry and SpireClimb on axis 2.
+
+| mode C axis | result |
+|---|---|
+| 1 Fluid & Maths | Skilled Generalist passed (median 2026-04, probability 0.99). Domain Expert: 2026-09, probability passed 0.70. Committee of Domain Experts: 2026-12, probability 0.41 (80 %: 2026-08 to 2027-03). |
+| 2 Knowledge & Commonsense QA | Not passed. Average Human: probability 0.82. Skilled Generalist: median 2028-10 (80 %: 2026-01 to 2031-08). Domain Expert: 2032-01 (80 %: 2027-05 to 2036-11). Top Performer: 2035-03. |
+| 3 Cyber | 4 / 4 drawn tiers passed. Committee of Domain Experts: median 2025-07 (80 %: 2024-11 to 2026-03). Rests on 2 scores. |
+| 4 Agentic | Skilled Generalist and Domain Expert passed (2024-07, 2024-12). Committee of Domain Experts not passed: median 2027-11, probability 0.09 (80 %: 2026-08 to 2029-07). Rests on 4 scores. |
+
+## 6. What the two modes agree on, and what they do not
+
+Same in both modes:
+- Cyber: every drawn tier is passed.
+- Agentic: the Skilled Generalist and the Domain Expert are passed.
+- The commonsense and factual axis is the last one. Its Skilled Generalist is not passed
+  (median 2031-03 in A, 2028-10 in C), and no expert-level tier is passed on it.
+
+Depends on the mode:
+- Agentic, Committee of Domain Experts: passed in A (median 2026-02, probability 0.999), not
+  passed in C (median 2027-11, probability 0.09).
+- Expert tiers on the reasoning side: passed on A's science axis (Domain Expert 2024-09,
+  Committee 2025-07); about now on C's fluid and maths axis (Domain Expert probability 0.70,
+  Committee 0.41). The two axes do not hold the same benchmarks: C's keeps ARC-AGI and maths and
+  loses the knowledge-recall benchmarks.
+
+## 7. Not done, by choice
+
 - Pseudo-human and leave-one-benchmark-out validation of the placement. Limitation sentence.
 - Stacking weights over modes. Limitation sentence.

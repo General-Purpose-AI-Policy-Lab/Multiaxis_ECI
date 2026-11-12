@@ -69,6 +69,9 @@ RULE_TITLES = {
     "Geolocation, Trivia & Commonsense": "Mixed (Visual, Trivia, Cyber)",
     "Fluid Intelligence, Scientific Knowledge & Coding": "Scientific Knowledge & Reasoning",
     "Agentic, Cyber & SWE": "General Capabilities (Agentic, Cyber & SWE)",
+    # The flagship's mode C at 50 chains (user, 2026-11-12): its axis 2 holds the commonsense and
+    # factual QA benchmarks plus the knowledge-recall ones (MMLU, WMDP) of the primary's science axis.
+    "Knowledge & Commonsense QA": "Commonsense & Factual Knowledge",
 }
 
 
