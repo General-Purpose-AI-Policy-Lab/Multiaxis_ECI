@@ -1,0 +1,44 @@
+eta cells over 1.05 (all chains): 251 / 5487, on 127 / 887 models and 45 / 107 benchmarks
+
+benchmarks with the most cells over 1.05 (count / cells on that benchmark):
+benchmark
+GPQA Main Chemistry          22 / 56
+Lech Mazur Writing           20 / 49
+WeirdML v2                  19 / 165
+CritPt                      14 / 217
+MMLU                        13 / 177
+DTBench                     11 / 211
+OTIS Mock AIME 2024-2025    11 / 268
+GeoBench                     11 / 27
+GPQA Diamond                11 / 260
+SimpleBench                   9 / 86
+LMCA                         8 / 176
+MMLU-Pro                      8 / 60
+
+models with the most cells over 1.05:
+model
+Llama-4-Maverick-17B-128E-Instruct    11 / 34
+DeepSeek-V3                            9 / 32
+gpt-4.5-preview-2025-02-27             7 / 30
+o3-mini-2025-01-31_high                6 / 18
+Llama-3.1-8B-Instruct                  6 / 27
+gemini-1.5-flash-001                   5 / 21
+o4-mini-2025-04-16_medium              5 / 28
+claude-3-7-sonnet-20250219_none        5 / 35
+gpt-4o-mini-2024-07-18                 5 / 21
+claude-sonnet-4-20250514_none          5 / 18
+qwen2.5-72b-instruct                   5 / 10
+Meta-Llama-3-8B-Instruct               5 / 14
+
+worst 10 cells:
+                             model           benchmark  score  rhat_all  rhat_modeA  chain_mean_range_in_sd
+              qwen2.5-72b-instruct          WeirdML v2  0.160     1.448       1.268                   1.706
+                qwen2-72b-instruct          WeirdML v2  0.113     1.283       1.167                   1.533
+                       DeepSeek-V3         SimpleBench  0.189     1.283       1.135                   1.761
+              qwen2.5-72b-instruct        GPQA Diamond  0.491     1.185       1.104                   1.329
+Llama-4-Maverick-17B-128E-Instruct           ARC-AGI-2  0.000     1.182       1.029                   2.018
+        Phi-3-medium-128k-instruct        GPQA Diamond  0.276     1.181       1.108                   1.401
+Llama-4-Maverick-17B-128E-Instruct         SimpleBench  0.277     1.162       1.019                   1.785
+Llama-4-Maverick-17B-128E-Instruct             ARC-AGI  0.044     1.160       1.031                   1.759
+           claude-fable-5-1_medium GPQA Main Chemistry  0.862     1.160       1.023                   1.868
+Llama-4-Maverick-17B-128E-Instruct     VisualToolBench  0.014     1.152       1.021                   1.858

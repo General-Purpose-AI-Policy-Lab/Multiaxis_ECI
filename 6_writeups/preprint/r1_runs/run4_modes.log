@@ -1,0 +1,8 @@
+Loading 5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc ...
+  basis: mean-loading match (min permutation/sign-matched |corr| > 0.8) · logp basins (no gap wider than 20 nats between sorted chain logps); Δlogp = mode mean chain logp minus the best mode's
+  mode A: chains [1, 4, 8, 12, 16, 17, 18, 22, 27, 28, 29, 31, 33, 34, 36, 37, 38]  Δlogp 0.0  within-mode corr 0.906  corr to best None
+  mode B: chains [11, 15, 19, 25]  Δlogp -7.6  within-mode corr 0.937  corr to best 0.783
+  mode C: chains [7, 20]  Δlogp -18.8  within-mode corr 0.979  corr to best 0.001
+  mode D: chains [0, 3, 5, 10, 13, 14, 21, 23, 24, 26, 30, 32, 35, 39]  Δlogp -20.3  within-mode corr 0.858  corr to best 0.019
+  mode E: chains [2, 6, 9]  Δlogp -25.3  within-mode corr 0.934  corr to best 0.098
+  5 mode(s) → 5_outputs/data20261019/mirt_lineageprior_lineagebm/mirt_modes_trace_mirt_k4_lineageprior_lineagebm.json

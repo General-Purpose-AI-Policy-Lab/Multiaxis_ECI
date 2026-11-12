@@ -1,0 +1,8 @@
+chains                            all 50 (50)  mode A (24)  mode B (4)  mode C (18)  mode D (4)
+loadings over 1.05                  306 / 428     90 / 428   241 / 428    103 / 428    59 / 428
+loading r-hat max                       1.918        1.341       1.822        1.179       1.126
+abilities over 1.05, Science        801 / 887    297 / 887   635 / 887    369 / 887   201 / 887
+abilities over 1.05, Agentic        811 / 887    361 / 887   588 / 887    399 / 887   115 / 887
+abilities over 1.05, Cyber          686 / 887    314 / 887   619 / 887     13 / 887    16 / 887
+abilities over 1.05, Commonsense    674 / 887    181 / 887   325 / 887    288 / 887    97 / 887
+ability r-hat max                       1.913        1.348       1.732        1.177       1.113

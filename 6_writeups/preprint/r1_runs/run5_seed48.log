@@ -1,0 +1,116 @@
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+
+Data: 5487 obs / 887 models / 107 benchmarks
+  --lineage-prior (Brownian (steps scale with the release gap)): 75 chains / 245 nodes / 729 chained models
+
+======================================================================
+Fitting MIRT  K = 4  (normal loadings, Brownian lineage prior, effort means, fixed-c 3PL, noise-ceiling 4PL, Beta-binomial on 4539 item-scored obs, pooled noise, skew-normal theta, sampler=nutpie)  (5487 obs / 887 models / 107 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  streaming draws to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/live_draws.zarr (read mid-run with persistence.load_live_draws)
+  effort sign: draws flipped per chain [0, 0, 2000, 0, 0, 2000, 0, 0, 0, 2000]
+  raw trace checkpointed to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc
+  sampling done in 7394.3s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=4: raw max r̂=2.730 (label-switching, ignore for K>1)  divergences=224 / 20000
+        identified: eta r̂ max=1.088 mean=1.009 (frac>1.01=0.26)  D r̂=1.246  sigma_b r̂=1.128
+
+── chains merged: 50 in all (the first from 5_outputs/data20261019/traces_backup/r1_local/trace_after_run4_seed47.nc) ──
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       0.825        0.734         0.926              1.000
+axis2       0.825        0.734         0.926              1.000
+axis3       0.825        0.734         0.926              1.000
+axis4       0.825        0.734         0.926                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3  axis4
+axis1  1.000  0.727  0.439  0.543
+axis2  0.727  1.000  0.614  0.509
+axis3  0.439  0.614  1.000  0.270
+axis4  0.543  0.509  0.270  1.000
+
+── axis1  top loadings (raw bundle (rank-tracked, no rotation)) ──
+               benchmark                      category  loading_median
+               ARC-AGI-2             Core AGI Progress        2.938435
+                 ARC-AGI             Core AGI Progress        2.309569
+OTIS Mock AIME 2024-2025                   Mathematics        2.264774
+                    VPCT      Multimodal Understanding        2.210691
+            MATH Level 5                   Mathematics        1.938119
+  FrontierMath Tier 4 v2                   Mathematics        1.875856
+     GPQA Main Chemistry                     Chemistry        1.418209
+      MMLU Pro Chemistry                     Chemistry        1.393587
+                  CritPt     Domain Specific Questions        1.372783
+       Fiction.LiveBench Advanced Language and Writing        1.349969
+
+── axis2  top loadings (raw bundle (rank-tracked, no rotation)) ──
+             benchmark                  category  loading_median
+             ARC-AGI-2         Core AGI Progress        2.237251
+               DeepSWE            Autonomous SWE        1.879593
+               ARC-AGI         Core AGI Progress        1.471250
+               OSWorld      Agentic Computer Use        1.445419
+            ProofBench               Mathematics        1.441214
+             GSO-Bench            Autonomous SWE        1.414632
+        Aider Polyglot            Autonomous SWE        1.346537
+                CritPt Domain Specific Questions        1.216288
+FrontierMath Tier 4 v2               Mathematics        1.139059
+     The Agent Company      Agentic Computer Use        1.123973
+
+── axis3  top loadings (raw bundle (rank-tracked, no rotation)) ──
+                     benchmark                 category  loading_median
+            Furniture Assembly Multimodal Understanding        1.796501
+                      CyberGym                    Cyber        1.782319
+                       Cybench                    Cyber        1.585007
+                    ProofBench              Mathematics        1.574001
+               CyScenarioBench                    Cyber        1.551126
+AISI CTF Suites - Practitioner                    Cyber        1.460125
+                       GBAEval           Autonomous SWE        1.406253
+   CyScenarioBench (Anthropic)                    Cyber        1.254217
+        FrontierMath Tier 4 v2              Mathematics        1.222315
+                     GSO-Bench           Autonomous SWE        1.211007
+
+── axis4  top loadings (raw bundle (rank-tracked, no rotation)) ──
+           benchmark                      category  loading_median
+               GSM8K                   Mathematics        1.525781
+         SimpleBench             General Reasoning        1.471283
+       InterCode-CTF                         Cyber        1.448019
+             ARC AI2     Domain Specific Questions        1.441394
+   SimpleQA Verified     Domain Specific Questions        1.425703
+                VPCT      Multimodal Understanding        1.325611
+   Fiction.LiveBench Advanced Language and Writing        1.319698
+          OpenBookQA       Trivia & Commonsense QA        1.282661
+Mystery Game Puzzles             General Reasoning        1.145869
+                MMLU     Domain Specific Questions        1.127173
+
+── PPC goodness-of-fit ──
+  MIRT (K=4): R²=0.965  RMSE=0.043  MAE=0.029
+
+Reusing cached K=1 baseline → /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k1.nc
+  1D (K=1, cached): R²=0.928  RMSE=0.068  MAE=0.046
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm
+Figures: run 4_diagnostics/3_plot_mirt.py --trace /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc
+     7585.27 real     55445.61 user       404.47 sys
+          9872474112  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             3682534  page reclaims
+                6572  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+              394005  messages sent
+              183202  messages received
+                   0  signals received
+              188914  voluntary context switches
+            28385036  involuntary context switches
+     796687218286703  instructions retired
+     163046032575256  cycles elapsed
+         12091927664  peak memory footprint

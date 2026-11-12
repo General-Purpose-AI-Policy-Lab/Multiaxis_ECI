@@ -1,0 +1,135 @@
+{
+ "trace": "trace_mirt_k4_lineageprior_lineagebm.nc",
+ "n_chains": 40,
+ "K": 4,
+ "basis": "mean-loading match (min permutation/sign-matched |corr| > 0.8) \u00b7 logp basins (no gap wider than 20 nats between sorted chain logps); \u0394logp = mode mean chain logp minus the best mode's",
+ "chain_delta_logp": [
+  -37.6,
+  -9.0,
+  -41.6,
+  -25.2,
+  -3.6,
+  -44.1,
+  -20.2,
+  -29.7,
+  -15.2,
+  -49.8,
+  -19.6,
+  -21.8,
+  -7.5,
+  -65.3,
+  -28.3,
+  -7.2,
+  -26.0,
+  0.0,
+  -10.4,
+  -31.7,
+  -31.7,
+  -31.3,
+  -2.7,
+  -20.7,
+  -30.1,
+  -17.2,
+  -31.1,
+  -2.5,
+  -12.0,
+  -11.4,
+  -30.9,
+  -15.0,
+  -34.0,
+  -4.2,
+  -21.2,
+  -24.6,
+  -26.6,
+  -18.9,
+  -15.3,
+  -27.9
+ ],
+ "modes": [
+  {
+   "chains": [
+    1,
+    4,
+    8,
+    12,
+    16,
+    17,
+    18,
+    22,
+    27,
+    28,
+    29,
+    31,
+    33,
+    34,
+    36,
+    37,
+    38
+   ],
+   "mean_logp": -22678.645227504596,
+   "min_matched_corr": 0.906,
+   "label": "A",
+   "delta_logp": 0.0,
+   "matched_corr_to_best": null
+  },
+  {
+   "chains": [
+    11,
+    15,
+    19,
+    25
+   ],
+   "mean_logp": -22686.271968161087,
+   "min_matched_corr": 0.937,
+   "label": "B",
+   "delta_logp": -7.6,
+   "matched_corr_to_best": 0.783
+  },
+  {
+   "chains": [
+    7,
+    20
+   ],
+   "mean_logp": -22697.49197029879,
+   "min_matched_corr": 0.979,
+   "label": "C",
+   "delta_logp": -18.8,
+   "matched_corr_to_best": 0.001
+  },
+  {
+   "chains": [
+    0,
+    3,
+    5,
+    10,
+    13,
+    14,
+    21,
+    23,
+    24,
+    26,
+    30,
+    32,
+    35,
+    39
+   ],
+   "mean_logp": -22698.985043280863,
+   "min_matched_corr": 0.858,
+   "label": "D",
+   "delta_logp": -20.3,
+   "matched_corr_to_best": 0.019
+  },
+  {
+   "chains": [
+    2,
+    6,
+    9
+   ],
+   "mean_logp": -22703.97938413803,
+   "min_matched_corr": 0.934,
+   "label": "E",
+   "delta_logp": -25.3,
+   "matched_corr_to_best": 0.098
+  }
+ ]
+}

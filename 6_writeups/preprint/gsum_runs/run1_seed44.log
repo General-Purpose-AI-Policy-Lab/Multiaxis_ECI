@@ -1,0 +1,130 @@
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/__init__.py:50: FutureWarning: 
+ArviZ is undergoing a major refactor to improve flexibility and extensibility while maintaining a user-friendly interface.
+Some upcoming changes may be backward incompatible.
+For details and migration guidance, visit: https://python.arviz.org/en/latest/user_guide/migration_guide.html
+  warn(
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_bifactor_lineageprior_lineagebm_gsum
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+
+Data: 5487 obs / 887 models / 107 benchmarks
+  --lineage-prior (Brownian (steps scale with the release gap)): 75 chains / 245 nodes / 729 chained models
+  mirt_modes_trace_mirt_k4_bifactor_lineageprior_lineagebm_gsum.json: its chain selection belongs to the replaced trace, kept as mirt_modes_trace_mirt_k4_bifactor_lineageprior_lineagebm_gsum_2026-11-02.json
+
+======================================================================
+Fitting MIRT  K = 4  (bifactor loadings, Brownian lineage prior, effort means, fixed-c 3PL, noise-ceiling 4PL, Beta-binomial on 4539 item-scored obs, pooled noise, skew-normal theta, axes = g + deviations, sampler=nutpie)  (5487 obs / 887 models / 107 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  streaming draws to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_bifactor_lineageprior_lineagebm_gsum/live_draws.zarr (read mid-run with persistence.load_live_draws)
+  effort sign: draws flipped per chain [0, 2000, 0, 0, 0, 0, 0, 0, 0, 0]
+  raw trace checkpointed to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_bifactor_lineageprior_lineagebm_gsum/trace_mirt_k4_bifactor_lineageprior_lineagebm_gsum.nc
+  sampling done in 17210.8s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=4: raw max r̂=2.881 (label-switching, ignore for K>1)  divergences=89 / 20000
+        identified: eta r̂ max=1.244 mean=1.015 (frac>1.01=0.38)  D r̂=1.302  sigma_b r̂=1.336
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1      10.389        5.296        15.597              2.439
+axis2       4.260        2.920         6.373              1.062
+axis3       4.013        2.874         5.696              1.077
+axis4       3.727        2.724         4.980                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3  axis4
+axis1  1.000  0.978  0.747  0.866
+axis2  0.978  1.000  0.706  0.792
+axis3  0.747  0.706  1.000  0.589
+axis4  0.866  0.792  0.589  1.000
+
+── axis1  top loadings (bifactor frame (axis1 = g, no rotation)) ──
+             benchmark                  category  loading_median
+             ARC-AGI-2         Core AGI Progress        3.328436
+               ARC-AGI         Core AGI Progress        2.291974
+               DeepSWE            Autonomous SWE        1.738009
+                CritPt Domain Specific Questions        1.363786
+                  VPCT  Multimodal Understanding        1.349647
+        Aider Polyglot            Autonomous SWE        1.302154
+     CAISI CTF-Archive                     Cyber        1.251578
+           BioLP-bench                   Biology        1.195226
+            ProofBench               Mathematics        1.171557
+GPQA Diamond Chemistry                 Chemistry        1.095595
+
+── axis2  top loadings (bifactor frame (axis1 = g, no rotation)) ──
+               benchmark                  category  loading_median
+               ARC-AGI-2         Core AGI Progress        1.319248
+OTIS Mock AIME 2024-2025               Mathematics        0.971703
+                 ARC-AGI         Core AGI Progress        0.962991
+                    VPCT  Multimodal Understanding        0.870468
+            MATH Level 5               Mathematics        0.838863
+  FrontierMath Tier 4 v2               Mathematics        0.761789
+                 DeepSWE            Autonomous SWE        0.709718
+                  CritPt Domain Specific Questions        0.634502
+     GPQA Main Chemistry                 Chemistry        0.521425
+          Aider Polyglot            Autonomous SWE        0.504657
+
+── axis3  top loadings (bifactor frame (axis1 = g, no rotation)) ──
+                     benchmark                 category  loading_median
+            Furniture Assembly Multimodal Understanding        0.951788
+                      CyberGym                    Cyber        0.933793
+                    ProofBench              Mathematics        0.855452
+                       Cybench                    Cyber        0.827583
+                       GBAEval           Autonomous SWE        0.817150
+               CyScenarioBench                    Cyber        0.809354
+AISI CTF Suites - Practitioner                    Cyber        0.783040
+                     GSO-Bench           Autonomous SWE        0.706955
+                        GDPval        Core AGI Progress        0.690412
+        FrontierMath Tier 4 v2              Mathematics        0.621833
+
+── axis4  top loadings (bifactor frame (axis1 = g, no rotation)) ──
+                  benchmark                      category  loading_median
+                      GSM8K                   Mathematics        0.957900
+                       VPCT      Multimodal Understanding        0.865237
+          SimpleQA Verified     Domain Specific Questions        0.813180
+          Fiction.LiveBench Advanced Language and Writing        0.752447
+               WMDP Biology                       Biology        0.667531
+CyScenarioBench (Anthropic)                         Cyber        0.651818
+                SimpleBench             General Reasoning        0.649033
+              InterCode-CTF                         Cyber        0.614965
+       Mystery Game Puzzles             General Reasoning        0.576609
+             WMDP Chemistry                     Chemistry        0.528247
+
+── PPC goodness-of-fit ──
+  MIRT (K=4): R²=0.963  RMSE=0.045  MAE=0.030
+
+======================================================================
+Fitting MIRT  K = 1  (normal loadings, fixed-c 3PL, noise-ceiling 4PL, Beta-binomial on 4539 item-scored obs, sampler=nutpie)  (5487 obs / 887 models / 107 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  streaming draws to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_bifactor_lineageprior_lineagebm_gsum/live_draws_k1.zarr (read mid-run with persistence.load_live_draws)
+  sampling done in 425.2s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=1: raw max r̂=1.013 (label-switching, ignore for K>1)  divergences=0 / 20000
+        identified: eta r̂ max=1.004 mean=1.000 (frac>1.01=0.00)  D r̂=1.008  sigma_b r̂=1.004
+  1D (K=1): R²=0.928  RMSE=0.068  MAE=0.046
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_bifactor_lineageprior_lineagebm_gsum
+Figures: run 4_diagnostics/3_plot_mirt.py --trace /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_bifactor_lineageprior_lineagebm_gsum/trace_mirt_k4_bifactor_lineageprior_lineagebm_gsum.nc
+       26.43 real     64094.01 user       592.04 sys
+          5349097472  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             6939081  page reclaims
+               35310  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+              617215  messages sent
+              284079  messages received
+                   0  signals received
+              253696  voluntary context switches
+            41064393  involuntary context switches
+        322714398817  instructions retired
+        101659297863  cycles elapsed
+           923436904  peak memory footprint

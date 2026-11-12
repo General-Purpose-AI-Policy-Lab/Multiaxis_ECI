@@ -1,0 +1,4 @@
+start 2026-11-11 14:32:18
+paused 2026-11-11 14:32:44 (SIGSTOP, on Yassine's request: another project is using a local llama-server)
+resumed 2026-11-11 16:58:31 (SIGCONT, the other project's model server absent for 10 min)
+end 2026-11-11 19:29:25 rc=0

@@ -1,0 +1,20 @@
+modes            local (chains, mean logp, Δ)            upstream (chains, mean logp, Δ)
+  A 24   -22676.6    0.0                   A 21   -22677.8    0.0
+  B  4   -22695.5  -18.9                   B  5   -22687.4   -9.6
+  C 18   -22697.9  -21.3                   C 19   -22695.1  -17.3
+  D  4   -22705.6  -29.0                   D  4   -22703.6  -25.8
+  -                                        E  1   -22732.0  -54.2
+
+chain-by-chain label agreement (same chain index, same seed):
+upstream   A  B   C  D  E
+local                    
+A         19  2   2  1  0
+B          0  3   0  1  0
+C          1  0  16  0  1
+D          1  0   1  2  0
+
+local mode vs upstream mode A loadings (pooled median over the mode's chains, best axis permutation):
+  local A: per-axis corr [0.651, 0.511, 0.47, 0.498]  min 0.470
+  local B: per-axis corr [0.911, 0.742, 0.633, 0.811]  min 0.633
+  local C: per-axis corr [0.731, 0.707, 0.642, 0.619]  min 0.619
+  local D: per-axis corr [0.673, 0.806, 0.739, 0.665]  min 0.665

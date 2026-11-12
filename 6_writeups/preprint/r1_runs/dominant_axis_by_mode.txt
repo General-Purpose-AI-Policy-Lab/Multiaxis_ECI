@@ -1,0 +1,97 @@
+benchmarks with the same dominant axis in all four modes: 16 / 107
+by axis (stable): {'Com': 9, 'Agt': 3, 'Cyb': 3, 'Sci': 1}
+
+contested benchmarks (dominant axis per mode A B C D):
+                                     A    B    C    D
+benchmark                                            
+APEX-Agents                        Agt  Agt  Agt  Com
+Aider Polyglot                     Agt  Agt  Agt  Com
+CAISI CTF-Archive                  Agt  Agt  Sci  Agt
+CAISI CVE-Bench                    Agt  Agt  Sci  Agt
+CAISI Cybench                      Agt  Agt  Sci  Agt
+CadEval                            Agt  Com  Agt  Com
+CritPt                             Agt  Sci  Sci  Agt
+DeepSWE                            Agt  Sci  Sci  Agt
+ExploitBench                       Agt  Agt  Cyb  Cyb
+FrontierSWE v2                     Agt  Agt  Cyb  Cyb
+GDP.pdf                            Agt  Agt  Sci  Agt
+GSO-Bench                          Agt  Agt  Agt  Cyb
+LMCA                               Agt  Agt  Agt  Com
+MCP Atlas                          Agt  Sci  Sci  Agt
+METR Time Horizons                 Agt  Agt  Sci  Agt
+MirrorCode                         Agt  Agt  Agt  Cyb
+OEIS Open Lite                     Agt  Agt  Agt  Cyb
+OSWorld                            Agt  Agt  Agt  Cyb
+OSWorld 2.0                        Agt  Agt  Agt  Cyb
+PostTrainBench v1.1                Agt  Agt  Agt  Cyb
+ProofBench                         Agt  Agt  Cyb  Cyb
+Remote Labor Index                 Agt  Agt  Agt  Cyb
+SEAL Tool Use (Enterprise)         Agt  Cyb  Agt  Cyb
+SWE Atlas                          Agt  Agt  Agt  Cyb
+Terminal Bench 2.0                 Agt  Agt  Cyb  Cyb
+The Agent Company                  Agt  Agt  Agt  Cyb
+ARC AI2                            Com  Com  Com  Sci
+CTI-REALM                          Com  Com  Agt  Com
+DeepResearch Bench                 Com  Com  Agt  Com
+DrugDiscoveryBench                 Com  Cyb  Com  Cyb
+HellaSwag                          Com  Com  Agt  Sci
+OpenBookQA                         Com  Com  Com  Sci
+PIQA                               Com  Com  Com  Sci
+WinoGrande                         Com  Com  Com  Sci
+AISI CTF Suites - Expert           Cyb  Agt  Cyb  Cyb
+AISI CTF Suites - Practitioner     Cyb  Agt  Cyb  Cyb
+AISI Cyber Ranges - Cooling Tower  Cyb  Agt  Cyb  Cyb
+AISI Cyber Ranges - The Last Ones  Cyb  Agt  Cyb  Cyb
+BlueprintBench 2                   Cyb  Agt  Agt  Cyb
+CAISI CTF-Archive-Diamond          Cyb  Cyb  Cyb  Sci
+CL-bench                           Cyb  Agt  Cyb  Cyb
+CL-bench Life                      Cyb  Agt  Sci  Cyb
+CyScenarioBench                    Cyb  Agt  Cyb  Cyb
+CyScenarioBench (Anthropic)        Cyb  Cyb  Cyb  Sci
+Cybench                            Cyb  Agt  Cyb  Cyb
+CyberGym                           Cyb  Agt  Cyb  Cyb
+EBR-bench                          Cyb  Agt  Cyb  Cyb
+FrontierMath Erdos                 Cyb  Com  Cyb  Cyb
+Furniture Assembly                 Cyb  Agt  Cyb  Cyb
+GBAEval                            Cyb  Agt  Cyb  Cyb
+GDPval                             Cyb  Agt  Cyb  Cyb
+GeoBench                           Cyb  Cyb  Com  Sci
+Surface Evolver Bench              Cyb  Agt  Cyb  Cyb
+TriviaQA                           Cyb  Cyb  Agt  Cyb
+ARC-AGI                            Sci  Sci  Sci  Agt
+ARC-AGI-2                          Sci  Sci  Sci  Agt
+AudioMultiChallenge                Sci  Sci  Sci  Agt
+BioLP-bench                        Sci  Sci  Sci  Agt
+CAISI ExploitGym Userspace         Sci  Cyb  Com  Sci
+CAISI OSS-Fuzz                     Sci  Cyb  Com  Sci
+CAISI SEC-Bench Pro                Sci  Cyb  Cyb  Sci
+DTBench                            Sci  Sci  Com  Com
+Fiction.LiveBench                  Sci  Sci  Com  Sci
+FrontierMath Tier 4 v2             Sci  Sci  Sci  Agt
+FrontierMath Tiers 1-3 v2          Sci  Sci  Sci  Agt
+GPQA Diamond                       Sci  Sci  Sci  Agt
+GPQA Diamond Biology               Sci  Sci  Sci  Agt
+GPQA Diamond Chemistry             Sci  Sci  Sci  Agt
+GPQA Main Biology                  Sci  Sci  Sci  Com
+GPQA Main Chemistry                Sci  Sci  Sci  Agt
+GSM8K                              Sci  Com  Com  Com
+LAB-Bench LitQA2                   Sci  Sci  Com  Com
+LAB-Bench SeqQA                    Sci  Sci  Sci  Agt
+MATH Level 5                       Sci  Sci  Sci  Agt
+MMLU Biology                       Sci  Sci  Com  Com
+MMLU Chemistry                     Sci  Sci  Com  Com
+MMLU Pro Biology                   Sci  Sci  Sci  Agt
+MMLU Pro Chemistry                 Sci  Sci  Sci  Agt
+MMLU-Pro                           Sci  Com  Com  Com
+MultiChallenge                     Sci  Sci  Sci  Agt
+Mystery Game Puzzles               Sci  Com  Com  Com
+OTIS Mock AIME 2024-2025           Sci  Sci  Sci  Agt
+SWE-Bench Pro V2                   Sci  Cyb  Com  Sci
+SpireClimb                         Sci  Cyb  Com  Sci
+TutorBench                         Sci  Sci  Sci  Agt
+VPCT                               Sci  Cyb  Sci  Sci
+Visual Task Assessment (VISTA)     Sci  Sci  Com  Com
+VisualToolBench                    Sci  Cyb  Sci  Sci
+WMDP Biology                       Sci  Sci  Com  Com
+WMDP Chemistry                     Sci  Sci  Com  Com
+WeirdML v2                         Sci  Agt  Sci  Agt

@@ -1,0 +1,116 @@
+  per-config folder: /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+
+Data: 5487 obs / 887 models / 107 benchmarks
+  --lineage-prior (Brownian (steps scale with the release gap)): 75 chains / 245 nodes / 729 chained models
+
+======================================================================
+Fitting MIRT  K = 4  (normal loadings, Brownian lineage prior, effort means, fixed-c 3PL, noise-ceiling 4PL, Beta-binomial on 4539 item-scored obs, pooled noise, skew-normal theta, sampler=nutpie)  (5487 obs / 887 models / 107 benchmarks)
+======================================================================
+  starting nutpie sampler at t=0 (no live heartbeat with this backend)
+  streaming draws to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/live_draws.zarr (read mid-run with persistence.load_live_draws)
+  effort sign: draws flipped per chain [2000, 0, 0, 0, 0, 0, 0, 2000, 0, 2000]
+  raw trace checkpointed to /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc
+  sampling done in 7517.7s, computing log-likelihood...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+/Users/yassineessifi/miniforge3/envs/pymc_env/lib/python3.11/site-packages/arviz/stats/diagnostics.py:596: RuntimeWarning: invalid value encountered in scalar divide
+  (between_chain_variance / within_chain_variance + num_samples - 1) / (num_samples)
+  K=4: raw max r̂=2.750 (label-switching, ignore for K>1)  divergences=345 / 20000
+        identified: eta r̂ max=1.141 mean=1.012 (frac>1.01=0.31)  D r̂=1.206  sigma_b r̂=1.217
+
+── chains merged: 20 in all (the first from 5_outputs/data20261019/traces_backup/r1_local/trace_after_run1_seed44.nc) ──
+
+── tau_A spectrum (gap ratio flags the live/dead break) ──
+ axis  tau_median  tau_hdi_low  tau_hdi_high  gap_ratio_to_next
+axis1       0.826        0.735         0.928              1.000
+axis2       0.826        0.735         0.928              1.000
+axis3       0.826        0.735         0.928              1.000
+axis4       0.826        0.735         0.928                NaN
+
+── factor correlation Phi (off-diag = axis-ability overlap) ──
+       axis1  axis2  axis3  axis4
+axis1  1.000  0.750  0.438  0.561
+axis2  0.750  1.000  0.636  0.525
+axis3  0.438  0.636  1.000  0.293
+axis4  0.561  0.525  0.293  1.000
+
+── axis1  top loadings (raw bundle (rank-tracked, no rotation)) ──
+               benchmark                      category  loading_median
+               ARC-AGI-2             Core AGI Progress        2.912613
+                 ARC-AGI             Core AGI Progress        2.298071
+OTIS Mock AIME 2024-2025                   Mathematics        2.254471
+                    VPCT      Multimodal Understanding        2.171442
+            MATH Level 5                   Mathematics        1.930757
+  FrontierMath Tier 4 v2                   Mathematics        1.837359
+     GPQA Main Chemistry                     Chemistry        1.415306
+      MMLU Pro Chemistry                     Chemistry        1.396922
+                  CritPt     Domain Specific Questions        1.352949
+       Fiction.LiveBench Advanced Language and Writing        1.349005
+
+── axis2  top loadings (raw bundle (rank-tracked, no rotation)) ──
+                     benchmark                  category  loading_median
+                     ARC-AGI-2         Core AGI Progress        2.285769
+                       DeepSWE            Autonomous SWE        1.819001
+                       ARC-AGI         Core AGI Progress        1.520705
+                    ProofBench               Mathematics        1.457975
+                       OSWorld      Agentic Computer Use        1.417006
+                     GSO-Bench            Autonomous SWE        1.400324
+                Aider Polyglot            Autonomous SWE        1.355487
+                        CritPt Domain Specific Questions        1.251580
+        FrontierMath Tier 4 v2               Mathematics        1.246173
+AISI CTF Suites - Practitioner                     Cyber        1.147746
+
+── axis3  top loadings (raw bundle (rank-tracked, no rotation)) ──
+                     benchmark                 category  loading_median
+            Furniture Assembly Multimodal Understanding        1.789148
+                      CyberGym                    Cyber        1.765631
+                       Cybench                    Cyber        1.567315
+                    ProofBench              Mathematics        1.566935
+               CyScenarioBench                    Cyber        1.536448
+AISI CTF Suites - Practitioner                    Cyber        1.429813
+                       GBAEval           Autonomous SWE        1.391708
+   CyScenarioBench (Anthropic)                    Cyber        1.267882
+        FrontierMath Tier 4 v2              Mathematics        1.215871
+                     GSO-Bench           Autonomous SWE        1.211859
+
+── axis4  top loadings (raw bundle (rank-tracked, no rotation)) ──
+           benchmark                      category  loading_median
+         SimpleBench             General Reasoning        1.490854
+               GSM8K                   Mathematics        1.475776
+       InterCode-CTF                         Cyber        1.452096
+             ARC AI2     Domain Specific Questions        1.411550
+   SimpleQA Verified     Domain Specific Questions        1.389512
+   Fiction.LiveBench Advanced Language and Writing        1.276763
+          OpenBookQA       Trivia & Commonsense QA        1.266072
+                VPCT      Multimodal Understanding        1.235300
+Mystery Game Puzzles             General Reasoning        1.137878
+      Aider Polyglot                Autonomous SWE        1.129826
+
+── PPC goodness-of-fit ──
+  MIRT (K=4): R²=0.965  RMSE=0.043  MAE=0.029
+
+Reusing cached K=1 baseline → /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k1.nc
+  1D (K=1, cached): R²=0.928  RMSE=0.068  MAE=0.046
+
+Outputs → /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm
+Figures: run 4_diagnostics/3_plot_mirt.py --trace /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc
+     7648.41 real     52413.88 user       349.22 sys
+          4896391168  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1797665  page reclaims
+                7148  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+              394077  messages sent
+              181778  messages received
+                   0  signals received
+              154940  voluntary context switches
+            21387596  involuntary context switches
+     808597425950663  instructions retired
+     172567014139289  cycles elapsed
+          6300359760  peak memory footprint

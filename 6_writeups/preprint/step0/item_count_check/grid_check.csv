@@ -1,0 +1,108 @@
+benchmark,scoring,n_items,verification,n_scores,on_grid,chance
+AISI Cyber Ranges - Cooling Tower,continuous,7.0,primary-source,7,,
+AISI Cyber Ranges - The Last Ones,continuous,32.0,primary-source,17,,
+APEX-Agents,continuous,240.0,primary-source,54,,
+Balrog,continuous,58.0,primary-source,36,,
+BlueprintBench 2,continuous,50.0,UNVERIFIED,32,,
+CTI-REALM,continuous,50.0,primary-source,11,,
+CyScenarioBench,continuous,11.0,primary-source,9,,
+CyScenarioBench (Anthropic),continuous,10.0,estimate,6,,
+DeepResearch Bench,continuous,169.0,primary-source,41,,
+ExploitBench,continuous,41.0,UNVERIFIED,18,,
+FrontierCode,continuous,100.0,UNVERIFIED,42,,
+FrontierSWE v2,continuous,34.0,primary-source,21,,
+GBAEval,continuous,27.0,primary-source,23,,
+LMCA,continuous,1461.0,primary-source,176,,
+Lech Mazur Writing,continuous,500.0,UNVERIFIED,49,,
+METR Time Horizons,continuous,170.0,not-item-mean,45,,
+MultiChallenge,continuous,273.0,UNVERIFIED,32,,
+PostTrainBench v1.1,continuous,28.0,primary-source,12,,
+SpireClimb,continuous,,primary-source,7,,
+Surface Evolver Bench,continuous,16.0,UNVERIFIED,28,,
+The Agent Company,continuous,175.0,UNVERIFIED,14,,
+TutorBench,continuous,1490.0,UNVERIFIED,27,,
+Visual Task Assessment (VISTA),continuous,758.0,UNVERIFIED,59,,
+WeirdML v2,continuous,17.0,primary-source,165,,
+WeirdML v3,continuous,11.0,primary-source,17,,
+AISI CTF Suites - Apprentice,items,25.0,estimate,17,0.0,0.025
+AISI CTF Suites - Expert,items,21.0,primary-source,10,0.0,0.021
+AISI CTF Suites - Practitioner,items,27.0,primary-source,10,0.0,0.027
+AISI CTF Suites - Technical Non-Expert,items,18.0,estimate,17,0.0,0.018000000000000002
+ARC AI2,items,1172.0,UNVERIFIED,77,1.0,1.0
+ARC-AGI,items,100.0,primary-source,253,0.2608695652173913,0.1
+ARC-AGI-2,items,120.0,primary-source,246,0.34146341463414637,0.12
+Aider Polyglot,items,225.0,UNVERIFIED,61,0.9672131147540983,0.225
+AudioMultiChallenge,items,452.0,score-grid,8,1.0,0.452
+BioLP-bench,items,800.0,UNVERIFIED,35,0.8571428571428571,0.8
+CAISI CTF-Archive,items,577.0,estimate,7,1.0,0.577
+CAISI CTF-Archive-Diamond,items,285.0,primary-source,8,0.75,0.28500000000000003
+CAISI CVE-Bench,items,15.0,estimate,8,0.25,0.015
+CAISI Cybench,items,40.0,estimate,8,0.25,0.04
+CAISI ExploitGym Userspace,items,502.0,primary-source,4,1.0,0.502
+CAISI OSS-Fuzz,items,297.0,primary-source,4,1.0,0.297
+CAISI SEC-Bench Pro,items,183.0,primary-source,4,1.0,0.183
+CL-bench,items,1899.0,UNVERIFIED,22,1.0,1.0
+CL-bench Life,items,405.0,UNVERIFIED,17,0.6470588235294118,0.405
+CadEval,items,50.0,primary-source,14,1.0,0.05
+CritPt,items,70.0,primary-source,217,0.33640552995391704,0.07
+Cybench,items,40.0,primary-source,25,0.72,0.04
+CyberGym,items,1507.0,UNVERIFIED,15,1.0,1.0
+DTBench,items,375.0,primary-source,211,0.8815165876777251,0.375
+DeepSWE,items,113.0,UNVERIFIED,69,0.14492753623188406,0.113
+DrugDiscoveryBench,items,82.0,primary-source,17,0.4117647058823529,0.082
+EBR-bench,items,21.0,primary-source,27,0.37037037037037035,0.021
+EnigmaEval,items,1161.0,primary-source,46,1.0,1.0
+Fiction.LiveBench,items,32.0,score-grid,38,0.7368421052631579,0.032
+FrontierMath Erdos,items,68.0,primary-source,7,1.0,0.068
+FrontierMath Tier 4 v2,items,41.0,stderr-inversion,75,0.92,0.041
+FrontierMath Tiers 1-3 v2,items,285.0,stderr-inversion,120,0.9833333333333333,0.28500000000000003
+Furniture Assembly,items,60.0,primary-source,34,0.6176470588235294,0.06
+GDP.pdf,items,100.0,score-grid,43,0.5116279069767442,0.1
+GDPval,items,220.0,primary-source,11,0.18181818181818182,0.22
+GPQA Diamond,items,198.0,primary-source,260,0.43846153846153846,0.198
+GPQA Diamond Biology,items,19.0,primary-source,52,0.7692307692307693,0.019
+GPQA Diamond Chemistry,items,93.0,primary-source,56,0.75,0.093
+GPQA Main Biology,items,78.0,primary-source,52,0.6923076923076923,0.078
+GPQA Main Chemistry,items,183.0,primary-source,56,0.7142857142857143,0.183
+GSM8K,items,1319.0,UNVERIFIED,84,1.0,1.0
+GSO-Bench,items,102.0,primary-source,36,0.8611111111111112,0.10200000000000001
+GeoBench,items,100.0,score-grid,27,1.0,0.1
+HLE Diamond,items,1000.0,primary-source,17,1.0,1.0
+HellaSwag,items,10042.0,UNVERIFIED,75,1.0,1.0
+InterCode-CTF,items,74.0,primary-source,16,0.8125,0.074
+LAB-Bench Cloning,items,33.0,primary-source,41,0.7317073170731707,0.033
+LAB-Bench LitQA2,items,199.0,primary-source,42,0.8809523809523809,0.199
+LAB-Bench Protocol,items,108.0,primary-source,44,0.8409090909090909,0.108
+LAB-Bench SeqQA,items,600.0,primary-source,43,0.9534883720930233,0.6
+MATH Level 5,items,1324.0,UNVERIFIED,107,1.0,1.0
+MCP Atlas,items,500.0,UNVERIFIED,33,0.5757575757575758,0.5
+MMLU,items,14042.0,primary-source,177,1.0,1.0
+MMLU Biology,items,536.0,primary-source,37,0.40540540540540543,0.536
+MMLU Chemistry,items,230.0,primary-source,40,0.325,0.23
+MMLU Pro Biology,items,717.0,primary-source,42,0.9523809523809523,0.717
+MMLU Pro Chemistry,items,1132.0,primary-source,45,1.0,1.0
+MMLU-Pro,items,12032.0,primary-source,60,1.0,1.0
+MirrorCode,items,30.0,primary-source,9,0.4444444444444444,0.03
+MultiNRC,items,1055.0,UNVERIFIED,44,1.0,1.0
+Mystery Game Puzzles,items,100.0,primary-source,140,0.8,0.1
+NL2Bash,items,129.0,primary-source,16,1.0,0.129
+OEIS Open Lite,items,100.0,primary-source,5,1.0,0.1
+OSWorld,items,369.0,UNVERIFIED,8,0.625,0.369
+OSWorld 2.0,items,108.0,UNVERIFIED,14,0.42857142857142855,0.108
+OTIS Mock AIME 2024-2025,items,45.0,stderr-inversion,268,0.4701492537313433,0.045
+OpenBookQA,items,500.0,score-grid,42,1.0,0.5
+PIQA,items,1838.0,UNVERIFIED,59,1.0,1.0
+ProofBench,items,100.0,score-grid,80,0.9875,0.1
+Remote Labor Index,items,240.0,score-grid,17,1.0,0.24
+SEAL Tool Use (Enterprise),items,288.0,score-grid,35,0.7142857142857143,0.28800000000000003
+SWE Atlas,items,269.0,primary-source,22,0.22727272727272727,0.269
+SWE-Bench Pro V2,items,51.0,primary-source,16,1.0,0.051000000000000004
+SimpleBench,items,213.0,UNVERIFIED,86,0.29069767441860467,0.213
+SimpleQA Verified,items,1000.0,stderr-inversion,142,1.0,1.0
+Terminal Bench 2.0,items,89.0,UNVERIFIED,52,0.11538461538461539,0.089
+TriviaQA,items,7993.0,primary-source,39,1.0,1.0
+VPCT,items,100.0,UNVERIFIED,36,0.5277777777777778,0.1
+VisualToolBench,items,1204.0,primary-source,20,1.0,1.0
+WMDP Biology,items,1273.0,primary-source,38,1.0,1.0
+WMDP Chemistry,items,408.0,primary-source,47,0.9574468085106383,0.40800000000000003
+WinoGrande,items,1267.0,UNVERIFIED,77,1.0,1.0

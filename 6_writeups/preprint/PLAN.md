@@ -190,7 +190,7 @@ the flagship's mode A), which is why both go in.
   gsum axis naming in `docs/model_math.md`.
 - **G. Writing.** After B, C and D exist. Not before.
 
-**Decisions open after this redraw.**
+**Decisions open after this redraw.** All taken on 2026-11-12, section 0d.
 
 - 2 ceilings: robust LOO +55.8 ± 12.1 for ceilings; R2 exists at 20 chains.
   A 50-chain R2 is needed only for a like-for-like mode count.
@@ -206,6 +206,49 @@ the flagship's mode A), which is why both go in.
   44 at least is shared. Run by the r1-runner session.
 - 11 gsum mode rule to state: LOO per mode plus non-empty g (the report's),
   or density rank with the empty-g mode shown beside it.
+
+## 0d. Scope fixed (2026-11-12)
+
+Goal restated by Yassine: a simple, solid preprint, written with Fable and
+Opus agents. Every decision left open in section 0c was taken that day. Where
+this section conflicts with section 0c, this section wins.
+
+- **3, refit queue: none.** R3 to R8 are not run. Work item E is closed. Each
+  becomes one sentence in the limitations: no bare K = 4 rung (R3), no K = 3
+  or K = 5 under the flagship prior (R4), no forecast backtest (R5), no
+  symmetric-drift sensitivity (R6), no recovery study on the current spec
+  (R7), no fit without the 15 RAND benchmarks (R8). The ladder is K = 1 (the
+  baseline sampled with each K = 4 fit on the same scope), K = 4 with the
+  lineage prior (R2, 20 chains), K = 4 with the lineage prior and ceilings
+  (R1, 50 chains).
+- **2, ceilings: settled by 3.** The ceiling fit is the flagship. The 20-chain
+  no-ceiling fit is the sensitivity. No 50-chain R2, so the two mode counts
+  are quoted with their chain counts and not compared like for like.
+- **11, gsum mode rule: the report's.** The selected mode is the one with the
+  best integrated LOO among the modes whose g column is not empty. The
+  best-density mode is shown beside it with its empty g.
+- **6, prose and category.** Fable drafts, Yassine revises. Drafting uses the
+  `yassine-voice` skill, with its check run on the actual draft. arXiv
+  primary stat.ML, cross-list cs.LG and cs.AI.
+- **4, frontier gaps: in this paper** (structure section 8).
+- **8, commit and push to origin** (private).
+
+Still owed from outside this session: Jérémy's agreement on 11 and 6 (he is a
+co-author), and Yassine's go for each of gsum runs 3 to 5.
+
+**Work left, in order.**
+
+1. A, gsum runs 3 to 5 (run 2, seed 45, started 2026-11-12 10:47).
+2. B, flagship trace work, and F, documentation and `refs.bib` trim (99 to
+   about 60 entries). Both can start now and do not touch the same files.
+3. C, gsum trace work, after A.
+4. D, cross-structure tables.
+5. Figures and tables (section 5 list).
+6. G, writing; then the referee pass against `agent_reports/red_team.md`,
+   the prose pass, the submission checklist.
+
+Who does what: Opus agents take F, the figures and the bib; Fable takes B, C,
+D, the draft and the referee pass; Yassine gives each go, revises and submits.
 
 ## 1. Where things stand
 

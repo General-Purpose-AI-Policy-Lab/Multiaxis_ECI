@@ -1,0 +1,26 @@
+
+== cores at co-assignment >= 90% in every pair: 10 with 3+ benchmarks, covering 59 / 107; 34 benchmarks alone ==
+  [12] AISI CTF Suites - Expert, AISI Cyber Ranges - Cooling Tower, AISI Cyber Ranges - The Last Ones, CyScenarioBench, Cybench, CyberGym, EBR-bench, Furniture Assembly, GBAEval, Lech Mazur Writing, Surface Evolver Bench, WeirdML v3
+  [12] ARC-AGI, AudioMultiChallenge, BioLP-bench, FrontierMath Tier 4 v2, GPQA Diamond, GPQA Diamond Chemistry, GPQA Main Chemistry, LAB-Bench SeqQA, MATH Level 5, MultiChallenge, OTIS Mock AIME 2024-2025, TutorBench
+  [7] DTBench, LAB-Bench LitQA2, MMLU Biology, MMLU Chemistry, Visual Task Assessment (VISTA), WMDP Biology, WMDP Chemistry
+  [6] GSO-Bench, OSWorld, OSWorld 2.0, PostTrainBench v1.1, SWE Atlas, The Agent Company
+  [5] LAB-Bench Cloning, MMLU, MultiNRC, SimpleBench, SimpleQA Verified
+  [5] CAISI CTF-Archive, CritPt, DeepSWE, GDP.pdf, METR Time Horizons
+  [3] ARC AI2, PIQA, WinoGrande
+  [3] GPQA Diamond Biology, MMLU Pro Biology, MMLU Pro Chemistry
+  [3] GSM8K, MMLU-Pro, Mystery Game Puzzles
+  [3] CAISI OSS-Fuzz, Fiction.LiveBench, SpireClimb
+
+== cores at co-assignment >= 70% in every pair: 12 with 3+ benchmarks, covering 96 / 107; 7 benchmarks alone ==
+  [15] ARC-AGI, ARC-AGI-2, AudioMultiChallenge, BioLP-bench, FrontierMath Tier 4 v2, FrontierMath Tiers 1-3 v2, GPQA Diamond, GPQA Diamond Chemistry, GPQA Main Chemistry, LAB-Bench SeqQA, MATH Level 5, MultiChallenge, OTIS Mock AIME 2024-2025, TutorBench, WeirdML v2
+  [14] AISI CTF Suites - Expert, AISI Cyber Ranges - Cooling Tower, AISI Cyber Ranges - The Last Ones, CyScenarioBench, Cybench, CyberGym, EBR-bench, FrontierMath Erdos, Furniture Assembly, GBAEval, Lech Mazur Writing, NL2Bash, Surface Evolver Bench, WeirdML v3
+  [12] AISI CTF Suites - Technical Non-Expert, APEX-Agents, FrontierCode, GSO-Bench, LMCA, MirrorCode, OEIS Open Lite, OSWorld, OSWorld 2.0, PostTrainBench v1.1, SWE Atlas, The Agent Company
+  [11] ARC AI2, Balrog, DrugDiscoveryBench, LAB-Bench Cloning, MMLU, MultiNRC, OpenBookQA, PIQA, SimpleBench, SimpleQA Verified, WinoGrande
+  [10] DTBench, GSM8K, LAB-Bench LitQA2, MMLU Biology, MMLU Chemistry, MMLU-Pro, Mystery Game Puzzles, Visual Task Assessment (VISTA), WMDP Biology, WMDP Chemistry
+  [6] AISI CTF Suites - Practitioner, CL-bench, ExploitBench, FrontierSWE v2, GDPval, ProofBench
+  [6] CAISI CTF-Archive, CAISI Cybench, CritPt, DeepSWE, GDP.pdf, METR Time Horizons
+  [6] EnigmaEval, GPQA Diamond Biology, GPQA Main Biology, MMLU Pro Biology, MMLU Pro Chemistry, VPCT
+  [5] AISI CTF Suites - Apprentice, Aider Polyglot, CAISI CVE-Bench, MCP Atlas, SEAL Tool Use (Enterprise)
+  [5] CAISI ExploitGym Userspace, CAISI OSS-Fuzz, Fiction.LiveBench, SWE-Bench Pro V2, SpireClimb
+  [3] HLE Diamond, InterCode-CTF, LAB-Bench Protocol
+  [3] CTI-REALM, DeepResearch Bench, HellaSwag
