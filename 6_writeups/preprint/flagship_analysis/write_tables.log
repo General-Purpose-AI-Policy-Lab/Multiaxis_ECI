@@ -1,0 +1,6 @@
+Loading 5_outputs/data20261019/mirt_lineageprior_lineagebm/trace_mirt_k4_lineageprior_lineagebm.nc ...
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+  axis tables rewritten on chains [1, 4, 8, 12, 15, 16, 17, 18, 22, 25, 27, 28, 29, 31, 33, 34, 36, 37, 38, 41, 44, 47, 48, 49] → /Users/yassineessifi/Desktop/ECI_Bayesian/5_outputs/data20261019/mirt_lineageprior_lineagebm
+$P 4_diagnostics/diagnose_chains.py --trace $T --write-tables  19.79s user 1.73s system 96% cpu 22.396 total

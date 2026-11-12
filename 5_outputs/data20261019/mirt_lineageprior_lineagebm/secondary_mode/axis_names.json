@@ -1,0 +1,66 @@
+{
+  "confirmed": false,
+  "how": "Read the loadings (loadings_per_axis figure, mirt_loadings.csv), give each axis a short title (title_fr for the French renders) and 2-3 signature benchmarks among its top benchmarks, then set confirmed to true. Figures title the axes 'Axis k' until then.",
+  "axes": {
+    "axis1": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "MATH Level 5",
+        "AudioMultiChallenge",
+        "CritPt",
+        "ARC-AGI",
+        "ARC-AGI-2",
+        "LAB-Bench SeqQA",
+        "GPQA Diamond Chemistry"
+      ]
+    },
+    "axis2": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "GSM8K",
+        "SimpleQA Verified",
+        "GeoBench",
+        "WMDP Chemistry",
+        "MMLU Biology",
+        "LAB-Bench Protocol",
+        "MMLU",
+        "MMLU Chemistry"
+      ]
+    },
+    "axis3": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "CyScenarioBench",
+        "CyberGym",
+        "Furniture Assembly",
+        "GBAEval",
+        "ExploitBench",
+        "AISI Cyber Ranges - Cooling Tower",
+        "Lech Mazur Writing",
+        "Cybench"
+      ]
+    },
+    "axis4": {
+      "title": null,
+      "title_fr": null,
+      "signature": [],
+      "top_benchmarks": [
+        "DeepResearch Bench",
+        "APEX-Agents",
+        "PostTrainBench v1.1",
+        "SWE Atlas",
+        "TriviaQA",
+        "OSWorld",
+        "CTI-REALM",
+        "MirrorCode"
+      ]
+    }
+  }
+}

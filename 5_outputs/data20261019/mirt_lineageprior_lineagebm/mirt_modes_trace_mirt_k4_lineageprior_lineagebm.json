@@ -142,5 +142,28 @@
    "delta_logp": -29.0,
    "matched_corr_to_best": 0.5
   }
- ]
+ ],
+ "secondary_chains": {
+  "chains": [
+   0,
+   3,
+   5,
+   10,
+   13,
+   14,
+   21,
+   23,
+   24,
+   26,
+   30,
+   32,
+   35,
+   39,
+   40,
+   42,
+   45,
+   46
+  ],
+  "why": "mode C (18 / 50 chains, -21.3 nats below A), the second-largest mode, kept beside the primary mode A (24 / 50). Its axes are not mode A's (best match r 0.89 / 0.76 / 0.92 / 0.81), so it is read on its own frame, secondary_mode/ (user, 2026-11-12)"
+ }
 }

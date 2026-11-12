@@ -1,0 +1,13 @@
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+  display axis -> subset column: 1->1 (r +1.00), 2->2 (r +1.00), 3->3 (r +1.00), 4->4 (r +1.00)
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+axis match below 0.8 (display axis -> subset column [1, 4, 3, 2], r [0.89, 0.76, 0.92, 0.81]); is mirt_loadings.csv on the chains this subset belongs to?
+[[ 0.886  0.554 -0.138 -0.042]
+ [ 0.675 -0.226  0.284  0.765]
+ [-0.032 -0.059  0.915  0.166]
+ [ 0.006  0.808  0.058  0.361]]
+~/miniforge3/envs/pymc_env/bin/python $L/crossings_by_mode.py  35.88s user 2.05s system 93% cpu 40.500 total

@@ -1,0 +1,11 @@
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+quantity  cells  rhat_max  rhat_median rhat_gt_1.01 rhat_gt_1.05  bulk_ess_min  bulk_ess_median  tail_ess_min mode  chains divergences
+     eta   5487     1.268        1.001   421 / 5487    20 / 5487            65            15943           113    A      24 369 / 24000
+       D    107     1.043        1.008     42 / 107      0 / 107           404             3873           578    A      24 369 / 24000
+ sigma_b    107     1.037        1.002     15 / 107      0 / 107           401            12713           280    A      24 369 / 24000
+     eta   5487     1.052        1.001   329 / 5487     1 / 5487           241            12788           263    C      18 407 / 18000
+       D    107     1.034        1.004     19 / 107      0 / 107           381             4867           681    C      18 407 / 18000
+ sigma_b    107     1.059        1.002     14 / 107      1 / 107           208            11376           444    C      18 407 / 18000
+~/miniforge3/envs/pymc_env/bin/python $L/convergence_by_mode.py  184.11s user 26.80s system 74% cpu 4:41.49 total

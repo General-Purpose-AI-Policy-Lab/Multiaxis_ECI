@@ -1,0 +1,109 @@
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 72 below-floor scores up to their benchmark chance floor
+  display axis -> subset column: 1->1 (r +1.00), 2->2 (r +1.00), 3->3 (r +1.00), 4->4 (r +1.00)
+trace_mirt_k4_lineageprior_lineagebm.nc: chains [1, 4, 8, 12, 15, 16, 17, 18, 22, 25, 27, 28, 29, 31, 33, 34, 36, 37, 38, 41, 44, 47, 48, 49]; axes {'axis1': 'Axis 1: Scientific Knowledge & Reasoning', 'axis2': 'Axis 2: Agentic Capabilities & Programming', 'axis3': 'Axis 3: Cyber Capabilities', 'axis4': 'Axis 4: Commonsense & Factual Knowledge'}
+   score view: 5588 obs, 107 benchmarks, 988 models
+   isolated families: dropped 101 obs of 101 test-takers in 97 families seen on one benchmark only; 887 models remain
+  floors (default; --no-floors opts out): fixed-c 3PL; clipped 75 below-floor scores up to their benchmark chance floor
+
+axis1: Scientific Knowledge & Reasoning
+  secondary (judged yes or forced, not dominant here): ['InterCode-CTF', 'LAB-Bench Cloning', 'LAB-Bench Protocol', 'METR Time Horizons', 'MMLU']
+  convergence {'rhat': 1.01, 'ess_bulk': 576.0, 'ess_tail': 576.0, 'divergences': 0, 'n_scores': 31}
+   * Average Human                      [-2.161, -1.846, -1.63]
+   * Skilled Generalist                 [-0.295, -0.223, -0.154]
+   * Domain Expert                      [0.964, 1.035, 1.108]
+   * Committee of Domain Experts        [1.385, 1.505, 1.623]
+     Top Performer                      [2.182, 3.334, 5.284]
+   * Committee of Average Humans        [-1.674, -0.804, 0.298]
+   * Committee of Skilled Generalists   [-0.049, 0.639, 1.304]
+   * High School Qualifier              [0.585, 0.703, 0.822]
+   * High School Top Performer          [1.642, 1.922, 2.28]
+     Domain Expert                  BioLP-bench                  observed 0.38 predicted 0.41 [0.38, 0.45]  first model at the score: 2025-04
+     Domain Expert                  DTBench                      observed 0.99 predicted 0.81 [0.80, 0.83]  first model at the score: 2026-09
+     Committee of Domain Experts    FrontierMath Tiers 1-3 v2    observed 0.35 predicted 0.54 [0.47, 0.60]  first model at the score: 2025-04
+     Domain Expert                  GPQA Diamond                 observed 0.70 predicted 0.80 [0.79, 0.82]  first model at the score: 2024-12
+     Skilled Generalist             GPQA Diamond                 observed 0.25 predicted 0.39 [0.37, 0.41]  first model at the score: 2023-03
+     Domain Expert                  GPQA Diamond Biology         at least 0.83 predicted 0.72 [0.70, 0.73]  first model at the score: 2026-04
+     Skilled Generalist             GPQA Diamond Biology         observed 0.25 predicted 0.50 [0.49, 0.52]  first model at the score: 2023-06
+     Domain Expert                  GPQA Diamond Chemistry       observed 0.83 predicted 0.70 [0.67, 0.72]  first model at the score: 2026-09
+     Skilled Generalist             GPQA Diamond Chemistry       observed 0.25 predicted 0.33 [0.32, 0.34]  first model at the score: 2023-06
+     Domain Expert                  GPQA Main Biology            observed 0.67 predicted 0.78 [0.77, 0.79]  first model at the score: 2024-04
+     Skilled Generalist             GPQA Main Biology            observed 0.43 predicted 0.51 [0.49, 0.52]  first model at the score: 2023-12
+     Domain Expert                  GPQA Main Chemistry          observed 0.72 predicted 0.68 [0.66, 0.71]  first model at the score: 2026-02
+     Skilled Generalist             GPQA Main Chemistry          observed 0.31 predicted 0.31 [0.30, 0.32]  first model at the score: 2023-06
+     Skilled Generalist             GSM8K                        at least 0.97 predicted 0.72 [0.69, 0.75]  first model at the score: none yet
+     Domain Expert                  InterCode-CTF                observed 0.96 predicted 0.93 [0.92, 0.94]  first model at the score: 2025-04
+     Domain Expert                  LAB-Bench Cloning            observed 0.60 predicted 0.54 [0.52, 0.56]  first model at the score: 2025-02
+     Domain Expert                  LAB-Bench LitQA2             observed 0.70 predicted 0.45 [0.44, 0.46]  first model at the score: none yet
+     Domain Expert                  LAB-Bench Protocol           observed 0.79 predicted 0.72 [0.70, 0.74]  first model at the score: 2026-10
+     Domain Expert                  LAB-Bench SeqQA              observed 0.78 predicted 0.72 [0.71, 0.73]  first model at the score: 2025-04
+     Domain Expert                  MATH Level 5                 observed 0.90 predicted 0.96 [0.95, 0.96]  first model at the score: 2024-12
+     Skilled Generalist             MATH Level 5                 observed 0.40 predicted 0.41 [0.36, 0.46]  first model at the score: 2023-11
+     Committee of Domain Experts    METR Time Horizons           observed 0.83 predicted 0.74 [0.72, 0.76]  first model at the score: 2026-04
+     Average Human                  MMLU                         observed 0.34 predicted 0.34 [0.31, 0.38]  first model at the score: 2021-12
+     High School Top Performer      MMLU                         observed 0.90 predicted 0.94 [0.94, 0.95]  first model at the score: 2024-12
+     High School Top Performer      MMLU Biology                 at least 0.90 predicted 0.83 [0.81, 0.85]  first model at the score: none yet
+     High School Top Performer      MMLU Chemistry               observed 0.90 predicted 0.86 [0.83, 0.88]  first model at the score: none yet
+     High School Qualifier          OTIS Mock AIME 2024-2025     observed 0.53 predicted 0.53 [0.44, 0.62]  first model at the score: 2024-12
+     High School Top Performer      OTIS Mock AIME 2024-2025     observed 0.93 predicted 0.98 [0.96, 0.99]  first model at the score: 2025-12
+     Average Human                  VPCT                         at least 1.00 predicted 0.33 [0.33, 0.33]  first model at the score: none yet
+     Domain Expert                  WMDP Biology                 observed 0.60 predicted 0.87 [0.86, 0.87]  first model at the score: 2023-06
+     Domain Expert                  WMDP Chemistry               observed 0.43 predicted 0.78 [0.77, 0.78]  first model at the score: 2023-06
+
+axis2: Agentic Capabilities & Programming
+  secondary (judged yes or forced, not dominant here): ['Cybench', 'EBR-bench']
+  convergence {'rhat': 1.0, 'ess_bulk': 698.0, 'ess_tail': 978.0, 'divergences': 0, 'n_scores': 6}
+   * Average Human                      [1.217, 1.426, 1.585]
+   * Skilled Generalist                 [1.402, 1.536, 1.664]
+   * Domain Expert                      [1.514, 1.632, 1.756]
+   * Committee of Domain Experts        [1.722, 1.874, 2.049]
+   > Top Performer                      [4.519, 5.636, 7.42]
+   * Committee of Average Humans        [1.368, 1.58, 1.771]
+   * Committee of Skilled Generalists   [1.565, 1.738, 1.93]
+     High School Qualifier              [-3.555, -0.061, 1.359]
+     High School Top Performer          [-2.195, 2.127, 4.675]
+     Committee of Domain Experts    Cybench                      observed 0.75 predicted 0.93 [0.90, 0.95]  first model at the score: 2025-11
+     Average Human                  EBR-bench                    observed 0.53 predicted 0.12 [0.10, 0.15]  first model at the score: 2026-09
+     Top Performer                  EBR-bench                    at least 1.00 predicted 0.99 [0.93, 1.00]  first model at the score: none yet
+     Committee of Domain Experts    METR Time Horizons           observed 0.83 predicted 0.80 [0.77, 0.82]  first model at the score: 2026-04
+     Skilled Generalist             OSWorld                      observed 0.72 predicted 0.70 [0.65, 0.75]  first model at the score: none yet
+     Domain Expert                  The Agent Company            observed 0.75 predicted 0.78 [0.74, 0.81]  first model at the score: none yet
+
+axis3: Cyber Capabilities
+  convergence {'rhat': 1.0, 'ess_bulk': 1321.0, 'ess_tail': 1177.0, 'divergences': 0, 'n_scores': 1}
+     Average Human                      [-6.161, -3.794, -1.981]
+     Skilled Generalist                 [-4.944, -2.509, -0.791]
+     Domain Expert                      [-1.837, -0.342, 0.495]
+   * Committee of Domain Experts        [0.504, 0.689, 0.898]
+     Top Performer                      [-0.421, 1.539, 4.125]
+     Committee of Average Humans        [-4.881, -2.494, -0.66]
+     Committee of Skilled Generalists   [-3.022, -0.725, 0.439]
+     High School Qualifier              [-4.833, -2.059, -0.402]
+     High School Top Performer          [-3.524, -0.585, 1.843]
+     Committee of Domain Experts    Cybench                      observed 0.75 predicted 0.76 [0.66, 0.85]  first model at the score: 2025-11
+
+axis4: Commonsense & Factual Knowledge
+  secondary (judged yes or forced, not dominant here): ['BlueprintBench 2', 'GSM8K', 'TriviaQA']
+  convergence {'rhat': 1.0, 'ess_bulk': 2565.0, 'ess_tail': 1031.0, 'divergences': 0, 'n_scores': 9}
+   * Average Human                      [1.569, 1.719, 1.885]
+   * Skilled Generalist                 [2.294, 2.792, 3.357]
+     Domain Expert                      [3.077, 4.494, 6.752]
+     Committee of Domain Experts        [4.773, 6.617, 9.126]
+   > Top Performer                      [4.251, 6.348, 9.163]
+   * Committee of Average Humans        [1.994, 2.661, 3.832]
+   * Committee of Skilled Generalists   [3.431, 4.313, 5.6]
+     High School Qualifier              [-3.739, 0.109, 3.925]
+     High School Top Performer          [-2.492, 1.661, 5.904]
+     Skilled Generalist             BlueprintBench 2             observed 0.59 predicted 0.59 [0.42, 0.75]  first model at the score: none yet
+     Skilled Generalist             GSM8K                        at least 0.97 predicted 0.98 [0.98, 0.98]  first model at the score: none yet
+     Committee of Average Humans    HellaSwag                    observed 0.96 predicted 0.96 [0.95, 0.97]  first model at the score: none yet
+     Average Human                  OpenBookQA                   observed 0.92 predicted 0.95 [0.95, 0.96]  first model at the score: none yet
+     Committee of Skilled Generalists PIQA                         observed 0.95 predicted 0.95 [0.94, 0.96]  first model at the score: none yet
+     Average Human                  SimpleBench                  observed 0.84 predicted 0.82 [0.78, 0.87]  first model at the score: none yet
+     Top Performer                  SimpleBench                  at least 0.95 predicted 0.97 [0.97, 0.97]  first model at the score: none yet
+     Average Human                  TriviaQA                     observed 0.80 predicted 0.91 [0.91, 0.91]  first model at the score: 2022-04
+     Committee of Average Humans    WinoGrande                   at least 0.94 predicted 0.96 [0.94, 0.96]  first model at the score: none yet
+
+wrote mirt_lineageprior_lineagebm/human_placement.json and human_placement_draws.npz
+$P 4_diagnostics/5_place_humans.py  97.45s user 4.63s system 133% cpu 1:16.56 total
