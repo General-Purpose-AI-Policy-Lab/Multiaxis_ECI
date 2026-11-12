@@ -3,8 +3,8 @@
 Each panel is built by the repo's own builder (viz.dashboard.forecast_figures: the dashboard's and
 the per-fit folders' panel, same frontier rule, same placement), on the mode's own frame and axis
 names, then restyled to ../PLOTLY_STYLE_GUIDE.md: no title, the "clean" template, the palette, the
-final size. Writes fig1_axis{k}_modeA and fig6_axis{k}_modeC (.pdf and .png) beside this file; the
-last panel of each figure carries the x title and the legend.
+final size. Writes fig1_axis{k}_modeA and fig6_axis{k}_modeC (.pdf and .png) beside this file. Every
+panel carries its own x title and legend, so it reads alone.
 
     python 6_writeups/preprint/figures/fig1_fig6_frontier_panels.py
 """
@@ -33,7 +33,7 @@ from style import BG, INK, LIGHT, MID, PALETTE, TINTS, ZOOM, save  # noqa: E402
 # The builder's colours, by role: both regimes' frontier points, trend and band take one palette
 # colour each (a trend takes the colour of the series it fits); the other models are a third series.
 ROLE = {(192, 80, 77): 0, (255, 149, 0): 0, (128, 100, 162): 1, (32, 163, 158): 2}
-PANEL_H, LAST_EXTRA, LABEL_PX = round(290 * ZOOM), 70, 10   # canvas px; a panel prints 290 px tall
+PANEL_H, LEGEND_H, LABEL_PX = round(290 * ZOOM), 92, 10   # canvas px; the plot part prints 290 px tall
 
 
 def role(color):
@@ -49,7 +49,7 @@ def role(color):
 
 # ponytail: the figure is recoloured after the build. If a second document needs this look, move
 # the palette into viz.style.FigureStyle and let the builder read it.
-def restyle(fig, label, last, panel_h=PANEL_H, cloud_px=5):
+def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
     """The builder's standalone panel in the guide's style. `label` names the axis above the plot."""
     legend_lines = [t for t in fig.data if t.x is not None and len(t.x) == 1 and t.x[0] is None
                     and t.mode == "lines"]
@@ -77,7 +77,7 @@ def restyle(fig, label, last, panel_h=PANEL_H, cloud_px=5):
         s.update(opacity=1, layer="below", line=dict(color=MID, width=0.7, dash=s.line.dash))
     for a in fig.layout.annotations:
         a.font = dict(size=LABEL_PX if a.xref == "paper" else 9.5, color=MID)
-    height = panel_h + (LAST_EXTRA if last else 0)
+    height = panel_h + LEGEND_H
     if tiers:
         # Names respread for this panel's height and type size (the builder spread them for its own).
         assert len(tiers) == len(lines), "tier names and tier lines do not pair up"
@@ -90,18 +90,21 @@ def restyle(fig, label, last, panel_h=PANEL_H, cloud_px=5):
             if abs(y - level) > 0.25 * gap:
                 fig.add_shape(type="line", xref="paper", yref="y", x0=1.0, y0=level, x1=1.01, y1=y,
                               line=dict(color=MID, width=0.5))
+    if tiers:                                                  # the grey lines, in the legend too
+        fig.add_scatter(x=[None], y=[None], mode="lines", line=dict(color=MID, width=0.7),
+                        name="Human baseline (named at right)", hoverinfo="skip")
     fig.add_annotation(text=f"<b>{label}</b>", xref="paper", yref="paper", x=0, y=1, xanchor="left",
                        yanchor="bottom", yshift=4, font=dict(size=12, color=INK))
     longest = max((len(a.text) for a in tiers), default=0)
     fig.update_layout(
         template="clean", title=None, font=dict(family="Arial, sans-serif", size=9.5, color=INK),
-        width=None, height=None, showlegend=last,
+        width=None, height=None, showlegend=True,
         legend=dict(orientation="h", x=0, xanchor="left", y=-62 / (panel_h - 50), yanchor="top", font=dict(size=10, color=INK),
                     bgcolor="rgba(0,0,0,0)", borderwidth=0, traceorder="normal"),
         margin=dict(l=4, r=14 + int(0.56 * LABEL_PX * longest), t=24, b=4))
     fig.update_xaxes(showline=True, linecolor=INK, linewidth=1, ticks="outside", tickcolor=INK, ticklen=4,
                      showgrid=False, tickfont=dict(size=12, color=INK),
-                     title=dict(text="Release date" if last else None, font=dict(size=12, weight=500)))
+                     title=dict(text="Release date", font=dict(size=12, weight=500)))
     fig.update_yaxes(showline=False, ticks="", showgrid=True, gridcolor=LIGHT, gridwidth=0.7,
                      tickfont=dict(size=12, color=INK),
                      title=dict(text="Ability (fitted scale)", font=dict(size=12, weight=500)))
@@ -132,6 +135,6 @@ if __name__ == "__main__":
     for fig_no, mode in ((1, "A"), (6, "C")):
         panels, labels, n_chains = build(mode)
         for k, (fig, label) in enumerate(zip(panels, labels), start=1):
-            fig, height = restyle(fig, label, last=k == len(panels))
+            fig, height = restyle(fig, label)
             save(fig, HERE / f"fig{fig_no}_axis{k}_mode{mode}", height / ZOOM)
             print(f"mode {mode} ({n_chains} chains), axis {k}: prints {height / ZOOM:.0f} px tall")
