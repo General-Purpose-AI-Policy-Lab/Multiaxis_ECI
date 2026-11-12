@@ -47,6 +47,7 @@ trace_mirt_k4_lineageprior_lineagebm.nc):
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -140,24 +141,26 @@ def _chain_logp(idata):
 
 
 def _match_corr(ref, other):
-    """Min over axes of the greedily permutation/sign-matched |corr| between two
-    chains' mean loading matrices, each (bench, K) — the 'same solution?' score.
-    1.0 for K=1, where there is nothing to match."""
+    """Min over axes of the permutation/sign-matched |corr| between two chains' mean
+    loading matrices, each (bench, K) — the 'same solution?' score. 1.0 for K=1,
+    where there is nothing to match.
+
+    The permutation is the one that maximises that min, searched exhaustively for
+    K <= 6 (720 orders), so the score is symmetric in its two arguments and never
+    understates a match. A greedy axis-by-axis pick is neither: the first axis can
+    take the column a later axis needs (on the 50-chain K=4 flagship it understated
+    207 / 1,225 chain pairs, by up to 0.66). Above K=6 the Hungarian assignment on
+    the summed |corr| stands in."""
     K = ref.shape[1]
     if K == 1:
         return 1.0
-    used, corrs = set(), []
-    for ja in range(K):
-        best = (-1.0, None)
-        for jb in range(K):
-            if jb in used:
-                continue
-            r = abs(np.corrcoef(ref[:, ja], other[:, jb])[0, 1])
-            if r > best[0]:
-                best = (r, jb)
-        used.add(best[1])
-        corrs.append(best[0])
-    return min(corrs)
+    C = np.abs(np.corrcoef(ref.T, other.T)[:K, K:])     # ref axis x other axis
+    if K <= 6:
+        perms = np.array(list(itertools.permutations(range(K))))
+        return float(C[np.arange(K), perms].min(1).max())
+    from scipy.optimize import linear_sum_assignment
+    row, col = linear_sum_assignment(-C)
+    return float(C[row, col].min())
 
 
 def _match_to_ref(post, ref_chain: int):

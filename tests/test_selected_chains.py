@@ -158,3 +158,13 @@ def test_the_forecast_only_view_is_the_cards(tmp_path, monkeypatch):
     out, titles = fo.card_view({"spec": spec, "drop_chains": [0, 3]}, None)
     assert calls == [("open", [1, 2, 4, 5]), ("align", "mirt_loadings.csv"), ("titles",)]
     assert out is view and titles == {"axis1": "T"}
+
+
+def test_axis_matching_takes_the_best_permutation():
+    """Axis 1 of `ref` correlates best with column 2 of `other`, but axis 2 needs column 2 more:
+    an axis-by-axis greedy pick scores the pair 0.244, the best permutation 0.816, either way round."""
+    dc = load("4_diagnostics/diagnose_chains.py")
+    ref = np.array([[1, 2], [2, 0], [2, 1], [0, 2], [0, 1]], float)
+    other = np.array([[1, 2], [0, 0], [0, 1], [1, 3], [3, 2]], float)
+    assert round(dc._match_corr(ref, other), 3) == round(dc._match_corr(other, ref), 3) == 0.816
+    assert dc._match_corr(ref, ref[:, ::-1]) == 1.0
