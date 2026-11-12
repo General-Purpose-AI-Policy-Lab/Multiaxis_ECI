@@ -222,7 +222,7 @@ PRIOR_COMP_OFFSET_SD = 1.0
 # scales are tunable: the drift mean, the regression tolerance, and the offset.
 PRIOR_LINEAGE_DRIFT  = 0.3    # scale of the positive per-step drift mean mu[k]
 PRIOR_LINEAGE_DELTA  = 1.0    # scale of the per-step regression tolerance s[k]
-PRIOR_LINEAGE_OFFSET = 0.25   # tight scale of the per-axis variant-offset sd tau_o[k]
+PRIOR_LINEAGE_OFFSET = 0.25   # tight scale of the variant-offset sd tau_o, one scalar for all axes
 # Reasoning-off variants (effort:none) get their own offset scale: one shared tau_o (learned
 # 0.22) pulled a reasoning-off run scored once toward its release by up to 20 ECI-H points,
 # where turning reasoning off can cost much more than a lower effort does (user, 2026-10-02).

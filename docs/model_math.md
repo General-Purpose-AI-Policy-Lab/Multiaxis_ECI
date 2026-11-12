@@ -369,6 +369,12 @@ criterion moved into the prior. Axis identity is structural ($g$ is column 1),
 so nothing is rotated downstream; a specific the data does not need collapses
 to an empty column. Mutually exclusive with anchors; needs $K \ge 2$.
 
+**`--general-sums` (with `"bifactor"`).** The reported axes are a general level and sums on
+it: axis 1 is $g$, and axis $k = 2..K$ is $\theta_k = g + \sigma_k z_k$, with
+$\sigma_k \sim \mathrm{LogNormal}(0, 0.5)$ learned (`config.PRIOR_GENERAL_SUMS_SD`, median 1).
+Every $\theta$ block is built in $(g, z)$ coordinates, so each axis $k \ge 2$ climbs with $g$.
+The fit names its axes `g` and `g+specific1` to `g+specific{K-1}` (tag `_gsum`).
+
 ### 5.4 Abilities $\theta_{m,k}$
 
 **Default (canonical + most fits):** a zero-sum normal per axis, over models:
@@ -485,7 +491,7 @@ compensatory one on the models' scores.
 successors), improvement is the *mean* step but a node may regress:
 
 $$
-\psi_{\text{founder},k} \sim \mathcal{N}(0,1),
+\psi_{\text{founder},k} = \theta^{\text{block}}_{f,k},
 \qquad
 \text{step: } \Delta_{e,k} = \mu_k + s_k\,z_{e,k},
 $$
@@ -506,6 +512,7 @@ $$
 | Symbol | Meaning |
 |---|---|
 | $\psi_{\text{node},k}$ | chain ability of a release node on axis $k$. |
+| $\theta^{\text{block}}_{f,k}$ | the founder's row of the shared exchangeable block: the ZeroSumNormal above, or the skew-normal block in the K-axis fits. Founders and unstructured models are one population. `--private-bases` gives each founder a private $\mathcal N(0,1)$ instead. |
 | $\mu_k$ | positive **drift** — the mean per-step improvement (`PRIOR_LINEAGE_DRIFT=0.3`). |
 | $s_k$ | per-step **regression tolerance**: a step can be negative (`PRIOR_LINEAGE_DELTA=1.0`). |
 | $\tau_o$ | tight scale of the per-variant offset $o$ (`PRIOR_LINEAGE_OFFSET=0.25`). Reasoning-off variants (`effort:none`) have a scale of their own, $\tau_{\text{none}} \sim \text{HalfNormal}(1)$ (`PRIOR_LINEAGE_OFFSET_NONE`), since turning reasoning off can cost far more than a lower effort. |
@@ -659,7 +666,11 @@ medians ($\hat A$, $\hat D$, $\hat\phi$), on axis $k$:
 
 - **Benchmarks.** $\mathcal B_k = \{\,b : k = \arg\max_j \hat A_{b,j}^2\,\}$, the benchmarks
   whose largest share of loading variance is on $k$, minus the pairs judged off-topic for the
-  axis's name in `1_curated/human_axis_content.csv`.
+  axis's name in `1_curated/human_axis_content.csv`. A benchmark dominant on another
+  axis also counts on $k$ when $k$ carries at least `SECONDARY_SHARE_MIN` = 0.2 of its loading variance,
+  $\hat A_{b,k}^2 / \sum_j \hat A_{b,j}^2 \ge 0.2$, when the content file judges that pair `yes`.
+  An unjudged secondary pair is listed and not used. A pair marked `force` counts whatever its
+  share, if its loading on $k$ is positive.
 - **Other axes.** A tier's abilities off $k$ are those of a typical model at the same ability on
   $k$: a least-squares line over the models' posterior medians,
   $\theta_{j} \approx \alpha_j + \gamma_j\,\theta_k$ for $j\neq k$. Benchmark $b$ then sees the

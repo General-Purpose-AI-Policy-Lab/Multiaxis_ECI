@@ -127,7 +127,7 @@ The forecast (`config.FORECAST_KW`, `analysis.regimes`, user decisions 2026-09-1
 
 Two figures per axis, added by `--forecast` on the CLI and by
 `"forecast": True` on a dashboard entry. Gated on K > 1, the compensatory
-family, and human tiers being in the fit.
+family, and human tiers, in the fit or placed beside it (`human_placement.json`).
 
 | key | what it shows |
 |---|---|
@@ -205,9 +205,9 @@ shows.
   than the sweep.
 - `analysis.open_flagship()` is the flagship reader every downstream script
   uses, and `analysis.FLAGSHIP_TRACE` is the one path any of them names. It
-  defaults to `FLAGSHIP_CHAINS` and `FLAGSHIP_THIN` (10). `FLAGSHIP_CHAINS` is
+  defaults to `FLAGSHIP_CHAINS` and `FLAGSHIP_THIN` (1). `FLAGSHIP_CHAINS` is
   `"best"`: the modes file's `selected_chains` when it carries one (a subset
-  chosen on other evidence, with its reason; the flagship's is {2, 4, 5}, the
-  converged sub-group of its best mode), else its best-log-density mode
+  chosen on other evidence, with its reason; the current flagship's modes file
+  carries none), else its best-log-density mode
   (`best_mode_chains`), every chain when there is one mode. A caller passes `chains=None` on purpose
   to read every chain of a multimodal flagship.

@@ -12,8 +12,9 @@ all-benchmarks level onto every class, the difference the scopes are compared fo
 closed labs' non-frontier models may be tuned to some benchmarks and not others, so they would
 bend the scale of the class they do well in.
 
-Frontier of a group: the running maximum of posterior-median ECI-H over the group's candidates
-by release date (`regimes.frontier_topk` with k = 1), one effort per family, the best on the
+Frontier of a group: the running top two of posterior-median ECI-H over the group's candidates
+by release date (`regimes.frontier_topk` with k = `FRONTIER_K` = 2, the records and their
+runners-up; k = 1 gives the running maximum alone), one effort per family, the best on the
 axis (`regimes.family_best`), one release per organization and day (`regimes.one_per_org_day`)
 and one record at most per day, the candidates being those of the timelines
 (`timelines.candidate_mask`: dated, not a human tier, evaluated on the axis), with at least two
