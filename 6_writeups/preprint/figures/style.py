@@ -74,10 +74,18 @@ def label_line_ends(fig):
     fig.update_layout(showlegend=False, margin_r=10 + 6 * max(len(t.name) for _, t in named))
 
 
-W = round(160 * 96 / 25.4)   # full text width in px: 160 mm at 96 px per inch
+W = round(160 * 96 / 25.4)   # the paper's text width in px: 160 mm at 96 px per inch
+# The canvas is ZOOM times the print size, type and marks staying at the guide's px sizes, and the
+# PDF is inserted at the text width. Type then prints 1 / ZOOM as large (ticks 9.2 px, 6.9 pt): the
+# room the dashboard's figures have. At ZOOM = 1 (the guide's print sizes, ticks 9 pt) the text and
+# the markers took 1.4 times more of the canvas than in those figures (Yassine, 2026-11-12:
+# "compressed"). One factor for every figure, so a role keeps one size across the paper.
+ZOOM = 1.3
 
 
 def save(fig, path, height, width=W):
-    """Write `path`.pdf (vector, final size) and `path`.png (preview, twice the pixels)."""
-    fig.write_image(f"{path}.pdf", width=width, height=height)
-    fig.write_image(f"{path}.png", width=width, height=height, scale=2)
+    """Write `path`.pdf (vector) and `path`.png (preview). `height` and `width` are print sizes
+    in px (W is the full text width); the canvas is ZOOM times larger."""
+    size = dict(width=round(width * ZOOM), height=round(height * ZOOM))
+    fig.write_image(f"{path}.pdf", **size)
+    fig.write_image(f"{path}.png", scale=2, **size)

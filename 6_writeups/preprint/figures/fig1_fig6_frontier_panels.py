@@ -28,12 +28,12 @@ from multiaxis_eci.analysis import (  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.viz.dashboard import forecast_figures  # noqa: E402
 from multiaxis_eci.viz.forecast import _spread_labels  # noqa: E402
-from style import BG, INK, LIGHT, MID, PALETTE, TINTS, save  # noqa: E402
+from style import BG, INK, LIGHT, MID, PALETTE, TINTS, ZOOM, save  # noqa: E402
 
 # The builder's colours, by role: both regimes' frontier points, trend and band take one palette
 # colour each (a trend takes the colour of the series it fits); the other models are a third series.
 ROLE = {(192, 80, 77): 0, (255, 149, 0): 0, (128, 100, 162): 1, (32, 163, 158): 2}
-PANEL_H, LAST_EXTRA, LABEL_PX = 235, 70, 10
+PANEL_H, LAST_EXTRA, LABEL_PX = round(290 * ZOOM), 70, 10   # canvas px; a panel prints 290 px tall
 
 
 def role(color):
@@ -49,7 +49,7 @@ def role(color):
 
 # ponytail: the figure is recoloured after the build. If a second document needs this look, move
 # the palette into viz.style.FigureStyle and let the builder read it.
-def restyle(fig, label, last):
+def restyle(fig, label, last, panel_h=PANEL_H, cloud_px=5):
     """The builder's standalone panel in the guide's style. `label` names the axis above the plot."""
     legend_lines = [t for t in fig.data if t.x is not None and len(t.x) == 1 and t.x[0] is None
                     and t.mode == "lines"]
@@ -66,7 +66,7 @@ def restyle(fig, label, last):
         elif t.mode == "markers":
             i = role(t.marker.color)
             cloud = i == 2
-            t.marker.update(color=TINTS[i] if cloud else PALETTE[i], size=5 if cloud else 7,
+            t.marker.update(color=TINTS[i] if cloud else PALETTE[i], size=cloud_px if cloud else 7,
                             opacity=1, line=dict(width=0.5 if cloud else 1, color=BG))
             if t.error_y.array is not None:
                 t.error_y.update(color=PALETTE[i], thickness=0.8, width=0)
@@ -77,12 +77,12 @@ def restyle(fig, label, last):
         s.update(opacity=1, layer="below", line=dict(color=MID, width=0.7, dash=s.line.dash))
     for a in fig.layout.annotations:
         a.font = dict(size=LABEL_PX if a.xref == "paper" else 9.5, color=MID)
-    height = PANEL_H + (LAST_EXTRA if last else 0)
+    height = panel_h + (LAST_EXTRA if last else 0)
     if tiers:
         # Names respread for this panel's height and type size (the builder spread them for its own).
         assert len(tiers) == len(lines), "tier names and tier lines do not pair up"
         lo, hi = fig.layout.yaxis.range
-        gap = 1.3 * LABEL_PX / (PANEL_H - 50) * (hi - lo)
+        gap = 1.3 * LABEL_PX / (panel_h - 50) * (hi - lo)
         levels = np.array([s.y0 for s in lines], dtype=float)
         for a, level, y in zip(tiers, levels, _spread_labels(levels, gap, lo + 0.02 * (hi - lo),
                                                              hi - 0.02 * (hi - lo))):
@@ -96,7 +96,7 @@ def restyle(fig, label, last):
     fig.update_layout(
         template="clean", title=None, font=dict(family="Arial, sans-serif", size=9.5, color=INK),
         width=None, height=None, showlegend=last,
-        legend=dict(orientation="h", x=0, xanchor="left", y=-0.32, yanchor="top", font=dict(size=10, color=INK),
+        legend=dict(orientation="h", x=0, xanchor="left", y=-62 / (panel_h - 50), yanchor="top", font=dict(size=10, color=INK),
                     bgcolor="rgba(0,0,0,0)", borderwidth=0, traceorder="normal"),
         margin=dict(l=4, r=14 + int(0.56 * LABEL_PX * longest), t=24, b=4))
     fig.update_xaxes(showline=True, linecolor=INK, linewidth=1, ticks="outside", tickcolor=INK, ticklen=4,
@@ -108,23 +108,30 @@ def restyle(fig, label, last):
     return fig, height
 
 
-trace, fit = FLAGSHIP_TRACE, FLAGSHIP_TRACE.parent
-with xr.open_dataset(trace, group="posterior") as post:
-    spec = FitSpec.from_trace(az.InferenceData(posterior=post.isel(draw=slice(0, 1))), trace)
-raw = pd.read_csv(PROCESSED_FILE)
-for fig_no, mode, chains, frame in ((1, "A", best_mode_chains(trace), fit),
-                                    (6, "C", secondary_mode_chains(trace), secondary_frame_dir(trace))):
+def build(mode):
+    """The builder's own trend panels of a mode ('A' or 'C'), in axis order, with the axis titles."""
+    trace, fit = FLAGSHIP_TRACE, FLAGSHIP_TRACE.parent
+    chains, frame = ((best_mode_chains(trace), fit) if mode == "A"
+                     else (secondary_mode_chains(trace), secondary_frame_dir(trace)))
+    with xr.open_dataset(trace, group="posterior") as post:
+        spec = FitSpec.from_trace(az.InferenceData(posterior=post.isel(draw=slice(0, 1))), trace)
     idata = spec.open_posterior(keep=("A", "theta", "tau_A", "D", "phi_b", "alpha", "ceiling_d"),
                                 path=trace, chains=chains)
     data, _, _ = spec.load_data(idata)
     view = align_to_reference_loadings(prepare_fit(idata, data), data, frame / "mirt_loadings.csv")
     view = attach_placement(view, frame)
     titles = load_axis_titles(frame, view, data)
-    figs = {k: f for k, f in forecast_figures(view, data, raw, view.names, view.theta,
-                                              axis_titles=titles).items() if not k.endswith("_when")}
+    figs = {k: f for k, f in forecast_figures(view, data, pd.read_csv(PROCESSED_FILE), view.names,
+                                              view.theta, axis_titles=titles).items()
+            if not k.endswith("_when")}
     assert len(figs) == view.K, f"mode {mode}: {len(figs)} trend panels for {view.K} axes"
-    for k, (key, fig) in enumerate(sorted(figs.items()), start=1):
-        fig, height = restyle(fig, titles.get(view.names[k - 1], view.names[k - 1]), last=k == view.K)
-        save(fig, HERE / f"fig{fig_no}_axis{k}_mode{mode}", height)
-        print(f"mode {mode} ({len(chains)} chains), axis {k}: {key}, {height} px")
-    del idata, view
+    return [figs[k] for k in sorted(figs)], [titles.get(n, n) for n in view.names], len(chains)
+
+
+if __name__ == "__main__":
+    for fig_no, mode in ((1, "A"), (6, "C")):
+        panels, labels, n_chains = build(mode)
+        for k, (fig, label) in enumerate(zip(panels, labels), start=1):
+            fig, height = restyle(fig, label, last=k == len(panels))
+            save(fig, HERE / f"fig{fig_no}_axis{k}_mode{mode}", height / ZOOM)
+            print(f"mode {mode} ({n_chains} chains), axis {k}: prints {height / ZOOM:.0f} px tall")

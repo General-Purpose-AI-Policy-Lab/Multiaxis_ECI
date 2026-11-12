@@ -327,7 +327,10 @@ MMLU Chemistry, SpireClimb); which trace the README's mode numbers describe;
 `PLOTLY_STYLE_GUIDE.md` (Yassine's guide, copied here with its example; the
 template is `figures/style.py`): no title in the figure, 160 mm wide, vector
 PDF with a PNG preview. One script per figure in `figures/`, one per table in
-`tables/`.
+`tables/`. The canvas is 1.3 times the print size (`ZOOM` in `style.py`), so type
+prints at 6.9 pt for ticks and 5.8 pt for labels, below the guide's 9 pt and
+7.5 pt: at the guide's print sizes Yassine found the figures compressed
+against the dashboard's (2026-11-12).
 
 | item | file | state |
 |---|---|---|
@@ -336,7 +339,7 @@ PDF with a PNG preview. One script per figure in `figures/`, one per table in
 | Fig 3 | `fig3_human_scores_single_axis` | done |
 | Fig 4 | `fig4_loadings_modeA`, `fig4_loadings_modeC` | done; top 10 benchmarks per axis by share |
 | Fig 5 | `fig5_benchmark_allocation_modes` | done; the script asserts the counts |
-| Fig 9 | `5_outputs/open_closed_frontier/`, `us_cn_frontier/` | exists in the dashboard's style; guide-style export owed |
+| Fig 9 | `fig9_frontier_gaps` | done; closed against open-weights and US against Chinese models, all benchmarks, from the saved frontier-gap files |
 | appendix | `figB_coverage_matrix`, `figE_predicted_vs_observed`, `figF_epoch_comparison` | done; LOO-PIT of the multi-axis model owed |
 | Table 1 | `tables/table1_data.{csv,md}` | done |
 | Table 2 | `tables/table2_model_comparison.csv` | single-axis against multi-axis done; ceilings row from the upstream robust LOO; bifactor row owed |
