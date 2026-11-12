@@ -2,7 +2,9 @@
 
 Reads the fit's LOO-PIT table (the position of each observed score in its leave-one-out predictive
 distribution) and counts the scores that fall in the bottom or top 5 %, for human rows and for AI
-rows. Writes human_pit.csv (one row per human score) beside this file.
+rows. The table leaves out the scores of exactly 0 or 1 (86 of the fit's 4,410, 2 of them human), so the
+counts are over 38 of the 40 human scores and 4,286 of the 4,370 AI scores. Writes human_pit.csv (one
+row per human score) beside this file.
 
     python 6_writeups/preprint/single_axis/human_pit.py
 """

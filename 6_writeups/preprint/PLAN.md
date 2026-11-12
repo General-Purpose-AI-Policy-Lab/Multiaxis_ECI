@@ -266,7 +266,9 @@ fit stays as the baseline of the model comparison, as the scale of the
 frontier gaps, and for one fact: it mispredicts the human scores. On the fit
 with humans inside, 19 / 38 human scores have a LOO-PIT below 0.05 or above
 0.95, against 360 / 4,286 AI scores; among the scores with Pareto k at most
-0.7, 7 / 22 against 309 / 4,139 (`single_axis/human_pit.py`). The comparison
+0.7, 7 / 22 against 309 / 4,139 (`single_axis/human_pit.py`). The counts leave
+out the scores of exactly 0 or 1: they cover 38 of the fit's 40 human scores
+and 4,286 of its 4,370 AI scores. The comparison
 with Epoch's published index is a reproduction check and goes to the appendix.
 
 The gsum fit is called the bifactor model in the paper and the compensatory
@@ -320,6 +322,55 @@ and on agent-drafted prose; the two model names; content judgments for five
 benchmarks on mode C (GPQA Diamond Biology, GPQA Main Biology, MMLU Biology,
 MMLU Chemistry, SpireClimb); which trace the README's mode numbers describe;
 `git push origin main`.
+
+**State of the two open tracks (2026-11-12, evening).** Every figure follows
+`PLOTLY_STYLE_GUIDE.md` (Yassine's guide, copied here with its example; the
+template is `figures/style.py`): no title in the figure, 160 mm wide, vector
+PDF with a PNG preview. One script per figure in `figures/`, one per table in
+`tables/`.
+
+| item | file | state |
+|---|---|---|
+| Fig 1, Fig 6 | `fig1_axis{1-4}_modeA`, `fig6_axis{1-4}_modeC` (`fig1_fig6_frontier_panels.py`) | done; built by the repo's forecast builder, restyled after the build |
+| Fig 2 | `fig2_model_schematic` | done; the 10 prior constants checked against `config.py` |
+| Fig 3 | `fig3_human_scores_single_axis` | done |
+| Fig 4 | `fig4_loadings_modeA`, `fig4_loadings_modeC` | done; top 10 benchmarks per axis by share |
+| Fig 5 | `fig5_benchmark_allocation_modes` | done; the script asserts the counts |
+| Fig 9 | `5_outputs/open_closed_frontier/`, `us_cn_frontier/` | exists in the dashboard's style; guide-style export owed |
+| appendix | `figB_coverage_matrix`, `figE_predicted_vs_observed`, `figF_epoch_comparison` | done; LOO-PIT of the multi-axis model owed |
+| Table 1 | `tables/table1_data.{csv,md}` | done |
+| Table 2 | `tables/table2_model_comparison.csv` | single-axis against multi-axis done; ceilings row from the upstream robust LOO; bifactor row owed |
+| Table 3 | `tables/table3_baselines_passed.csv` | done for modes A and C; bifactor columns owed |
+
+Numbers these produced.
+
+- Table 2. PSIS-LOO at equal draws (10 chains x 1,000 draws each): the
+  multi-axis model against the single-axis baseline, +1,332 +/- 52 nats on the
+  5,487 scores and +1,073 +/- 38 on the 4,420 scores with Pareto k at most 0.7
+  in both (mode A); +1,295 +/- 52 and +1,040 +/- 37 (mode C). In sample, RMSE
+  0.068 to 0.043 and R2 0.928 to 0.965. The baseline is the K = 1 fit sampled
+  with the flagship: ceilings, no lineage prior.
+- Table 1. 5,487 scores from eight feeds: Epoch ZIP 2,959, Epoch live feed
+  1,146, RAND 565, SEAL 336, Epoch cyber ECI 205, Kaggle 169, own local runs
+  105, Cybench leaderboard 2. 1,481 carry a reported standard error.
+- Comparison with Epoch's index: 260 / 270 of Epoch's rows matched, Spearman
+  0.993, Pearson 0.984. Our index runs higher at the top of the scale (about
+  +13 on the three highest models).
+
+Points for the text, found on the way.
+
+- Table 3 counts the human scores behind each placed baseline. Some baselines
+  are drawn with 0 scores on an axis: they are held between two scored
+  baselines by the order alone (mode C: the Domain Expert on the cyber axis
+  and on the knowledge axis). Their rows need a mark in the paper.
+- The human baselines file is `0_input/human_baselines.csv`, 56 scores. The
+  single-axis fit was run on a 57-row copy (one more: Skilled Generalist on
+  SimpleQA Verified, 0.944).
+- `docs/model_math.md` section 5.1 says a ZeroSumNormal pins the location.
+  Under the skew-normal block the code has no ZeroSumNormal and the pin is
+  soft (its own section 5.4 says so). The schematic follows the code.
+- The trend band on Fig 1 and Fig 6 is the 80 % interval. The level of the
+  whiskers on the frontier points is to check before the caption is written.
 
 ## 1. Where things stand
 

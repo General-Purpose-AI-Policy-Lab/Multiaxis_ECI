@@ -1,0 +1,43 @@
+mode,chains,axis,baseline,human_scores,probability_passed,result,interval_80
+A,24,Scientific Knowledge & Reasoning,Average Human,2,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,Committee of Average Humans,0,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,Skilled Generalist,7,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,Committee of Skilled Generalists,0,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,High School Qualifier,1,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,Domain Expert,15,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,Committee of Domain Experts,2,1.0,passed,
+A,24,Scientific Knowledge & Reasoning,High School Top Performer,4,0.89,2026-03,2025-08 to 2026-09
+A,24,Agentic Capabilities & Programming,Average Human,1,1.0,passed,
+A,24,Agentic Capabilities & Programming,Skilled Generalist,1,1.0,passed,
+A,24,Agentic Capabilities & Programming,Committee of Average Humans,0,1.0,passed,
+A,24,Agentic Capabilities & Programming,Domain Expert,1,1.0,passed,
+A,24,Agentic Capabilities & Programming,Committee of Skilled Generalists,0,1.0,passed,
+A,24,Agentic Capabilities & Programming,Committee of Domain Experts,2,1.0,passed,
+A,24,Cyber Capabilities,Committee of Domain Experts,1,1.0,passed,
+A,24,Commonsense & Factual Knowledge,Average Human,3,0.33,2024-08,2023-11 to 2027-04
+A,24,Commonsense & Factual Knowledge,Committee of Average Humans,2,0.01,2031-01,2024-03 to 2035-03
+A,24,Commonsense & Factual Knowledge,Skilled Generalist,2,0.0,2031-03,2027-11 to 2035-05
+A,24,Commonsense & Factual Knowledge,Committee of Skilled Generalists,1,0.0,2037-06,2030-09 to 2044-10
+C,18,Fluid Intelligence & Mathematics,High School Qualifier,1,1.0,passed,
+C,18,Fluid Intelligence & Mathematics,High School Top Performer,1,0.99,passed,
+C,18,Fluid Intelligence & Mathematics,Average Human,3,1.0,passed,
+C,18,Fluid Intelligence & Mathematics,Skilled Generalist,5,0.99,passed,
+C,18,Fluid Intelligence & Mathematics,Domain Expert,4,0.7,2026-09,2026-05 to 2027-01
+C,18,Fluid Intelligence & Mathematics,Committee of Average Humans,2,0.54,2026-11,2026-07 to 2027-02
+C,18,Fluid Intelligence & Mathematics,Committee of Skilled Generalists,0,0.47,2026-11,2026-08 to 2027-03
+C,18,Fluid Intelligence & Mathematics,Committee of Domain Experts,2,0.41,2026-12,2026-08 to 2027-03
+C,18,Knowledge & Commonsense QA,Average Human,3,0.82,2026-03,2025-07 to 2026-11
+C,18,Knowledge & Commonsense QA,Committee of Average Humans,2,0.19,2028-03,2025-11 to 2030-09
+C,18,Knowledge & Commonsense QA,Skilled Generalist,1,0.13,2028-10,2026-01 to 2031-08
+C,18,Knowledge & Commonsense QA,High School Top Performer,2,0.03,2030-07,2026-07 to 2034-08
+C,18,Knowledge & Commonsense QA,Committee of Skilled Generalists,1,0.0,2032-02,2027-11 to 2036-09
+C,18,Knowledge & Commonsense QA,Domain Expert,0,0.01,2032-01,2027-05 to 2036-11
+C,18,Knowledge & Commonsense QA,Top Performer,2,0.0,2035-03,2029-12 to 2040-12
+C,18,Cyber Capabilities,Skilled Generalist,1,1.0,passed,
+C,18,Cyber Capabilities,Committee of Skilled Generalists,0,1.0,passed,
+C,18,Cyber Capabilities,Domain Expert,0,1.0,passed,
+C,18,Cyber Capabilities,Committee of Domain Experts,1,1.0,passed,
+C,18,Agentic Capabilities & Programming,Skilled Generalist,1,1.0,passed,
+C,18,Agentic Capabilities & Programming,Domain Expert,2,0.99,passed,
+C,18,Agentic Capabilities & Programming,Committee of Skilled Generalists,0,0.54,2026-08,2024-06 to 2028-01
+C,18,Agentic Capabilities & Programming,Committee of Domain Experts,1,0.09,2027-11,2026-08 to 2029-07

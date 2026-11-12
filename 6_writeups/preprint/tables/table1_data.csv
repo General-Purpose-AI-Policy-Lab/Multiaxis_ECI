@@ -1,0 +1,10 @@
+feed,observations,models,benchmarks,with reported SE
+Epoch AI benchmark hub (ZIP),2959,762,47,96
+Epoch AI internal evaluations (live feed),1146,374,13,1111
+RAND RR-A3797-1,565,40,15,0
+Scale SEAL leaderboards,336,185,13,0
+Epoch AI cyber ECI,205,74,21,0
+Kaggle Open Benchmarks,169,76,3,169
+GPAI Policy Lab local runs,105,16,12,105
+Cybench leaderboard,2,2,1,0
+Total,5487,887,107,1481
