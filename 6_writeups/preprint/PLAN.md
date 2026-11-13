@@ -302,6 +302,12 @@ Fig 2 to update to the models-only model). Table 3's multi-axis columns are
 bifactor refit and its analysis: section 3.4, section 3.5, Fig 7, Fig 8,
 Table 4, and the bifactor row of Table 2 on the local trace.
 
+**Status is kept in `STATUS.md`** (flow chart, outline with what is ready, items
+done and open, what people owe). On 2026-11-13: the bifactor fit is done (5
+runs, 50 chains, 10 modes, the upstream fit's chosen mode reproduced on 12 / 50
+chains); the bifactor analysis is next. The table below is the plan as written
+on 2026-11-12.
+
 **Work plan (2026-11-12, replaces "Work left" of section 0d).** Done: scope,
 outline, multi-axis analysis (`flagship_analysis/`), documentation and
 bibliography. Three tracks feed the draft.
@@ -330,7 +336,11 @@ PDF with a PNG preview. One script per figure in `figures/`, one per table in
 `tables/`. The canvas is 1.3 times the print size (`ZOOM` in `style.py`), so type
 prints at 6.9 pt for ticks and 5.8 pt for labels, below the guide's 9 pt and
 7.5 pt: at the guide's print sizes Yassine found the figures compressed
-against the dashboard's (2026-11-12).
+against the dashboard's (2026-11-12). On the trend panels the legend and the
+human baselines' names sit inside the plot, so the plot takes the full width: a
+name sits on its own line where it covers nothing, and baselines too close for
+that end early with their names in a spread column tied by leaders. The
+baseline lines are drawn over the bands and the other models (2026-11-13).
 
 | item | file | state |
 |---|---|---|
