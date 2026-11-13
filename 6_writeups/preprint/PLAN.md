@@ -337,9 +337,10 @@ PDF with a PNG preview. One script per figure in `figures/`, one per table in
 prints at 6.9 pt for ticks and 5.8 pt for labels, below the guide's 9 pt and
 7.5 pt: at the guide's print sizes Yassine found the figures compressed
 against the dashboard's (2026-11-12). On the trend panels the legend and the
-human baselines' names sit inside the plot, so the plot takes the full width: a
-name sits on its own line where it covers nothing, and baselines too close for
-that end early with their names in a spread column tied by leaders. The
+human baselines' names sit inside the plot, so the plot takes the full width:
+the names stand in one column against the right or the left edge, the lines
+stop at the column, and names of lines too close together are spread and tied
+by leaders. A line is never cut where data or the trend's band lies on it. The
 baseline lines are drawn over the bands and the other models (2026-11-13).
 
 | item | file | state |

@@ -6,8 +6,9 @@ names, then restyled to ../PLOTLY_STYLE_GUIDE.md: no title, the "clean" template
 final size. Writes fig1_axis{k}_modeA and fig6_axis{k}_modeC (.pdf and .png) beside this file. Every
 panel carries its own x title and legend, so it reads alone. The legend sits inside the plot, against
 an edge, where it covers no data (free_spot), and under the plot only when no such place exists.
-Each human baseline's name sits on its line inside the plot (name_spots), so the plot takes the full
-width, and the baseline lines are drawn over the bands and the other models.
+The human baselines' names stand in one column inside the plot, at the end of their lines
+(name_column), so the plot takes the full width, and the baseline lines are drawn over the bands and
+the other models.
 
     python 6_writeups/preprint/figures/fig1_fig6_frontier_panels.py
 """
@@ -87,70 +88,62 @@ def covers(mark, xa, xb, ya, yb):
     return bool(((mark[0] > xa) & (mark[0] < xb) & (mark[1] > ya) & (mark[1] < yb)).any())
 
 
-def free_spot(mark, box, plot):
+def free_spot(mark, box, plot, levels):
     """Where a legend of `box` px fits inside a `plot` px plotting area without covering the
     footprint `mark`: the axis fractions of its top-left corner, or None. Tried in this order:
     along the top edge from the left, along the bottom edge from the right, down the left edge, up
-    the right edge. The first free place wins, so the legend stays against an edge."""
+    the right edge, so the legend stays against an edge. Among the free places, the one that covers
+    the fewest baseline lines (`levels`, axis fractions) wins, the first tried on a tie."""
     w, h, air = box[0] / plot[0], box[1] / plot[1], 0.025
     # Flush with the plot's left or right edge at the ends, so the opaque ground leaves no stub of a
     # grid line beside it.
     xs, ys = np.append(np.arange(0.0, 1.0 - w, 0.02), 1.0 - w), np.arange(0.99, 0.01 + h, -0.02)
+    best = None
     for cx, cy in ([(cx, 0.99) for cx in xs] + [(cx, 0.01 + h) for cx in xs[::-1]]
                    + [(0.0, cy) for cy in ys] + [(1.0 - w, cy) for cy in ys[::-1]]):
         if not covers(mark, cx - air, cx + w + air, cy - h - air, cy + air):
-            return float(cx), float(cy)
-    return None
-
-
-def overlap(a, b):
-    """Whether two rectangles (x0, x1, y0, y1) overlap."""
-    return a[0] < b[1] and b[0] < a[1] and a[2] < b[3] and b[2] < a[3]
-
-
-def name_spots(mark, levels, widths, plot, taken, only):
-    """Where a baseline's name sits on its own line: {baseline: (x of the text's right end, side)},
-    x in axis fractions, side 'above' or 'below' the line, for the baselines in `only`. `levels` are
-    all the lines' heights in axis fractions, `widths` the names' widths in px, `taken` the
-    rectangles already used. A name goes as far right as it can, above its line before below it,
-    where it covers no data, no other baseline's line and no other name. A baseline with no such
-    place is left out."""
-    h, gap, air = 1.25 * LABEL_PX / plot[1], 2 / plot[1], 0.006
-    taken, spots = list(taken), {}
-    for n in sorted(only, key=lambda n: -levels[n]):               # from the top line down
-        w, others = widths[n] / plot[0], np.delete(levels, n)
-        for xb, (side, ya) in ((xb, s) for xb in np.arange(0.996, w, -0.01)
-                               for s in (("above", levels[n] + gap), ("below", levels[n] - gap - h))):
-            box = (xb - w, xb, ya, ya + h)
-            if (ya > 0 and ya + h < 1 and not covers(mark, box[0] - air, xb + air, ya - air, ya + h + air)
-                    and not ((others > ya - gap) & (others < ya + h + gap)).any()
-                    and not any(overlap(box, t) for t in taken)):
-                spots[n] = (float(xb), side)
-                taken.append(box)
+            cut = int(((levels > cy - h) & (levels < cy)).sum())
+            if best is None or cut < best[0]:
+                best = (cut, float(cx), float(cy))
+            if cut == 0:
                 break
-    return spots
+    return best and best[1:]
 
 
-def name_stack(mark, levels, widths, plot, taken):
-    """For baselines too close together to be named each on its line: their lines end at one x and
-    the names follow in a column, spread apart, each tied to its line by a short leader. Returns
-    (x where the lines end, the names' heights, the column's rectangle), in axis fractions. The
-    column goes as far right as it fits, and moves down before it moves left when something is in
-    its way (in these panels that is the trend's band, above it). With no free place it takes the
-    first one tried."""
+def name_column(mark, levels, widths, plot):
+    """Where the baselines' names go: one column inside the plot, against its right or its left
+    edge. The lines stop at the column and each name follows its own line; names of lines too close
+    together are spread apart and tied to their line by a short leader. Returns (side, the column's
+    rectangle, the names' heights), in axis fractions. Tried in this order: the right edge, the left
+    edge, then leftward from the right edge; at each, the names at their lines first, then pushed
+    down from the top or up from the bottom when something is in the way (in these panels, the
+    trend's band). A place is free when the column covers no data and no line loses a stretch
+    where data lies on it. With no free place the column goes against the right edge."""
     order = np.argsort(levels)[::-1]
-    step, w, air = 1.3 * LABEL_PX / plot[1], (max(widths) + FAN) / plot[0], 0.006
-    first = None
-    for x in np.arange(0.996 - w, 0.0, -0.01):
-        for top in np.arange(0.98, levels.max() - 2 * step, -0.02):
-            ys = _spread_labels(levels[order], step, 0.02, top)
+    lv, step, w, air = levels[order], 1.3 * LABEL_PX / plot[1], (max(widths) + FAN) / plot[0], 0.006
+
+    def pushed(start, sign):                        # sign -1: down from a top; +1: up from a bottom
+        y = lv.copy() if sign < 0 else lv[::-1].copy()
+        y[0] = min(y[0], start) if sign < 0 else max(y[0], start)
+        for i in range(1, len(y)):
+            y[i] = min(y[i], y[i - 1] - step) if sign < 0 else max(y[i], y[i - 1] + step)
+        return y if sign < 0 else y[::-1]
+
+    shifts = np.arange(0, 8 * step, step / 2)
+    stacks = ([_spread_labels(lv, step, 0.02, 0.98)] + [pushed(lv[0] - d, -1) for d in shifts]
+              + [pushed(lv[-1] + d, +1) for d in shifts])
+    for side, x in [("right", 0.996 - w), ("left", 0.004)] + [("right", x) for x in np.arange(0.986 - w, 0.3, -0.01)]:
+        # The part of a line that the column replaces must be empty: a line is never cut short of a
+        # point, or of the band that will cross it.
+        if any(covers(mark, x - air, x + w + air, level - air, level + air) for level in lv):
+            continue
+        for ys in stacks:
             box = (float(x), float(x + w), ys[-1] - step / 2, ys[0] + step / 2)
-            out = (float(x), ys[np.argsort(order)], box)
-            first = first or out
-            if (not covers(mark, x - air, x + w + air, box[2] - air, box[3] + air)
-                    and not any(overlap(box, t) for t in taken)):
+            out = (side, box, ys[np.argsort(order)])
+            if box[2] > 0 and box[3] < 1 and not covers(mark, x - air, x + w + air, box[2] - air, box[3] + air):
                 return out
-    return first
+    ys = stacks[0]
+    return "right", (0.996 - w, 0.996, ys[-1] - step / 2, ys[0] + step / 2), ys[np.argsort(order)]
 
 
 # ponytail: the figure is recoloured after the build. If a second document needs this look, move
@@ -189,44 +182,44 @@ def restyle(fig, label, panel_h=PANEL_H, cloud_px=5):
         s.update(opacity=1, layer="below", line=dict(color=MID, width=0.7, dash=s.line.dash))
     for a in fig.layout.annotations:
         a.font = dict(size=LABEL_PX if a.xref == "paper" else 9.5, color=MID)
-    for a in tiers:                                            # a grid line stops around a name
-        a.update(bgcolor=BG, borderpad=1)
     plot = (W * ZOOM - 62 - RIGHT, panel_h - 70)               # the plotting area, canvas px
     mark = footprint(fig)
+
+    # The baselines' names: one column inside the plot, where nothing else is drawn. The lines stop
+    # at the column.
+    x0, x1 = pd.to_datetime(list(fig.layout.xaxis.range))
+    lo, hi = fig.layout.yaxis.range
+    levels = np.array([(s.y0 - lo) / (hi - lo) for s in lines])
+    span = [0.0, 1.0]                                          # where the lines start and end
+    if tiers:
+        widths = [0.48 * LABEL_PX * len(a.text) for a in tiers]   # Arial, measured on a render
+        side, column, ys = name_column(mark, levels, widths, plot)
+        right = side == "right"
+        span = [0.0, column[0]] if right else [column[1], 1.0]
+        edge, out = (column[0], 1) if right else (column[1], -1)   # the line's end, and the way to the name
+        for a, s, y in zip(tiers, lines, ys):
+            a.update(xref="x domain", x=edge + out * (FAN - 3) / plot[0], xanchor="left" if right else "right",
+                     y=lo + y * (hi - lo), yanchor="middle")
+            fig.add_shape(type="line", xref="x domain", yref="y", x0=edge, y0=s.y0, x1=edge + out * (FAN - 5) / plot[0],
+                          y1=a.y, line=dict(color=MID, width=0.7 if a.y == s.y0 else 0.5), layer="above")
+        # A white ground under the column, over the grid: no grid line runs through a name.
+        fig.add_shape(type="rect", xref="x", yref="y", fillcolor=BG, line=dict(width=0), layer="between",
+                      x0=(x0 + (column[0] if right else 0) * (x1 - x0)).isoformat(),
+                      x1=(x0 + (1 if right else column[1]) * (x1 - x0)).isoformat(),
+                      y0=lo + column[2] * (hi - lo), y1=lo + column[3] * (hi - lo))
+        gx, gy = np.meshgrid(np.linspace(column[0], column[1], 30), np.linspace(column[2], column[3], 30))
+        mark = (np.append(mark[0], gx), np.append(mark[1], gy))   # the legend keeps off the column
+
     box = (LEGEND_BOX[0], LEGEND_BOX[1] * (5 if tiers else 4) + 10)
-    spot = free_spot(mark, box, plot)
+    spot = free_spot(mark, box, plot, levels)
     legend = dict(orientation="h", x=0, xanchor="left", y=-62 / (panel_h - 50), yanchor="top")
     if spot:                                                   # anchored on the plot edge it sits against
         at_right = spot[0] + box[0] / plot[0] > 0.999
         legend = dict(x=1 if at_right else spot[0], xanchor="right" if at_right else "left", y=spot[1], yanchor="top")
     height = panel_h + (0 if spot else LEGEND_H)
-
-    # Each baseline's name sits on its line, inside the plot, where nothing else is drawn. Lines too
-    # close together for that end early, and their names follow in a column with leaders.
-    x0, x1 = pd.to_datetime(list(fig.layout.xaxis.range))
-    lo, hi = fig.layout.yaxis.range
-    levels = np.array([(s.y0 - lo) / (hi - lo) for s in lines])
-    widths = np.array([0.48 * LABEL_PX * len(a.text) for a in tiers])   # Arial, measured on a render
-    taken = [(spot[0], spot[0] + box[0] / plot[0], spot[1] - box[1] / plot[1], spot[1])] if spot else []
-    spots, ends, stacked = name_spots(mark, levels, widths, plot, taken, range(len(lines))), np.ones(len(lines)), {}
-    crowded = np.flatnonzero((np.abs(levels[:, None] - levels[None, :]) < 1.5 * LABEL_PX / plot[1]).sum(1) > 1)
-    if len(spots) < len(lines) and len(crowded):
-        x_end, ys, column = name_stack(mark, levels[crowded], widths[crowded], plot, taken)
-        ends[crowded], stacked = x_end, dict(zip(crowded, ys))
-        spots = name_spots(mark, levels, widths, plot, taken + [column], set(range(len(lines))) - set(crowded))
-    for n, (a, s) in enumerate(zip(tiers, lines)):
-        if n in stacked:
-            a.update(xref="x domain", x=ends[n] + (FAN - 3) / plot[0], xanchor="left", y=lo + stacked[n] * (hi - lo),
-                     yanchor="middle")
-            fig.add_shape(type="line", xref="x domain", yref="y", x0=ends[n], y0=s.y0, x1=ends[n] + (FAN - 5) / plot[0],
-                          y1=a.y, line=dict(color=MID, width=0.5))
-        else:
-            x, side = spots.get(n, (0.996, "above"))           # no free place: at the right edge
-            a.update(xref="x domain", x=x, xanchor="right", y=s.y0, yanchor="bottom" if side == "above" else "top",
-                     yshift=2 if side == "above" else -2)
     kept = list(fig.data)
-    for s, end in zip(lines, ends):                            # a line is a trace, to sit between traces
-        fig.add_scatter(x=[x0.isoformat(), (x0 + end * (x1 - x0)).isoformat()], y=[s.y0, s.y0], mode="lines",
+    for s in lines:                                            # a line is a trace, to sit between traces
+        fig.add_scatter(x=[(x0 + f * (x1 - x0)).isoformat() for f in span], y=[s.y0, s.y0], mode="lines",
                         line=dict(color=MID, width=0.7, dash=s.line.dash), showlegend=False, hoverinfo="skip")
     fig.data = kept[:under] + list(fig.data[len(kept):]) + kept[under:]
     if tiers:                                                  # the grey lines, in the legend too

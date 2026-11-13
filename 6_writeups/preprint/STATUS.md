@@ -3,6 +3,10 @@
 Updated 2026-11-13. The plan itself is in `PLAN.md` section 0e (outline, figure list, numbers).
 This file holds the flow chart and what is done.
 
+The preprint work is on the branch `preprint`, checked out in its own folder
+(`~/Desktop/ECI_Bayesian-preprint`, a git worktree; the large traces are links to the main folder).
+`main` in `~/Desktop/ECI_Bayesian` follows origin and has none of it.
+
 ```mermaid
 flowchart TD
     base["Scope, outline, multi-axis analysis,<br/>documentation, bibliography<br/><b>done</b>"]:::done
@@ -95,7 +99,7 @@ as the scale of the frontier gaps, and for one fact: it mispredicts the human sc
 | The two model names ("multi-axis model", "bifactor model") | Yassine | open |
 | Yes or no for five benchmarks on mode C (GPQA Diamond Biology, GPQA Main Biology, MMLU Biology, MMLU Chemistry, SpireClimb) | Yassine | open |
 | Which trace the README's mode numbers describe | Yassine | open |
-| `git push origin main` | Yassine | open |
+| Push the `preprint` branch (`git push -u origin preprint`, from this folder) | Yassine | open |
 
 ## Not committed
 
