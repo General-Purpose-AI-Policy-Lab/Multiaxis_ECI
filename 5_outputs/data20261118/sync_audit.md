@@ -1,12 +1,12 @@
 # Sync audit, data generation 20261118
 
-Reference: 0_input/ at `HEAD`. Produced by `1_curated/0_audit_sync.py`; the procedure is `.claude/skills/data-refresh/SKILL.md`.
+Reference: 0_input/ at `main`. Produced by `1_curated/0_audit_sync.py`; the procedure is `.claude/skills/data-refresh/SKILL.md`.
 
 | level | findings |
 |---|---|
 | BLOCK | 0 |
 | DECIDE | 10 |
-| CHECK | 35 |
+| CHECK | 39 |
 | INFO | 4 |
 
 ## DECIDE
@@ -29,9 +29,13 @@ Reference: 0_input/ at `HEAD`. Produced by `1_curated/0_audit_sync.py`; the proc
 ## CHECK
 
 **provenance**
-- `ed95c6468`: the synced pipeline commit is on no remote branch: merge and push the pipeline branch before the refit reaches main, or 0_input names a commit nobody else can check out
+- `040204df8`: the synced pipeline commit is on no remote branch: merge and push the pipeline branch before the refit reaches main, or 0_input names a commit nobody else can check out
 
 **benchmark removed**
+- `CAISI ExploitGym Userspace`: in the previous generation, not in this one: a retirement or a rename upstream? (a rename needs every curated table renamed too)
+- `CAISI OSS-Fuzz`: in the previous generation, not in this one: a retirement or a rename upstream? (a rename needs every curated table renamed too)
+- `CAISI SEC-Bench Pro`: in the previous generation, not in this one: a retirement or a rename upstream? (a rename needs every curated table renamed too)
+- `CyScenarioBench (Anthropic)`: in the previous generation, not in this one: a retirement or a rename upstream? (a rename needs every curated table renamed too)
 - `GDP.pdf`: in the previous generation, not in this one: a retirement or a rename upstream? (a rename needs every curated table renamed too)
 
 **new benchmark**
@@ -73,7 +77,7 @@ Reference: 0_input/ at `HEAD`. Produced by `1_curated/0_audit_sync.py`; the proc
 - `MirrorCode / claude-opus-5-5_max`: 0.774 -> 0.956: an upstream revision (source page, METR/AISI update) or an identity change?
 
 **scores dropped**
-- `106`: scores of models still present are gone: GDP.pdf (41), Terminal Bench 2.0 (14), APEX-Agents (11), GSO-Bench (6), WeirdML v2 (4), Aider Polyglot (2), PIQA (2), Mystery Game Puzzles (2), SimpleQA Verified (2), Cybench (2), DTBench (2), LMCA (2)
+- `124`: scores of models still present are gone: GDP.pdf (41), Terminal Bench 2.0 (14), APEX-Agents (11), CyScenarioBench (Anthropic) (6), GSO-Bench (6), CAISI ExploitGym Userspace (4), CAISI OSS-Fuzz (4), CAISI SEC-Bench Pro (4), WeirdML v2 (4), Aider Polyglot (2), PIQA (2), Mystery Game Puzzles (2)
 
 **openness to re-check**
 - `mistral-large-4-0`: API public preview on 2026-10-06; the weights (mistralai/Mistral-Large-4-1T-A52B, private on 2026-10-20) are public on Hugging Face on 2026-11-18 and Epoch dates the open release 2026-10-29, inside the 30-day window that closed on 2026-11-05. Re-checked 2026-11-18: open
@@ -85,7 +89,7 @@ Reference: 0_input/ at `HEAD`. Produced by `1_curated/0_audit_sync.py`; the proc
 ## INFO
 
 **provenance**
-- `20261118`: pipeline commit ed95c6468, run 20261118
+- `20261118`: pipeline commit 040204df8, run 20261118
 
 **new benchmark**
 - `GDP.pdf v1.1`: 19 test-takers, category Domain Specific Questions, floor 0.0, ceiling nan, access public, scores 0.328-0.564
@@ -94,4 +98,4 @@ Reference: 0_input/ at `HEAD`. Produced by `1_curated/0_audit_sync.py`; the proc
 - `73`: MiniMax-M3.1-Flash_xhigh, Muse-Spark-Open-816B-A42B_high, Muse-Spark-Open-816B-A42B_low, Muse-Spark-Open-816B-A42B_medium, beam-1.0, beam-1.0_high, beam-1.0_low, beam-1.0_max, beam-1.0_medium, beam-1.0_xhigh, claude-fable-5-2, claude-fable-5-2_high, claude-fable-5-2_low, claude-fable-5-2_max, claude-fable-5-2_medium, claude-fable-5-2_xhigh, claude-opus-4-1-20250805_2K, deepseek-v4.1-flash-1017, deepseek-v4.1-flash-1017_high, deepseek-v4.1-flash-1017_low, deepseek-v4.1-flash-1017_max, deepseek-v4.1-flash-1017_none, deepseek-v4.1-flash-1017_xhigh, doubao-seed-2.0-lite-260428_high, doubao-seed-2.0-pro-260215_high, doubao-seed-2.1-pro-260628_high, doubao-seed-2.1-turbo-260628_high, doubao-seed-evolving_high, gemini-2.5-flash_16K, gemini-2.5-pro-preview-05-06_1K, gemini-2.5-pro_1K, gemini-4-argon_low, gemini-4-carbon, gemini-4-carbon_high, gemini-4-carbon_low, gemini-4-carbon_medium, gemini-4-hydrogen, gemini-4-hydrogen_high, gemma-3-270m-it, gemma-4-E2B-it_thinking, gemma-4-E4B-it_thinking, gpt-6.1-terra, gpt-6.1-terra_high, gpt-6.1-terra_low, gpt-6.1-terra_max, gpt-6.1-terra_medium, gpt-6.1-terra_none, gpt-6.1-terra_xhigh, gpt-6.2-astra_max, grok-3-mini_medium, hy4-preview_high, inkling-2-small, inkling-2-small_xhigh, kimi-k2.7-code_high, kimi-k3.1-pro, kimi-k3.1-pro_max, kimi-k3.1-pro_xhigh, ministral-3b-2512, ministral-3b-2512_thinking, ministral-8b-2512_thinking, mistral-large-4-0-oss_high, mistral-large-4-0-oss_medium, muse-ember-1.0, muse-ember-1.0_max, nemotron-3-nano-4b_thinking, nemotron-3-ultra_high, nemotron-3.5-bolt-e4b_thinking, nvidia-nemotron-nano-9b-v2, qwen3.5-0.8b, qwen3.5-0.8b_none, qwen3.5-2b_none, qwen3.5-4b_thinking, seed-1.6
 
 **scores**
-- `5975`: +387 (model, benchmark) cells; 5359 carried over, 7 revised by more than 0.05
+- `5956`: +368 (model, benchmark) cells; 5340 carried over, 7 revised by more than 0.05

@@ -363,8 +363,8 @@ claude-haiku-4-5-20251001_32K,Anthropic,haiku,Haiku 4.5,,2025-10-15,token:32k,ye
 claude-haiku-4-5-20251001_8K,Anthropic,haiku,Haiku 4.5,,2025-10-15,token:8k,yes,2
 claude-haiku-4-5-20251001_none,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:none,yes,19
 claude-haiku-4-5-20251001_thinking,Anthropic,haiku,Haiku 4.5,,2025-10-15,thinking,yes,6
-claude-haiku-4-5-20251001,Anthropic,haiku,Haiku 4.5,,2025-10-15,bare,yes,3
 claude-haiku-4-5-20251001_low,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:low,yes,1
+claude-haiku-4-5-20251001,Anthropic,haiku,Haiku 4.5,,2025-10-15,bare,yes,2
 claude-haiku-4-5-20251001_xhigh,Anthropic,haiku,Haiku 4.5,,2025-10-15,effort:xhigh,yes,1
 claude-haiku-5-5_max,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:max,yes,29
 claude-haiku-5-5_medium,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:medium,yes,11
@@ -372,9 +372,9 @@ claude-haiku-5-5_none,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:none,yes,19
 claude-haiku-5-5_high,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:high,yes,7
 claude-haiku-5-5_low,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:low,yes,16
 claude-haiku-5-5_xhigh,Anthropic,haiku,Haiku 5.5,,2026-10-07,effort:xhigh,yes,7
-claude-haiku-5-5,Anthropic,haiku,Haiku 5.5,,2026-10-07,bare,yes,8
+claude-haiku-5-5,Anthropic,haiku,Haiku 5.5,,2026-10-07,bare,yes,7
 claude-mythos-preview-early,Anthropic,mythos-fable,Mythos Preview Early,,2026-04-06,preview,yes,8
-claude-mythos-preview,Anthropic,mythos-fable,Mythos Preview,,2026-04-07,preview,yes,8
+claude-mythos-preview,Anthropic,mythos-fable,Mythos Preview,,2026-04-07,preview,yes,5
 claude-fable-5_max,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:max,yes,21
 claude-fable-5_high,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:high,yes,12
 claude-fable-5_low,Anthropic,mythos-fable,Fable 5,,2026-06-09,effort:low,yes,7
@@ -388,7 +388,6 @@ claude-fable-5-1_low,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:low,yes
 claude-fable-5-1_medium,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:medium,yes,8
 claude-fable-5-1_xhigh,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,effort:xhigh,yes,7
 claude-fable-5-1,Anthropic,mythos-fable,Fable 5.1,,2026-09-01,bare,yes,6
-claude-mythos-5-1,Anthropic,mythos-fable,Mythos 5.1,Mythos Preview,2026-09-01,bare,yes,1
 claude-fable-5-2_max,Anthropic,mythos-fable,Fable 5.2,,2026-11-09,effort:max,yes,18
 claude-fable-5-2_high,Anthropic,mythos-fable,Fable 5.2,,2026-11-09,effort:high,yes,5
 claude-fable-5-2_low,Anthropic,mythos-fable,Fable 5.2,,2026-11-09,effort:low,yes,5
@@ -452,7 +451,7 @@ claude-opus-4-8,Anthropic,opus,Opus 4.8,,2026-05-28,bare,yes,4
 claude-opus-4-8_xhigh,Anthropic,opus,Opus 4.8,,2026-05-28,effort:xhigh,yes,5
 claude-opus-5_max,Anthropic,opus,Opus 5,,2026-07-24,effort:max,yes,23
 claude-opus-5_high,Anthropic,opus,Opus 5,,2026-07-24,effort:high,yes,14
-claude-opus-5,Anthropic,opus,Opus 5,,2026-07-24,bare,yes,7
+claude-opus-5,Anthropic,opus,Opus 5,,2026-07-24,bare,yes,6
 claude-opus-5_low,Anthropic,opus,Opus 5,,2026-07-24,effort:low,yes,7
 claude-opus-5_medium,Anthropic,opus,Opus 5,,2026-07-24,effort:medium,yes,5
 claude-opus-5_xhigh,Anthropic,opus,Opus 5,,2026-07-24,effort:xhigh,yes,9
@@ -462,7 +461,7 @@ claude-opus-5-5_medium,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:medium,y
 claude-opus-5-5_high,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:high,yes,6
 claude-opus-5-5_low,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:low,yes,5
 claude-opus-5-5_xhigh,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,effort:xhigh,yes,6
-claude-opus-5-5,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,bare,yes,8
+claude-opus-5-5,Anthropic,opus,Opus 5.5,Opus 5,2026-09-22,bare,yes,7
 claude-3-sonnet-20240229,Anthropic,sonnet,Sonnet 3,,2024-02-29,bare,yes,23
 claude-3-5-sonnet-20240620,Anthropic,sonnet,Sonnet 3.5-Jun,,2024-06-20,bare,yes,29
 claude-3-5-sonnet-20241022,Anthropic,sonnet,Sonnet 3.5-Oct,,2024-10-22,bare,yes,34
@@ -508,7 +507,7 @@ claude-sonnet-4-6,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,bare,yes,2
 claude-sonnet-4-6_32K,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,token:32k,yes,2
 claude-sonnet-4-6_medium,Anthropic,sonnet,Sonnet 4.6,,2026-02-17,effort:medium,yes,4
 claude-sonnet-5_max,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:max,yes,12
-claude-sonnet-5,Anthropic,sonnet,Sonnet 5,,2026-06-30,bare,yes,7
+claude-sonnet-5,Anthropic,sonnet,Sonnet 5,,2026-06-30,bare,yes,6
 claude-sonnet-5_low,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:low,yes,8
 claude-sonnet-5_medium,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:medium,yes,9
 claude-sonnet-5_none,Anthropic,sonnet,Sonnet 5,,2026-06-30,effort:none,yes,12
@@ -519,7 +518,7 @@ claude-sonnet-5-5_medium,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:
 claude-sonnet-5-5_high,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:high,yes,11
 claude-sonnet-5-5_low,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:low,yes,9
 claude-sonnet-5-5_xhigh,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,effort:xhigh,yes,8
-claude-sonnet-5-5,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,bare,yes,6
+claude-sonnet-5-5,Anthropic,sonnet,Sonnet 5.5,Sonnet 5,2026-09-28,bare,yes,5
 deepseek-v4-flash_high,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:high,yes,2
 deepseek-v4-flash_max,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:max,yes,4
 deepseek-v4-flash_none,DeepSeek,deepseek-flash,V4-flash,,2026-04-24,effort:none,yes,2
@@ -766,7 +765,7 @@ kimi-k2.5_thinking,Moonshot,kimi,K2.5,,2026-01-27,thinking,yes,20
 kimi-k2.6,Moonshot,kimi,K2.6,,2026-04-20,bare,yes,8
 kimi-k2.6_thinking,Moonshot,kimi,K2.6,,2026-04-20,thinking,yes,10
 kimi-k2.6_none,Moonshot,kimi,K2.6,,2026-04-20,effort:none,yes,1
-kimi-k3,Moonshot,kimi,K3,,2026-07-16,bare,yes,9
+kimi-k3,Moonshot,kimi,K3,,2026-07-16,bare,yes,6
 kimi-k3_max,Moonshot,kimi,K3,,2026-07-16,effort:max,yes,23
 kimi-k3_high,Moonshot,kimi,K3,,2026-07-16,effort:high,yes,5
 kimi-k3_low,Moonshot,kimi,K3,,2026-07-16,effort:low,yes,6
@@ -838,7 +837,7 @@ gpt-6-astra_low,OpenAI,gpt-astra,astra 6,,2026-09-03,effort:low,yes,7
 gpt-6-astra_medium,OpenAI,gpt-astra,astra 6,,2026-09-03,effort:medium,yes,7
 gpt-6-astra_none,OpenAI,gpt-astra,astra 6,,2026-09-03,effort:none,yes,4
 gpt-6-astra_xhigh,OpenAI,gpt-astra,astra 6,,2026-09-03,effort:xhigh,yes,9
-gpt-6-astra,OpenAI,gpt-astra,astra 6,,2026-09-03,bare,yes,13
+gpt-6-astra,OpenAI,gpt-astra,astra 6,,2026-09-03,bare,yes,10
 gpt-6.2-astra_max,OpenAI,gpt-astra,astra 6.2,,2026-11-17,effort:max,yes,11
 gpt-5.6-luna_max,OpenAI,gpt-luna,luna 5.6,,2026-07-09,effort:max,yes,18
 gpt-5.6-luna_high,OpenAI,gpt-luna,luna 5.6,,2026-07-09,effort:high,yes,7
@@ -983,8 +982,8 @@ glm-5.2_low,Zhipu,glm,5.2,,2026-06-16,effort:low,yes,4
 glm-5.2_medium,Zhipu,glm,5.2,,2026-06-16,effort:medium,yes,1
 glm-5.2_minimal,Zhipu,glm,5.2,,2026-06-16,effort:minimal,yes,1
 glm-5.3_max,Zhipu,glm,5.3,,2026-08-14,effort:max,yes,14
-glm-5.3,Zhipu,glm,5.3,,2026-08-14,bare,yes,8
 glm-5.3_low,Zhipu,glm,5.3,,2026-08-14,effort:low,yes,1
+glm-5.3,Zhipu,glm,5.3,,2026-08-14,bare,yes,5
 glm-4.7-flash_none,Zhipu,glm-flash,flash 4.7,,2026-01-19,effort:none,yes,2
 glm-4.7-flash_thinking,Zhipu,glm-flash,flash 4.7,,2026-01-19,thinking,yes,1
 glm-5.3-flash_max,Zhipu,glm-flash,flash 5.3,,2026-08-20,effort:max,yes,13

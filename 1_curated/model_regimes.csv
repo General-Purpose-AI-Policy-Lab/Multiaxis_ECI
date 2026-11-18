@@ -242,7 +242,6 @@ claude-haiku-5-5_xhigh,reasoning,on,run mode on
 claude-instant-1.1,non-reasoning,off,non-reasoning pattern
 claude-instant-1.2,non-reasoning,off,non-reasoning pattern
 claude-mythos-5,reasoning,default,pattern 'claude-mythos'
-claude-mythos-5-1,reasoning,default,pattern 'claude-mythos'
 claude-mythos-preview,reasoning,default,pattern 'claude-mythos'
 claude-mythos-preview-early,reasoning,default,pattern 'claude-mythos'
 claude-opus-4-1-20250805,undetermined,default,bare run of a hybrid release
