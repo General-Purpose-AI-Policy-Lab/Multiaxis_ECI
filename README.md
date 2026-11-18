@@ -37,7 +37,7 @@ The 20 benchmarks with the largest share of each axis, their loadings (median an
 
 <img src="docs/figures/loadings_per_axis.png" width="760" alt="The 20 benchmarks that best define each axis of the flagship (loadings, median and 95% interval, coloured by axis share)">
 
-`python docs/make_readme_figures.py` redraws these five figures from the flagship trace, with the builders of the per-fit folders.
+`python docs/make_readme_figures.py` redraws these five figures from the flagship trace ([downloaded from its release](#traces)), with the builders of the per-fit folders.
 
 The K=4 fit sees 5,487 observations, 887 models and 107 benchmarks; 40 human scores fall on benchmarks that measure an axis and place the tiers. The canonical K=1 index, which also applies the curated exclusions and fits the tiers inside, sees 4,410 observations on 93 benchmarks.
 
@@ -68,6 +68,17 @@ Two modeling-stage filters apply at load time: the curated exclusion list of the
 What belongs to the model stays in `1_curated/`: the "easy for humans" exclusion list of the canonical index, the reviewed lineage map and its overrides, the data-driven SOTA list, the reviewed clips of below-floor scores, the models' openness labels, the content judgments of the human placement and Epoch's reference ECI table. See [`1_curated/README.md`](1_curated/README.md).
 
 Every output goes under `5_outputs/<data generation>/`, named after the day of the pipeline run it was fitted on (`config.DATA_TAG`): the flagship is `5_outputs/data20261019/mirt_lineageprior_lineagebm/`, the canonical K=1 index `5_outputs/data20261019/canonical_humanmerge/`. A fit on a newer build never overwrites an older one. `5_outputs/pre_pipeline/` holds the post's fits as they were published.
+
+## Traces
+
+The posterior traces (`*.nc`, ArviZ netCDF) are too large for git and are not in a clone: each fit folder holds its tables, axis names, modes file and human placement, but not its trace. The traces of the main fits are attached to a [GitHub release](https://github.com/General-Purpose-AI-Policy-Lab/Multiaxis_ECI/releases), one per data generation, tagged at the commit they go with. Release [`traces-data20261019`](https://github.com/General-Purpose-AI-Policy-Lab/Multiaxis_ECI/releases/tag/traces-data20261019) holds the flagship (with its K=1 baseline) and the g + deviations bifactor (gsum); its notes list each file, the folder it goes in and its checksum. To fetch the flagship's:
+
+```bash
+gh release download traces-data20261019 -p 'trace_mirt_k4_lineageprior_lineagebm.nc' -p 'trace_mirt_k1.nc' \
+    -D 5_outputs/data20261019/mirt_lineageprior_lineagebm/
+```
+
+Every script that reads a fit takes the trace's path (`--trace`), and the figures, diagnostics, residuals and factor scores regenerate from it. A trace not in a release is regenerated with the commands of [Run](#run).
 
 ## Run
 
@@ -110,7 +121,7 @@ ECI-H is the per-draw affine transform of ability pinned at Claude 3.5 Sonnet (2
 ├── 2_model/multiaxis_eci/  # step 2: the library: config, data loading, models, analysis, figures, sync
 ├── 3_fit/fit.py         # step 3: the fit CLI (canonical preset + exploration)
 ├── 4_diagnostics/       # step 4: post-fit tools, the numbered four in reproduction order
-├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace, figures/; pre_pipeline/ holds the post's fits, open_closed_frontier/ and us_cn_frontier/ the open-weights vs closed and US vs Chinese frontier notes
+├── 5_outputs/           # step 5: everything a fit writes, one folder per data generation (data<YYYYMMDD>/), then per fit: tables, trace (not tracked: see Traces), figures/; pre_pipeline/ holds the post's fits, open_closed_frontier/ and us_cn_frontier/ the open-weights vs closed and US vs Chinese frontier notes
 ├── 6_writeups/          # step 6: the post's figure scripts (6_writeups/blogpost/), the dashboard's card registry
 ├── archive/             # kept for the record, not maintained: notebooks (one-off investigations), results_old (superseded fits)
 ├── docs/                # model math, CLI reference, figure catalogue, the README's figures (figures/, make_readme_figures.py)
