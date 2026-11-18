@@ -63,6 +63,9 @@ Work on a branch (`refresh-YYYYMMDD`), in a worktree when another session uses t
 ## 2. Multiaxis: sync and audit
 
 In the refit worktree (`git worktree add ../Multiaxis_ECI-<name> -b <branch>`; symlink `.venv`).
+The venv's editable install points at the main checkout: in the worktree run every command with
+`export PYTHONPATH=$PWD/2_model`, or `sync` and the builders read and write the main checkout's
+files (it happened on 2026-11-18; check with `python -c "import multiaxis_eci; print(multiaxis_eci.__file__)"`).
 
 1. `python -m multiaxis_eci sync --pipeline <pipeline checkout of the run>`.
 2. `python 1_curated/0_audit_sync.py` (it compares with the previous generation and writes
