@@ -244,6 +244,15 @@ def classify(mv, org):
         if re.search(r'flash-8b', tl): return dict(vendor='Google', chain='', node='gemini-flash-8b', variant='', in_chain='no')
         if 'gemini' in tl:
             v = variant(t)
+            # Gemini 4 drops the Pro / Flash / Flash-Lite names for Carbon (Google: its strongest
+            # reasoning model), Argon (the efficient frontier model) and Hydrogen (the fast,
+            # everyday one). Three new lines, each starting at its generation-4 node, as for
+            # GPT's Luna / Terra / Sol / Astra: no link assumed to a generation-3 tier (user
+            # decision 2026-11-18; until then Argon fell to the Pro default as 'pro 4').
+            mo = re.search(r'gemini[- ](\d(?:\.\d)?)[- ](carbon|argon|hydrogen)', tl)
+            if mo:
+                return dict(vendor='Google', chain=f'gemini-{mo.group(2)}',
+                            node=f'{mo.group(2)} {mo.group(1)}', variant=v, in_chain='yes')
             tier = 'flash-lite' if ('flash-lite' in tl or 'flash lite' in tl) else ('flash' if 'flash' in tl else 'pro')
             # anchor version to 'gemini-<ver>' so dates (03-25) and token sizes (32k) don't leak
             mo = re.search(r'gemini[- ](\d(?:\.\d)?)', tl)
@@ -390,7 +399,8 @@ def classify(mv, org):
         # Ahead of the 'thinking' test: a thinking run of a NEW generation is a
         # variant of that generation, not a node of the previous one. Without a
         # branch here a new K<n> falls to the K2 default and shares K2's node.
-        if 'k3' in tl: node='K3'
+        if 'k3.1' in tl or 'k3-1' in tl or 'k3p1' in tl: node='K3.1'   # K3.1 Pro (2026-10-23), the next release of the spine
+        elif 'k3' in tl: node='K3'
         elif 'k2.7' in tl or 'k2-7' in tl: node='K2.7'
         elif 'k2.6' in tl or 'k2-6' in tl: node='K2.6'
         elif 'k2.5' in tl or 'k2-5' in tl or 'k2p5' in tl: node='K2.5'
@@ -541,9 +551,11 @@ def classify(mv, org):
             return dict(vendor='Thinking Machines', chain='',
                         node='(independent)', variant='', in_chain='no')
         small = 'small' in tl
+        # Inkling 2 Small (2026-11-05) is the next node of the Small line, not a run of the first.
+        gen = ' 2' if re.search(r'inkling[- ]2(?!\d)', tl) else ''
         return dict(vendor='Thinking Machines',
                     chain='inkling-small' if small else 'inkling',
-                    node='Inkling Small' if small else 'Inkling',
+                    node=f'Inkling{gen} Small' if small else f'Inkling{gen}',
                     variant=v, in_chain='yes')
 
     # long tail of minor vendors not among the chained majors → independent
