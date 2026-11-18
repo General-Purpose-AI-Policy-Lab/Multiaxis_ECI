@@ -28,6 +28,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     load_axis_titles,
     loadings_table,
     prepare_fit,
+    reading_view,
 )
 from multiaxis_eci.data import PROCESSED_FILE  # noqa: E402
 from multiaxis_eci.scripts import load as _load_script  # noqa: E402
@@ -52,13 +53,15 @@ def main():
         view = align_to_reference_loadings(view, data, ref)
     view = attach_placement(view, trace.parent)       # a fit without humans: the 2b tiers
     titles = load_axis_titles(trace.parent, view, data)
+    fitted = view
+    view = reading_view(view, data)       # the reading the figures show (config.AXIS_READING)
     raw = pd.read_csv(PROCESSED_FILE)
     bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
 
     figs = {k: f for k, f in forecast_figures(view, data, raw, view.names, view.theta,
                                               axis_titles=titles).items()
             if not k.endswith("_when")}
-    ldf = loadings_table(view.require_A(), bench, hdi=(2.5, 97.5))
+    ldf = loadings_table(fitted.require_A(), bench, hdi=(2.5, 97.5))
     figs["loadings_per_axis"] = loadings_grid_fig(ldf, titles, top_n=20)
 
     OUT.mkdir(parents=True, exist_ok=True)

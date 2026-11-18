@@ -311,8 +311,10 @@ def build_chain_group_figures(view_a, view_b, data, raw, titles: dict | None, mo
         figs["human_tiers_compare"] = placed_tiers_compare_fig(
             view_a.human_placement, view_b.human_placement, names, titles, labels)
     if fitted or placed:
+        # The crossings on the reading the fit's own forecasts show (config.AXIS_READING).
+        from multiaxis_eci.analysis.reading import reading_view
         tables = []
-        for view in (view_a, view_b):
+        for view in (reading_view(view_a, data), reading_view(view_b, data)):
             parts = []
             for k, name in enumerate(names):
                 try:

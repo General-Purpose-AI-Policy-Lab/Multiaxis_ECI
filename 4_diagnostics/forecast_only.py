@@ -42,6 +42,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     attach_placement,
     load_axis_titles,
     prepare_fit,
+    reading_view,
 )
 from multiaxis_eci.scripts import load as _load_script  # noqa: E402
 
@@ -102,6 +103,7 @@ def main():
     from multiaxis_eci.data import PROCESSED_FILE, SCORE_COLUMNS
     raw = pd.read_csv(PROCESSED_FILE)[SCORE_COLUMNS]
     view, titles = card_view(fit, data)
+    view = reading_view(view, data)       # the reading the card's figures show (config.AXIS_READING)
     figs = forecast_figures(view, data, raw, view.names, view.theta, axis_titles=titles)
     if not figs:
         sys.exit("no forecast figures produced — is this a K=1 or human-free fit?")

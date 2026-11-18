@@ -58,6 +58,7 @@ from multiaxis_eci.analysis import (  # noqa: E402
     mirt_model_timeline_df,
     prepare_fit,
     propose_axis_names,
+    reading_view,
     rescale_frame,
     rescale_theta,
     trace_loading_prior,
@@ -86,6 +87,7 @@ from multiaxis_eci.viz import (  # noqa: E402
     save_fig,
 )
 from multiaxis_eci.viz.chain_groups import build_chain_group_figures  # noqa: E402
+from multiaxis_eci.viz.dashboard import THETA_TWIN  # noqa: E402
 from multiaxis_eci.viz.i18n import translate_fig  # noqa: E402
 
 # Every posterior variable any figure or the PPC here reads. Names absent from a
@@ -210,10 +212,15 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         gof = compute_gof(yrep, data, mu, pointwise_log_lik(idata))
         figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                  forecast=forecast, axis_titles=axis_titles,
-                                 doc_variants=True)
+                                 doc_variants=True, theta_twins=True)
         # A figure's document twin (`key__svg`) is not a figure of its own: it only replaces
         # the French SVG of `key`.
         svg_twins = {k[:-len("__svg")]: figs.pop(k) for k in list(figs) if k.endswith("__svg")}
+        # The ability-side figures read each axis on predicted scores (config.AXIS_READING);
+        # their twins on the fitted abilities are filed apart, under theta/.
+        theta_figs = {k[:-len(THETA_TWIN)]: figs.pop(k) for k in list(figs)
+                      if k.endswith(THETA_TWIN)}
+        rview = reading_view(view, data)
         figs["pit_ecdf"] = pit_ecdf_fig(gof.pit, loo=gof.metrics["pit_kind"] == "loo")
 
         # ── signed extras: the rotation-method comparison (four independent
@@ -232,12 +239,21 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         affine = human_unit_affine(view.theta, data, human_scale_axes(
             view_human_contraction(view, data), view.K))
         if n_axes >= 2:
-            axis_tl = {k: rescale_frame(mirt_model_timeline_df(view.theta, k, data, raw,
-                                                              A_draws=view.A), k, affine)
-                       for k in range(n_axes)}
             # the axes under their titles (Axis k: <title>) where they are named
             shown = [(axis_titles or {}).get(n, n) for n in names]
-            figs["axes_timeline_compare"] = axes_frontier_fig(axis_tl, shown, n_axes)
+
+            def frontiers(v):
+                """The axes' running frontiers side by side, on the reading `v` is on."""
+                aff = human_unit_affine(v.theta, data, human_scale_axes(
+                    view_human_contraction(v, data), v.K))
+                tl = {k: rescale_frame(mirt_model_timeline_df(v.theta, k, data, raw,
+                                                              A_draws=v.A), k, aff)
+                      for k in range(n_axes)}
+                return axes_frontier_fig(tl, shown, n_axes)
+
+            figs["axes_timeline_compare"] = frontiers(rview)
+            if rview is not view:
+                theta_figs["axes_timeline_compare"] = frontiers(view)
             keep = (mirt_informed_mask(view.theta)[:, :n_axes].all(axis=1)
                     & ~data.is_human & ~data.is_low_obs)
             idx = np.where(keep)[0]
@@ -300,6 +316,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                     # names its chain group, centred and clear of the panel titles.
                     fig.update_layout(title=dict(text=note, x=0.5),
                                       margin_t=max(fig.layout.margin.t or 0, 110))
+        for name, fig in theta_figs.items():
+            if note and fig.layout.title.text:
+                fig.update_layout(title_text=f"{fig.layout.title.text} · {note}")
+            save_fig(fig, figure_filename(name) + suffix, figures_dir / "theta")
         for name, fig in figs.items():
             save_fig(fig, figure_filename(name) + suffix, figures_dir)
             if name in fr_figs:
@@ -308,7 +328,9 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
                          svg_fig=translate_fig(twin, first=group_fr) if twin else None)
         print(f"  PPC: R²={gof.metrics['bayesian_r2']:.3f}  RMSE={gof.metrics['rmse']:.3f}  "
               f"MAE={gof.metrics['mae']:.3f}")
-        print(f"figures → {figures_dir}")
+        print(f"figures → {figures_dir}"
+              + (f" (the ability-side figures on the fitted abilities → {figures_dir / 'theta'})"
+                 if theta_figs else ""))
         return figs
 
     split = chain_split(trace_path, int(idata.posterior.sizes["chain"]))

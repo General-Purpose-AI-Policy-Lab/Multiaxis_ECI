@@ -126,6 +126,22 @@ FR_TABLE: list[tuple[str, str]] = [
     ("Domain Expert", "Expert du domaine"),
     ("Top Performer", "Meilleur performeur"),
     # Trend legend and subtitle (the per-fit panels), before "models" and "AI models"
+    # The placed-tier subtitles (viz.dashboard.forecast_figures), longest first
+    ("Frontier forecast against the human tiers placed on this axis "
+     "(placed after a fit on the models alone)",
+     "Prévision de la frontière face aux niveaux humains placés sur cet axe "
+     "(placés après un ajustement sur les modèles seuls)"),
+    ("Frontier forecast against the human tiers placed on this axis "
+     "(fitted scale: the scale's anchor tiers are not placed)",
+     "Prévision de la frontière face aux niveaux humains placés sur cet axe "
+     "(échelle ajustée : les niveaux d'ancrage de l'échelle ne sont pas placés)"),
+    ("Frontier forecast; no human tier drawn: no human score on a benchmark this axis measures",
+     "Prévision de la frontière ; aucun niveau humain tracé : aucun score humain sur un "
+     "benchmark que cet axe mesure"),
+    ("Frontier forecast; no human tier drawn: no human score on a benchmark that measures "
+     "this axis",
+     "Prévision de la frontière ; aucun niveau humain tracé : aucun score humain sur un "
+     "benchmark qui mesure cet axe"),
     ("Frontier forecast against human tiers",
      "Prévision de la frontière face aux niveaux humains"),
     ("Non-reasoning models (frontier)", "Modèles sans raisonnement (frontière)"),
@@ -182,6 +198,12 @@ FR_TABLE: list[tuple[str, str]] = [
     (" months<extra>", " mois<extra>"),
     ("months", "mois"),          # the table's unit column, after every phrase containing it
 
+    # The predicted-score reading's captions (analysis.reading), before "models" and "Ability"
+    ("Predicted score: ", "Score prédit : "),
+    ("predicted score on the axis's benchmarks", "score prédit sur les benchmarks de l'axe"),
+    ("Predicted score", "Score prédit"),
+    ("(logit scale)", "(échelle logit)"),
+    ("(fitted scale)", "(échelle ajustée)"),
     # Axis captions, legend entries, small words — last
     ("Release date", "Date de sortie"),
     ("Crossing date", "Date de croisement"),

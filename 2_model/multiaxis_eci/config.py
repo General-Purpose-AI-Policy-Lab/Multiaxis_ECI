@@ -443,6 +443,18 @@ SOTA_FAMILIES: list[str] = _load_sota_families()
 # axis with share 1 everywhere, so any scored release passes.
 MIN_AXIS_COVERAGE = 1.0
 
+# What the ability-side figures of a K-axis fit read on each axis (`analysis.reading`):
+# "predicted", the test-taker's predicted score on the benchmarks the axis dominates (the
+# share-weighted mean of their standardised predictors, on the scale of the abilities), or
+# "theta", the fitted ability on the axis alone. User decision 2026-11-12: "predicted" for
+# the timelines, the forecasts, the crossings and the forests; the same figures on theta
+# are kept in a `theta/` folder beside them. On the flagship the two readings disagree
+# mostly on the commonsense axis, where 12 of the 20 best models by theta are beyond rank
+# 100 on predicted scores (GPT-6 astra 288th by theta, 2nd by predicted score): theta_k is
+# one term of a sum the data pin far better than its parts. Loadings, item curves and
+# tables keep the fitted abilities.
+AXIS_READING = "predicted"
+
 # The ability scale of the figures (analysis.scale): "human" re-expresses every axis so the
 # posterior median of the first anchor tier sits at 0 and the second at 1, draw by draw; any
 # other value keeps the fitted logit scale. Tables and loadings are never rescaled.

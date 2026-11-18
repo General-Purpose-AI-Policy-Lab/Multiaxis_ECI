@@ -695,3 +695,54 @@ same without the offset, `noncomp` fixes $\beta=5$. On the 2026-10-01 data, `sem
 learns $\beta\approx0.8$ and ties the compensatory fit on held-out model scores; without the
 offset's freedom one axis no longer becomes the binding one on almost every benchmark, which
 it did with it (95 of 98 benchmarks on the fit without humans).
+
+---
+
+## 9. Reading an axis on predicted scores
+
+The figures do not show $\theta_{m,k}$ itself (`config.AXIS_READING = "predicted"`,
+`analysis.reading`; user decision 2026-11-12). The likelihood sees a test-taker only through
+the sums $\eta_{m,b} = A_b\cdot\theta_m - D_b$ of the benchmarks it was scored on, so a
+single coordinate $\theta_{m,k}$ is far less determined than those sums: abilities can move
+between axes while every predicted score stays put (within one model, the flagship's posterior
+correlation between axes 1 and 2 is $-0.46$). The frontier of an axis read on $\theta_k$ then
+holds models that lead on none of its benchmarks.
+
+For axis $k$, let $\mathcal B_k$ be the benchmarks whose largest share of loading variance is
+on $k$ (the rule of §8), $w_b$ that share, and $\mu_b$, $\sigma_b$ the mean and standard
+deviation over the models of the posterior-median predictor $\hat\eta_{m,b}$. The reading is
+
+$$
+s_{m,k} \;=\; \frac{1}{\sum_{b\in\mathcal B_k} w_b}\sum_{b\in\mathcal B_k} w_b\,
+\frac{A_b\cdot\theta_m - D_b - \mu_b}{\sigma_b},
+$$
+
+computed draw by draw, then centred and scaled over the models (the mean and standard
+deviation of its posterior medians), so it sits on the scale of the abilities. It is linear in
+the abilities, $s_{m,k} = \theta_m\cdot v_k - c_k$ with
+$v_k = \sum_b (w_b/\sigma_b)\,A_b \big/ \sum_b w_b$: the ability along the direction the
+axis's benchmarks point to. Only the products $A_b\cdot\theta_m$ enter, so $s_{m,k}$ does not
+change when $(A, \theta)$ change frame with $A\theta^\top$ fixed and $\mathcal B_k$, $w$ kept.
+
+Human tiers are read by the same map. A tier fitted with the models is a row of $\theta$. A
+tier placed by §8 at ability $t$ on axis $k$ is, by that placement's assumption, the typical
+model at $t$, $\theta^{\text{tier}} = (t,\ \alpha_j + \gamma_j t)_{j\ne k}$, and its reading is
+$\theta^{\text{tier}}\cdot\hat v_k - \hat c_k$ with the benchmark side at its medians: the
+predicted scores the placement fitted to the tier's own scores.
+
+What it changes on the flagship of 2026-10-19 (mode A, same candidates and forecast rule):
+the Domain Expert is passed in February 2025 instead of September 2024 on science, in November
+2025 instead of December 2025 on agentic capabilities, and in June 2030 (80% interval 2027 to
+2033) instead of November 2037 (2029 to 2047) on commonsense, where the frontier's slope goes
+from 0.38 to 0.76 sd a year; the Committee of Domain Experts on cyber in August 2025 instead
+of March 2024, close to the date a model first reached its Cybench score (November 2025). In
+the fits with the tiers inside, the Domain Expert's distance to the frontier across the axes
+goes from $-6.6$ to $+14.5$ sd on $\theta$ to $-1.5$ to $+3.4$ on this reading (flagship with
+`--human-merge`), and no tier is passed before the first model of the data any more; what is
+left is on the one axis where the tiers have almost no score.
+
+The price: the readings of the axes are closer to one another than the abilities (each is
+about 0.8 of its own ability and 0.3 to 0.4 of each other one; correlations over the models
+0.92 to 0.97 against 0.23 to 0.64). The loadings, the item curves, the tables and the
+placement itself keep the fitted abilities; the figures on $\theta$ are written beside the
+others, under `theta/`.

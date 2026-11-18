@@ -98,6 +98,13 @@ from multiaxis_eci.analysis.rotation import (
     permutation_matched_reproducibility,
     promax_rotate,
 )
+from multiaxis_eci.analysis.reading import (
+    axis_scores,
+    has_predicted_reading,
+    predicted_view,
+    reading_view,
+    value_label,
+)
 from multiaxis_eci.analysis.scale import (
     ability_label,
     human_unit_affine,
@@ -162,6 +169,7 @@ __all__ = [
     "family_best", "frontier_topk", "is_reasoning", "one_per_org_day", "reasoning_mask", "regime_crossover_df",
     "two_regime_forecast", "weighted_line_fit",
     "FitView", "prepare_fit",
+    "axis_scores", "has_predicted_reading", "predicted_view", "reading_view", "value_label",
     "FitSpec", "spec_json", "FLAGSHIP", "FLAGSHIP_CHAINS", "JOINT_FIT",
     "FLAGSHIP_THIN", "FLAGSHIP_TRACE", "open_flagship", "best_mode_chains", "secondary_frame_dir", "secondary_mode_chains",
 ]

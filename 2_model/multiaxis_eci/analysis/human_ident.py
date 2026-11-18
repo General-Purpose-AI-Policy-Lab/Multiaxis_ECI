@@ -177,7 +177,12 @@ def view_human_contraction(view, data: ECIData, theta: np.ndarray | None = None,
     """Per tier and axis, the smaller of `human_axis_contraction` (is the tier's chain placed by
     benchmarks mostly measuring the axis?) and `increment_contraction` (is the tier's own step
     placed?), on a FitView (its own frame unless `theta` / `A` are given)."""
-    theta = view.theta if theta is None else theta
+    if getattr(view, "reading", "theta") == "predicted":
+        # Which tiers the data place on an axis is a property of the fit: read it on the fitted
+        # abilities, whatever reading the figures show (`analysis.reading`).
+        theta = view.theta_fit
+    else:
+        theta = view.theta if theta is None else theta
     delta_sd = PRIOR_DELTA_HUMAN if view.human_delta_sd is None else view.human_delta_sd
     root_sd = PRIOR_HUMAN_ROOT if view.human_root_sd is None else view.human_root_sd
     chain = human_axis_contraction(view.A if A is None else A, theta, data,

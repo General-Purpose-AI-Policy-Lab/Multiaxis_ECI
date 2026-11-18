@@ -112,7 +112,8 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     (`analysis.load_axis_titles`) swaps the display text only; figure dict keys and
     axis widget titles keep `names[k]` so cache/anchor ids don't churn.
     `human_labels` reaches `capability_timeline_fig` unchanged (None = the
-    English tier names; a dict overrides them)."""
+    English tier names; a dict overrides them). The timelines read `view.theta`, whatever
+    reading the view is on (`analysis.reading`), and caption it accordingly."""
     from multiaxis_eci.analysis import (
         loadings_forest_df,
         mirt_human_axis_stats,
@@ -135,6 +136,7 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
         human_scale_axes,
         view_human_contraction,
     )
+    from multiaxis_eci.analysis.reading import value_label
     from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
     contraction = view_human_contraction(view, data, theta=theta, A=A)
     human_axes = human_scale_axes(contraction, K)
@@ -142,7 +144,8 @@ def build_axis_figures(view, data, raw, bench, signed_frames=None,
     tag = "_oblique" if signed_frames else ""
     for k in range(K):
         disp = titles.get(names[k], names[k])
-        y_label = ability_label(affine, human=bool(human_axes[k]))
+        y_label = value_label(view, ability_label(affine, human=bool(human_axes[k])),
+                              human_units=affine is not None and bool(human_axes[k]))
         if view.human_placement is not None:
             # a fit without humans: the tiers placed axis by axis (analysis.human_placement)
             from multiaxis_eci.analysis.human_placement import placement_frame
@@ -208,8 +211,9 @@ def forecast_figures(view, data, raw, names, th_fc,
     ONE definition for both the dashboard card and the forecast-only re-render
     (`4_diagnostics/forecast_only.py`), so the two cannot drift apart on
     fit_basis or the candidate gate. `th_fc` is the ability array to forecast on, in the frame the
-    caller's timelines already use. `axis_titles` swaps display text only,
-    same convention as `build_axis_figures`.
+    caller's timelines already use: `view.theta` of a view on the reading the figures show
+    (`analysis.reading.reading_view`; the captions follow `view.reading`). `axis_titles` swaps
+    display text only, same convention as `build_axis_figures`.
 
     `doc_variants` adds, per trend panel `key`, a `key + "__svg"` twin for the SVG a document
     embeds: the `DOC_TIERS` only, with the bottom and top tiers' intervals drawn.
@@ -270,9 +274,12 @@ def forecast_figures(view, data, raw, names, th_fc,
         # anchors: the tier lines already mark Average Human at 0 and Top Performer at 1. An
         # axis without placed tiers says it is on the fitted scale and that no tier is drawn.
         kind = titles.get(names[k], "").partition(": ")[2]
-        y_label = f"Ability: {kind}" if kind else "Ability"
+        predicted = view.reading == "predicted"
+        what = "Predicted score" if predicted else "Ability"
+        fitted = " (logit scale)" if predicted else " (fitted scale)"
+        y_label = f"{what}: {kind}" if kind else what
         if placed:
-            y_label += " (fitted scale)"
+            y_label += fitted
             subtitle = ("Frontier forecast against the human tiers placed on this axis "
                         "(placed after a fit on the models alone)" if len(inputs["hs"]) else
                         "Frontier forecast; no human tier drawn: no human score on a benchmark "
@@ -281,11 +288,11 @@ def forecast_figures(view, data, raw, names, th_fc,
             subtitle = "Frontier forecast against human tiers"
         elif len(inputs["hs"]):
             # Some tiers are placed, but not both anchors of the human-unit scale.
-            y_label += " (fitted scale)"
+            y_label += fitted
             subtitle = ("Frontier forecast against the human tiers placed on this axis "
                         "(fitted scale: the scale's anchor tiers are not placed)")
         else:
-            y_label += " (fitted scale)"
+            y_label += fitted
             subtitle = ("Frontier forecast; no human tier drawn: "
                         "no human score on a benchmark that measures this axis")
         trend = dict(title=disp, subtitle=subtitle, y_label=y_label, standalone=True,
@@ -304,10 +311,59 @@ def forecast_figures(view, data, raw, names, th_fc,
     return figs
 
 
+def _forest_figures(view, data, raw, names, titles) -> dict:
+    """The two per-axis forests (runs, and releases at their best effort) of a view, on the
+    reading the view is on: top models, pinned frontier releases and human tiers per axis,
+    the post's forest figure: same candidates as the timelines and the forecast
+    (`candidate_mask`), 95% intervals."""
+    from multiaxis_eci.analysis import forest_frames
+    from multiaxis_eci.analysis.human_ident import (
+        drop_unidentified,
+        human_scale_axes,
+        view_human_contraction,
+    )
+    from multiaxis_eci.analysis.reading import value_label
+    from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
+    K = view.K
+    contraction = view_human_contraction(view, data)
+    human_axes = human_scale_axes(contraction, K)
+    affine = human_unit_affine(view.theta, data, human_axes)
+    # One shared x caption: the human-unit one, flagged when an axis keeps the fitted scale.
+    x_title = (f"{value_label(view, ability_label(affine), human_units=affine is not None)} "
+               "(median, 95% interval)")
+    if affine is not None and not human_axes.all():
+        x_title += "; " + ", ".join((titles or {}).get(names[k], names[k])
+                                    for k in np.where(~human_axes)[0]) + ": fitted scale"
+    frames = [rescale_frame(drop_unidentified(f, k, contraction), k, affine)
+              for k, f in enumerate(forest_frames(view, data, raw, A_draws=view.A))]
+    figs = {"forests_per_axis": forest_grid_fig(
+        frames, [(titles or {}).get(n, n) for n in names], x_title=x_title)}
+    # The same forest at the level of releases: one row per family, its best effort.
+    fam = [rescale_frame(drop_unidentified(f, k, contraction), k, affine)
+           for k, f in enumerate(forest_frames(view, data, raw, by_family=True,
+                                               A_draws=view.A))]
+    figs["forests_per_family"] = forest_grid_fig(
+        fam, [(titles or {}).get(n, n) for n in names], x_title=x_title,
+        title="Top releases (best effort), frontier releases and human tiers per axis")
+    return figs
+
+
+THETA_TWIN = "__theta"
+
+
 def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                       forecast: bool = False, axis_titles: dict | None = None,
-                      doc_variants: bool = False) -> dict:
+                      doc_variants: bool = False, reading: str | None = None,
+                      theta_twins: bool = False) -> dict:
     """Canonical per-fit MIRT figure set, gated by fit family (comp / nc).
+
+    The ability-side figures (the per-axis timelines, the forecasts and their crossings, the
+    forests) read each axis under `reading` (`analysis.reading`; default
+    `config.AXIS_READING`, the predicted scores on the axis's benchmarks). `theta_twins` adds
+    the same figures on the fitted abilities under `key + THETA_TWIN`, for the caller to file
+    apart; nothing is added where the two readings are the same view (a fit without a
+    predicted-score reading, or `reading="theta"`). Loadings, item curves, goodness of fit and
+    the factor correlations always read the fit itself.
 
     Returns a name→go.Figure dict instead of writing files, so the dashboard
     embeds them and the single-fit CLI saves them. `view` is a `analysis.FitView`. Diagnostic honesty: GoF/PIT come from `gof`
@@ -368,8 +424,11 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     # Display titles come from the fit's hand-filled axis_names.json
     # (`analysis.load_axis_titles`); None titles every axis `Axis k`.
     from multiaxis_eci.analysis.axes import bare_axis_title
+    from multiaxis_eci.analysis.reading import reading_view
     titles = axis_titles or {n: bare_axis_title(n) for n in names}
-    axis_figs = build_axis_figures(view, data, raw, bench, signed_frames, axis_titles=titles)
+    # The view the ability-side figures read: the fit's own, or its predicted-score reading.
+    rview = reading_view(view, data, reading)
+    axis_figs = build_axis_figures(rview, data, raw, bench, signed_frames, axis_titles=titles)
     load_figs = {k: axis_figs.pop(k) for k in list(axis_figs)
                  if k.startswith("loadings")}
     figs.update(axis_figs)
@@ -385,49 +444,34 @@ def build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
     # axis and project when it crosses each human tier. Same oblique frame as the
     # timelines above; gated on human tiers, in the fit or placed beside it (nothing to cross
     # otherwise).
-    if forecast and not view.is_nc and K > 1 and (data.is_human.any()
-                                                  or view.human_placement is not None):
-        th_fc = signed_frames["oblique"].theta if is_signed else view.theta
-        figs.update(forecast_figures(view, data, raw, names, th_fc, axis_titles=titles,
+    with_forecast = forecast and not view.is_nc and K > 1 and (
+        data.is_human.any() or view.human_placement is not None)
+    if with_forecast:
+        th_fc = signed_frames["oblique"].theta if is_signed else rview.theta
+        figs.update(forecast_figures(rview, data, raw, names, th_fc, axis_titles=titles,
                                      doc_variants=doc_variants))
 
     figs.update(load_figs)          # held back above — legacy page position
 
     if K >= 2 and view.A is not None:
-        # Top models, pinned frontier releases and human tiers per axis, the
-        # post's forest figure: same candidates as the timelines and the
-        # forecast (`candidate_mask`), 95% intervals.
-        from multiaxis_eci.analysis import forest_frames
-        from multiaxis_eci.analysis.human_ident import (
-            drop_unidentified,
-            human_scale_axes,
-            view_human_contraction,
-        )
-        from multiaxis_eci.analysis.scale import ability_label, human_unit_affine, rescale_frame
-        contraction = view_human_contraction(view, data)
-        human_axes = human_scale_axes(contraction, K)
-        affine = human_unit_affine(view.theta, data, human_axes)
-        # One shared x caption: the human-unit one, flagged when an axis keeps the fitted scale.
-        x_title = f"{ability_label(affine)} (median, 95% interval)"
-        if affine is not None and not human_axes.all():
-            x_title += "; " + ", ".join((titles or {}).get(names[k], names[k])
-                                        for k in np.where(~human_axes)[0]) + ": fitted scale"
-        frames = [rescale_frame(drop_unidentified(f, k, contraction), k, affine)
-                  for k, f in enumerate(forest_frames(view, data, raw, A_draws=view.A))]
-        figs["forests_per_axis"] = forest_grid_fig(
-            frames, [(titles or {}).get(n, n) for n in names], x_title=x_title)
-        # The same forest at the level of releases: one row per family, its best effort.
-        fam = [rescale_frame(drop_unidentified(f, k, contraction), k, affine)
-               for k, f in enumerate(forest_frames(view, data, raw, by_family=True,
-                                                   A_draws=view.A))]
-        figs["forests_per_family"] = forest_grid_fig(
-            fam, [(titles or {}).get(n, n) for n in names], x_title=x_title,
-            title="Top releases (best effort), frontier releases and human tiers per axis")
+        figs.update(_forest_figures(rview, data, raw, names, titles))
         # The benchmarks that define each axis, ranked by axis share (95%
         # intervals): the post's loadings figure, beside the heatmap.
         from multiaxis_eci.analysis import loadings_table
         ldf = loadings_table(view.require_A(), bench, hdi=(2.5, 97.5))
         figs["loadings_per_axis"] = loadings_grid_fig(ldf, titles or {}, top_n=20)
+
+    if theta_twins and rview is not view:
+        # The same ability-side figures on the fitted abilities, for the caller to file apart.
+        twins = {k: f for k, f in build_axis_figures(view, data, raw, bench, signed_frames,
+                                                     axis_titles=titles).items()
+                 if not k.startswith("loadings")}
+        if with_forecast:
+            twins.update(forecast_figures(view, data, raw, names, view.theta,
+                                          axis_titles=titles))
+        if K >= 2 and view.A is not None:
+            twins.update(_forest_figures(view, data, raw, names, titles))
+        figs.update({k + THETA_TWIN: f for k, f in twins.items()})
 
     if K >= 2:
         # A signed fit's display Phi is the promax factor correlation, an

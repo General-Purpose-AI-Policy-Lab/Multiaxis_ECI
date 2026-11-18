@@ -70,6 +70,16 @@ class FitView:
     # The tiers placed axis by axis on a fit without human baselines (analysis.human_placement,
     # `attach_placement`), which the figures draw in place of fitted tiers. None otherwise.
     human_placement: dict | None = None
+    # The difficulty draws (S, B) behind `theta` and `A`, kept where the predictor is
+    # A . theta - D (the linear link): what `analysis.reading` needs to read an axis on predicted
+    # scores. None for the softmin and log-logistic links and for non-comp fits.
+    D: np.ndarray | None = None
+    # What `theta` holds: "theta", the fitted abilities, or "predicted", each axis read on the
+    # predicted scores of the benchmarks it dominates (`analysis.reading.predicted_view`).
+    reading: str = "theta"
+    # On the predicted-score reading, the fitted abilities `theta` replaced: what stays a
+    # property of the fit (which tiers the data place on an axis, `analysis.human_ident`).
+    theta_fit: np.ndarray | None = None
 
     def require_A(self) -> np.ndarray:
         if self.A is None:
@@ -77,6 +87,25 @@ class FitView:
                 "FitView has no loadings A — this is a non-compensatory fit "
                 "(slope fixed = 1); its benchmark→axis structure is the Q-matrix.")
         return self.A
+
+
+def _linear_D(post, n_draws: int) -> np.ndarray | None:
+    """The difficulty draws (S, B) of a fit whose predictor is A . theta - D, in the draw order of
+    `mirt_factors_from_trace` (chains then draws); None for any other link (softmin, log-logistic,
+    softplus abilities), where a linear composite of the abilities is not a predicted score."""
+    import json
+    if "D" not in post or "alpha" in post or "comp_beta" in post:
+        return None
+    if str(post.attrs.get("mirt_link", "linear")) != "linear":
+        return None
+    try:
+        if json.loads(post.attrs.get("mirt_spec", "{}")).get("theta_pos"):
+            return None
+    except (TypeError, ValueError):
+        pass
+    D = post["D"].values
+    D = D.reshape(-1, D.shape[-1])
+    return D if D.shape[0] == n_draws else None
 
 
 def prepare_fit(idata, data: ECIData) -> FitView:
@@ -136,7 +165,7 @@ def prepare_fit(idata, data: ECIData) -> FitView:
     return FitView(theta=theta, Phi=Phi, Phi_raw=Phi_raw, names=names, K=K,
                    is_nc=False, anchored=anchored, rotated=rotated,
                    A=A, tau=tau, phi_is_promax=phi_is_promax,
-                   D_med=med("D"), phi_med=med("phi_b"),
+                   D_med=med("D"), phi_med=med("phi_b"), D=_linear_D(post, theta.shape[0]),
                    human_order=trace_human_order(idata),
                    human_delta_sd=trace_human_delta_sd(post),
                    human_root_sd=trace_human_root_sd(post))
