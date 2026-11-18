@@ -364,6 +364,10 @@ Small get nodes of their own. Re-pinned again the same day when the pipeline exc
 CyScenarioBench (Anthropic) and, for now, three four-model CAISI series (user; pipeline 040204d).
 Scope: 4,409 -> 4,634 obs / 809 -> 836 models / 93 -> 89 benchmarks curated; 5,543 -> 5,906 /
 896 -> 925 / 107 -> 103 on the full set. Data only; no model math moved.
+Re-pinned a third time that day when the lab's own TriviaQA runs entered (19 runs of recent Claude
+models; pipeline 3a654fe) and TriviaQA's item count went from 7,993 to 2,000, the size of the
+draw those runs use: 4,634 -> 4,653 obs curated, 5,906 -> 5,925 on the full set, models and
+benchmarks unchanged. Data only; no model math moved.
 
 Three guards:
 - Golden initial-point log-probabilities per model configuration — any
@@ -433,7 +437,7 @@ class TestGoldenLogp:
     found in the 2026-08-31 pre-publication review. A data refresh re-pins
     them like the rest, at their perturbed point.
 
-    Last re-pinned on the 2026-11-18 data (pipeline 040204d, run 20261118). A legitimate
+    Last re-pinned on the 2026-11-18 data (pipeline 3a654fe, run 20261118). A legitimate
     data refresh moves every value here:
     recompute all of them in one pass and re-pin together, never one at a time.
     """
@@ -442,12 +446,12 @@ class TestGoldenLogp:
     def test_mirt_k1_normal(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="normal")),
-            -101325.983738, rtol=self.RTOL)
+            -102365.994688, rtol=self.RTOL)
 
     def test_mirt_k3_normal(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=3, loading_prior="normal")),
-            -102989.801949, rtol=self.RTOL)
+            -104029.812899, rtol=self.RTOL)
 
     def test_mirt_k1_pt1_censored(self, data):
         """--censor-bounds: boundary scores enter as Beta CDF terms (data.load_boundary_eps
@@ -458,7 +462,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         censor_eps=load_boundary_eps(data))),
-            -88583.206127, rtol=self.RTOL)
+            -89623.217076, rtol=self.RTOL)
 
     def test_mirt_k1_pt1_beta_binomial(self, data):
         """The default likelihood since 2026-10-01: Beta-binomial on the item-scored
@@ -468,22 +472,22 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         binomial_n=load_binomial_n(data))),
-            -69308.066866, rtol=self.RTOL)
+            -70328.365393, rtol=self.RTOL)
 
     def test_mirt_k1_pt1(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1")),
-            -101342.254899, rtol=self.RTOL)
+            -102382.265848, rtol=self.RTOL)
 
     def test_mirt_k3_pt1(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=3, loading_prior="pt1")),
-            -103038.615431, rtol=self.RTOL)
+            -104078.626381, rtol=self.RTOL)
 
     def test_mirt_k3_signed(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=3, loading_prior="signed")),
-            -103041.372246, rtol=self.RTOL)
+            -104081.383196, rtol=self.RTOL)
 
     def test_mirt_k3_signed_full_options(self, data):
         bench = data.blookup["benchmark"].tolist()
@@ -492,20 +496,20 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup),
             plt_founders=[bench[5], bench[10], bench[20]])
         np.testing.assert_allclose(
-            total_logp(model), -103690.454263, rtol=self.RTOL)
+            total_logp(model), -104730.465212, rtol=self.RTOL)
 
     def test_mirt_k3_normal_human_merged(self, data):
         model = build_mirt_model(data, K=3, loading_prior="normal",
                                  human_order=HUMAN_ORDER_MERGED)
         np.testing.assert_allclose(
-            total_logp(model), -103524.39322, rtol=self.RTOL)
+            total_logp(model), -104564.404169, rtol=self.RTOL)
 
     def test_mirt_k3_signed_lineage_bm(self, data):
         model = build_mirt_model(
             data, K=3, loading_prior="signed",
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True)
         np.testing.assert_allclose(
-            total_logp(model), -103686.759796, rtol=self.RTOL)
+            total_logp(model), -104726.770746, rtol=self.RTOL)
 
     def test_mirt_k3_normal_lineage_bm(self, data):
         # The signed BM goldens are blind to the delta formula (signed A is 0
@@ -516,7 +520,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal",
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True)
         np.testing.assert_allclose(
-            total_logp(model), -175703.934154, rtol=self.RTOL)
+            total_logp(model), -175719.600759, rtol=self.RTOL)
 
     def test_mirt_k3_signed_bm_full_options(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial
@@ -530,7 +534,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup), lineage_bm=True,
             plt_founders=[bench[5], bench[10], bench[20]])
         np.testing.assert_allclose(
-            perturbed_logp(model), -86037.164688, rtol=self.RTOL)
+            perturbed_logp(model), -86881.042535, rtol=self.RTOL)
 
     def test_mirt_k3_normal_time_prior(self, data):
         # Config lock only: at the initial point time_beta = 0, so the trend
@@ -544,7 +548,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=lin, time_t=release_time_covariate(data.mlookup, lin))
         np.testing.assert_allclose(
-            total_logp(model), -168240.869091, rtol=self.RTOL)
+            total_logp(model), -168226.805211, rtol=self.RTOL)
 
     def test_mirt_k3_signed_theta_t(self, data):
         # Config lock: at the initial point every t cell is 0 and re-centering
@@ -554,7 +558,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=3, loading_prior="signed",
                                         theta_t_cells=True)),
-            -103199.350989, rtol=self.RTOL)
+            -104239.361938, rtol=self.RTOL)
 
     def test_mirt_k3_normal_theta_t_full(self, data):
         # Same lock with both theta-structure priors on: the t block must cover
@@ -565,7 +569,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), theta_t_cells=True)
         np.testing.assert_allclose(
-            total_logp(model), -168283.98208, rtol=self.RTOL)
+            total_logp(model), -168269.9182, rtol=self.RTOL)
 
     def test_mirt_k3_normal_theta_pos(self, data):
         # Formula lock: at the initial point theta = 0 but softplus(0) = log 2,
@@ -575,7 +579,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=3, loading_prior="normal",
                                         theta_pos=True)),
-            -156965.4754870, rtol=self.RTOL)
+            -157153.5351660, rtol=self.RTOL)
 
     def test_mirt_k3_normal_loglog(self, data):
         # Formula lock: at the initial point theta = 0 and logA_mix_z = 0
@@ -587,7 +591,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=3, loading_prior="normal",
                                         link="loglog")),
-            -124549.59356, rtol=self.RTOL)
+            -124991.095831, rtol=self.RTOL)
 
     def test_mirt_k1_loglog(self, data):
         # K=1 degeneracy: the ZeroSumNormal over a size-1 latent axis is
@@ -597,7 +601,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="normal",
                                         link="loglog")),
-            -101284.522028, rtol=self.RTOL)
+            -102324.532978, rtol=self.RTOL)
 
     def test_mirt_k3_normal_known_se(self, data):
         # Config lock AND formula lock: n_eff enters the Beta precision
@@ -608,7 +612,7 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal", human_order=HUMAN_ORDER,
             lineage=build_lineage_structure(data.mlookup), known_se=True)
         np.testing.assert_allclose(
-            total_logp(model), -151047.49247, rtol=self.RTOL)
+            total_logp(model), -151032.446859, rtol=self.RTOL)
 
     def test_mirt_k3_normal_pooled_knownse(self, data):
         # The production combo: pooled noise on top of the known-SE split. At the
@@ -621,7 +625,7 @@ class TestGoldenLogp:
             lineage=build_lineage_structure(data.mlookup), known_se=True,
             pooled_noise=True)
         np.testing.assert_allclose(
-            total_logp(model), -192985.321709, rtol=self.RTOL)
+            total_logp(model), -192977.409204, rtol=self.RTOL)
 
     def test_mirt_k3_signed_floors(self, data_all):
         from multiaxis_eci.data import clip_scores_to_floors, load_benchmark_floors
@@ -630,12 +634,12 @@ class TestGoldenLogp:
         model = build_mirt_model(clipped, K=3, loading_prior="signed",
                                  floor_c=floors)
         np.testing.assert_allclose(
-            total_logp(model), -126082.265965, rtol=self.RTOL)
+            total_logp(model), -126877.360451, rtol=self.RTOL)
 
     def test_mirt_k4_bifactor(self, data):
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=4, loading_prior="bifactor")),
-            -104129.498664, rtol=self.RTOL)
+            -105169.509613, rtol=self.RTOL)
 
     def test_mirt_k4_bifactor_full_options(self, data_all):
         # The live exploratory base, bifactor loadings: both theta priors,
@@ -654,7 +658,7 @@ class TestGoldenLogp:
             floor_c=floors, ceiling_noise=True,
             known_ceiling=load_benchmark_ceilings(clipped))
         np.testing.assert_allclose(
-            total_logp(model), -213497.446376, rtol=self.RTOL)
+            total_logp(model), -213429.557013, rtol=self.RTOL)
 
     def test_mirt_k3_anchored(self, data):
         # Pinned at the PERTURBED point (2026-08-31): at the default initial
@@ -667,28 +671,28 @@ class TestGoldenLogp:
             data, K=3, loading_prior="normal",
             anchors={bench[5]: 0, bench[10]: 1, bench[20]: 2})
         np.testing.assert_allclose(
-            perturbed_logp(model), -92985.012834, rtol=self.RTOL)
+            perturbed_logp(model), -94301.375664, rtol=self.RTOL)
 
     def test_nc_k3_full(self, data_all):
         from multiaxis_eci.fits.fit_nc import build_qmatrix
         Q, _ = build_qmatrix(data_all, 3, "full")
         np.testing.assert_allclose(
             total_logp(build_mirt_nc_model(data_all, Q)),
-            -156920.1862330, rtol=self.RTOL)
+            -157189.8311910, rtol=self.RTOL)
 
     def test_sparse_k3(self, data):
         bench = data.blookup["benchmark"].tolist()
         model = build_mirt_sparse_model(
             data, anchors={bench[0]: 0, bench[1]: 1, bench[2]: 2}, K=3)
         np.testing.assert_allclose(
-            total_logp(model), -117659.442123, rtol=self.RTOL)
+            total_logp(model), -118202.485849, rtol=self.RTOL)
 
     def test_interaction_k3(self, data):
         bench = data.blookup["benchmark"].tolist()
         model = build_mirt_interaction_model(
             data, plt_founders=[bench[5], bench[10], bench[20]], K=3)
         np.testing.assert_allclose(
-            total_logp(model), -105365.932413, rtol=self.RTOL)
+            total_logp(model), -106196.729488, rtol=self.RTOL)
 
     def test_interaction_k3_pooled_gamma(self, data):
         bench = data.blookup["benchmark"].tolist()
@@ -696,7 +700,7 @@ class TestGoldenLogp:
             data, plt_founders=[bench[5], bench[10], bench[20]], K=3,
             gamma_pooling="pooled")
         np.testing.assert_allclose(
-            total_logp(model), -105174.323496, rtol=self.RTOL)
+            total_logp(model), -106005.120571, rtol=self.RTOL)
 
     def test_interaction_k3_gamma_none(self, data):
         # gamma == 0 skips the interaction term entirely, so this value must NOT
@@ -707,7 +711,7 @@ class TestGoldenLogp:
             data, plt_founders=[bench[5], bench[10], bench[20]], K=3,
             gamma_pooling="none")
         np.testing.assert_allclose(
-            total_logp(model), -103041.372246, rtol=self.RTOL)
+            total_logp(model), -104081.383196, rtol=self.RTOL)
 
     def test_interaction_k3_normal_floors_pooled(self, data):
         # non-negative loadings (no founders) + fixed-c 3PL + pooled gamma —
@@ -719,7 +723,7 @@ class TestGoldenLogp:
             clipped, plt_founders=None, K=3, gamma_pooling="pooled",
             loading_prior="normal", floor_c=floors)
         np.testing.assert_allclose(
-            total_logp(model), -98414.113699, rtol=self.RTOL)
+            total_logp(model), -99043.541492, rtol=self.RTOL)
 
 
 class TestSparseBuilder:
