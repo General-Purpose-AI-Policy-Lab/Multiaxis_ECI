@@ -137,11 +137,13 @@ TIMELINE_HDI_PROB = 0.80
 TIMELINE_ECI_RANGE = (50, 230)
 # The names written on that figure, and where their labels sit (release date, ECI-H): in the
 # empty parts of the plot, joined to their point by a leader line, so none covers the cloud.
-TIMELINE_BENCH_LABELS = {"MMLU": ("2020-11-15", 72), "GSM8K": ("2021-10-15", 128),
-                         "GPQA Diamond": ("2023-04-01", 160), "OSWorld": ("2024-04-11", 168),
-                         "GSO-Bench": ("2024-12-01", 203), "HLE Diamond": ("2026-11-10", 222)}
-TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-06-15", 61, "Claude 3.5 Sonnet (Oct 2024)"),
-                         config.ANCHOR_HIGH[0]: ("2025-09-20", 72, "GPT-5 (medium)")}
+# Placed for the scale of the anchors of 2026-11-19: clear of the tier lines (High School Top
+# Performer near 158, Top Performer near 219 with its band from 203).
+TIMELINE_BENCH_LABELS = {"MMLU": ("2020-11-15", 80), "GSM8K": ("2021-10-15", 128),
+                         "GPQA Diamond": ("2023-04-01", 165), "OSWorld": ("2024-04-11", 168),
+                         "GSO-Bench": ("2024-12-01", 196), "HLE Diamond": ("2026-11-10", 226)}
+TIMELINE_MODEL_LABELS = {config.ANCHOR_LOW[0]: ("2024-11-01", 62, "Claude 3.5 Sonnet (Jun 2024)"),
+                         config.ANCHOR_HIGH[0]: ("2025-09-20", 72, "GPT-5 (high)")}
 
 def load_axis_pin(path) -> dict:
     """--axis-pin FILE: a CSV with `benchmark` and `axis` (1-based) columns, as
@@ -423,7 +425,7 @@ def run_canonical(args) -> None:
     # don't match the config's versioned anchors — remap on the config module
     # so analysis (attribute access) picks them up.
     if args.eci_data_only:
-        config.ANCHOR_LOW  = ("Claude 3.5 Sonnet (October 2024)", 130.0)
+        config.ANCHOR_LOW  = ("Claude 3.5 Sonnet", 130.0)   # Epoch's anchor: the June 2024 release
         config.ANCHOR_HIGH = ("GPT-5", 150.0)
         config.SOTA_FAMILIES = [
             "GPT-5", "o3-pro", "o3", "Gemini 2.5 Pro (Mar 2025)", "o1",

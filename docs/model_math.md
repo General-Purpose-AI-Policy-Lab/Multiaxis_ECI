@@ -621,13 +621,24 @@ $$
 i.e.
 
 $$
-\mathrm{ECI\text{-}H}_{\text{Claude 3.5 Sonnet (2024-10-22)}} = 130,
+\mathrm{ECI\text{-}H}_{\text{Claude 3.5 Sonnet (2024-06-20)}} = 130,
 \qquad
-\mathrm{ECI\text{-}H}_{\text{GPT-5 (2025-08-07, medium)}} = 150.
+\mathrm{ECI\text{-}H}_{\text{GPT-5 (2025-08-07, high)}} = 150.
 $$
 
-The choice of anchors is arbitrary (it matches the public Epoch dashboard for
-comparability); differences and rankings are **invariant** to it.
+The anchors are Epoch's, for comparability with its public dashboard, in the two rows of
+this fit closest to them (`config.ANCHOR_LOW` / `ANCHOR_HIGH`, since 2026-11-19). Epoch
+pins the model aggregations "Claude 3.5 Sonnet" and "GPT-5" (`eci-public`,
+`src/eci/bayesian.py`). The first is the June 2024 release; the October one is a
+separate aggregation, at 133.3 in Epoch's file of 2026-11-18. The second pools the
+reasoning efforts and keeps the best score per benchmark (`src/eci/dataloader.py`): 20
+of its 28 scores are the high effort. Here each effort is a test-taker of its own, so
+the high effort stands for it. Until 2026-11-19 the anchors were the October Sonnet and
+GPT-5 medium, which stretched the scale by about a quarter: an ECI-H published before
+that date is not on the present scale.
+
+The anchors set the unit only: rankings and ratios of differences are **invariant** to
+them.
 
 ---
 

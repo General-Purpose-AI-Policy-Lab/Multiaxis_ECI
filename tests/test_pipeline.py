@@ -405,7 +405,7 @@ class TestEraFilter:
         # EBR-bench (first model 2025-08) since GeoBench joined the exclusions (2026-09-29).
         assert past.is_human.sum() >= data.is_human.sum() - 1
         # a pre-cutoff staple survives; the post-cutoff ECI anchor is gone
-        assert ANCHOR_LOW[0] in present            # Claude 3.5 Sonnet, 2024-10
+        assert ANCHOR_LOW[0] in present            # Claude 3.5 Sonnet, 2024-06
         assert ANCHOR_HIGH[0] not in present       # GPT-5, 2025-08
         from multiaxis_eci.data import PROCESSED_FILE
         raw = pd.read_csv(PROCESSED_FILE)
@@ -478,8 +478,10 @@ class TestAnalysis:
     def test_eci_anchor_literals(self):
         # A silent anchor swap rescales every published ECI-H number while the
         # pin test above (which reads the same constants) keeps passing.
-        assert ANCHOR_LOW == ("claude-3-5-sonnet-20241022", 130.0)
-        assert ANCHOR_HIGH == ("gpt-5-2025-08-07_medium", 150.0)
+        # Epoch's anchors (2026-11-19): the June 2024 Sonnet, and the high effort that carries
+        # most of the scores of its "GPT-5" aggregation.
+        assert ANCHOR_LOW == ("claude-3-5-sonnet-20240620", 130.0)
+        assert ANCHOR_HIGH == ("gpt-5-2025-08-07_high", 150.0)
 
     def test_forecast_config_wiring(self):
         # The figure pipeline feeds FORECAST_KW / FORECAST_BACKCAST_FLOOR into
@@ -812,6 +814,18 @@ class TestPlots:
     def test_sota_forest(self, synth_trace, data, raw_df):
         df = sota_stats_df(synth_trace, data, raw_df)
         assert isinstance(sota_forest_fig(df, "ECI", "t", "ECI"), go.Figure)
+
+    def test_sota_forest_shows_every_model_name(self):
+        # 40 rows: every label is a tick, and the figure is taller than its 520 px floor.
+        n = 40
+        df = pd.DataFrame({"model": [f"m{i}" for i in range(n)],
+                           "release_date": ["2026-01-01"] * n,
+                           "ECI_mean": np.arange(n, dtype=float),
+                           "ECI_hdi_low": np.arange(n) - 1.0,
+                           "ECI_hdi_high": np.arange(n) + 1.0})
+        fig = sota_forest_fig(df, "ECI", "t", "ECI")
+        assert len(fig.layout.yaxis.tickvals) == n
+        assert fig.layout.height > 520
 
     def test_all_models_forest(self, synth_trace, data):
         df = all_models_stats_df(synth_trace, data)

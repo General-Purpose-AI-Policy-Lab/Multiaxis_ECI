@@ -456,7 +456,8 @@ def sota_forest_fig(sota_df: pd.DataFrame,
                      bar_color: str = "steelblue",
                      anchors: list[tuple[float, str]] | None = None,
                      reference: float | None = None,
-                     ref_label: str | None = None) -> go.Figure:
+                     ref_label: str | None = None,
+                     row_px: int = 24) -> go.Figure:
     labels = [f"{m} ({d})" for m, d in zip(sota_df["model"], sota_df["release_date"])]
     means = sota_df[f"{x_col}_mean"].values
     los   = sota_df[f"{x_col}_hdi_low"].values
@@ -474,14 +475,20 @@ def sota_forest_fig(sota_df: pd.DataFrame,
         fig.add_vline(x=reference, line_dash="dot", line_color="gray",
                       annotation_text=ref_label or "", annotation_position="top")
     if anchors:
+        # The lowest anchor's label goes left of its line and the others right of theirs: with
+        # both on the left, the two labels (130 and 150, 20 points apart) ran into each other.
+        lowest = min(val for val, _ in anchors)
         for val, label in anchors:
-            fig.add_vline(x=val, line_dash="dot", line_color="#666",
-                          annotation_text=label, annotation_position="top left")
+            fig.add_vline(x=val, line_dash="dot", line_color="#666", annotation_text=label,
+                          annotation_position="top left" if val == lowest else "top right")
     fig.update_layout(
         title=title, xaxis_title=xaxis_title,
-        yaxis=dict(autorange="reversed"),
+        # Every model name is drawn (Plotly skips ticks on a long list: at 31 rows in 520 px
+        # it showed one name in two) and the height grows with the row count.
+        yaxis=dict(autorange="reversed", tickmode="array", tickvals=labels, ticktext=labels,
+                   automargin=True),
         template="plotly_white",
-        height=520, width=950,
+        height=max(520, row_px * len(labels) + 100), width=950,
         margin=dict(l=240, r=40, t=55, b=45),
     )
     return fig

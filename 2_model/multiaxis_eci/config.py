@@ -399,12 +399,19 @@ SAMPLE_KW = dict(
 )
 
 # ── ECI affine anchors (For comparability) ───────────────────────────────
-# IDs match `model_version` in 0_input/all_scores_flat.csv.
-# Where models expose a reasoning-effort suffix (_low/_medium/_high), we pick
-# `_medium` as a default-ish operating point and keep the choice consistent
-# across the SOTA list — anchors are arbitrary; differences are invariant.
-ANCHOR_LOW  = ("claude-3-5-sonnet-20241022", 130.0)
-ANCHOR_HIGH = ("gpt-5-2025-08-07_medium",    150.0)
+# IDs match `model_version` in 0_input/all_scores_flat.csv. The two rows closest to Epoch's own
+# anchors, read at the source on 2026-11-19 (user decision the same day; until then the October
+# Sonnet and GPT-5 medium, which stretched the scale by about a quarter against Epoch's):
+#   - Epoch pins the model aggregations "Claude 3.5 Sonnet" = 130 and "GPT-5" = 150
+#     (eci-public, src/eci/bayesian.py, matched on the aggregation's name).
+#   - "Claude 3.5 Sonnet" is the June 2024 release: every score of it in Epoch's ECI input is
+#     claude-3-5-sonnet-20240620, and the October release is another aggregation (133.3).
+#   - "GPT-5" pools the efforts and keeps the best score per benchmark (src/eci/dataloader.py):
+#     20 of its 28 scores are the high effort, 4 the medium one. Here an effort is a
+#     test-taker of its own, so the high effort is the nearest single row.
+# The anchors set the unit only: rankings and ratios of differences do not depend on them.
+ANCHOR_LOW  = ("claude-3-5-sonnet-20240620", 130.0)
+ANCHOR_HIGH = ("gpt-5-2025-08-07_high",      150.0)
 
 # ── SOTA families (data-driven; newest first) ───────────────────────────────
 # NOT hand-maintained. `1_curated/1_compute_sota.py` writes
