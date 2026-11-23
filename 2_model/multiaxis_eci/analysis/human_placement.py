@@ -41,10 +41,10 @@ import pandas as pd
 from multiaxis_eci.config import (
     CONTINUOUS_EPS,
     CURATED_DIR,
-    PROJECT_ROOT,
     HUMAN_ORDER_MERGED,
     PRIOR_DELTA_HUMAN,
     PRIOR_HUMAN_ROOT,
+    PROJECT_ROOT,
 )
 
 CONTENT_FILE = CURATED_DIR / "human_axis_content.csv"
@@ -191,9 +191,12 @@ def place_axis(k, scores, bench, A, D, phi, floor_c, theta_models, tiers, seed=8
     import pymc as pm
     import pytensor.tensor as pt
 
-    from multiaxis_eci.models.mirt import softmin_eta
-
-    from multiaxis_eci.models.mirt import _beta_binomial_logp, _human_block, _human_structure
+    from multiaxis_eci.models.mirt import (
+        _beta_binomial_logp,
+        _human_block,
+        _human_structure,
+        softmin_eta,
+    )
 
     struct = _human_structure(HUMAN_ORDER_MERGED, tiers)
     order = [tiers[r] for r in struct[0]]

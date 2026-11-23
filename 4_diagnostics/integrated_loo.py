@@ -281,9 +281,8 @@ def soft_link(spec) -> bool:
 
 def load_fit(trace_path: Path, chains: list[int], lineage_map: Path | None = None):
     from multiaxis_eci.analysis.fitspec import FitSpec, sampled_human_order
-    from multiaxis_eci.models.mirt import trace_softmin
     from multiaxis_eci.lineage import trace_lineage_structure
-    from multiaxis_eci.models.mirt import _human_structure
+    from multiaxis_eci.models.mirt import _human_structure, trace_softmin
 
     post_all = xr.open_dataset(trace_path, group="posterior")
     spec = FitSpec.from_trace(az.InferenceData(posterior=post_all), trace_path)

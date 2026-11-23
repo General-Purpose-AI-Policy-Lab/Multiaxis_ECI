@@ -16,6 +16,7 @@ def test_axes_are_g_plus_scaled_deviations():
     """theta[:, 0] is the exchangeable block's first column and theta[:, k] = theta[:, 0] +
     sigma_k * cell[:, k], draw by draw under the prior."""
     import pymc as pm
+
     from multiaxis_eci.models.mirt import build_mirt_model
     model = build_mirt_model(_toy_data(), 3, loading_prior="bifactor", theta_skew=True,
                              general_sums=True)
@@ -61,6 +62,7 @@ def test_a_spec_written_before_general_sums_reads_as_the_same_fit():
     (no general_sums key) is the same fit as today's run with it off, and a real change is not."""
     import dataclasses
     import json
+
     from multiaxis_eci.analysis.fitspec import FitSpec
     today = FitSpec(K=4, lineage_prior=True, lineage_bm=True, theta_skew=True, no_humans=True)
     old = {k: (list(v) if isinstance(v, tuple) else v)

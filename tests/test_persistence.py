@@ -101,6 +101,7 @@ def test_merge_chains_reads_an_older_spec_as_the_same_fit():
     same fit, as fit.py's own check does (FitSpec.from_spec_json); a real change still refuses."""
     import dataclasses
     import json
+
     from multiaxis_eci.analysis.fitspec import FitSpec
     today = FitSpec(K=4, lineage_prior=True, lineage_bm=True, theta_skew=True, no_humans=True)
     new = {k: (list(v) if isinstance(v, tuple) else v) for k, v in dataclasses.asdict(today).items()}

@@ -35,8 +35,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci.config import DIAGNOSTICS_DIR, ECI_EPS  # noqa: E402
-from multiaxis_eci.persistence import save_trace  # noqa: E402
 from multiaxis_eci.data import load_eci_data  # noqa: E402
+from multiaxis_eci.persistence import save_trace  # noqa: E402
 
 MIN_BENCH_OBS = 3
 RESULTS_DIR = DIAGNOSTICS_DIR / "ppca"

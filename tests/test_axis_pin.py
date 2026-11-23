@@ -33,6 +33,7 @@ def test_pin_leans_the_prior_shares_of_the_pinned_rows_only():
     """Under the prior, a pinned row's share on its axis sits near the offset's design value
     (0.93 at concentration 2.5, offset 1.5) while an unpinned row keeps the symmetric shares."""
     import pymc as pm
+
     from multiaxis_eci.models.mirt import build_mirt_model
     data = _toy_data()
     model = build_mirt_model(data, 3, simple_structure=True, share_conc=2.5,

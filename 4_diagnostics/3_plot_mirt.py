@@ -49,8 +49,6 @@ from multiaxis_eci.analysis import (  # noqa: E402
     attach_placement,
     axis_title_translations,
     best_mode_chains,
-    secondary_frame_dir,
-    secondary_mode_chains,
     human_unit_affine,
     load_axis_titles,
     mirt_factors_from_trace,
@@ -61,13 +59,15 @@ from multiaxis_eci.analysis import (  # noqa: E402
     reading_view,
     rescale_frame,
     rescale_theta,
+    secondary_frame_dir,
+    secondary_mode_chains,
     trace_loading_prior,
 )
-from multiaxis_eci.analysis.human_placement import SECONDARY_DIR  # noqa: E402
 from multiaxis_eci.analysis.human_ident import (  # noqa: E402
     human_scale_axes,
     view_human_contraction,
 )
+from multiaxis_eci.analysis.human_placement import SECONDARY_DIR  # noqa: E402
 from multiaxis_eci.data import PROCESSED_FILE, model_organization  # noqa: E402
 from multiaxis_eci.ppc import (  # noqa: E402
     compute_gof,

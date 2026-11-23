@@ -48,9 +48,9 @@ from multiaxis_eci.analysis.fitspec import (
     JOINT_FIT,
     FitSpec,
     best_mode_chains,
+    open_flagship,
     secondary_frame_dir,
     secondary_mode_chains,
-    open_flagship,
     spec_json,
 )
 from multiaxis_eci.analysis.fitview import FitView, prepare_fit
@@ -73,6 +73,13 @@ from multiaxis_eci.analysis.human_placement import (
     attach_placement,
     load_placement,
     run_placement,
+)
+from multiaxis_eci.analysis.reading import (
+    axis_scores,
+    has_predicted_reading,
+    predicted_view,
+    reading_view,
+    value_label,
 )
 from multiaxis_eci.analysis.regimes import (
     family_best,
@@ -97,13 +104,6 @@ from multiaxis_eci.analysis.rotation import (
     geomin_rotate,
     permutation_matched_reproducibility,
     promax_rotate,
-)
-from multiaxis_eci.analysis.reading import (
-    axis_scores,
-    has_predicted_reading,
-    predicted_view,
-    reading_view,
-    value_label,
 )
 from multiaxis_eci.analysis.scale import (
     ability_label,

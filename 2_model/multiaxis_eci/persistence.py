@@ -10,7 +10,6 @@ import pandas as pd
 
 from multiaxis_eci.data import ECIData
 
-
 FLOAT32_GROUPS = ("posterior", "log_likelihood")
 
 

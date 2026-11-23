@@ -33,16 +33,16 @@ sys.path.insert(0, str(ROOT / "2_model"))
 
 from multiaxis_eci import config  # noqa: E402
 from multiaxis_eci.analysis.frontier_gap import (  # noqa: E402
-    GROUP_PAIRS,
     FRONTIER_K,
+    GROUP_PAIRS,
     GROUP_TITLES,
     LAG_MEAN_MONTHS,
     LEADER_SD_CAP,
     LINE_TOP_K,
     LINK_MIN_OBS,
-    RECORD_MIN_OBS,
     LINK_ORGANIZATIONS,
     RECORD_FRONTIER_TOL,
+    RECORD_MIN_OBS,
     SCOPES,
     build_group_frontier,
     group_labels,

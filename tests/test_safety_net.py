@@ -387,8 +387,7 @@ import pytest
 from multiaxis_eci.config import HUMAN_ORDER, HUMAN_ORDER_MERGED
 from multiaxis_eci.data import load_eci_data
 from multiaxis_eci.lineage import build_lineage_structure
-from multiaxis_eci.models.mirt import (_human_block, _human_structure, build_mirt_model,
-                                       softmin_eta)
+from multiaxis_eci.models.mirt import _human_block, _human_structure, build_mirt_model, softmin_eta
 from multiaxis_eci.models.mirt_interaction import build_mirt_interaction_model
 from multiaxis_eci.models.mirt_nc import build_mirt_nc_model
 from multiaxis_eci.models.mirt_sparse import build_mirt_sparse_model
@@ -651,8 +650,11 @@ class TestGoldenLogp:
         # since 2026-10-15; the relative Beta(1, 20) gap gave -195869.637522), the
         # gap truncated at the best observed score since 2026-10-19 (-211740.068299
         # before: at the initial point a bounded gap sits mid-interval, closer to the data).
-        from multiaxis_eci.data import (clip_scores_to_floors, load_benchmark_ceilings,
-                                        load_benchmark_floors)
+        from multiaxis_eci.data import (
+            clip_scores_to_floors,
+            load_benchmark_ceilings,
+            load_benchmark_floors,
+        )
         floors = load_benchmark_floors(data_all)
         clipped = clip_scores_to_floors(data_all, floors)
         model = build_mirt_model(
@@ -979,6 +981,7 @@ class TestThetaSkew:
 
     def test_spec_reads_the_flag_back_from_the_trace_attrs(self):
         from types import SimpleNamespace
+
         from multiaxis_eci.analysis.fitspec import FitSpec, _attr_flags
         assert FitSpec(K=4).theta_skew is True
         assert _attr_flags(SimpleNamespace(attrs={"mirt_theta_skew": "true"})).get("theta_skew") is True
@@ -1001,6 +1004,7 @@ class TestThetaSkew:
     def test_cli_default_and_opt_out(self):
         """3_fit/fit.py fits the skew-normal block unless --normal-theta is passed."""
         import argparse
+
         from multiaxis_eci.analysis.fitspec import FitSpec
         ns = dict(K=4, loading_prior="normal", link="linear", human_prior=False, human_merge=False,
                   lineage_prior=True, lineage_bm=True, effort_means=True, time_prior=False,
@@ -1448,6 +1452,7 @@ class TestFloat32Trace:
         the Beta draw then fails on b = 0. _pull_flat hands the predictive float64 arrays."""
         import xarray as xr
         from scipy.special import expit
+
         from multiaxis_eci.ppc import _pull_flat
         post = xr.Dataset({"D": (("chain", "draw", "b"), np.full((2, 3, 1), -17.5, np.float32))})
         (D,) = _pull_flat(post, ["D"], max_draws=10)
@@ -1457,6 +1462,7 @@ class TestFloat32Trace:
     def test_beta_draw_survives_a_saturated_mean(self):
         """A human tier inside a fit reaches eta ~ 100: mu is exactly 1 even in float64."""
         from types import SimpleNamespace
+
         from multiaxis_eci.ppc import _beta_draw
         data = SimpleNamespace(bench_idx=np.array([0, 0]))
         y = _beta_draw(np.array([[1.0, 0.0]]), np.array([[50.0]]), data, seed=0)

@@ -33,14 +33,13 @@ from multiaxis_eci.analysis import (  # noqa: E402
     FitSpec,
     align_to_reference_loadings,
     best_mode_chains,
-    secondary_frame_dir,
-    secondary_mode_chains,
     load_axis_titles,
     prepare_fit,
     run_placement,
+    secondary_frame_dir,
+    secondary_mode_chains,
 )
 from multiaxis_eci.analysis.human_placement import SECONDARY_DIR  # noqa: E402
-
 
 # Axis titles of exploration fits that borrow the flagship axes' content judgments
 # (1_curated/human_axis_content.csv): semicomp0 mode A, named by the user on 2026-10-08.
