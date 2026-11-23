@@ -1,6 +1,6 @@
 # Benchmarks by access class (canonical scope, curated exclusions applied)
 
-## public (61)
+## public (60)
 
 - APEX-Agents
 - ARC AI2
@@ -10,7 +10,6 @@
 - BioLP-bench
 - CAISI CVE-Bench
 - CAISI Cybench
-- CAISI SEC-Bench Pro
 - CL-bench
 - CL-bench Life
 - CTI-REALM
@@ -23,7 +22,7 @@
 - ExploitBench
 - FrontierSWE v2
 - GBAEval
-- GDP.pdf
+- GDP.pdf v1.1
 - GDPval
 - GPQA Diamond
 - GPQA Diamond Biology
@@ -77,7 +76,7 @@
 - Remote Labor Index
 - WeirdML v2
 
-## private (19)
+## private (16)
 
 - AISI CTF Suites - Apprentice
 - AISI CTF Suites - Expert
@@ -87,10 +86,7 @@
 - AISI Cyber Ranges - The Last Ones
 - CAISI CTF-Archive
 - CAISI CTF-Archive-Diamond
-- CAISI ExploitGym Userspace
-- CAISI OSS-Fuzz
 - CyScenarioBench
-- CyScenarioBench (Anthropic)
 - EBR-bench
 - Fiction.LiveBench
 - FrontierCode
