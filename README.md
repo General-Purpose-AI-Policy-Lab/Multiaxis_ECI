@@ -184,7 +184,7 @@ Whether the chains agree on those axes is a different question, with its own num
 - **The unordered canonical index splits.** Without the human tier order (a sensitivity fit), some chains settle in a second mode where MMLU, ARC (AI2) and GSM8K go flat and the Average Human rises above most tiers. The ordered index every analysis reads converges.
 - **Data.** We need more of it and of better quality, especially for the human baselines. The 6% fill rate is what forced the extra assumptions above.
 - **Benchmark-level scores.** We fit those rather than item-level answers, so the MIRT assumptions are not fully respected. The Rosetta Stone paper and the ECI have the same problem.
-- **Calibration.** The predictive intervals come out wider than the data requires (leave-one-out PIT variance 0.066 at K=4 against 0.083 for a calibrated model), which makes the model somewhat more conservative than it should be.
+- **Calibration.** The predictive intervals come out wider than the data requires (leave-one-out PIT variance 0.067 at K=4 on the selected mode against 0.083 for a calibrated model), which makes the model somewhat more conservative than it should be.
 
 ## Resources
 
