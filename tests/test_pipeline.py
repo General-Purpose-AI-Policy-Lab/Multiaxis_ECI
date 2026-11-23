@@ -3318,6 +3318,28 @@ class TestPipelineIdentity:
             else:
                 assert np.isnan(n[rows]).all(), b
 
+    def test_a_fit_reads_the_item_table_frozen_beside_its_trace(self, data, tmp_path,
+                                                                 monkeypatch):
+        # The flagship of data 20261118 was sampled before five benchmarks moved to items: its
+        # rebuilds must score it with the table it saw, frozen beside the trace.
+        from multiaxis_eci.analysis import fitspec
+        from multiaxis_eci.data import FITTED_N_ITEMS_NAME, N_ITEMS_FILE, load_binomial_n
+        monkeypatch.setattr(fitspec, "RESULTS_DIR", tmp_path)
+        spec = fitspec.FLAGSHIP
+        current = load_binomial_n(data)
+        assert np.array_equal(spec.binomial_n(data), current, equal_nan=True)  # nothing frozen
+        bench = list(data.blookup.sort_values("benchmark_idx")["benchmark"])
+        i = next(j for j in range(len(bench))
+                 if np.isfinite(current[data.bench_idx == j]).any())
+        table = pd.read_csv(N_ITEMS_FILE)
+        table.loc[table["benchmark"] == bench[i], "scoring"] = "continuous"
+        spec.results_dir.mkdir(parents=True)
+        table.to_csv(spec.results_dir / FITTED_N_ITEMS_NAME, index=False)
+        frozen = spec.binomial_n(data)
+        rows = data.bench_idx == i
+        assert np.isnan(frozen[rows]).all()
+        assert np.array_equal(frozen[~rows], current[~rows], equal_nan=True)
+
     def test_beta_binomial_logp_matches_scipy_and_keeps_beta_rows(self):
         import pytensor.tensor as pt
         from scipy.stats import beta as beta_dist

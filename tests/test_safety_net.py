@@ -437,7 +437,10 @@ class TestGoldenLogp:
     found in the 2026-08-31 pre-publication review. A data refresh re-pins
     them like the rest, at their perturbed point.
 
-    Last re-pinned on the 2026-11-18 data (pipeline 3a654fe, run 20261118). A legitimate
+    Last re-pinned on the 2026-11-18 data (pipeline 3a654fe, run 20261118). 2026-11-23: the
+    two goldens that read 1_curated/benchmark_n_items.csv (censored, beta_binomial) re-pinned
+    after five rate-scored benchmarks moved to items (fcea240); same scope (5,975 obs, 1,022
+    models, 103 benchmarks before the fit's drops), every other golden unchanged. A legitimate
     data refresh moves every value here:
     recompute all of them in one pass and re-pin together, never one at a time.
     """
@@ -462,7 +465,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         censor_eps=load_boundary_eps(data))),
-            -89623.217076, rtol=self.RTOL)
+            -89572.413431, rtol=self.RTOL)
 
     def test_mirt_k1_pt1_beta_binomial(self, data):
         """The default likelihood since 2026-10-01: Beta-binomial on the item-scored
@@ -472,7 +475,7 @@ class TestGoldenLogp:
         np.testing.assert_allclose(
             total_logp(build_mirt_model(data, K=1, loading_prior="pt1",
                                         binomial_n=load_binomial_n(data))),
-            -70328.365393, rtol=self.RTOL)
+            -68780.680605, rtol=self.RTOL)
 
     def test_mirt_k1_pt1(self, data):
         np.testing.assert_allclose(

@@ -170,6 +170,7 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
     raw = pd.read_csv(PROCESSED_FILE)
     data, floor_c, n_eff = spec.load_data(idata)
+    binomial_n = spec.binomial_n(data)   # the item table the fit saw (frozen beside its trace)
     view_all = prepare_fit(idata, data)
     K = view_all.K
     n_axes = min(axes or K, K)
@@ -206,9 +207,10 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
         bench = data.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
         mod = data.mlookup.sort_values("model_idx")["model"].tolist()
         # ── canonical per-fit figure set (shared with the dashboard) ──────────────
-        yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff)
+        yrep = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff,
+                                         binomial_n=binomial_n)
         mu = posterior_predictive_mirt(idata, data, floor_c=floor_c, n_eff=n_eff,
-                                       return_mean=True)
+                                       return_mean=True, binomial_n=binomial_n)
         gof = compute_gof(yrep, data, mu, pointwise_log_lik(idata))
         figs = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                  forecast=forecast, axis_titles=axis_titles,
@@ -283,7 +285,8 @@ def plot_fit(trace_path, *, idata=None, axes=None, out=None, thin: int = 1,
 
                 # 3_fit/fit.py fits the K=1 baseline with the same likelihood options.
                 pred_1d = posterior_predictive_mirt(idata_1d, data, floor_c=floor_c,
-                                                    n_eff=n_eff).mean(axis=0)
+                                                    n_eff=n_eff,
+                                                    binomial_n=binomial_n).mean(axis=0)
                 resid_kd = data.scores - gof.y_pred_mean
                 resid_1d = data.scores - pred_1d
                 hover = [f"{mod[m]} · {bench[b]}" for m, b in zip(data.model_idx, data.bench_idx)]

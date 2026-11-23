@@ -465,9 +465,18 @@ class FitSpec:
         return data, floor_c, (data.n_eff if self.known_se else None)
 
     def binomial_n(self, data):
-        """Per-observation item count for `build_mirt_model(binomial_n=)`, or None for a Beta fit."""
-        from multiaxis_eci.data import load_binomial_n
-        return load_binomial_n(data) if self.beta_binomial else None
+        """Per-observation item count for `build_mirt_model(binomial_n=)`, or None for a Beta fit.
+
+        Read from the item table frozen beside the trace (`data.FITTED_N_ITEMS_NAME`) when the fit
+        left one, else from the current `1_curated/benchmark_n_items.csv`: the flagship of data
+        20261118 was sampled before five rate-scored benchmarks moved to `items` (fcea240), and is
+        scored with the table it saw. `data` may be another scope of the same fit (its humans in,
+        `human_placement.human_scores`)."""
+        from multiaxis_eci.data import FITTED_N_ITEMS_NAME, load_binomial_n
+        if not self.beta_binomial:
+            return None
+        frozen = self.results_dir / FITTED_N_ITEMS_NAME
+        return load_binomial_n(data, frozen if frozen.exists() else None)
 
     # ── lazy posterior access ───────────────────────────────────────────────
     def open_posterior(self, keep=None, thin: int = 1, chains=None, path=None,

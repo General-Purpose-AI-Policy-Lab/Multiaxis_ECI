@@ -480,12 +480,15 @@ def render_fit(fit, data, raw, bench, mod):
     # Same rule for the known-SE noise split: the predictive Beta must carry the
     # per-cell instrument precision the fit used.
     n_eff = data.n_eff if fit["spec"].known_se else None
+    # ...and the item table it was sampled with (frozen beside its trace).
+    binomial_n = None if is_nc else fit["spec"].binomial_n(data)
     yrep = (posterior_predictive_mirt_nc(idata, data) if is_nc
             else posterior_predictive_mirt(idata, data, floor_c=floor_c,
-                                           n_eff=n_eff))
+                                           n_eff=n_eff, binomial_n=binomial_n))
     mu = (posterior_predictive_mirt_nc(idata, data, return_mean=True) if is_nc
           else posterior_predictive_mirt(idata, data, floor_c=floor_c,
-                                         n_eff=n_eff, return_mean=True))
+                                         n_eff=n_eff, return_mean=True,
+                                         binomial_n=binomial_n))
     gof = compute_gof(yrep, data, mu, pointwise_log_lik(idata))
     figures = build_fit_figures(view, gof, yrep, data, raw, bench, mod, idata,
                                 forecast=fit.get("forecast", False),

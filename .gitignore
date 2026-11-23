@@ -10,6 +10,8 @@ build/
 
 # PyMC / ArviZ trace files (large, regenerable) — all locations, any prefix
 **/*trace*.nc
+**/*trace*.nc.part-*
+**/SHA256SUMS
 
 # --stream-draws live stores: the same draws as the trace, plus the warmup
 # nutpie's store writes unconditionally. Thousands of chunk files each.

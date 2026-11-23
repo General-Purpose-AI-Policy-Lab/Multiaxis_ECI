@@ -136,7 +136,7 @@ def human_scores(spec) -> pd.DataFrame:
     names = data_h.mlookup.sort_values("model_idx")["model"].tolist()
     bench = data_h.blookup.sort_values("benchmark_idx")["benchmark"].tolist()
     i = np.where(np.asarray(data_h.is_human)[data_h.model_idx])[0]
-    bn = spec_h.binomial_n(data_h)
+    bn = spec.binomial_n(data_h)   # the fit's folder holds its frozen item table, not spec_h's
     n = (np.where(np.isfinite(bn[i]) & (bn[i] > 0), bn[i], 0.0) if bn is not None
          else np.zeros(len(i)))
     return pd.DataFrame({"tier": [names[data_h.model_idx[j]] for j in i],

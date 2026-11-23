@@ -1,0 +1,82 @@
+{
+  "confirmed": true,
+  "how": "User, 2026-11-23: names carried over from the 2026-10-19 flagship (user, 2026-10-21) to the selected mode C. Each axis of this frame matches the same-numbered named axis (median loadings, 102 common benchmarks, |corr| 0.975 / 0.899 / 0.922 / 0.934, same signs), and every signature benchmark is still among the axis's top 9 by share.",
+  "axes": {
+    "axis1": {
+      "title": "Scientific Knowledge & Reasoning",
+      "title_fr": "Connaissances et raisonnements scientifiques",
+      "signature": [
+        "OTIS Mock AIME 2024-2025",
+        "MMLU Chemistry",
+        "GPQA Main Chemistry"
+      ],
+      "top_benchmarks": [
+        "OTIS Mock AIME 2024-2025",
+        "GPQA Main Chemistry",
+        "MATH Level 5",
+        "GPQA Main Biology",
+        "GPQA Diamond Chemistry",
+        "MMLU Biology",
+        "SpireClimb",
+        "MMLU Pro Chemistry"
+      ]
+    },
+    "axis2": {
+      "title": "Agentic Capabilities & Programming",
+      "title_fr": "Capacités agentiques & Programmation",
+      "signature": [
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents"
+      ],
+      "top_benchmarks": [
+        "MirrorCode",
+        "PostTrainBench v1.1",
+        "OSWorld",
+        "SWE Atlas",
+        "APEX-Agents",
+        "DeepResearch Bench",
+        "MCP Atlas",
+        "DeepSWE"
+      ]
+    },
+    "axis3": {
+      "title": "Cyber Capabilities",
+      "title_fr": "Capacités cyber",
+      "signature": [
+        "CyScenarioBench",
+        "CyberGym",
+        "Cybench"
+      ],
+      "top_benchmarks": [
+        "CyScenarioBench",
+        "GBAEval",
+        "CyberGym",
+        "Furniture Assembly",
+        "Lech Mazur Writing",
+        "FrontierMath Erdos",
+        "EBR-bench",
+        "AISI Cyber Ranges - Cooling Tower"
+      ]
+    },
+    "axis4": {
+      "title": "Commonsense & Factual Knowledge",
+      "title_fr": "Sens commun & connaissances factuelles",
+      "signature": [
+        "OpenBookQA",
+        "ARC AI2",
+        "SimpleQA Verified"
+      ],
+      "top_benchmarks": [
+        "SimpleQA Verified",
+        "ARC AI2",
+        "OpenBookQA",
+        "HellaSwag",
+        "GDP.pdf v1.1",
+        "WinoGrande",
+        "SimpleBench",
+        "HLE Diamond"
+      ]
+    }
+  }
+}

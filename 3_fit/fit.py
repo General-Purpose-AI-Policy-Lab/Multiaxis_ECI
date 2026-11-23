@@ -728,6 +728,13 @@ def run_exploration(args, parser) -> None:
     results_dir.mkdir(parents=True, exist_ok=True)
     if spec.tag:
         print(f"  per-config folder: {results_dir}", flush=True)
+    # the item table this fit is sampled with, frozen beside its trace (data.FITTED_N_ITEMS_NAME)
+    # before anything reads it: a later edit of the curated table must not change the likelihood
+    # a rebuild scores this trace with (FitSpec.binomial_n)
+    import shutil
+
+    from multiaxis_eci.data import FITTED_N_ITEMS_NAME, N_ITEMS_FILE
+    shutil.copyfile(N_ITEMS_FILE, results_dir / FITTED_N_ITEMS_NAME)
 
     sample_kw = {
         **SAMPLE_KW,
